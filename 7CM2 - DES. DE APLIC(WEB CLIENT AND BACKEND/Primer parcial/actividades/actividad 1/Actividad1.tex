@@ -1,0 +1,156 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Actividad 1}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Aquí va el nombre del Alumno}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{mail@mail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Quelltext}
+
+
+\lstset{
+	language=Java,
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Conceptos}}
+
+\subsection{ \color{colorESCOM}{Concepto 1}}
+
+\begin{itemize}
+	\item  punto 1
+	\item  punto 2
+	\item  punto ...
+
+\end{itemize}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Desarrollo}}
+
+%################################################
+\subsection{
+	\textit{
+		\color{colorESCOM}{Nombre del archivo/ejemplo }
+	}
+}
+
+\begin{lstlisting}
+	// código aquí
+\end{lstlisting} \hfill
+
+{\bfseries\itshape\color{colorESCOM}{Algoritmo:}} Explicación del algoritmo.
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Resultados}}
+
+\subsection{	\color{colorESCOM}{Ejecución del Programa }}
+
+% Coloca tu imagen en la carpeta imagenes/ y descomenta este bloque:
+% \begin{figure}[H]
+% 	\includegraphics[scale=.54]{nombreImagen.png}
+% 	\centering \linebreak \linebreak
+% 	\caption{Descripción de la figura}
+% 	\label{img:nombreImagen}
+% \end{figure} \hfill
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Conclusión}}
+
+\color{colorIPN}{
+	\begin{flushright}
+		\textit{
+			Aquí va el nombre del Alumno
+		}
+	\end{flushright} \hfill \break
+}
+
+\pagebreak
+
+%################################################
+
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\nocite{*}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}
