@@ -1,0 +1,2348 @@
+<title>Del Monolito al Microservicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+
+:root{
+  --bg:#EDF0F4;
+  --surface:#FFFFFF;
+  --surface-2:#F5F7FA;
+  --ink:#141A22;
+  --ink-2:#4C5A6B;
+  --ink-3:#7A889A;
+  --line:#D3DAE3;
+  --line-2:#B4BFCC;
+  --accent:#1E4FCC;
+  --accent-ink:#1A44AE;
+  --accent-soft:#E3EAFB;
+  --warn:#8A5A06;
+  --warn-soft:#FAEFD9;
+  --ok:#14603E;
+  --ok-soft:#DCF0E5;
+  --stop:#93231C;
+  --stop-soft:#FAE5E2;
+  --code-bg:#F1F4F9;
+}
+
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1219;
+    --surface:#141B24;
+    --surface-2:#1A222D;
+    --ink:#E5EBF3;
+    --ink-2:#A4B1C1;
+    --ink-3:#7A8798;
+    --line:#26313D;
+    --line-2:#3A4757;
+    --accent:#82A2FF;
+    --accent-ink:#9DB6FF;
+    --accent-soft:#182640;
+    --warn:#DFB262;
+    --warn-soft:#2B2314;
+    --ok:#7FCFA5;
+    --ok-soft:#10281D;
+    --stop:#E89189;
+    --stop-soft:#2C1815;
+    --code-bg:#101720;
+  }
+}
+
+:root[data-theme="dark"]{
+  --bg:#0D1219;
+  --surface:#141B24;
+  --surface-2:#1A222D;
+  --ink:#E5EBF3;
+  --ink-2:#A4B1C1;
+  --ink-3:#7A8798;
+  --line:#26313D;
+  --line-2:#3A4757;
+  --accent:#82A2FF;
+  --accent-ink:#9DB6FF;
+  --accent-soft:#182640;
+  --warn:#DFB262;
+  --warn-soft:#2B2314;
+  --ok:#7FCFA5;
+  --ok-soft:#10281D;
+  --stop:#E89189;
+  --stop-soft:#2C1815;
+  --code-bg:#101720;
+}
+
+html{scroll-behavior:smooth;scroll-padding-top:2rem}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Serif",Georgia,"Times New Roman",serif;
+  font-size:17px;
+  line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3,h4,h5{font-family:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;font-weight:700;line-height:1.14;text-wrap:balance;margin:0}
+code,kbd,pre{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace}
+
+.progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:60;transition:width .1s linear}
+@media (prefers-reduced-motion:reduce){.progress{transition:none}}
+
+.masthead{
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  padding:clamp(2.5rem,7vw,5rem) 1.5rem clamp(2rem,4vw,3rem);
+}
+.masthead-in{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:1.5rem}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);
+}
+.masthead h1{font-size:clamp(2.6rem,7.5vw,5rem);letter-spacing:-.02em;max-width:16ch}
+.masthead h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:clamp(1.05rem,2.2vw,1.28rem);color:var(--ink-2);max-width:62ch;margin:0}
+.factbar{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  gap:1px;background:var(--line);border:1px solid var(--line);margin:.5rem 0 0;
+}
+.fact{background:var(--surface);padding:.9rem 1.1rem;display:flex;flex-direction:column;gap:.2rem}
+.fact dt{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.fact dd{margin:0;font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:1.02rem;color:var(--ink)}
+
+.shell{max-width:1180px;margin:0 auto;padding:0 1.5rem 6rem;display:grid;grid-template-columns:1fr;gap:2.5rem}
+@media(min-width:1000px){
+  .shell{grid-template-columns:250px minmax(0,1fr);gap:3.5rem;padding-top:3rem}
+}
+
+.toc-mobile{margin:2rem 0 0}
+.toc-mobile summary{
+  cursor:pointer;font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;
+  padding:.85rem 1.1rem;background:var(--surface);border:1px solid var(--line);
+  list-style:none;display:flex;justify-content:space-between;align-items:center;
+}
+.toc-mobile summary::-webkit-details-marker{display:none}
+.toc-mobile summary::after{content:"+";font-family:"IBM Plex Mono",monospace;color:var(--accent)}
+.toc-mobile[open] summary::after{content:"\2013"}
+.toc-mobile .toc-body{border:1px solid var(--line);border-top:none;background:var(--surface);padding:1rem}
+.toc-desk{display:none}
+@media(min-width:1000px){
+  .toc-mobile{display:none}
+  .toc-desk{display:block;position:sticky;top:2rem;max-height:calc(100vh - 4rem);overflow-y:auto;padding-right:.5rem}
+}
+.toc-title{font-family:"IBM Plex Mono",monospace;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--line)}
+.toc-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.1rem;font-family:"IBM Plex Sans Condensed",sans-serif;font-size:.93rem}
+.toc-list li{margin:0}
+.toc-list a{
+  display:flex;gap:.6rem;text-decoration:none;color:var(--ink-2);
+  padding:.3rem .5rem .3rem .7rem;border-left:2px solid transparent;line-height:1.35;
+}
+.toc-list a:hover{color:var(--accent);background:var(--accent-soft)}
+.toc-list a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.toc-list a.on{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc-list .num{font-family:"IBM Plex Mono",monospace;font-size:.76rem;color:var(--ink-3);flex:0 0 2.1rem;padding-top:.12rem}
+.toc-list a.on .num{color:var(--accent)}
+.toc-grp{font-family:"IBM Plex Mono",monospace;font-size:.63rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:1.3rem 0 .35rem .7rem}
+
+main{min-width:0}
+.part{border-top:2px solid var(--ink);padding-top:1rem;margin:5rem 0 2rem}
+.part:first-child{margin-top:1.5rem}
+.part-num{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.4rem}
+.part h2{font-size:clamp(1.9rem,4vw,2.7rem);letter-spacing:-.015em}
+.part-lede{color:var(--ink-2);max-width:64ch;margin:.8rem 0 0}
+
+section{scroll-margin-top:1.5rem}
+h3{font-size:clamp(1.32rem,2.6vw,1.7rem);margin:3rem 0 .9rem;letter-spacing:-.01em;display:flex;gap:.7rem;align-items:baseline}
+h3 .h-num{font-family:"IBM Plex Mono",monospace;font-size:.82rem;font-weight:500;color:var(--accent);flex:none;padding-top:.15rem}
+h4{font-size:1.12rem;margin:2.1rem 0 .6rem;color:var(--ink)}
+h5{font-size:.86rem;margin:1.6rem 0 .5rem;font-weight:600;color:var(--ink-2);font-family:"IBM Plex Mono",monospace;letter-spacing:.05em;text-transform:uppercase}
+p{margin:0 0 1.05rem;max-width:70ch}
+strong{font-weight:600;color:var(--ink)}
+a{color:var(--accent-ink);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+ul,ol{margin:0 0 1.15rem;padding-left:1.35rem;max-width:70ch}
+li{margin-bottom:.5rem}
+li::marker{color:var(--ink-3)}
+.tight li{margin-bottom:.22rem}
+
+code{background:var(--code-bg);border:1px solid var(--line);padding:.08em .38em;font-size:.85em}
+pre{
+  background:var(--code-bg);border:1px solid var(--line);border-left:3px solid var(--accent);
+  padding:1.05rem 1.2rem;overflow-x:auto;font-size:.81rem;line-height:1.6;margin:0 0 1.3rem;
+}
+pre code{background:none;border:none;padding:0;font-size:1em}
+.pre-label{
+  font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 .4rem;display:block;
+}
+
+.box{border:1px solid var(--line);background:var(--surface);padding:1.1rem 1.3rem;margin:1.6rem 0;max-width:70ch}
+.box > :last-child{margin-bottom:0}
+.box-tag{
+  font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.15em;text-transform:uppercase;
+  font-weight:600;display:block;margin-bottom:.5rem;
+}
+.box p,.box li{font-size:.94rem}
+.box.prog{background:var(--surface-2);border-color:var(--line);border-left:3px solid var(--ink-2)}
+.box.prog .box-tag{color:var(--ink-2)}
+.box.prog p{font-family:"IBM Plex Mono",monospace;font-size:.81rem;line-height:1.7;color:var(--ink-2)}
+.box.exam{background:var(--accent-soft);border-color:transparent;border-left:3px solid var(--accent)}
+.box.exam .box-tag{color:var(--accent-ink)}
+.box.trap{background:var(--stop-soft);border-color:transparent;border-left:3px solid var(--stop)}
+.box.trap .box-tag{color:var(--stop)}
+.box.proj{background:var(--ok-soft);border-color:transparent;border-left:3px solid var(--ok)}
+.box.proj .box-tag{color:var(--ok)}
+.box.note{background:var(--warn-soft);border-color:transparent;border-left:3px solid var(--warn)}
+.box.note .box-tag{color:var(--warn)}
+
+.tw{overflow-x:auto;margin:1.6rem 0;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:540px}
+th,td{text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{
+  font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;background:var(--surface-2);
+}
+tbody tr:last-child td{border-bottom:none}
+td.k{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600}
+.nums{font-variant-numeric:tabular-nums}
+
+figure{margin:2rem 0;max-width:100%}
+.fig-body{background:var(--surface);border:1px solid var(--line);padding:1.4rem;overflow-x:auto}
+figure svg{display:block;margin:0 auto;max-width:100%;height:auto}
+figcaption{
+  font-family:"IBM Plex Mono",monospace;font-size:.71rem;line-height:1.6;color:var(--ink-3);
+  margin-top:.7rem;max-width:70ch;
+}
+.s-surface{fill:var(--surface)}
+.s-s2{fill:var(--surface-2)}
+.s-line{stroke:var(--line-2);fill:none;stroke-width:1.2}
+.s-acc{stroke:var(--accent);fill:none;stroke-width:1.6}
+.s-accf{fill:var(--accent)}
+.s-t{fill:var(--ink);font-family:"IBM Plex Sans Condensed",sans-serif;font-size:13px;font-weight:600}
+.s-ts{fill:var(--ink-2);font-family:"IBM Plex Mono",monospace;font-size:9.5px}
+.s-ta{fill:var(--accent);font-family:"IBM Plex Mono",monospace;font-size:9.5px;font-weight:500}
+
+.check{list-style:none;padding:0;margin:1.4rem 0;max-width:70ch;display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line)}
+.check li{margin:0;background:var(--surface);padding:.75rem 1rem;display:flex;gap:.85rem;align-items:flex-start;font-size:.93rem}
+.check .cb{flex:none;width:1rem;height:1rem;border:1.5px solid var(--line-2);margin-top:.35rem}
+.check b{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;color:var(--ink)}
+.check span{color:var(--ink-2)}
+
+.qa-wrap{display:flex;flex-direction:column;gap:0;margin:1.5rem 0;max-width:70ch}
+.qa{border:1px solid var(--line);background:var(--surface);margin:0 0 -1px}
+.qa summary{
+  cursor:pointer;padding:.85rem 1.1rem;list-style:none;display:flex;gap:.8rem;align-items:flex-start;
+  font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;font-size:1rem;
+}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary:hover{background:var(--surface-2)}
+.qa summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.qa summary .qn{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--accent);flex:none;padding-top:.2rem}
+.qa[open] summary{border-bottom:1px solid var(--line);background:var(--surface-2)}
+.qa-a{padding:1rem 1.1rem 1.1rem 3rem;font-size:.93rem}
+.qa-a > :last-child{margin-bottom:0}
+
+.gloss{margin:1.5rem 0;border-top:1px solid var(--line);max-width:70ch}
+.gloss > div{border-bottom:1px solid var(--line);padding:.75rem 0;display:grid;grid-template-columns:1fr;gap:.15rem}
+@media(min-width:640px){.gloss > div{grid-template-columns:13rem 1fr;gap:1.2rem}}
+.gloss dt{font-family:"IBM Plex Sans Condensed",sans-serif;font-weight:600;color:var(--ink)}
+.gloss dd{margin:0;font-size:.91rem;color:var(--ink-2)}
+
+.kicker{font-family:"IBM Plex Mono",monospace;font-size:.67rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);margin:2.6rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid var(--line);max-width:70ch}
+.footer{border-top:2px solid var(--ink);margin-top:5rem;padding-top:1.2rem;font-family:"IBM Plex Mono",monospace;font-size:.73rem;line-height:1.7;color:var(--ink-3);max-width:70ch}
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:.67rem;letter-spacing:.06em;padding:.12rem .5rem;border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap}
+</style>
+
+<div class="progress" id="prog"></div>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <span class="eyebrow">IPN &middot; ESCOM &middot; ISC Plan 2020 &middot; Semestre VII &middot; C704</span>
+    <h1>Del monolito al <em>microservicio</em></h1>
+    <p class="lede">Gu&iacute;a de estudio para la <strong>Unidad I: Arquitecturas de desarrollo web</strong> de <em>Web client and backend development frameworks</em>, m&aacute;s todo lo que el programa da por sabido antes del primer d&iacute;a de clase. Escrita para leerse completa una vez y consultarse por partes despu&eacute;s.</p>
+    <dl class="factbar">
+      <div class="fact"><dt>Unidad tem&aacute;tica</dt><dd>I de V</dd></div>
+      <div class="fact"><dt>Horas teor&iacute;a</dt><dd class="nums">15.0</dd></div>
+      <div class="fact"><dt>Horas pr&aacute;ctica</dt><dd class="nums">1.5</dd></div>
+      <div class="fact"><dt>Aprendizaje aut&oacute;nomo</dt><dd class="nums">5.0</dd></div>
+      <div class="fact"><dt>Competencia</dt><dd>Dise&ntilde;ar con microservicios</dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="shell">
+
+<aside>
+  <details class="toc-mobile">
+    <summary>&Iacute;ndice de la gu&iacute;a</summary>
+    <div class="toc-body">
+      <ul class="toc-list" id="tocM"></ul>
+    </div>
+  </details>
+  <nav class="toc-desk" aria-label="&Iacute;ndice">
+    <p class="toc-title">&Iacute;ndice</p>
+    <ul class="toc-list" id="tocD"></ul>
+  </nav>
+</aside>
+
+<main>
+
+<!-- ============ PARTE 0 ============ -->
+<div class="part" id="p0">
+  <span class="part-num">Parte 0</span>
+  <h2>C&oacute;mo leer esta gu&iacute;a</h2>
+  <p class="part-lede">Qu&eacute; contiene, en qu&eacute; orden usarla y cu&aacute;l es la &uacute;nica idea que amarra las seis secciones de la Unidad I.</p>
+</div>
+
+<section id="s-mapa">
+<h3><span class="h-num">0.1</span><span>El mapa del terreno</span></h3>
+
+<p>La Unidad I es, con diferencia, la m&aacute;s pesada del programa en horas de teor&iacute;a: <strong>15 horas con docente frente a 1.5 de pr&aacute;ctica</strong>. Compara eso con la Unidad II (13.5 teor&iacute;a / 9 pr&aacute;ctica) o la Unidad V (4.5 / 4.5). El mensaje est&aacute; en los n&uacute;meros: esta unidad casi no se programa, se <em>entiende</em>. Y como no se programa, es donde cae la mayor parte de la evaluaci&oacute;n escrita.</p>
+
+<p>Ese desequilibrio genera una trampa muy repetida: el alumno t&iacute;pico de s&eacute;ptimo semestre ya sabe escribir c&oacute;digo, as&iacute; que ojea la Unidad I, piensa &laquo;esto es puro dibujito de cajas&raquo; y se salta al backend. Luego llega el examen y descubre que le piden distinguir arquitectura de cebolla de arquitectura hexagonal, o justificar por qu&eacute; un m&oacute;dulo no puede importar a otro. Peor a&uacute;n: llega al proyecto final con una estructura de carpetas improvisada que ya no puede reorganizar sin romperlo todo.</p>
+
+<div class="box prog">
+  <span class="box-tag">Del programa oficial</span>
+  <p>UNIDAD DE COMPETENCIA &mdash; &laquo;Dise&ntilde;a una aplicaci&oacute;n web con base en la arquitectura de microservicios.&raquo;</p>
+</div>
+
+<p>F&iacute;jate en el verbo: <strong>dise&ntilde;a</strong>, no &laquo;implementa&raquo;. La unidad te pide producir un dise&ntilde;o defendible &mdash; diagramas, l&iacute;mites entre m&oacute;dulos, justificaci&oacute;n de por qu&eacute; partiste el sistema donde lo partiste. La implementaci&oacute;n viene en las unidades II a V.</p>
+
+<h4>Las seis secciones y por qu&eacute; est&aacute;n en ese orden</h4>
+
+<p>El programa no lista las arquitecturas al azar. Van de menos a m&aacute;s separaci&oacute;n, y cada una nace de un problema que la anterior no resolvi&oacute;:</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Punto</th><th>Arquitectura</th><th>El problema que viene a resolver</th></tr></thead>
+<tbody>
+<tr><td class="k nums">1.1</td><td class="k">Principios comunes</td><td>El vocabulario y los criterios que se aplican a todas las dem&aacute;s</td></tr>
+<tr><td class="k nums">1.2</td><td class="k">Monol&iacute;tica</td><td>El punto de partida: todo junto. Simple, y por eso mismo se degrada</td></tr>
+<tr><td class="k nums">1.3</td><td class="k">N&ndash;capas</td><td>Poner orden dentro del monolito separando responsabilidades t&eacute;cnicas</td></tr>
+<tr><td class="k nums">1.4</td><td class="k">Cebolla / limpia</td><td>Las n&ndash;capas dejan el negocio colgando de la base de datos. Se invierte</td></tr>
+<tr><td class="k nums">1.5</td><td class="k">Hexagonal</td><td>La misma inversi&oacute;n, expresada como puertos y adaptadores sim&eacute;tricos</td></tr>
+<tr><td class="k nums">1.6</td><td class="k">Microservicios</td><td>La separaci&oacute;n deja de ser l&oacute;gica y se vuelve f&iacute;sica: procesos distintos</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Si puedes contar esa historia &mdash; qu&eacute; falla en cada nivel y qu&eacute; propone el siguiente &mdash; ya entendiste la unidad. Todo lo dem&aacute;s son detalles que se cuelgan de ese esqueleto.</p>
+</section>
+
+<section id="s-hilo">
+<h3><span class="h-num">0.2</span><span>La &uacute;nica pregunta que hay que traer en la cabeza</span></h3>
+
+<p>Hay una sola pregunta que atraviesa las seis secciones, y si la traes presente todo lo dem&aacute;s se acomoda solo:</p>
+
+<div class="box exam">
+  <span class="box-tag">La pregunta</span>
+  <p style="font-size:1.15rem;font-family:'IBM Plex Sans Condensed',sans-serif;font-weight:600;line-height:1.3">&iquest;Qui&eacute;n depende de qui&eacute;n, y hacia d&oacute;nde apuntan las flechas?</p>
+</div>
+
+<p>Toda esta unidad es una discusi&oacute;n sobre la <strong>direcci&oacute;n de las dependencias</strong>. Un m&oacute;dulo A depende de B cuando A no compila, no arranca o no se puede probar sin B. Esa flecha, dibujada de A hacia B, es la unidad m&iacute;nima de an&aacute;lisis arquitect&oacute;nico.</p>
+
+<ul>
+<li>En <strong>n&ndash;capas</strong>, las flechas apuntan hacia abajo: la interfaz de usuario depende del negocio, y el negocio depende de la base de datos. La consecuencia es que si cambias de base de datos, el negocio se entera.</li>
+<li>En <strong>cebolla y hexagonal</strong>, las flechas apuntan hacia adentro: todo depende del dominio y el dominio no depende de nada. La consecuencia es que puedes cambiar de base de datos sin tocar una sola regla de negocio.</li>
+<li>En <strong>microservicios</strong>, las flechas dejan de ser importaciones de c&oacute;digo y se convierten en llamadas de red. La consecuencia es que ahora las dependencias pueden fallar a mitad de camino, y hay que dise&ntilde;ar para eso.</li>
+</ul>
+
+<p>Cuando el profesor dibuje cajas en el pizarr&oacute;n, no memorices las cajas. Pregunta d&oacute;nde est&aacute;n las flechas y hacia d&oacute;nde apuntan. Es literalmente la respuesta a la mitad de las preguntas de examen posibles.</p>
+</section>
+
+<section id="s-uso">
+<h3><span class="h-num">0.3</span><span>C&oacute;mo usar el documento</span></h3>
+
+<p>La <strong>Parte 1</strong> es el repaso de prerrequisitos: lo que el programa da por adquirido porque supuestamente lo viste en <em>Tecnolog&iacute;as para el desarrollo de aplicaciones web</em> y en <em>Software quality assurance and design patterns</em>. L&eacute;ela antes de que empiece el semestre; es lo que responde literalmente a &laquo;qu&eacute; debo venir estudiado&raquo;.</p>
+
+<p>La <strong>Parte 2</strong> es la Unidad I completa, punto por punto, siguiendo la numeraci&oacute;n oficial del programa. Est&aacute; escrita para leerse en orden la primera vez.</p>
+
+<p>Las <strong>Partes 3 a 6</strong> son de consulta: c&oacute;mo aterrizar todo esto en tu proyecto del semestre, un banco de preguntas de examen con respuestas modelo, un glosario y un plan de estudio de dos semanas.</p>
+
+<p>A lo largo del texto hay cuatro tipos de recuadro, y cada uno significa algo distinto:</p>
+
+<div class="box prog"><span class="box-tag">Del programa oficial</span><p>Cita textual del PDF del programa. Es lo que el profesor tiene que cubrir por reglamento.</p></div>
+<div class="box exam"><span class="box-tag">Para el examen</span><p>Algo que se pregunta con mucha frecuencia, o una definici&oacute;n que conviene poder soltar de memoria.</p></div>
+<div class="box trap"><span class="box-tag">Trampa com&uacute;n</span><p>Un error de comprensi&oacute;n que casi todos cometen. Vale la pena leerlos aunque saltes el resto.</p></div>
+<div class="box proj"><span class="box-tag">En tu proyecto</span><p>C&oacute;mo se traduce el concepto en una decisi&oacute;n concreta del proyecto que vas a entregar.</p></div>
+</section>
+
+<!-- ============ PARTE 1 ============ -->
+<div class="part" id="p1">
+  <span class="part-num">Parte 1</span>
+  <h2>Lo que debes venir estudiado</h2>
+  <p class="part-lede">El programa declara esta materia consecuente de <em>Tecnolog&iacute;as para el desarrollo de aplicaciones web</em> y <em>Software quality assurance and design patterns</em>. Nadie va a repasar esto en clase. Aqu&iacute; est&aacute; lo que de verdad se usa, ordenado por cu&aacute;nto duele no saberlo.</p>
+</div>
+
+<section id="s-http">
+<h3><span class="h-num">1&middot;A</span><span>HTTP a fondo</span></h3>
+
+<p>Es el prerrequisito n&uacute;mero uno y el que m&aacute;s gente cree dominar sin dominarlo. Las unidades II y III son pr&aacute;cticamente un curso de HTTP aplicado, y la Unidad I ya lo asume cuando habla de comunicaci&oacute;n entre servicios.</p>
+
+<h4>El modelo mental correcto</h4>
+
+<p>HTTP es un protocolo <strong>petici&oacute;n&ndash;respuesta</strong> y <strong>sin estado</strong>. Sin estado significa que el servidor no recuerda nada de una petici&oacute;n a la siguiente: cada petici&oacute;n debe traer consigo todo lo necesario para ser atendida. Las sesiones, las cookies y los tokens existen precisamente porque HTTP no recuerda &mdash; son maneras de simular memoria encima de un protocolo amn&eacute;sico.</p>
+
+<p>Una petici&oacute;n tiene cuatro partes: <strong>m&eacute;todo</strong> (el verbo), <strong>URL</strong> (qu&eacute; recurso), <strong>cabeceras</strong> (metadatos) y <strong>cuerpo</strong> (los datos, opcional). Una respuesta tiene tres: <strong>c&oacute;digo de estado</strong>, <strong>cabeceras</strong> y <strong>cuerpo</strong>.</p>
+
+<pre><span class="pre-label">Petici&oacute;n HTTP cruda</span><code>POST /api/v1/productos HTTP/1.1
+Host: api.miapp.com
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Accept: application/json
+
+{"nombre":"Teclado mec&aacute;nico","precio":1299.00,"stock":15}</code></pre>
+
+<pre><span class="pre-label">Respuesta HTTP cruda</span><code>HTTP/1.1 201 Created
+Content-Type: application/json
+Location: /api/v1/productos/842
+
+{"id":842,"nombre":"Teclado mec&aacute;nico","precio":1299.00,"stock":15}</code></pre>
+
+<h4>M&eacute;todos: seguridad e idempotencia</h4>
+
+<p>Esta tabla se pregunta en examen casi con seguridad. <strong>Seguro</strong> significa que no modifica el estado del servidor. <strong>Idempotente</strong> significa que ejecutarlo N veces deja el sistema igual que ejecutarlo una vez.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>M&eacute;todo</th><th>Prop&oacute;sito</th><th>Seguro</th><th>Idempotente</th><th>Cuerpo</th></tr></thead>
+<tbody>
+<tr><td class="k">GET</td><td>Obtener un recurso</td><td>S&iacute;</td><td>S&iacute;</td><td>No</td></tr>
+<tr><td class="k">POST</td><td>Crear un recurso subordinado</td><td>No</td><td><strong>No</strong></td><td>S&iacute;</td></tr>
+<tr><td class="k">PUT</td><td>Reemplazar un recurso completo</td><td>No</td><td>S&iacute;</td><td>S&iacute;</td></tr>
+<tr><td class="k">PATCH</td><td>Modificar parcialmente</td><td>No</td><td>Depende</td><td>S&iacute;</td></tr>
+<tr><td class="k">DELETE</td><td>Eliminar un recurso</td><td>No</td><td>S&iacute;</td><td>No</td></tr>
+<tr><td class="k">HEAD</td><td>Como GET pero sin cuerpo</td><td>S&iacute;</td><td>S&iacute;</td><td>No</td></tr>
+<tr><td class="k">OPTIONS</td><td>Consultar capacidades (CORS)</td><td>S&iacute;</td><td>S&iacute;</td><td>No</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p>&laquo;&iquest;Por qu&eacute; DELETE es idempotente si la segunda vez devuelve 404?&raquo; Porque idempotencia habla del <strong>estado del servidor</strong>, no del c&oacute;digo de respuesta. Despu&eacute;s de uno o de cinco DELETE al mismo recurso, el recurso est&aacute; borrado. El estado final es id&eacute;ntico. La respuesta puede diferir.</p>
+</div>
+
+<h4>C&oacute;digos de estado</h4>
+
+<p>Apr&eacute;ndete las familias y unos quince c&oacute;digos concretos. El error m&aacute;s com&uacute;n en pr&aacute;cticas es devolver <code>200 OK</code> para absolutamente todo, incluyendo errores, con un <code>{"error": "..."}</code> en el cuerpo. Eso rompe REST y te lo van a marcar.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Familia</th><th>Significado</th><th>Los que debes conocer</th></tr></thead>
+<tbody>
+<tr><td class="k nums">1xx</td><td>Informativo</td><td>100 Continue, 101 Switching Protocols (WebSockets)</td></tr>
+<tr><td class="k nums">2xx</td><td>&Eacute;xito</td><td><strong>200</strong> OK, <strong>201</strong> Created, 202 Accepted, <strong>204</strong> No Content</td></tr>
+<tr><td class="k nums">3xx</td><td>Redirecci&oacute;n</td><td>301 Moved Permanently, 302 Found, <strong>304</strong> Not Modified</td></tr>
+<tr><td class="k nums">4xx</td><td>Error del cliente</td><td><strong>400</strong> Bad Request, <strong>401</strong> Unauthorized, <strong>403</strong> Forbidden, <strong>404</strong> Not Found, 405 Method Not Allowed, 409 Conflict, 422 Unprocessable Entity, 429 Too Many Requests</td></tr>
+<tr><td class="k nums">5xx</td><td>Error del servidor</td><td><strong>500</strong> Internal Server Error, 502 Bad Gateway, <strong>503</strong> Service Unavailable, 504 Gateway Timeout</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box trap">
+  <span class="box-tag">Trampa com&uacute;n</span>
+  <p><strong>401 no es 403.</strong> <code>401 Unauthorized</code> significa &laquo;no s&eacute; qui&eacute;n eres, identif&iacute;cate&raquo; &mdash; falta o es inv&aacute;lida la credencial. <code>403 Forbidden</code> significa &laquo;s&eacute; perfectamente qui&eacute;n eres y no tienes permiso&raquo; &mdash; la credencial es v&aacute;lida pero no alcanza. El nombre del 401 est&aacute; mal puesto hist&oacute;ricamente: deber&iacute;a llamarse <em>Unauthenticated</em>.</p>
+</div>
+
+<h4>Cabeceras que vas a usar todo el semestre</h4>
+
+<ul class="tight">
+<li><code>Content-Type</code> &mdash; qu&eacute; formato lleva el cuerpo que env&iacute;o (<code>application/json</code>, <code>multipart/form-data</code>).</li>
+<li><code>Accept</code> &mdash; qu&eacute; formato quiero de vuelta. Base de la negociaci&oacute;n de contenido.</li>
+<li><code>Authorization</code> &mdash; la credencial. <code>Bearer &lt;token&gt;</code> o <code>Basic &lt;base64&gt;</code>.</li>
+<li><code>Location</code> &mdash; d&oacute;nde qued&oacute; el recurso reci&eacute;n creado. Acompa&ntilde;a al 201.</li>
+<li><code>Cache-Control</code>, <code>ETag</code>, <code>If-None-Match</code> &mdash; cach&eacute; y peticiones condicionales.</li>
+<li><code>Access-Control-Allow-Origin</code> y familia &mdash; CORS. Vuelve en el punto 3.3.2 del programa.</li>
+<li><code>Set-Cookie</code> / <code>Cookie</code> &mdash; sesiones. Vuelve en 2.6.1.</li>
+</ul>
+
+<div class="box note">
+  <span class="box-tag">C&oacute;mo estudiarlo</span>
+  <p>Abre las herramientas de desarrollador del navegador, pesta&ntilde;a <strong>Network</strong>, entra a cualquier sitio y lee peticiones reales durante media hora. Mira m&eacute;todo, estado, cabeceras y cuerpo. Media hora ah&iacute; ense&ntilde;a m&aacute;s HTTP que tres cap&iacute;tulos de libro.</p>
+</div>
+</section>
+
+<section id="s-poo">
+<h3><span class="h-num">1&middot;B</span><span>POO y SOLID</span></h3>
+
+<p>Aqu&iacute; est&aacute; la llave de toda la Unidad I. Las arquitecturas de cebolla y hexagonal <strong>son</strong> el principio de inversi&oacute;n de dependencias aplicado a nivel de sistema completo. Si SOLID te suena a acr&oacute;nimo que memorizaste para un examen, los puntos 1.4 y 1.5 te van a parecer misticismo.</p>
+
+<h4>Los cuatro pilares, en la versi&oacute;n que importa</h4>
+
+<ul>
+<li><strong>Encapsulamiento</strong> &mdash; el objeto esconde c&oacute;mo hace las cosas y expone qu&eacute; puede hacer. Arquitect&oacute;nicamente: un m&oacute;dulo publica una interfaz peque&ntilde;a y esconde todo lo dem&aacute;s.</li>
+<li><strong>Abstracci&oacute;n</strong> &mdash; trabajar con el concepto, no con la implementaci&oacute;n. Programar contra <code>Repositorio</code> y no contra <code>RepositorioPostgres</code>.</li>
+<li><strong>Herencia</strong> &mdash; reutilizaci&oacute;n por especializaci&oacute;n. &Uacute;til, pero la regla moderna es <em>preferir composici&oacute;n sobre herencia</em>.</li>
+<li><strong>Polimorfismo</strong> &mdash; el mismo mensaje produce comportamientos distintos seg&uacute;n el objeto que lo recibe. Es el mecanismo t&eacute;cnico que hace posible cambiar de base de datos sin tocar el negocio.</li>
+</ul>
+
+<h4>SOLID, con el enfoque arquitect&oacute;nico</h4>
+
+<div class="tw">
+<table>
+<thead><tr><th>Letra</th><th>Principio</th><th>Qu&eacute; significa</th><th>D&oacute;nde reaparece en la unidad</th></tr></thead>
+<tbody>
+<tr><td class="k">S</td><td class="k">Responsabilidad &uacute;nica</td><td>Una clase debe tener una sola raz&oacute;n para cambiar</td><td>C&oacute;mo se separan capas y c&oacute;mo se parten microservicios</td></tr>
+<tr><td class="k">O</td><td class="k">Abierto/cerrado</td><td>Abierto a extensi&oacute;n, cerrado a modificaci&oacute;n</td><td>A&ntilde;adir un adaptador nuevo sin tocar el n&uacute;cleo</td></tr>
+<tr><td class="k">L</td><td class="k">Sustituci&oacute;n de Liskov</td><td>Un subtipo debe poder usarse donde se espera el tipo base</td><td>Cambiar el repositorio real por uno falso en pruebas</td></tr>
+<tr><td class="k">I</td><td class="k">Segregaci&oacute;n de interfaces</td><td>Muchas interfaces peque&ntilde;as, no una gigante</td><td>Definici&oacute;n de puertos en arquitectura hexagonal</td></tr>
+<tr><td class="k">D</td><td class="k">Inversi&oacute;n de dependencias</td><td>Depender de abstracciones, no de concreciones</td><td><strong>Es el motor de 1.4, 1.5 y buena parte de 1.6</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Inversi&oacute;n de dependencias, con c&oacute;digo</h4>
+
+<p>Esto merece que lo veas escrito, porque es exactamente el salto entre el punto 1.3 y el 1.4 del programa.</p>
+
+<pre><span class="pre-label">Sin inversi&oacute;n &mdash; el negocio depende de la base de datos</span><code>// servicio de negocio
+import { PostgresClient } from "../db/postgres.js";
+
+export class ServicioPedidos {
+  constructor() {
+    this.db = new PostgresClient();   // acoplado a Postgres
+  }
+  async confirmar(idPedido) {
+    const filas = await this.db.query(
+      "SELECT * FROM pedidos WHERE id = $1", [idPedido]
+    );
+    // ... regla de negocio mezclada con SQL
+  }
+}</code></pre>
+
+<p>Problemas: no puedes probar <code>ServicioPedidos</code> sin una base de datos Postgres levantada; si migras a MongoDB reescribes la clase; y una regla de negocio (&laquo;confirmar un pedido&raquo;) qued&oacute; enredada con detalles de almacenamiento.</p>
+
+<pre><span class="pre-label">Con inversi&oacute;n &mdash; la base de datos depende del negocio</span><code>// dominio/RepositorioPedidos.js  &mdash;  la ABSTRACCI&Oacute;N vive en el dominio
+export class RepositorioPedidos {
+  async porId(id)      { throw new Error("no implementado"); }
+  async guardar(pedido) { throw new Error("no implementado"); }
+}
+
+// dominio/ServicioPedidos.js  &mdash;  no importa nada de infraestructura
+export class ServicioPedidos {
+  constructor(repositorio) {      // se lo inyectan
+    this.repositorio = repositorio;
+  }
+  async confirmar(idPedido) {
+    const pedido = await this.repositorio.porId(idPedido);
+    pedido.confirmar();           // la regla vive en la entidad
+    await this.repositorio.guardar(pedido);
+    return pedido;
+  }
+}
+
+// infraestructura/RepositorioPedidosPostgres.js  &mdash;  IMPLEMENTA la abstracci&oacute;n
+import { RepositorioPedidos } from "../dominio/RepositorioPedidos.js";
+
+export class RepositorioPedidosPostgres extends RepositorioPedidos {
+  constructor(cliente) { super(); this.cliente = cliente; }
+  async porId(id) { /* SQL aqu&iacute; */ }
+  async guardar(p)  { /* SQL aqu&iacute; */ }
+}</code></pre>
+
+<p>Ahora la flecha de dependencia se invirti&oacute;: <code>infraestructura</code> importa de <code>dominio</code>, y <code>dominio</code> no importa de nadie. Puedes probar <code>ServicioPedidos</code> pas&aacute;ndole un repositorio falso en memoria, y puedes cambiar Postgres por Mongo escribiendo una clase nueva sin tocar una l&iacute;nea del negocio.</p>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p>Si te piden explicar la arquitectura de cebolla o la hexagonal y no mencionas inversi&oacute;n de dependencias, la respuesta est&aacute; incompleta por definici&oacute;n. Las dos <em>son</em> ese principio escalado a nivel de sistema.</p>
+</div>
+</section>
+
+<section id="s-patrones">
+<h3><span class="h-num">1&middot;C</span><span>Patrones de dise&ntilde;o que se usan de verdad</span></h3>
+
+<p>De los veintitr&eacute;s patrones GoF, en esta materia se usan un pu&ntilde;ado una y otra vez. Estos son los que conviene traer frescos, con el matiz de para qu&eacute; sirven <em>aqu&iacute;</em>.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Patr&oacute;n</th><th>Qu&eacute; hace</th><th>D&oacute;nde aparece en la materia</th></tr></thead>
+<tbody>
+<tr><td class="k">Repository</td><td>Abstrae el acceso a datos como si fuera una colecci&oacute;n en memoria</td><td>Punto 1.3.1 y 1.4.3. El patr&oacute;n central de la unidad</td></tr>
+<tr><td class="k">DAO</td><td>Encapsula operaciones sobre una tabla concreta</td><td>Capa de acceso a datos. Emparentado con Repository, no id&eacute;ntico</td></tr>
+<tr><td class="k">Adapter</td><td>Traduce una interfaz a otra que el cliente espera</td><td>Punto 1.5.4. Le da nombre a media arquitectura hexagonal</td></tr>
+<tr><td class="k">DTO</td><td>Objeto plano para transportar datos entre capas o procesos</td><td>Fronteras entre capas y cuerpos JSON de la API</td></tr>
+<tr><td class="k">Facade</td><td>Una interfaz simple sobre un subsistema complejo</td><td>Servicios de aplicaci&oacute;n, API Gateway</td></tr>
+<tr><td class="k">Strategy</td><td>Familia de algoritmos intercambiables en tiempo de ejecuci&oacute;n</td><td>Pol&iacute;ticas de negocio, m&eacute;todos de pago, esquemas de autenticaci&oacute;n</td></tr>
+<tr><td class="k">Factory</td><td>Crear objetos sin acoplarse a la clase concreta</td><td>Construcci&oacute;n de adaptadores seg&uacute;n configuraci&oacute;n</td></tr>
+<tr><td class="k">Observer</td><td>Notificar cambios a suscriptores</td><td>Comunicaci&oacute;n por eventos entre microservicios (1.6.4)</td></tr>
+<tr><td class="k">Singleton</td><td>Una &uacute;nica instancia global</td><td>Pools de conexi&oacute;n. &Uacute;salo poco: complica las pruebas</td></tr>
+<tr><td class="k">Proxy</td><td>Intermediario que controla el acceso</td><td>API Gateway, sidecars, carga perezosa en ORM</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Repository vs DAO: la distinci&oacute;n que preguntan</h4>
+
+<p>Se confunden constantemente y no son lo mismo. Un <strong>DAO</strong> es una abstracci&oacute;n sobre <em>la tabla</em>: <code>UsuarioDAO</code> tiene <code>insertar</code>, <code>actualizarPorId</code>, <code>borrarPorId</code>, y habla el lenguaje de la base de datos. Un <strong>Repository</strong> es una abstracci&oacute;n sobre <em>la colecci&oacute;n de objetos de dominio</em>: <code>RepositorioPedidos</code> tiene <code>porId</code>, <code>guardar</code>, <code>pendientesDe(cliente)</code>, y habla el lenguaje del negocio. Un repositorio puede tocar tres tablas para reconstruir un agregado; un DAO normalmente toca una.</p>
+
+<h4>Inyecci&oacute;n de dependencias</h4>
+
+<p>No es un patr&oacute;n GoF pero es la t&eacute;cnica que hace posible todo lo anterior. Consiste en que un objeto reciba sus colaboradores desde fuera en vez de construirlos. Tres formas, en orden de preferencia:</p>
+
+<ol class="tight">
+<li><strong>Por constructor</strong> &mdash; la mejor. Las dependencias quedan expl&iacute;citas y el objeto nunca existe a medias.</li>
+<li><strong>Por m&eacute;todo setter</strong> &mdash; para dependencias opcionales.</li>
+<li><strong>Por campo con anotaci&oacute;n</strong> &mdash; c&oacute;moda en Spring (<code>@Autowired</code>), pero esconde las dependencias y complica las pruebas.</li>
+</ol>
+
+<p>Spring, NestJS y Angular traen contenedores de inyecci&oacute;n integrados. En Express y React se hace a mano, que para efectos de aprender es incluso mejor porque ves el cableado.</p>
+</section>
+
+<section id="s-datos">
+<h3><span class="h-num">1&middot;D</span><span>Modelo relacional, SQL y NoSQL</span></h3>
+
+<p>La Unidad III es mapeo objeto&ndash;relacional, y un ORM no es m&aacute;s que automatizaci&oacute;n de algo que t&uacute; deber&iacute;as poder escribir a mano. Si no entiendes la relaci&oacute;n, no vas a entender el mapeo &mdash; vas a estar peleando con el ORM a ciegas.</p>
+
+<h5>Relacional: lo m&iacute;nimo</h5>
+<ul class="tight">
+<li>Llaves primarias y for&aacute;neas, y qu&eacute; garantiza la integridad referencial.</li>
+<li><code>INNER JOIN</code>, <code>LEFT JOIN</code>, y saber cu&aacute;ndo cada uno cambia el resultado.</li>
+<li>Cardinalidades: 1:1, 1:N y N:M, y c&oacute;mo se representa cada una en tablas. La N:M siempre necesita tabla intermedia &mdash; esto reaparece literal en el punto 3.1.4 del programa.</li>
+<li>Normalizaci&oacute;n hasta 3FN, y por qu&eacute; a veces se desnormaliza a prop&oacute;sito.</li>
+<li>&Iacute;ndices: para qu&eacute; sirven y por qu&eacute; no se ponen en todo.</li>
+<li>Transacciones y ACID. <strong>Atomicidad, Consistencia, Aislamiento, Durabilidad.</strong> Vuelve en 1.6 cuando se discuta por qu&eacute; los microservicios no pueden usar transacciones distribuidas c&oacute;modamente.</li>
+</ul>
+
+<h5>NoSQL: lo m&iacute;nimo</h5>
+<p>El programa lo pide expl&iacute;citamente en el punto 4.2.3 y la bibliograf&iacute;a incluye MongoDB. Basta con entender que hay cuatro familias &mdash; documental (MongoDB), clave&ndash;valor (Redis), columnar (Cassandra) y de grafos (Neo4j) &mdash; que la documental es la que usar&aacute;s, y que el intercambio de fondo es: ganas flexibilidad de esquema y escalado horizontal, pierdes joins y garant&iacute;as transaccionales fuertes.</p>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p><strong>Teorema CAP.</strong> En un sistema distribuido puedes garantizar como m&aacute;ximo dos de: <strong>C</strong>onsistencia, <strong>A</strong>vailability (disponibilidad) y <strong>P</strong>artition tolerance (tolerancia a particiones de red). Como las particiones de red ocurren s&iacute; o s&iacute; en una red real, P no es negociable: la elecci&oacute;n real es entre C y A. Es un cl&aacute;sico de examen en la parte de microservicios.</p>
+</div>
+</section>
+
+<section id="s-js">
+<h3><span class="h-num">1&middot;E</span><span>El lenguaje y su ecosistema</span></h3>
+
+<p>La bibliograf&iacute;a del programa delata dos rutas posibles, y conviene que preguntes cu&aacute;l usar&aacute; tu profesor en la primera clase:</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Ruta</th><th>Libros del programa</th><th>Stack t&iacute;pico</th></tr></thead>
+<tbody>
+<tr><td class="k">JavaScript</td><td>Holmes (MEAN), Zammeti (TypeScript/React/Node/Webpack/Docker), Biswas (React + Firebase)</td><td>Node + Express + MongoDB o Postgres + React o Angular</td></tr>
+<tr><td class="k">Java</td><td>Ottinger (Hibernate 6), Varanasi (Spring REST), Shmeling (Kubernetes Native)</td><td>Spring Boot + JPA/Hibernate + Postgres + Angular o React</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Si va por JavaScript</h4>
+<ul class="tight">
+<li><strong>As&iacute;ncrono de verdad</strong>: callbacks, promesas, <code>async/await</code>, <code>Promise.all</code>, y manejo de errores con <code>try/catch</code> dentro de funciones as&iacute;ncronas. Es la fuente n&uacute;mero uno de bugs en pr&aacute;cticas.</li>
+<li>M&oacute;dulos ES (<code>import</code>/<code>export</code>) frente a CommonJS (<code>require</code>), y por qu&eacute; mezclarlos causa errores raros.</li>
+<li>Desestructuraci&oacute;n, spread/rest, arrow functions, template literals, encadenamiento opcional.</li>
+<li><code>fetch</code> y c&oacute;mo se manejan respuestas que no son 2xx (pista: <code>fetch</code> no lanza excepci&oacute;n en un 404).</li>
+<li><strong>TypeScript b&aacute;sico</strong>: tipos, interfaces, gen&eacute;ricos simples. Zammeti est&aacute; en la bibliograf&iacute;a por algo, y en arquitectura hexagonal las interfaces son literalmente los puertos.</li>
+<li>npm: <code>package.json</code>, scripts, dependencias vs devDependencies, <code>package-lock.json</code>.</li>
+</ul>
+
+<h4>Si va por Java</h4>
+<ul class="tight">
+<li>Interfaces, clases abstractas, gen&eacute;ricos, colecciones.</li>
+<li>Anotaciones y qu&eacute; significa que un framework las lea en tiempo de ejecuci&oacute;n.</li>
+<li>Maven o Gradle: <code>pom.xml</code>, dependencias, ciclo de vida de build.</li>
+<li>Fundamentos de Spring: contenedor de beans, <code>@Component</code>, <code>@Service</code>, <code>@Repository</code>, <code>@RestController</code>, inyecci&oacute;n por constructor.</li>
+<li>JPA b&aacute;sico: <code>@Entity</code>, <code>@Id</code>, <code>@OneToMany</code>, <code>@ManyToMany</code>.</li>
+</ul>
+
+<div class="box note">
+  <span class="box-tag">Recomendaci&oacute;n pr&aacute;ctica</span>
+  <p>Si puedes elegir, empieza por <strong>Node + Express</strong>: el cableado queda a la vista y entiendes qu&eacute; hace cada pieza. Spring Boot hace much&iacute;simo por ti mediante anotaciones, lo cual es genial cuando ya entiendes la arquitectura y confuso cuando no. Aprende el concepto donde se ve, apl&iacute;calo despu&eacute;s donde est&aacute; automatizado.</p>
+</div>
+</section>
+
+<section id="s-herr">
+<h3><span class="h-num">1&middot;F</span><span>Herramientas que se dan por sabidas</span></h3>
+
+<ul>
+<li><strong>Git</strong> &mdash; <code>commit</code>, <code>branch</code>, <code>merge</code>, resolver conflictos, <code>remote</code>, <code>push</code>, <code>pull</code>. Vas a entregar por repositorio y probablemente en equipo. Un conflicto de merge sin resolver el d&iacute;a de la entrega es una historia que se repite cada semestre.</li>
+<li><strong>L&iacute;nea de comandos</strong> &mdash; navegar, variables de entorno, redirecci&oacute;n, procesos, puertos ocupados. En Windows conviene tener WSL2 instalado antes de que empiece el semestre; Docker funciona much&iacute;simo mejor ah&iacute;.</li>
+<li><strong>Cliente HTTP</strong> &mdash; Postman, Insomnia o la extensi&oacute;n REST Client de VS Code. Es la pr&aacute;ctica 4 completa del programa, as&iacute; que llegar sabi&eacute;ndolo es un regalo.</li>
+<li><strong>Herramientas de desarrollador del navegador</strong> &mdash; Network, Console, Application (cookies y almacenamiento local). Imprescindibles cuando el frontend no logra hablar con tu API.</li>
+<li><strong>Variables de entorno y <code>.env</code></strong> &mdash; y la regla de oro: credenciales fuera del repositorio. Van a revisar tu Git.</li>
+</ul>
+</section>
+
+<section id="s-auto">
+<h3><span class="h-num">1&middot;G</span><span>Autoevaluaci&oacute;n antes del primer d&iacute;a</span></h3>
+
+<p>Respuestas honestas. Si fallas m&aacute;s de tres, ah&iacute; tienes tu plan de preparaci&oacute;n antes de que arranque el semestre.</p>
+
+<ul class="check">
+<li><span class="cb"></span><span><b>&iquest;Puedo explicar la diferencia entre 401 y 403</b> sin buscarla?</span></li>
+<li><span class="cb"></span><span><b>&iquest;S&eacute; por qu&eacute; POST no es idempotente</b> y PUT s&iacute;?</span></li>
+<li><span class="cb"></span><span><b>&iquest;Puedo escribir de memoria</b> una funci&oacute;n <code>async</code> que llame a una API, maneje el error y devuelva datos tipados?</span></li>
+<li><span class="cb"></span><span><b>&iquest;S&eacute; representar una relaci&oacute;n N:M</b> en tablas sin pensarlo dos veces?</span></li>
+<li><span class="cb"></span><span><b>&iquest;Puedo dar un ejemplo propio</b> de cada letra de SOLID, no el ejemplo del libro?</span></li>
+<li><span class="cb"></span><span><b>&iquest;S&eacute; qu&eacute; es inyecci&oacute;n de dependencias</b> y puedo escribirla a mano sin framework?</span></li>
+<li><span class="cb"></span><span><b>&iquest;He resuelto un conflicto de merge</b> en Git yo mismo, sin borrar la carpeta y volver a clonar?</span></li>
+<li><span class="cb"></span><span><b>&iquest;He hecho una petici&oacute;n POST con cuerpo JSON</b> y cabecera de autorizaci&oacute;n desde Postman?</span></li>
+<li><span class="cb"></span><span><b>&iquest;S&eacute; qu&eacute; significa que HTTP sea sin estado</b> y c&oacute;mo se le a&ntilde;ade memoria encima?</span></li>
+<li><span class="cb"></span><span><b>&iquest;Puedo dibujar la arquitectura</b> del &uacute;ltimo proyecto que hice, con las flechas de dependencia bien puestas?</span></li>
+</ul>
+</section>
+
+<!-- ============ PARTE 2 ============ -->
+<div class="part" id="p2">
+  <span class="part-num">Parte 2</span>
+  <h2>La Unidad I, punto por punto</h2>
+  <p class="part-lede">Sigue la numeraci&oacute;n oficial del programa. Cada secci&oacute;n empieza con lo que dice el PDF y contin&uacute;a con lo que hay que entender detr&aacute;s de esa l&iacute;nea.</p>
+</div>
+
+<section id="s-11">
+<h3><span class="h-num">1.1</span><span>Principios comunes para las arquitecturas</span></h3>
+
+<div class="box prog">
+  <span class="box-tag">Del programa oficial</span>
+  <p>1.1. Principios comunes para las arquitecturas</p>
+</div>
+
+<p>Una sola l&iacute;nea en el programa, y sin embargo es el cimiento de las otras cinco secciones. Aqu&iacute; est&aacute; lo que esa l&iacute;nea contiene.</p>
+
+<h4>Qu&eacute; es arquitectura de software</h4>
+
+<p>La definici&oacute;n operativa m&aacute;s &uacute;til: la arquitectura es <strong>el conjunto de decisiones de dise&ntilde;o que son caras de cambiar despu&eacute;s</strong>. Elegir el nombre de una variable no es arquitectura. Elegir si el sistema ser&aacute; un proceso o veinte s&iacute; lo es, porque revertirlo cuesta meses.</p>
+
+<p>La definici&oacute;n formal, si te la piden en examen (IEEE 1471 / ISO 42010): la arquitectura es la organizaci&oacute;n fundamental de un sistema, encarnada en sus componentes, las relaciones entre ellos y con el entorno, y los principios que gu&iacute;an su dise&ntilde;o y evoluci&oacute;n.</p>
+
+<p>Conviene distinguir tres niveles que se confunden:</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Nivel</th><th>Alcance</th><th>Ejemplo</th></tr></thead>
+<tbody>
+<tr><td class="k">Arquitectura</td><td>El sistema completo y sus l&iacute;mites</td><td>&laquo;Tres servicios independientes que hablan por HTTP&raquo;</td></tr>
+<tr><td class="k">Patr&oacute;n de dise&ntilde;o</td><td>Un problema recurrente entre unas cuantas clases</td><td>&laquo;El acceso a datos se hace v&iacute;a Repository&raquo;</td></tr>
+<tr><td class="k">Idioma / t&eacute;cnica</td><td>Una l&iacute;nea o un bloque</td><td>&laquo;Aqu&iacute; usamos <code>async/await</code> en vez de <code>.then()</code>&raquo;</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Los principios que se repiten en todas</h4>
+
+<h5>Separaci&oacute;n de responsabilidades</h5>
+<p>Cada parte del sistema se ocupa de una cosa. La regla pr&aacute;ctica: si tienes que explicar qu&eacute; hace un m&oacute;dulo y usas la palabra &laquo;y&raquo; m&aacute;s de una vez, probablemente hace demasiado. Es el principio que engendra las capas del punto 1.3.</p>
+
+<h5>Cohesi&oacute;n alta, acoplamiento bajo</h5>
+<p>Este par es <em>el</em> criterio de calidad arquitect&oacute;nica, y probablemente lo que te van a pedir justificar en el examen.</p>
+<ul class="tight">
+<li><strong>Cohesi&oacute;n</strong> es qu&eacute; tan relacionadas est&aacute;n entre s&iacute; las cosas que viven dentro de un mismo m&oacute;dulo. Alta cohesi&oacute;n = todo lo de dentro trabaja para el mismo prop&oacute;sito.</li>
+<li><strong>Acoplamiento</strong> es qu&eacute; tanto un m&oacute;dulo necesita conocer las tripas de otro. Bajo acoplamiento = puedo cambiar el interior de A sin tocar B.</li>
+</ul>
+<p>La meta siempre es <strong>cohesi&oacute;n alta y acoplamiento bajo</strong>. Y no son independientes: si partes mal el sistema, bajas la cohesi&oacute;n <em>y</em> subes el acoplamiento a la vez, porque cosas que deber&iacute;an estar juntas quedan separadas y luego tienen que llamarse constantemente. Esto explica por qu&eacute; unos microservicios mal divididos son peores que un monolito.</p>
+
+<h5>Inversi&oacute;n de dependencias</h5>
+<p>Ya lo viste en la Parte 1. A nivel arquitect&oacute;nico se enuncia as&iacute;: <strong>las pol&iacute;ticas de alto nivel no deben depender de los detalles de bajo nivel; ambos deben depender de abstracciones.</strong> El &laquo;alto nivel&raquo; son las reglas de negocio; los &laquo;detalles&raquo; son la base de datos, el framework web, el proveedor de correo. Es lo que separa 1.3 de 1.4.</p>
+
+<h5>Ocultamiento de informaci&oacute;n</h5>
+<p>Formulado por David Parnas en 1972 y sigue vigente: un m&oacute;dulo debe esconder las decisiones que tienen m&aacute;s probabilidad de cambiar. La interfaz p&uacute;blica es un contrato; todo lo dem&aacute;s se reserva el derecho de cambiar sin avisar.</p>
+
+<h5>DRY, KISS y YAGNI</h5>
+<ul class="tight">
+<li><strong>DRY</strong> (<em>Don't Repeat Yourself</em>) &mdash; cada pieza de conocimiento debe tener una representaci&oacute;n &uacute;nica. Ojo: aplica al <em>conocimiento</em>, no al c&oacute;digo que se parece. Dos fragmentos id&eacute;nticos que cambian por razones distintas deben permanecer separados.</li>
+<li><strong>KISS</strong> (<em>Keep It Simple</em>) &mdash; la soluci&oacute;n m&aacute;s simple que funcione. En esta unidad significa: no montes microservicios para un CRUD de dos entidades.</li>
+<li><strong>YAGNI</strong> (<em>You Aren't Gonna Need It</em>) &mdash; no construyas para requisitos hipot&eacute;ticos.</li>
+</ul>
+
+<h4>Atributos de calidad</h4>
+
+<p>Son los criterios contra los cuales se juzga una arquitectura. Ninguna arquitectura es buena en abstracto: es buena <em>para ciertos atributos</em>. Esto es lo que convierte &laquo;&iquest;cu&aacute;l es mejor?&raquo; en una pregunta mal planteada.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>Atributo</th><th>Pregunta que responde</th></tr></thead>
+<tbody>
+<tr><td class="k">Mantenibilidad</td><td>&iquest;Cu&aacute;nto cuesta cambiar algo dentro de seis meses?</td></tr>
+<tr><td class="k">Escalabilidad</td><td>&iquest;Qu&eacute; pasa si el tr&aacute;fico se multiplica por cien?</td></tr>
+<tr><td class="k">Disponibilidad</td><td>&iquest;Qu&eacute; porcentaje del tiempo est&aacute; en pie? &iquest;Qu&eacute; se cae cuando algo falla?</td></tr>
+<tr><td class="k">Rendimiento</td><td>&iquest;Cu&aacute;nto tarda en responder y cu&aacute;ntas peticiones aguanta?</td></tr>
+<tr><td class="k">Seguridad</td><td>&iquest;Qui&eacute;n puede hacer qu&eacute;, y c&oacute;mo se verifica?</td></tr>
+<tr><td class="k">Testabilidad</td><td>&iquest;Puedo probar el negocio sin levantar media infraestructura?</td></tr>
+<tr><td class="k">Portabilidad</td><td>&iquest;Puedo moverlo a otro entorno o proveedor?</td></tr>
+<tr><td class="k">Observabilidad</td><td>Cuando algo falle en producci&oacute;n, &iquest;podr&eacute; saber por qu&eacute;?</td></tr>
+</tbody>
+</table>
+</div>
+
+<h5>Escalado vertical frente a horizontal</h5>
+<p>Distinci&oacute;n que se pregunta y que reaparece en la Unidad V. <strong>Vertical</strong> es darle m&aacute;s recursos a la misma m&aacute;quina: m&aacute;s CPU, m&aacute;s RAM. Es simple pero tiene un techo f&iacute;sico y un punto de fallo &uacute;nico. <strong>Horizontal</strong> es poner m&aacute;s m&aacute;quinas iguales detr&aacute;s de un balanceador. No tiene techo pr&aacute;ctico, pero exige que la aplicaci&oacute;n sea <em>sin estado</em> &mdash; que cualquier instancia pueda atender cualquier petici&oacute;n. Esa exigencia es la que empuja hacia sesiones basadas en token en lugar de sesiones en memoria del servidor, y es una de las razones por las que los microservicios se llevan bien con la nube.</p>
+
+<h4>Todo es un intercambio</h4>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p>La respuesta correcta a &laquo;&iquest;cu&aacute;l es la mejor arquitectura?&raquo; es siempre <strong>&laquo;depende del contexto&raquo;</strong>, seguida de los criterios: tama&ntilde;o y madurez del equipo, complejidad del dominio, requisitos de escalado, presupuesto de operaci&oacute;n y plazo. Una respuesta que declare ganador absoluto a los microservicios est&aacute; mal, y es exactamente el error que el profesor est&aacute; buscando.</p>
+</div>
+
+<p>Conway lo formul&oacute; en 1967 y sigue siendo inc&oacute;modamente cierto: <strong>una organizaci&oacute;n produce dise&ntilde;os que copian su propia estructura de comunicaci&oacute;n</strong>. Tres equipos que no se hablan producir&aacute;n tres m&oacute;dulos con interfaces mal negociadas. La versi&oacute;n moderna &mdash; la &laquo;maniobra de Conway inversa&raquo; &mdash; propone organizar los equipos seg&uacute;n la arquitectura que quieres obtener. Vale la pena mencionarlo en un examen de arquitectura; casi nadie lo hace.</p>
+
+<h4>Vistas arquitect&oacute;nicas: el modelo 4+1</h4>
+
+<p>Propuesto por Philippe Kruchten. Una arquitectura no se describe con un solo diagrama sino con varias vistas, cada una para una audiencia distinta:</p>
+
+<ul class="tight">
+<li><strong>L&oacute;gica</strong> &mdash; funcionalidad para el usuario. Diagramas de clases y de paquetes.</li>
+<li><strong>De procesos</strong> &mdash; concurrencia, procesos, hilos, comunicaci&oacute;n.</li>
+<li><strong>De desarrollo</strong> &mdash; organizaci&oacute;n de m&oacute;dulos y carpetas para el programador.</li>
+<li><strong>F&iacute;sica</strong> &mdash; d&oacute;nde corre cada cosa: servidores, contenedores, red. Diagrama de despliegue.</li>
+<li><strong>+1: escenarios</strong> &mdash; casos de uso que amarran las cuatro vistas anteriores.</li>
+</ul>
+
+<p>Menciona este modelo si te piden &laquo;documentar la arquitectura&raquo;. Y si prefieres algo m&aacute;s moderno y visual, el <strong>modelo C4</strong> (Contexto, Contenedores, Componentes, C&oacute;digo) es el est&aacute;ndar de facto hoy y es m&aacute;s f&aacute;cil de dibujar.</p>
+
+<h4>Deuda t&eacute;cnica</h4>
+<p>Met&aacute;fora de Ward Cunningham: tomar un atajo hoy es pedir prestado tiempo, y se paga con intereses en forma de cambios cada vez m&aacute;s lentos. No toda deuda es mala &mdash; a veces salir antes al mercado vale la pena &mdash; pero la deuda <em>no reconocida</em> siempre lo es. Arquitect&oacute;nicamente, la deuda m&aacute;s cara es la de l&iacute;mites mal puestos, porque corregirla implica mover c&oacute;digo entre m&oacute;dulos que ya se acostumbraron a conocerse.</p>
+</section>
+
+<section id="s-12">
+<h3><span class="h-num">1.2</span><span>Arquitectura monol&iacute;tica</span></h3>
+
+<div class="box prog">
+  <span class="box-tag">Del programa oficial</span>
+  <p>1.2. Arquitectura monol&iacute;tica<br>1.2.1. Contenedores</p>
+</div>
+
+<h4>Definici&oacute;n</h4>
+
+<p>Un monolito es una aplicaci&oacute;n que se <strong>construye, despliega y ejecuta como una sola unidad</strong>. Un solo artefacto (un <code>.jar</code>, un <code>.war</code>, una carpeta de Node), un solo proceso, normalmente una sola base de datos.</p>
+
+<div class="box trap">
+  <span class="box-tag">Trampa com&uacute;n</span>
+  <p>Monolito <strong>no</strong> significa desordenado. Un monolito puede estar impecablemente organizado en capas, con m&oacute;dulos de fronteras estrictas y dominio aislado &mdash; toda la Unidad I es aplicable dentro de un monolito. Lo que define al monolito es la <strong>unidad de despliegue</strong>, no la calidad interna. Confundir &laquo;monol&iacute;tico&raquo; con &laquo;mal hecho&raquo; es el error m&aacute;s frecuente de esta secci&oacute;n.</p>
+</div>
+
+<h4>Monolito modular frente a bola de lodo</h4>
+
+<p>Dos monolitos pueden ser opuestos en calidad:</p>
+
+<ul>
+<li>El <strong>monolito modular</strong> tiene m&oacute;dulos con l&iacute;mites definidos que se comunican por interfaces expl&iacute;citas. Un m&oacute;dulo no mete la mano en las tablas de otro. Se despliega junto, pero se razona por separado. Es una arquitectura perfectamente respetable y, para el tama&ntilde;o de proyecto de esta materia, casi siempre la correcta.</li>
+<li>La <strong>bola de lodo</strong> (<em>big ball of mud</em>) no tiene l&iacute;mites: cualquier clase llama a cualquier otra, la l&oacute;gica de negocio est&aacute; regada entre controladores, vistas y triggers de base de datos. Es lo que ocurre cuando un monolito crece sin disciplina. No es un estilo arquitect&oacute;nico, es la ausencia de uno.</li>
+</ul>
+
+<figure>
+<div class="fig-body">
+<svg viewBox="0 0 640 240" role="img" aria-label="Monolito modular con l&iacute;mites internos frente a bola de lodo sin l&iacute;mites">
+  <rect x="8" y="34" width="288" height="180" class="s-s2" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="16" y="24" class="s-t">Monolito modular</text>
+  <rect x="28" y="56" width="112" height="60" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="42" y="90" class="s-ts">Pedidos</text>
+  <rect x="164" y="56" width="112" height="60" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="178" y="90" class="s-ts">Cat&aacute;logo</text>
+  <rect x="28" y="136" width="112" height="60" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="42" y="170" class="s-ts">Usuarios</text>
+  <rect x="164" y="136" width="112" height="60" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="178" y="170" class="s-ts">Pagos</text>
+  <path d="M140 86 L164 86" class="s-acc"/>
+  <path d="M84 116 L84 136" class="s-acc"/>
+  <path d="M220 116 L220 136" class="s-acc"/>
+
+  <rect x="344" y="34" width="288" height="180" class="s-s2" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="352" y="24" class="s-t">Bola de lodo</text>
+  <g stroke="var(--line-2)" stroke-width="1" fill="none">
+    <path d="M380 70 L520 130 M420 60 L600 100 M370 150 L590 70 M400 190 L560 60 M480 55 L410 195 M600 160 L380 110 M540 190 L390 80 M450 120 L610 190 M370 190 L620 130 M500 200 L370 60"/>
+  </g>
+  <g fill="var(--accent)">
+    <circle cx="380" cy="70" r="5"/><circle cx="520" cy="130" r="5"/><circle cx="420" cy="60" r="5"/>
+    <circle cx="600" cy="100" r="5"/><circle cx="370" cy="150" r="5"/><circle cx="590" cy="70" r="5"/>
+    <circle cx="400" cy="190" r="5"/><circle cx="560" cy="60" r="5"/><circle cx="480" cy="55" r="5"/>
+    <circle cx="410" cy="195" r="5"/><circle cx="450" cy="120" r="5"/><circle cx="610" cy="190" r="5"/>
+    <circle cx="500" cy="200" r="5"/><circle cx="620" cy="130" r="5"/>
+  </g>
+</svg>
+</div>
+<figcaption>Los dos son monolitos: un solo artefacto, un solo despliegue. La diferencia est&aacute; en si existen l&iacute;mites internos que alguien respeta.</figcaption>
+</figure>
+
+<h4>Ventajas y desventajas</h4>
+
+<div class="tw">
+<table>
+<thead><tr><th>A favor</th><th>En contra</th></tr></thead>
+<tbody>
+<tr><td>Un solo proyecto que clonar, compilar y correr. Un rec&eacute;n llegado es productivo en un d&iacute;a</td><td>A cierto tama&ntilde;o, nadie entiende el sistema completo</td></tr>
+<tr><td>Llamadas entre m&oacute;dulos en memoria: r&aacute;pidas y confiables</td><td>Un fallo grave (fuga de memoria, excepci&oacute;n no capturada) tumba todo</td></tr>
+<tr><td>Transacciones ACID reales que abarcan todo el sistema</td><td>Solo escala verticalmente, o replicando el monolito entero aunque solo un m&oacute;dulo est&eacute; saturado</td></tr>
+<tr><td>Depuraci&oacute;n sencilla: una traza de pila cuenta la historia completa</td><td>Todo el sistema queda atado a un &uacute;nico lenguaje y a las versiones de sus librer&iacute;as</td></tr>
+<tr><td>Despliegue simple y barato de operar</td><td>Cualquier cambio, por peque&ntilde;o que sea, obliga a redesplegar todo</td></tr>
+<tr><td>Refactorizar entre m&oacute;dulos es f&aacute;cil: el compilador te avisa</td><td>El tiempo de compilaci&oacute;n y de pruebas crece hasta volverse molesto</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Cu&aacute;ndo elegirlo</h4>
+
+<p>Casi siempre al principio. Martin Fowler lo llam&oacute; <strong>&laquo;monolith first&raquo;</strong>: empieza monol&iacute;tico, descubre d&oacute;nde est&aacute;n de verdad las fronteras del dominio y extrae servicios cuando exista una raz&oacute;n concreta. La raz&oacute;n es sencilla: los l&iacute;mites entre microservicios son car&iacute;simos de mover una vez trazados, y al inicio de un proyecto todav&iacute;a no sabes d&oacute;nde van.</p>
+
+<div class="box proj">
+  <span class="box-tag">En tu proyecto</span>
+  <p>Para el proyecto del semestre, salvo que tu profesor exija expl&iacute;citamente varios servicios, la decisi&oacute;n s&oacute;lida es <strong>un monolito modular con arquitectura hexagonal por dentro, empaquetado en un contenedor Docker y publicado en un PaaS</strong>. Cumple con la Unidad V, demuestra que entiendes las Unidades I a IV, y no te vas a pasar la mitad del semestre depurando llamadas de red entre tus propios servicios.</p>
+</div>
+
+<h4>1.2.1 Contenedores</h4>
+
+<p>Este subpunto confunde a mucha gente porque la palabra &laquo;contenedor&raquo; significa <strong>dos cosas distintas</strong> en el mundo del backend, y el programa las usa ambas: aqu&iacute; en 1.2.1 y otra vez en el punto 5.2 (&laquo;contenedores virtuales de aplicaci&oacute;n&raquo;).</p>
+
+<h5>Sentido 1: contenedor de aplicaci&oacute;n (servidor de aplicaciones)</h5>
+<p>El sentido cl&aacute;sico, sobre todo en el mundo Java. Un contenedor de aplicaci&oacute;n es un entorno de ejecuci&oacute;n que aloja tu aplicaci&oacute;n y le proporciona servicios que no tienes que programar: gesti&oacute;n del ciclo de vida, pool de hilos, pool de conexiones, seguridad declarativa, transacciones. Tomcat, Jetty, WildFly, GlassFish. T&uacute; entregas un <code>.war</code> y el contenedor lo ejecuta.</p>
+<p>La idea clave es la <strong>inversi&oacute;n de control</strong>: t&uacute; no controlas el flujo del programa; el contenedor lo controla y llama a tu c&oacute;digo cuando corresponde. En Spring Boot esto viene con un Tomcat embebido, por eso puedes correr un <code>.jar</code> directamente. En Node no hay contenedor en este sentido: tu proceso <em>es</em> el servidor.</p>
+
+<h5>Sentido 2: contenedor de sistema operativo (Docker)</h5>
+<p>Un empaquetado aislado que contiene tu aplicaci&oacute;n con todas sus dependencias y una porci&oacute;n m&iacute;nima de sistema operativo, ejecut&aacute;ndose sobre el kernel del anfitri&oacute;n. Es el sentido que domina hoy y el que retomar&aacute; la Unidad V.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th></th><th>M&aacute;quina virtual</th><th>Contenedor</th></tr></thead>
+<tbody>
+<tr><td class="k">Qu&eacute; virtualiza</td><td>Hardware completo</td><td>El sistema operativo (namespaces y cgroups)</td></tr>
+<tr><td class="k">Sistema operativo</td><td>Uno completo por VM</td><td>Comparte el kernel del anfitri&oacute;n</td></tr>
+<tr><td class="k">Tama&ntilde;o t&iacute;pico</td><td>Gigabytes</td><td>Decenas o cientos de megabytes</td></tr>
+<tr><td class="k">Arranque</td><td>Decenas de segundos</td><td>Milisegundos o pocos segundos</td></tr>
+<tr><td class="k">Aislamiento</td><td>Muy fuerte</td><td>Bueno, pero comparte kernel</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Lo que resuelve un contenedor es el problema de &laquo;en mi m&aacute;quina s&iacute; funciona&raquo;: la imagen incluye runtime, librer&iacute;as y configuraci&oacute;n, as&iacute; que corre igual en tu laptop, en el laboratorio y en el PaaS.</p>
+
+<pre><span class="pre-label">Dockerfile de un monolito Node</span><code>FROM node:20-alpine
+
+WORKDIR /app
+
+# copiar manifiestos primero aprovecha la cach&eacute; de capas:
+# si package.json no cambi&oacute;, npm ci no se vuelve a ejecutar
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY . .
+
+ENV NODE_ENV=production
+EXPOSE 3000
+
+# usuario sin privilegios: buena pr&aacute;ctica de seguridad
+USER node
+
+CMD ["node", "src/main.js"]</code></pre>
+
+<p>Vocabulario m&iacute;nimo que hay que manejar: una <strong>imagen</strong> es la plantilla inmutable; un <strong>contenedor</strong> es una instancia en ejecuci&oacute;n de esa imagen; un <strong>registro</strong> (Docker Hub, GitHub Container Registry) es donde se publican las im&aacute;genes; un <strong>volumen</strong> es almacenamiento que sobrevive al contenedor; y <strong>Docker Compose</strong> orquesta varios contenedores en tu m&aacute;quina, t&iacute;picamente aplicaci&oacute;n m&aacute;s base de datos.</p>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p>Si te preguntan por &laquo;contenedores&raquo; en el contexto de la arquitectura monol&iacute;tica, la respuesta completa reconoce los dos sentidos: el contenedor de aplicaci&oacute;n que aloja y gestiona el ciclo de vida del monolito (Tomcat), y el contenedor de sistema operativo que lo empaqueta para desplegarlo de forma reproducible (Docker). Mencionar ambos, y notar que un monolito en Docker sigue siendo un monolito, es la respuesta que distingue.</p>
+</div>
+</section>
+
+<section id="s-13">
+<h3><span class="h-num">1.3</span><span>Arquitectura tradicional de n&ndash;capas</span></h3>
+
+<div class="box prog">
+  <span class="box-tag">Del programa oficial</span>
+  <p>1.3. Arquitectura tradicional de n&ndash;capas<br>1.3.1. Capa de acceso a datos<br>1.3.2. Capa de l&oacute;gica de negocios<br>1.3.3. Interfaz de usuario</p>
+</div>
+
+<p>La forma m&aacute;s difundida de organizar un monolito y, con toda probabilidad, la que ya has usado sin saber c&oacute;mo se llama. La idea es agrupar el c&oacute;digo por <strong>responsabilidad t&eacute;cnica</strong> en capas horizontales, donde cada capa solo puede hablar con la inmediatamente inferior.</p>
+
+<h4>Capas y niveles: no son lo mismo</h4>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p><strong>Capa</strong> (<em>layer</em>) es una divisi&oacute;n <strong>l&oacute;gica</strong> del c&oacute;digo. <strong>Nivel</strong> (<em>tier</em>) es una divisi&oacute;n <strong>f&iacute;sica</strong>: procesos o m&aacute;quinas distintas. Una aplicaci&oacute;n puede tener tres capas y correr en un solo nivel &mdash; todo en tu laptop &mdash; o tres capas en tres niveles: navegador, servidor de aplicaci&oacute;n, servidor de base de datos. En espa&ntilde;ol la distinci&oacute;n se pierde porque ambas se traducen &laquo;capa&raquo;, y es justo por eso que se pregunta.</p>
+</div>
+
+<figure>
+<div class="fig-body">
+<svg viewBox="0 0 560 300" role="img" aria-label="Diagrama de arquitectura de tres capas con dependencias hacia abajo">
+  <rect x="120" y="20" width="320" height="58" class="s-surface" stroke="var(--accent)" stroke-width="1.6"/>
+  <text x="140" y="45" class="s-t">Capa de presentaci&oacute;n</text>
+  <text x="140" y="63" class="s-ts">Controladores, vistas, validaci&oacute;n de entrada, serializaci&oacute;n</text>
+
+  <rect x="120" y="112" width="320" height="58" class="s-surface" stroke="var(--accent)" stroke-width="1.6"/>
+  <text x="140" y="137" class="s-t">Capa de l&oacute;gica de negocio</text>
+  <text x="140" y="155" class="s-ts">Servicios, reglas, orquestaci&oacute;n de casos de uso</text>
+
+  <rect x="120" y="204" width="320" height="58" class="s-surface" stroke="var(--accent)" stroke-width="1.6"/>
+  <text x="140" y="229" class="s-t">Capa de acceso a datos</text>
+  <text x="140" y="247" class="s-ts">Repositorios, DAO, ORM, consultas SQL</text>
+
+  <path d="M280 78 L280 104" class="s-acc" marker-end="url(#ar1)"/>
+  <path d="M280 170 L280 196" class="s-acc" marker-end="url(#ar1)"/>
+  <defs>
+    <marker id="ar1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+  <text x="292" y="96" class="s-ta">depende de</text>
+  <text x="292" y="188" class="s-ta">depende de</text>
+  <text x="20" y="240" class="s-ts">La base de datos</text>
+  <text x="20" y="254" class="s-ts">queda en el centro</text>
+  <text x="20" y="268" class="s-ts">de gravedad</text>
+</svg>
+</div>
+<figcaption>Las flechas apuntan hacia abajo. El negocio depende del acceso a datos &mdash; y ese es exactamente el problema que la arquitectura de cebolla viene a corregir.</figcaption>
+</figure>
+
+<h4>1.3.3 Interfaz de usuario (capa de presentaci&oacute;n)</h4>
+
+<p>Es la frontera con el mundo exterior. Su responsabilidad es traducir entre el protocolo externo y el lenguaje interno de la aplicaci&oacute;n; nada m&aacute;s.</p>
+<ul class="tight">
+<li>Recibir la petici&oacute;n HTTP y extraer par&aacute;metros, cuerpo y cabeceras.</li>
+<li>Validar el <em>formato</em> de la entrada &mdash; que el correo parezca correo, que la cantidad sea num&eacute;rica.</li>
+<li>Llamar al servicio de negocio correspondiente.</li>
+<li>Traducir el resultado o la excepci&oacute;n a un c&oacute;digo de estado y un cuerpo JSON.</li>
+</ul>
+
+<p>En una API REST esta capa son los <em>controladores</em> o <em>routers</em>. En una aplicaci&oacute;n con vistas del lado del servidor incluye las plantillas. En una SPA, la capa de presentaci&oacute;n vive en el navegador y se comunica con el servidor por HTTP &mdash; que es exactamente el escenario de la Unidad IV.</p>
+
+<div class="box trap">
+  <span class="box-tag">Trampa com&uacute;n</span>
+  <p>Meter reglas de negocio en el controlador. Si en tu <code>router.post()</code> aparece un <code>if (usuario.saldo &lt; monto)</code>, esa regla est&aacute; en el lugar equivocado: pertenece al negocio. La se&ntilde;al de alarma es simple &mdash; si cambiaras de HTTP a una interfaz de l&iacute;nea de comandos, &iquest;qu&eacute; l&oacute;gica tendr&iacute;as que reescribir? Todo eso deb&iacute;a estar m&aacute;s abajo.</p>
+</div>
+
+<p>Vale la pena distinguir dos tipos de validaci&oacute;n, porque se confunden: la <strong>validaci&oacute;n de formato</strong> (&laquo;el precio es un n&uacute;mero&raquo;) es de presentaci&oacute;n; la <strong>validaci&oacute;n de reglas</strong> (&laquo;el precio no puede ser menor al costo&raquo;) es de negocio. La primera protege contra entradas malformadas; la segunda expresa conocimiento del dominio.</p>
+
+<h4>1.3.2 Capa de l&oacute;gica de negocio</h4>
+
+<p>El coraz&oacute;n de la aplicaci&oacute;n: donde vive el conocimiento que hace que este software valga algo. Reglas, invariantes, c&aacute;lculos, flujos de trabajo, orquestaci&oacute;n de casos de uso, transacciones.</p>
+
+<h5>Modelo an&eacute;mico frente a modelo rico</h5>
+<p>Una discusi&oacute;n cl&aacute;sica que ilustra el problema de fondo de las n&ndash;capas.</p>
+<p>En el <strong>modelo an&eacute;mico</strong>, las entidades son bolsas de datos con getters y setters, y toda la l&oacute;gica vive en clases de servicio. Es lo que produce naturalmente el estilo n&ndash;capas, y funciona bien mientras las reglas son pocas. El problema aparece al crecer: los servicios se vuelven procedimientos gigantes y la misma regla acaba duplicada en tres sitios porque nada impide olvidarla.</p>
+<p>En el <strong>modelo rico</strong>, las entidades contienen los datos <em>y</em> las reglas que los gobiernan. <code>Pedido</code> tiene un m&eacute;todo <code>confirmar()</code> que sabe que un pedido cancelado no puede confirmarse, y no hay manera de saltarse esa regla porque la entidad no lo permite. Es el enfoque de DDD y el que asumen las arquitecturas de los puntos 1.4 y 1.5.</p>
+
+<pre><span class="pre-label">An&eacute;mico &mdash; la regla se puede olvidar</span><code>class Pedido {
+  constructor(id, estado, lineas) {
+    this.id = id; this.estado = estado; this.lineas = lineas;
+  }
+}
+
+class ServicioPedidos {
+  confirmar(pedido) {
+    if (pedido.estado === "CANCELADO") throw new Error("...");
+    if (pedido.lineas.length === 0)   throw new Error("...");
+    pedido.estado = "CONFIRMADO";
+  }
+}
+// nada impide que otro punto del c&oacute;digo haga:
+// pedido.estado = "CONFIRMADO";   &lt;-- se salt&oacute; las reglas</code></pre>
+
+<pre><span class="pre-label">Rico &mdash; la regla no se puede evitar</span><code>class Pedido {
+  #estado;                       // privado de verdad
+  constructor(id, lineas) {
+    if (lineas.length === 0) throw new PedidoVacio();
+    this.id = id; this.lineas = lineas; this.#estado = "BORRADOR";
+  }
+  get estado() { return this.#estado; }
+
+  confirmar() {
+    if (this.#estado === "CANCELADO")   throw new PedidoCancelado();
+    if (this.#estado === "CONFIRMADO")  return;   // idempotente
+    this.#estado = "CONFIRMADO";
+  }
+}
+// el estado s&oacute;lo cambia pasando por confirmar()</code></pre>
+
+<h4>1.3.1 Capa de acceso a datos</h4>
+
+<p>Traduce entre objetos y almacenamiento persistente. Su valor est&aacute; en que el resto del sistema no tenga que saber si detr&aacute;s hay Postgres, MongoDB o un archivo.</p>
+
+<ul class="tight">
+<li><strong>Repositorios o DAO</strong> &mdash; la interfaz que expone a la capa superior. Ver la distinci&oacute;n en la Parte 1&middot;C.</li>
+<li><strong>ORM</strong> &mdash; Hibernate, TypeORM, Prisma, Sequelize, Mongoose. Es todo el contenido de la Unidad III.</li>
+<li><strong>Mapeo</strong> &mdash; c&oacute;mo una fila se convierte en objeto y viceversa. Cuidado con el desajuste de impedancia objeto&ndash;relacional: la herencia, las colecciones y la identidad no tienen equivalente natural en tablas.</li>
+<li><strong>Pool de conexiones</strong> &mdash; abrir una conexi&oacute;n es caro, as&iacute; que se reutilizan de un conjunto.</li>
+<li><strong>Transacciones</strong> &mdash; qui&eacute;n las abre y las cierra. Normalmente el servicio de negocio, no el repositorio.</li>
+</ul>
+
+<div class="box trap">
+  <span class="box-tag">Trampa com&uacute;n</span>
+  <p><strong>El problema N+1.</strong> Cargas 100 pedidos con una consulta, y luego el ORM ejecuta una consulta adicional por cada pedido para traer sus l&iacute;neas: 101 consultas donde bastaba una con <code>JOIN</code>. Es la causa m&aacute;s frecuente de lentitud inexplicable en pr&aacute;cticas con ORM, y en el programa aparece bajo el nombre &laquo;estrategias de recuperaci&oacute;n de asociaciones&raquo; (punto 3.1.5): carga perezosa frente a carga ansiosa.</p>
+</div>
+
+<h4>Reglas de las capas</h4>
+
+<p>Una <strong>capa cerrada</strong> obliga a pasar por ella: presentaci&oacute;n no puede saltarse el negocio para hablar con datos. Una <strong>capa abierta</strong> se puede sortear. La regla por omisi&oacute;n es cerrada, y el motivo es el aislamiento: si presentaci&oacute;n puede tocar datos directamente, la capa de negocio deja de ser el &uacute;nico lugar donde viven las reglas y todo el esquema se degrada.</p>
+
+<p>El precio de las capas cerradas es el llamado <em>antipatr&oacute;n del sumidero</em>: un caso de uso trivial &mdash; leer un producto por id &mdash; atraviesa tres capas donde dos de ellas no hacen m&aacute;s que reenviar la llamada. Es c&oacute;digo repetitivo real, y es un intercambio aceptado a cambio de la consistencia estructural.</p>
+
+<h4>Estructura de carpetas t&iacute;pica</h4>
+
+<pre><span class="pre-label">Organizaci&oacute;n por capa t&eacute;cnica</span><code>src/
+  controllers/          &lt;- presentaci&oacute;n
+    productos.controller.js
+    pedidos.controller.js
+  services/             &lt;- negocio
+    productos.service.js
+    pedidos.service.js
+  repositories/         &lt;- acceso a datos
+    productos.repository.js
+    pedidos.repository.js
+  models/
+    producto.model.js
+  middlewares/
+  config/
+  main.js</code></pre>
+
+<div class="box note">
+  <span class="box-tag">Matiz que suma puntos</span>
+  <p>Esta organizaci&oacute;n agrupa por <em>capa t&eacute;cnica</em>. La alternativa moderna es agrupar por <strong>caracter&iacute;stica del negocio</strong> &mdash; <code>src/pedidos/{controlador,servicio,repositorio}.js</code> &mdash; de modo que todo lo relacionado con pedidos vive junto. Esto sube la cohesi&oacute;n, hace evidente d&oacute;nde est&aacute;n las fronteras del dominio y es el paso natural hacia el monolito modular y, m&aacute;s adelante, hacia los microservicios. Sacar este punto cuando se discuta el 1.3 demuestra que entendiste el principio de cohesi&oacute;n, no solo el diagrama.</p>
+</div>
+
+<h4>La limitaci&oacute;n de fondo</h4>
+
+<p>Las n&ndash;capas ordenan, pero dejan un problema sin resolver: <strong>el negocio depende del acceso a datos</strong>. Consecuencias concretas:</p>
+<ul class="tight">
+<li>No puedes probar la l&oacute;gica de negocio sin una base de datos disponible.</li>
+<li>Un cambio de motor de base de datos se propaga hacia arriba.</li>
+<li>Las entidades del ORM, con sus anotaciones y sus peculiaridades, se filtran hasta el negocio y a veces hasta la respuesta JSON.</li>
+<li>El dise&ntilde;o tiende a empezar por el esquema de tablas en lugar de por el modelo del dominio.</li>
+</ul>
+
+<p>De esa insatisfacci&oacute;n nacen las dos arquitecturas siguientes.</p>
+</section>
+
+<section id="s-14">
+<h3><span class="h-num">1.4</span><span>Arquitectura de cebolla (arquitectura limpia)</span></h3>
+
+<div class="box prog">
+  <span class="box-tag">Del programa oficial</span>
+  <p>1.4. Arquitectura de cebolla (arquitectura limpia)<br>1.4.1. Modelo del dominio<br>1.4.2. Interfaz de usuario<br>1.4.3. Infraestructura<br>1.4.4. Pruebas</p>
+</div>
+
+<h4>De d&oacute;nde viene</h4>
+
+<p>La <strong>arquitectura de cebolla</strong> la propuso Jeffrey Palermo en 2008 como respuesta expl&iacute;cita al problema del punto anterior: en las n&ndash;capas, la base de datos termina siendo el centro de gravedad del dise&ntilde;o. Palermo propuso poner en el centro el <em>modelo del dominio</em> y dejar todo lo dem&aacute;s como anillos exteriores.</p>
+
+<p>La <strong>arquitectura limpia</strong> (<em>Clean Architecture</em>) es la versi&oacute;n que Robert C. Martin populariz&oacute; en 2012 y en el libro de 2017. Es esencialmente la misma idea con otros nombres para los anillos. El programa las trata como sin&oacute;nimos, y para efectos de la materia lo son.</p>
+
+<h4>La regla de dependencia</h4>
+
+<p>Es la &uacute;nica regla que hay que saberse, y de ella se deduce todo lo dem&aacute;s:</p>
+
+<div class="box exam">
+  <span class="box-tag">La regla de dependencia</span>
+  <p style="font-size:1.05rem;font-family:'IBM Plex Sans Condensed',sans-serif;font-weight:600">Las dependencias del c&oacute;digo fuente solo pueden apuntar <em>hacia adentro</em>. Nada en un anillo interior puede saber absolutamente nada de un anillo exterior.</p>
+</div>
+
+<p>&laquo;Nada&raquo; es literal: ni un nombre de clase, ni una funci&oacute;n, ni una variable, ni un formato de datos. Si el dominio importa <code>express</code>, <code>mongoose</code> o <code>@Entity</code>, la regla est&aacute; rota.</p>
+
+<figure>
+<div class="fig-body">
+<svg viewBox="0 0 460 400" role="img" aria-label="Anillos conc&eacute;ntricos de la arquitectura de cebolla con dependencias hacia el centro">
+  <circle cx="230" cy="190" r="180" class="s-s2" stroke="var(--line-2)" stroke-width="1.2"/>
+  <circle cx="230" cy="190" r="136" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <circle cx="230" cy="190" r="94" class="s-s2" stroke="var(--accent)" stroke-width="1.4"/>
+  <circle cx="230" cy="190" r="52" class="s-surface" stroke="var(--accent)" stroke-width="2"/>
+
+  <text x="230" y="185" class="s-t" text-anchor="middle">Entidades</text>
+  <text x="230" y="202" class="s-ts" text-anchor="middle">reglas del negocio</text>
+
+  <text x="230" y="120" class="s-t" text-anchor="middle" font-size="12">Servicios de dominio</text>
+  <text x="230" y="76" class="s-t" text-anchor="middle" font-size="12">Casos de uso</text>
+  <text x="230" y="36" class="s-t" text-anchor="middle" font-size="12">Infraestructura &middot; UI &middot; Frameworks</text>
+
+  <text x="230" y="292" class="s-ts" text-anchor="middle">interfaces de repositorio aqu&iacute;</text>
+  <text x="230" y="322" class="s-ts" text-anchor="middle">orquestaci&oacute;n, transacciones</text>
+  <text x="230" y="358" class="s-ts" text-anchor="middle">Postgres, Express, React, SMTP</text>
+
+  <defs>
+    <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+  <path d="M414 190 L292 190" class="s-acc" marker-end="url(#ar2)"/>
+  <text x="330" y="178" class="s-ta" text-anchor="middle">dependencias</text>
+</svg>
+</div>
+<figcaption>Todas las flechas apuntan al centro. El anillo exterior conoce al interior; el interior jam&aacute;s conoce al exterior.</figcaption>
+</figure>
+
+<h4>1.4.1 Modelo del dominio</h4>
+
+<p>El anillo central. Contiene el conocimiento del negocio que ser&iacute;a cierto aunque el software no existiera.</p>
+
+<ul>
+<li><strong>Entidades</strong> &mdash; objetos con identidad propia que persiste en el tiempo. Un <code>Pedido</code> con id 842 sigue siendo el mismo pedido aunque cambien todos sus datos. La identidad es lo que define a la entidad.</li>
+<li><strong>Objetos de valor</strong> (<em>value objects</em>) &mdash; objetos sin identidad, definidos enteramente por sus atributos, e inmutables. <code>Dinero(1299.00, "MXN")</code>, <code>CorreoElectronico("a@b.com")</code>, un rango de fechas. Dos objetos de valor con los mismos atributos son intercambiables. Usarlos elimina una cantidad sorprendente de bugs, porque <code>Dinero</code> no se puede sumar con un n&uacute;mero suelto por accidente.</li>
+<li><strong>Agregados</strong> &mdash; un grupo de entidades y objetos de valor que se trata como una unidad de consistencia, con una entidad ra&iacute;z que es la &uacute;nica puerta de entrada. <code>Pedido</code> es la ra&iacute;z y sus <code>LineaDePedido</code> solo se tocan a trav&eacute;s de &eacute;l. La regla &laquo;el total del pedido es la suma de sus l&iacute;neas&raquo; se puede garantizar porque nadie modifica una l&iacute;nea por fuera.</li>
+<li><strong>Servicios de dominio</strong> &mdash; l&oacute;gica que no cae naturalmente en ninguna entidad. &laquo;Transferir de una cuenta a otra&raquo; involucra dos cuentas: no es responsabilidad de ninguna de las dos en particular.</li>
+<li><strong>Interfaces de repositorio</strong> &mdash; aqu&iacute; est&aacute; el truco central. La <em>interfaz</em> del repositorio vive en el dominio porque es el dominio quien declara qu&eacute; necesita; la <em>implementaci&oacute;n</em> vive en infraestructura. Esa asimetr&iacute;a es la inversi&oacute;n de dependencias en acci&oacute;n.</li>
+<li><strong>Excepciones de dominio</strong> &mdash; <code>SaldoInsuficiente</code>, <code>PedidoYaCancelado</code>. Expresan reglas violadas en el lenguaje del negocio, no en el de HTTP.</li>
+</ul>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p>La prueba de fuego del modelo de dominio: <strong>&iquest;compila y se ejecuta sin base de datos, sin servidor web y sin ning&uacute;n framework instalado?</strong> Si la respuesta es s&iacute;, el dominio est&aacute; bien aislado. Si necesitas levantar Postgres para instanciar una entidad, no lo est&aacute;.</p>
+</div>
+
+<h4>Capa de aplicaci&oacute;n (casos de uso)</h4>
+
+<p>El anillo que rodea al dominio. Aqu&iacute; viven los <strong>casos de uso</strong>: un caso de uso es una operaci&oacute;n completa que el sistema ofrece &mdash; &laquo;registrar usuario&raquo;, &laquo;confirmar pedido&raquo;, &laquo;generar reporte mensual&raquo;.</p>
+
+<p>Un caso de uso <em>orquesta</em>: pide datos a los repositorios, invoca m&eacute;todos del dominio, coordina la transacci&oacute;n y devuelve el resultado. Lo que <strong>no</strong> hace es contener reglas de negocio &mdash; esas van en las entidades &mdash; ni saber nada de HTTP.</p>
+
+<pre><span class="pre-label">aplicacion/ConfirmarPedido.js</span><code>export class ConfirmarPedido {
+  constructor(repoPedidos, pasarelaPagos, notificador) {
+    this.repoPedidos    = repoPedidos;     // interfaz del dominio
+    this.pasarelaPagos  = pasarelaPagos;   // interfaz del dominio
+    this.notificador    = notificador;     // interfaz del dominio
+  }
+
+  async ejecutar({ idPedido, idUsuario }) {
+    const pedido = await this.repoPedidos.porId(idPedido);
+    if (!pedido) throw new PedidoNoEncontrado(idPedido);
+    if (pedido.idUsuario !== idUsuario) throw new AccesoDenegado();
+
+    pedido.confirmar();                       // regla en la entidad
+    await this.pasarelaPagos.cobrar(pedido.total(), idUsuario);
+    await this.repoPedidos.guardar(pedido);
+    await this.notificador.pedidoConfirmado(pedido);
+
+    return pedido;
+  }
+}</code></pre>
+
+<p>Observa que en ese archivo no aparece <code>req</code>, ni <code>res</code>, ni <code>200</code>, ni SQL, ni el nombre de ning&uacute;n proveedor de pagos. Solo conceptos del negocio y abstracciones. Ese es el objetivo.</p>
+
+<h4>1.4.2 Interfaz de usuario</h4>
+
+<p>Anillo exterior. Aqu&iacute; s&iacute; vive el framework web: rutas, controladores, middlewares, plantillas, o el cliente React de la Unidad IV. Su trabajo es traducir del protocolo al caso de uso y de vuelta.</p>
+
+<pre><span class="pre-label">infraestructura/http/pedidos.controlador.js</span><code>export function montarRutasPedidos(app, casosDeUso) {
+  app.post("/api/pedidos/:id/confirmar", async (req, res, next) =&gt; {
+    try {
+      const pedido = await casosDeUso.confirmarPedido.ejecutar({
+        idPedido:  req.params.id,
+        idUsuario: req.usuario.id          // lo puso el middleware de auth
+      });
+      res.status(200).json(aDTO(pedido));  // traducci&oacute;n a JSON
+    } catch (e) {
+      next(e);                             // el middleware de errores
+    }                                      // traduce excepci&oacute;n -&gt; c&oacute;digo HTTP
+  });
+}</code></pre>
+
+<p>Un detalle que suele pasarse por alto: el mapeo de excepciones de dominio a c&oacute;digos HTTP pertenece a esta capa, no al dominio. <code>PedidoNoEncontrado</code> se convierte en 404 <em>aqu&iacute;</em>; el dominio no sabe que existe el 404.</p>
+
+<h4>1.4.3 Infraestructura</h4>
+
+<p>El otro anillo exterior. Todo lo que es un detalle t&eacute;cnico reemplazable:</p>
+<ul class="tight">
+<li>Implementaciones concretas de los repositorios, con su ORM y su SQL.</li>
+<li>Clientes HTTP hacia APIs de terceros &mdash; que es la pr&aacute;ctica 8 del programa.</li>
+<li>Env&iacute;o de correo, almacenamiento de archivos, colas de mensajes.</li>
+<li>Configuraci&oacute;n, registro de bit&aacute;coras, m&eacute;tricas.</li>
+<li>El <strong>ensamblador</strong> (<em>composition root</em>): el &uacute;nico punto del programa donde se construyen las clases concretas y se inyectan. Normalmente <code>main.js</code> o <code>Application.java</code>.</li>
+</ul>
+
+<pre><span class="pre-label">main.js &mdash; el ensamblador: el &uacute;nico lugar que conoce a todos</span><code>import express from "express";
+import { Pool } from "pg";
+import { RepositorioPedidosPostgres } from "./infraestructura/RepositorioPedidosPostgres.js";
+import { PasarelaStripe }             from "./infraestructura/PasarelaStripe.js";
+import { NotificadorSMTP }            from "./infraestructura/NotificadorSMTP.js";
+import { ConfirmarPedido }            from "./aplicacion/ConfirmarPedido.js";
+import { montarRutasPedidos }         from "./infraestructura/http/pedidos.controlador.js";
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// adaptadores concretos
+const repoPedidos = new RepositorioPedidosPostgres(pool);
+const pagos       = new PasarelaStripe(process.env.STRIPE_KEY);
+const notificador = new NotificadorSMTP(process.env.SMTP_URL);
+
+// casos de uso, cableados con abstracciones
+const casosDeUso = {
+  confirmarPedido: new ConfirmarPedido(repoPedidos, pagos, notificador)
+};
+
+const app = express();
+app.use(express.json());
+montarRutasPedidos(app, casosDeUso);
+app.listen(3000);</code></pre>
+
+<p>Para cambiar de Stripe a PayPal escribes <code>PasarelaPayPal</code> y modificas una l&iacute;nea de este archivo. Nada m&aacute;s del sistema se entera. Eso es lo que compra la arquitectura.</p>
+
+<h4>1.4.4 Pruebas</h4>
+
+<p>El programa dedica un subpunto entero a pruebas dentro de esta secci&oacute;n, y no es casualidad: <strong>la testabilidad es el argumento comercial principal de esta arquitectura</strong>. Si te preguntan por qu&eacute; usar cebolla en vez de n&ndash;capas, las pruebas son la mitad de la respuesta.</p>
+
+<h5>La pir&aacute;mide de pruebas</h5>
+<ul class="tight">
+<li><strong>Unitarias</strong> (la base, muchas) &mdash; prueban una clase o funci&oacute;n aislada. Milisegundos. En esta arquitectura, el dominio y los casos de uso se prueban unitariamente sin infraestructura alguna.</li>
+<li><strong>De integraci&oacute;n</strong> (el medio) &mdash; prueban que dos piezas reales encajan: el repositorio contra una base de datos de verdad, por ejemplo.</li>
+<li><strong>De extremo a extremo</strong> (la punta, pocas) &mdash; el sistema completo, por HTTP o por el navegador. Lentas y fr&aacute;giles, pero son las &uacute;nicas que prueban que todo junto funciona.</li>
+</ul>
+
+<h5>Dobles de prueba</h5>
+<p>Terminolog&iacute;a de Gerard Meszaros que se pregunta:</p>
+<div class="tw">
+<table>
+<thead><tr><th>Doble</th><th>Qu&eacute; hace</th></tr></thead>
+<tbody>
+<tr><td class="k">Dummy</td><td>Se pasa para rellenar un par&aacute;metro, nunca se usa</td></tr>
+<tr><td class="k">Stub</td><td>Devuelve respuestas fijas preprogramadas</td></tr>
+<tr><td class="k">Spy</td><td>Es un stub que adem&aacute;s registra c&oacute;mo fue llamado</td></tr>
+<tr><td class="k">Mock</td><td>Tiene expectativas: falla si no se le llama como se esperaba</td></tr>
+<tr><td class="k">Fake</td><td>Implementaci&oacute;n real pero simplificada: un repositorio en memoria</td></tr>
+</tbody>
+</table>
+</div>
+
+<pre><span class="pre-label">Prueba de un caso de uso, sin base de datos</span><code>class RepositorioPedidosEnMemoria {          // un FAKE
+  constructor(inicial = []) { this.datos = new Map(inicial.map(p =&gt; [p.id, p])); }
+  async porId(id)   { return this.datos.get(id) ?? null; }
+  async guardar(p)  { this.datos.set(p.id, p); }
+}
+
+test("confirmar un pedido lo deja CONFIRMADO y cobra el total", async () =&gt; {
+  const pedido = new Pedido("842", "u1", [new Linea("sku-1", 2, 100)]);
+  const repo   = new RepositorioPedidosEnMemoria([pedido]);
+  const pagos  = { cobrado: null, async cobrar(m) { this.cobrado = m; } };  // SPY
+  const notif  = { async pedidoConfirmado() {} };                            // DUMMY
+
+  const caso = new ConfirmarPedido(repo, pagos, notif);
+  const res  = await caso.ejecutar({ idPedido: "842", idUsuario: "u1" });
+
+  expect(res.estado).toBe("CONFIRMADO");
+  expect(pagos.cobrado).toBe(200);
+});</code></pre>
+
+<p>Esa prueba corre en milisegundos, no necesita Docker, no necesita red y no falla intermitentemente. En una arquitectura de n&ndash;capas cl&aacute;sica, la misma prueba requerir&iacute;a una base de datos levantada y sembrada.</p>
+
+<h4>El costo</h4>
+
+<div class="box trap">
+  <span class="box-tag">Trampa com&uacute;n</span>
+  <p>Presentar la arquitectura limpia como pura ganancia. Tiene costos reales: m&aacute;s archivos, m&aacute;s interfaces, m&aacute;s indirecci&oacute;n y m&aacute;s c&oacute;digo de traducci&oacute;n entre entidades de dominio, entidades de ORM y DTOs. Para un CRUD de dos tablas es sobreingenier&iacute;a evidente. El valor aparece cuando hay reglas de negocio de verdad y el proyecto va a vivir a&ntilde;os. Reconocer el intercambio en el examen vale m&aacute;s que recitar las ventajas.</p>
+</div>
+</section>
+
+<section id="s-15">
+<h3><span class="h-num">1.5</span><span>Arquitectura hexagonal</span></h3>
+
+<div class="box prog">
+  <span class="box-tag">Del programa oficial</span>
+  <p>1.5. Arquitectura hexagonal<br>1.5.1. Dominio de la aplicaci&oacute;n<br>1.5.2. Puertos<br>1.5.3. Capa de servicios<br>1.5.4. Adaptadores</p>
+</div>
+
+<h4>La idea</h4>
+
+<p>Alistair Cockburn la formul&oacute; en 2005 con el nombre de <strong>Puertos y Adaptadores</strong>, y su enunciado original es una de las frases m&aacute;s claras que se han escrito sobre arquitectura: la aplicaci&oacute;n debe poder ser operada indistintamente por usuarios, programas, pruebas automatizadas o scripts, y poder desarrollarse y probarse aislada de sus dispositivos y bases de datos definitivos.</p>
+
+<p>Dicho en corto: <strong>la aplicaci&oacute;n no debe saber qui&eacute;n la llama ni a qui&eacute;n llama.</strong></p>
+
+<div class="box trap">
+  <span class="box-tag">Trampa com&uacute;n</span>
+  <p>&laquo;&iquest;Por qu&eacute; un hex&aacute;gono? &iquest;Son seis capas?&raquo; No. Cockburn eligi&oacute; el hex&aacute;gono por una raz&oacute;n puramente de dibujo: quer&iacute;a mostrar que hay <em>varios</em> puntos de entrada y salida alrededor del n&uacute;cleo, y un c&iacute;rculo no deja colocarlos bien. El seis no significa nada. Si alguien te dice que son seis capas, est&aacute; equivocado, y esta es una pregunta trampa cl&aacute;sica.</p>
+</div>
+
+<figure>
+<div class="fig-body">
+<svg viewBox="0 0 620 400" role="img" aria-label="Arquitectura hexagonal con adaptadores primarios a la izquierda y secundarios a la derecha">
+  <defs>
+    <marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0 0 L9 4.5 L0 9 z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+
+  <polygon points="310,60 430,130 430,270 310,340 190,270 190,130" class="s-s2" stroke="var(--accent)" stroke-width="1.8"/>
+  <polygon points="310,120 380,160 380,240 310,280 240,240 240,160" class="s-surface" stroke="var(--accent)" stroke-width="1.6"/>
+  <text x="310" y="196" class="s-t" text-anchor="middle">Dominio</text>
+  <text x="310" y="212" class="s-ts" text-anchor="middle">entidades + reglas</text>
+  <text x="310" y="100" class="s-t" text-anchor="middle" font-size="12">Servicios de aplicaci&oacute;n</text>
+
+  <text x="86" y="40" class="s-t" font-size="12">Adaptadores</text>
+  <text x="86" y="55" class="s-t" font-size="12">primarios</text>
+  <text x="86" y="70" class="s-ts">(driving &mdash; nos usan)</text>
+
+  <rect x="20" y="96" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="34" y="121" class="s-ts">Controlador REST</text>
+  <rect x="20" y="152" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="34" y="177" class="s-ts">CLI</text>
+  <rect x="20" y="208" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="34" y="233" class="s-ts">Consumidor de cola</text>
+  <rect x="20" y="264" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="34" y="289" class="s-ts">Pruebas</text>
+
+  <path d="M152 116 L206 150" class="s-acc" marker-end="url(#ar3)"/>
+  <path d="M152 172 L204 186" class="s-acc" marker-end="url(#ar3)"/>
+  <path d="M152 228 L204 214" class="s-acc" marker-end="url(#ar3)"/>
+  <path d="M152 284 L206 250" class="s-acc" marker-end="url(#ar3)"/>
+
+  <text x="468" y="40" class="s-t" font-size="12">Adaptadores</text>
+  <text x="468" y="55" class="s-t" font-size="12">secundarios</text>
+  <text x="468" y="70" class="s-ts">(driven &mdash; los usamos)</text>
+
+  <rect x="468" y="96" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="482" y="121" class="s-ts">Repositorio Postgres</text>
+  <rect x="468" y="152" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="482" y="177" class="s-ts">Cliente API pagos</text>
+  <rect x="468" y="208" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="482" y="233" class="s-ts">Correo SMTP</text>
+  <rect x="468" y="264" width="132" height="40" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="482" y="289" class="s-ts">Repositorio en memoria</text>
+
+  <path d="M414 150 L468 116" class="s-acc" marker-end="url(#ar3)"/>
+  <path d="M416 186 L468 172" class="s-acc" marker-end="url(#ar3)"/>
+  <path d="M416 214 L468 228" class="s-acc" marker-end="url(#ar3)"/>
+  <path d="M414 250 L468 284" class="s-acc" marker-end="url(#ar3)"/>
+
+  <circle cx="206" cy="150" r="4" class="s-accf"/><circle cx="204" cy="186" r="4" class="s-accf"/>
+  <circle cx="204" cy="214" r="4" class="s-accf"/><circle cx="206" cy="250" r="4" class="s-accf"/>
+  <circle cx="414" cy="150" r="4" class="s-accf"/><circle cx="416" cy="186" r="4" class="s-accf"/>
+  <circle cx="416" cy="214" r="4" class="s-accf"/><circle cx="414" cy="250" r="4" class="s-accf"/>
+
+  <text x="310" y="376" class="s-ta" text-anchor="middle">los puntos sobre el borde son los PUERTOS &mdash; interfaces definidas por la aplicaci&oacute;n</text>
+</svg>
+</div>
+<figcaption>Izquierda: alguien nos llama. Derecha: nosotros llamamos a alguien. El hex&aacute;gono es indiferente a qui&eacute;n hay del otro lado de cada puerto.</figcaption>
+</figure>
+
+<h4>1.5.1 Dominio de la aplicaci&oacute;n</h4>
+
+<p>Es el mismo n&uacute;cleo que en la arquitectura de cebolla: entidades, objetos de valor, agregados, reglas. Cockburn lo llama simplemente &laquo;la aplicaci&oacute;n&raquo;. No conoce ning&uacute;n framework, ning&uacute;n protocolo y ninguna base de datos.</p>
+
+<h4>1.5.2 Puertos</h4>
+
+<p>Un <strong>puerto</strong> es una interfaz que define <em>la aplicaci&oacute;n</em> para hablar con el exterior. Es un contrato expresado en el lenguaje del dominio, no en el de la tecnolog&iacute;a. Hay dos familias, y distinguirlas es lo que se pregunta:</p>
+
+<div class="tw">
+<table>
+<thead><tr><th></th><th>Puertos primarios</th><th>Puertos secundarios</th></tr></thead>
+<tbody>
+<tr><td class="k">Otros nombres</td><td>De entrada, <em>driving</em>, conductores</td><td>De salida, <em>driven</em>, conducidos</td></tr>
+<tr><td class="k">Qui&eacute;n inicia</td><td>El exterior llama a la aplicaci&oacute;n</td><td>La aplicaci&oacute;n llama al exterior</td></tr>
+<tr><td class="k">Qui&eacute;n define la interfaz</td><td>La aplicaci&oacute;n</td><td>La aplicaci&oacute;n</td></tr>
+<tr><td class="k">Qui&eacute;n la implementa</td><td>La aplicaci&oacute;n</td><td>Un adaptador de infraestructura</td></tr>
+<tr><td class="k">Ejemplo</td><td><code>ConfirmarPedidoPort</code></td><td><code>RepositorioPedidos</code>, <code>PasarelaPagos</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p>La asimetr&iacute;a es el punto fino: <strong>la aplicaci&oacute;n define ambos tipos de puerto, pero solo implementa los primarios</strong>. Los secundarios los implementa infraestructura. Por eso los secundarios son inversi&oacute;n de dependencias pura: el que necesita el servicio dicta la forma del contrato, no el que lo provee.</p>
+</div>
+
+<pre><span class="pre-label">Puertos como interfaces TypeScript</span><code>// ---- puerto PRIMARIO: lo que la aplicaci&oacute;n ofrece al mundo ----
+export interface ConfirmarPedidoPort {
+  ejecutar(cmd: { idPedido: string; idUsuario: string }): Promise&lt;Pedido&gt;;
+}
+
+// ---- puertos SECUNDARIOS: lo que la aplicaci&oacute;n necesita del mundo ----
+export interface RepositorioPedidos {
+  porId(id: string): Promise&lt;Pedido | null&gt;;
+  guardar(pedido: Pedido): Promise&lt;void&gt;;
+}
+
+export interface PasarelaPagos {
+  cobrar(monto: Dinero, idUsuario: string): Promise&lt;Comprobante&gt;;
+}
+
+export interface Notificador {
+  pedidoConfirmado(pedido: Pedido): Promise&lt;void&gt;;
+}</code></pre>
+
+<p>Nota c&oacute;mo estas interfaces est&aacute;n escritas en vocabulario de negocio: <code>cobrar</code>, <code>Dinero</code>, <code>Comprobante</code>. Ninguna menciona SQL, HTTP ni Stripe. Un puerto que se llamara <code>ejecutarConsultaSQL</code> no ser&iacute;a un puerto: ser&iacute;a una filtraci&oacute;n de infraestructura hacia el dominio.</p>
+
+<h4>1.5.3 Capa de servicios</h4>
+
+<p>Los <strong>servicios de aplicaci&oacute;n</strong> implementan los puertos primarios. Son los mismos casos de uso de la arquitectura de cebolla: orquestan el dominio y los puertos secundarios, gestionan la transacci&oacute;n y no contienen reglas de negocio propias.</p>
+
+<pre><span class="pre-label">Servicio de aplicaci&oacute;n implementando el puerto primario</span><code>export class ServicioConfirmarPedido implements ConfirmarPedidoPort {
+  constructor(
+    private readonly repo:   RepositorioPedidos,   // puerto secundario
+    private readonly pagos:  PasarelaPagos,        // puerto secundario
+    private readonly avisos: Notificador           // puerto secundario
+  ) {}
+
+  async ejecutar(cmd: { idPedido: string; idUsuario: string }): Promise&lt;Pedido&gt; {
+    const pedido = await this.repo.porId(cmd.idPedido);
+    if (!pedido) throw new PedidoNoEncontrado(cmd.idPedido);
+
+    pedido.confirmar();                        // la REGLA vive en la entidad
+    await this.pagos.cobrar(pedido.total(), cmd.idUsuario);
+    await this.repo.guardar(pedido);
+    await this.avisos.pedidoConfirmado(pedido);
+    return pedido;
+  }
+}</code></pre>
+
+<h4>1.5.4 Adaptadores</h4>
+
+<p>Un <strong>adaptador</strong> es c&oacute;digo que conecta un puerto con una tecnolog&iacute;a concreta. Es el patr&oacute;n Adapter del GoF aplicado a la frontera del sistema, y de ah&iacute; viene el nombre.</p>
+
+<ul>
+<li><strong>Adaptadores primarios</strong> &mdash; traducen un est&iacute;mulo externo en una llamada a un puerto primario. Un controlador REST convierte una petici&oacute;n HTTP en un comando. Un consumidor de cola convierte un mensaje en un comando. Una prueba automatizada tambi&eacute;n es un adaptador primario &mdash; este punto suele sorprender y es exactamente lo que Cockburn quer&iacute;a lograr.</li>
+<li><strong>Adaptadores secundarios</strong> &mdash; implementan un puerto secundario contra una tecnolog&iacute;a. <code>RepositorioPedidosPostgres</code> implementa <code>RepositorioPedidos</code> usando SQL. <code>PasarelaStripe</code> implementa <code>PasarelaPagos</code> llamando a la API de Stripe.</li>
+</ul>
+
+<pre><span class="pre-label">Dos adaptadores del mismo puerto secundario</span><code>// producci&oacute;n
+export class RepositorioPedidosPostgres implements RepositorioPedidos {
+  constructor(private readonly pool: Pool) {}
+
+  async porId(id: string): Promise&lt;Pedido | null&gt; {
+    const { rows } = await this.pool.query(
+      `SELECT p.id, p.usuario_id, p.estado,
+              l.sku, l.cantidad, l.precio_unitario
+         FROM pedidos p
+         LEFT JOIN lineas_pedido l ON l.pedido_id = p.id
+        WHERE p.id = $1`, [id]);
+    return rows.length ? this.aDominio(rows) : null;   // mapeo fila -&gt; entidad
+  }
+
+  async guardar(pedido: Pedido): Promise&lt;void&gt; { /* ... */ }
+  private aDominio(rows: any[]): Pedido { /* ... */ }
+}
+
+// pruebas: mismo contrato, cero infraestructura
+export class RepositorioPedidosEnMemoria implements RepositorioPedidos {
+  private datos = new Map&lt;string, Pedido&gt;();
+  async porId(id: string)      { return this.datos.get(id) ?? null; }
+  async guardar(p: Pedido)     { this.datos.set(p.id, p); }
+}</code></pre>
+
+<h4>Estructura de carpetas</h4>
+
+<pre><span class="pre-label">Organizaci&oacute;n hexagonal</span><code>src/
+  dominio/                       &lt;- NO importa nada de fuera
+    Pedido.ts
+    LineaPedido.ts
+    Dinero.ts
+    errores.ts
+  aplicacion/
+    puertos/
+      entrada/ConfirmarPedidoPort.ts
+      salida/RepositorioPedidos.ts
+      salida/PasarelaPagos.ts
+      salida/Notificador.ts
+    servicios/
+      ServicioConfirmarPedido.ts
+  infraestructura/
+    entrada/
+      http/pedidos.controlador.ts
+      cli/comandos.ts
+    salida/
+      persistencia/RepositorioPedidosPostgres.ts
+      pagos/PasarelaStripe.ts
+      correo/NotificadorSMTP.ts
+  main.ts                        &lt;- el ensamblador</code></pre>
+
+<div class="box proj">
+  <span class="box-tag">En tu proyecto</span>
+  <p>Si adoptas esta estructura desde el primer commit, ganas dos cosas concretas. Primero, cuando llegue la Unidad III y toque cambiar de acceso directo a ORM, solo tocas <code>infraestructura/salida/persistencia/</code>. Segundo, tienes un diagrama que defender en la exposici&oacute;n &mdash; y las exposiciones cuentan en la evaluaci&oacute;n seg&uacute;n el programa. La estructura de carpetas <em>es</em> tu argumento arquitect&oacute;nico hecho visible.</p>
+</div>
+
+<h4>Cebolla, limpia y hexagonal: la comparaci&oacute;n</h4>
+
+<p>Esta tabla responde la pregunta de examen m&aacute;s previsible de toda la unidad.</p>
+
+<div class="tw">
+<table>
+<thead><tr><th></th><th>Hexagonal (2005)</th><th>Cebolla (2008)</th><th>Limpia (2012)</th></tr></thead>
+<tbody>
+<tr><td class="k">Autor</td><td>Alistair Cockburn</td><td>Jeffrey Palermo</td><td>Robert C. Martin</td></tr>
+<tr><td class="k">Met&aacute;fora</td><td>Hex&aacute;gono con puertos</td><td>Anillos conc&eacute;ntricos</td><td>Anillos conc&eacute;ntricos</td></tr>
+<tr><td class="k">&Eacute;nfasis</td><td>Simetr&iacute;a entrada/salida y sustituibilidad</td><td>El dominio como centro, no la base de datos</td><td>La regla de dependencia como ley expl&iacute;cita</td></tr>
+<tr><td class="k">Vocabulario</td><td>Puertos, adaptadores</td><td>Dominio, servicios, infraestructura</td><td>Entidades, casos de uso, adaptadores de interfaz, frameworks</td></tr>
+<tr><td class="k">Aporte propio</td><td>Ver las pruebas como otro adaptador m&aacute;s</td><td>Poner las interfaces de repositorio dentro del dominio</td><td>Formular la regla en una sola frase</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box exam">
+  <span class="box-tag">Respuesta modelo</span>
+  <p>&laquo;Las tres pertenecen a la misma familia y comparten el principio central: <strong>el dominio en el centro y las dependencias apuntando hacia adentro</strong>, logrado mediante inversi&oacute;n de dependencias. Difieren en la met&aacute;fora y en el &eacute;nfasis: la hexagonal destaca la simetr&iacute;a entre lo que nos llama y lo que llamamos mediante puertos y adaptadores; la de cebolla destaca que el modelo del dominio, y no la base de datos, es el centro de gravedad; y la limpia enuncia la regla de dependencia de forma expl&iacute;cita y nombra cuatro anillos. En la pr&aacute;ctica los equipos las mezclan.&raquo;</p>
+</div>
+
+<h4>Se&ntilde;ales de que lo est&aacute;s haciendo mal</h4>
+<ul class="tight">
+<li>Una entidad de dominio con anotaciones del ORM (<code>@Entity</code>, <code>@Column</code>) o de serializaci&oacute;n. Esas anotaciones son infraestructura.</li>
+<li>Un puerto que devuelve un tipo del ORM, o un <code>ResultSet</code>, o un <code>Response</code>.</li>
+<li>Un servicio de aplicaci&oacute;n que recibe <code>req</code> y <code>res</code> como par&aacute;metros.</li>
+<li>Un <code>import</code> desde <code>dominio/</code> hacia <code>infraestructura/</code>. Con una sola l&iacute;nea as&iacute; la arquitectura ya no se sostiene.</li>
+<li>Puertos con veinte m&eacute;todos. Eso viola segregaci&oacute;n de interfaces y suele indicar que el agregado est&aacute; mal delimitado.</li>
+</ul>
+
+<div class="box note">
+  <span class="box-tag">Truco de verificaci&oacute;n</span>
+  <p>Se puede automatizar. En Java existe ArchUnit, que permite escribir una prueba que falla si alg&uacute;n paquete de dominio importa infraestructura. En JavaScript se logra con <code>eslint-plugin-boundaries</code> o con reglas de <code>no-restricted-imports</code>. Mencionar que las reglas arquitect&oacute;nicas se pueden <em>probar autom&aacute;ticamente</em> es el tipo de detalle que separa una exposici&oacute;n buena de una excelente.</p>
+</div>
+</section>
+
+<section id="s-16">
+<h3><span class="h-num">1.6</span><span>Arquitectura de microservicios</span></h3>
+
+<div class="box prog">
+  <span class="box-tag">Del programa oficial</span>
+  <p>1.6. Arquitectura de microservicios<br>1.6.1. Fundamentos de microservicios<br>1.6.2. Arquitectura del dominio<br>1.6.3. Modelo de referencia<br>1.6.4. Modelo de implementaci&oacute;n<br>1.6.5. Modelo de despliegue<br>1.6.6. Dise&ntilde;o de aplicaciones web</p>
+</div>
+
+<p>Es el punto m&aacute;s extenso de la unidad y el que nombra la unidad de competencia. Todo lo anterior fue preparaci&oacute;n para esto.</p>
+
+<h4>1.6.1 Fundamentos</h4>
+
+<h5>Definici&oacute;n</h5>
+<p>Un estilo arquitect&oacute;nico en el que la aplicaci&oacute;n se construye como un conjunto de <strong>servicios peque&ntilde;os, aut&oacute;nomos y desplegables de forma independiente</strong>, cada uno ejecut&aacute;ndose en su propio proceso y comunic&aacute;ndose por mecanismos ligeros, normalmente HTTP o mensajer&iacute;a as&iacute;ncrona.</p>
+
+<p>El salto conceptual respecto a todo lo anterior: hasta ahora la separaci&oacute;n era <strong>l&oacute;gica</strong> &mdash; carpetas, m&oacute;dulos, interfaces, todo dentro del mismo proceso. Aqu&iacute; la separaci&oacute;n se vuelve <strong>f&iacute;sica</strong>. Y esa es la diferencia que lo cambia todo, porque una llamada entre m&oacute;dulos que antes era una llamada a funci&oacute;n ahora es una llamada de red que puede tardar, fallar o llegar dos veces.</p>
+
+<h5>Las caracter&iacute;sticas</h5>
+<p>Lewis y Fowler enumeraron nueve rasgos que se citan constantemente. Estos son los que hay que poder nombrar:</p>
+
+<ol>
+<li><strong>Componentizaci&oacute;n v&iacute;a servicios</strong> &mdash; los componentes son procesos independientes, no librer&iacute;as enlazadas.</li>
+<li><strong>Organizaci&oacute;n en torno a capacidades de negocio</strong> &mdash; el servicio de &laquo;pedidos&raquo;, no el servicio de &laquo;base de datos&raquo;. Un equipo por capacidad, con frontend, backend y datos.</li>
+<li><strong>Productos, no proyectos</strong> &mdash; el equipo que lo construye lo opera. <em>You build it, you run it.</em></li>
+<li><strong>Extremos inteligentes, tuber&iacute;as tontas</strong> &mdash; la l&oacute;gica vive en los servicios; el medio de transporte solo transporta. Es una reacci&oacute;n expl&iacute;cita contra los buses de servicios empresariales cargados de l&oacute;gica.</li>
+<li><strong>Gobierno descentralizado</strong> &mdash; cada servicio puede usar el lenguaje y las herramientas que le convengan. En la pr&aacute;ctica se limita, porque cada tecnolog&iacute;a extra es un costo permanente.</li>
+<li><strong>Gesti&oacute;n de datos descentralizada</strong> &mdash; <strong>una base de datos por servicio</strong>. Esta es la m&aacute;s importante y la que m&aacute;s se incumple.</li>
+<li><strong>Automatizaci&oacute;n de infraestructura</strong> &mdash; sin integraci&oacute;n y despliegue continuos, esto no es sostenible.</li>
+<li><strong>Dise&ntilde;o para el fallo</strong> &mdash; los servicios fallan. Hay que asumirlo en el dise&ntilde;o, no tratarlo como excepci&oacute;n.</li>
+<li><strong>Dise&ntilde;o evolutivo</strong> &mdash; los servicios se reemplazan y se retiran; no son estructuras permanentes.</li>
+</ol>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p><strong>Una base de datos por servicio</strong> es el criterio que separa microservicios de verdad de un monolito troceado. Si dos servicios comparten tablas, no son independientes: no puedes cambiar el esquema sin coordinar despliegues, y acabas de construir un <em>monolito distribuido</em> &mdash; todos los costos de lo distribuido, ninguna de las ventajas. Es el antipatr&oacute;n que m&aacute;s se pregunta.</p>
+</div>
+
+<figure>
+<div class="fig-body">
+<svg viewBox="0 0 640 330" role="img" aria-label="Comparaci&oacute;n entre monolito con base de datos &uacute;nica y microservicios con base de datos por servicio">
+  <text x="10" y="20" class="s-t">Monolito</text>
+  <rect x="10" y="34" width="240" height="120" class="s-s2" stroke="var(--line-2)" stroke-width="1.2"/>
+  <rect x="28" y="52" width="90" height="38" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="40" y="75" class="s-ts">Pedidos</text>
+  <rect x="142" y="52" width="90" height="38" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="154" y="75" class="s-ts">Cat&aacute;logo</text>
+  <rect x="28" y="102" width="90" height="38" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="40" y="125" class="s-ts">Usuarios</text>
+  <rect x="142" y="102" width="90" height="38" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="154" y="125" class="s-ts">Pagos</text>
+  <ellipse cx="130" cy="212" rx="76" ry="22" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="130" y="217" class="s-ts" text-anchor="middle">una sola base de datos</text>
+  <path d="M130 154 L130 190" class="s-line"/>
+  <text x="10" y="266" class="s-ts">1 proceso &middot; 1 despliegue</text>
+  <text x="10" y="282" class="s-ts">transacciones ACID reales</text>
+  <text x="10" y="298" class="s-ts">falla todo o nada</text>
+
+  <line x1="310" y1="20" x2="310" y2="310" stroke="var(--line)" stroke-width="1"/>
+
+  <text x="370" y="20" class="s-t">Microservicios</text>
+  <rect x="370" y="34" width="112" height="40" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="384" y="59" class="s-ts">Svc Pedidos</text>
+  <ellipse cx="426" cy="102" rx="44" ry="16" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="426" y="106" class="s-ts" text-anchor="middle">db pedidos</text>
+  <path d="M426 74 L426 86" class="s-line"/>
+
+  <rect x="506" y="34" width="112" height="40" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="520" y="59" class="s-ts">Svc Cat&aacute;logo</text>
+  <ellipse cx="562" cy="102" rx="44" ry="16" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="562" y="106" class="s-ts" text-anchor="middle">db cat&aacute;logo</text>
+  <path d="M562 74 L562 86" class="s-line"/>
+
+  <rect x="370" y="140" width="112" height="40" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="384" y="165" class="s-ts">Svc Usuarios</text>
+  <ellipse cx="426" cy="208" rx="44" ry="16" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="426" y="212" class="s-ts" text-anchor="middle">db usuarios</text>
+  <path d="M426 180 L426 192" class="s-line"/>
+
+  <rect x="506" y="140" width="112" height="40" class="s-surface" stroke="var(--accent)" stroke-width="1.4"/>
+  <text x="520" y="165" class="s-ts">Svc Pagos</text>
+  <ellipse cx="562" cy="208" rx="44" ry="16" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="562" y="212" class="s-ts" text-anchor="middle">db pagos</text>
+  <path d="M562 180 L562 192" class="s-line"/>
+
+  <path d="M482 54 L506 54" class="s-acc"/>
+  <path d="M482 160 L506 160" class="s-acc"/>
+  <path d="M426 118 L426 140" class="s-acc" stroke-dasharray="3 3"/>
+
+  <text x="370" y="266" class="s-ts">N procesos &middot; N despliegues</text>
+  <text x="370" y="282" class="s-ts">consistencia eventual entre servicios</text>
+  <text x="370" y="298" class="s-ts">falla parcial: se degrada, no cae</text>
+</svg>
+</div>
+<figcaption>La l&iacute;nea que importa no es la que separa las cajas de arriba, sino la que separa las bases de datos de abajo.</figcaption>
+</figure>
+
+<h5>Monolito frente a microservicios, sin propaganda</h5>
+
+<div class="tw">
+<table>
+<thead><tr><th>Criterio</th><th>Monolito</th><th>Microservicios</th></tr></thead>
+<tbody>
+<tr><td class="k">Despliegue</td><td>Todo junto, siempre</td><td>Cada servicio a su ritmo</td></tr>
+<tr><td class="k">Escalado</td><td>Se replica el sistema entero</td><td>Se escala solo el servicio saturado</td></tr>
+<tr><td class="k">Fallo</td><td>Se cae todo</td><td>Fallo parcial y degradaci&oacute;n, si se dise&ntilde;&oacute; para ello</td></tr>
+<tr><td class="k">Transacciones</td><td>ACID directo</td><td>Consistencia eventual, sagas, compensaciones</td></tr>
+<tr><td class="k">Tecnolog&iacute;a</td><td>Una sola pila</td><td>Libre por servicio, con el costo que eso implica</td></tr>
+<tr><td class="k">Depuraci&oacute;n</td><td>Una traza de pila</td><td>Trazas distribuidas y correlaci&oacute;n de bit&aacute;coras</td></tr>
+<tr><td class="k">Pruebas</td><td>Directas</td><td>Complejas: contratos, entornos, dobles de servicio</td></tr>
+<tr><td class="k">Operaci&oacute;n</td><td>Barata</td><td>Cara: orquestador, registro, monitoreo, CI/CD por servicio</td></tr>
+<tr><td class="k">Equipo m&iacute;nimo</td><td>Uno peque&ntilde;o basta</td><td>Varios equipos, o el costo de coordinaci&oacute;n te come</td></tr>
+<tr><td class="k">Refactorizar l&iacute;mites</td><td>Barato: lo hace el IDE</td><td>Car&iacute;simo: implica migrar datos y coordinar APIs</td></tr>
+</tbody>
+</table>
+</div>
+
+<h5>Las falacias de la computaci&oacute;n distribuida</h5>
+<p>Formuladas en Sun Microsystems por Peter Deutsch y otros. Son ocho suposiciones falsas que todo el mundo hace al principio, y explican de d&oacute;nde sale la dificultad real de los microservicios:</p>
+<ol class="tight">
+<li>La red es confiable.</li>
+<li>La latencia es cero.</li>
+<li>El ancho de banda es infinito.</li>
+<li>La red es segura.</li>
+<li>La topolog&iacute;a no cambia.</li>
+<li>Hay un solo administrador.</li>
+<li>El costo de transporte es cero.</li>
+<li>La red es homog&eacute;nea.</li>
+</ol>
+<p>Cada una de estas falacias tiene un patr&oacute;n de mitigaci&oacute;n correspondiente: reintentos e idempotencia para la primera, cach&eacute; y agregaci&oacute;n para la segunda, TLS y autenticaci&oacute;n servicio a servicio para la cuarta, descubrimiento de servicios para la quinta.</p>
+
+<h4>1.6.2 Arquitectura del dominio</h4>
+
+<p>La pregunta pr&aacute;ctica m&aacute;s dif&iacute;cil de todo el tema: <strong>&iquest;d&oacute;nde se corta?</strong> Y la respuesta que da la industria viene del dise&ntilde;o guiado por el dominio (DDD) de Eric Evans.</p>
+
+<h5>Contexto delimitado (bounded context)</h5>
+<p>Es el concepto clave. Un contexto delimitado es una frontera dentro de la cual un modelo y su vocabulario son consistentes y sin ambig&uuml;edad. Fuera de esa frontera, las mismas palabras significan otra cosa.</p>
+
+<p>El ejemplo cl&aacute;sico es la palabra <em>producto</em>:</p>
+<ul class="tight">
+<li>En el contexto de <strong>cat&aacute;logo</strong>, un producto tiene descripci&oacute;n, im&aacute;genes, categor&iacute;a y atributos de b&uacute;squeda.</li>
+<li>En el de <strong>inventario</strong>, un producto es un SKU con existencias, ubicaci&oacute;n en almac&eacute;n y punto de reorden.</li>
+<li>En el de <strong>facturaci&oacute;n</strong>, es una l&iacute;nea con precio, impuesto y clave del SAT.</li>
+<li>En el de <strong>env&iacute;os</strong>, es un bulto con peso, dimensiones y fragilidad.</li>
+</ul>
+<p>Intentar un &uacute;nico modelo <code>Producto</code> que sirva para los cuatro produce una clase monstruosa que nadie entiende y que cambia cada vez que cambia cualquiera de los cuatro negocios. La propuesta de DDD es aceptar que son <strong>cuatro modelos distintos</strong> que comparten un identificador.</p>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p>&laquo;&iquest;C&oacute;mo se decide d&oacute;nde partir los microservicios?&raquo; La respuesta esperada: <strong>por contextos delimitados del dominio, no por capas t&eacute;cnicas</strong>. Un servicio de &laquo;pedidos&raquo; es correcto; un servicio de &laquo;base de datos&raquo; o de &laquo;controladores&raquo; es un error conceptual, porque reintroduce el acoplamiento que se quer&iacute;a evitar y obliga a modificar varios servicios para cualquier cambio funcional.</p>
+</div>
+
+<h5>Lenguaje ubicuo</h5>
+<p>Dentro de cada contexto, el equipo y el c&oacute;digo usan exactamente las mismas palabras que usa el negocio. Si el &aacute;rea comercial dice &laquo;cotizaci&oacute;n&raquo;, la clase se llama <code>Cotizacion</code>, no <code>OrderDraft</code>. Suena trivial y evita una cantidad enorme de malentendidos.</p>
+
+<h5>Mapa de contextos</h5>
+<p>Documenta c&oacute;mo se relacionan los contextos entre s&iacute;. Los patrones que conviene poder nombrar:</p>
+<div class="tw">
+<table>
+<thead><tr><th>Patr&oacute;n</th><th>Relaci&oacute;n que describe</th></tr></thead>
+<tbody>
+<tr><td class="k">Cliente&ndash;proveedor</td><td>El de aguas arriba provee; el de aguas abajo negocia sus necesidades</td></tr>
+<tr><td class="k">Conformista</td><td>El de abajo se traga el modelo del de arriba sin poder negociar</td></tr>
+<tr><td class="k">Capa anticorrupci&oacute;n</td><td>El de abajo traduce el modelo ajeno para no contaminar el propio</td></tr>
+<tr><td class="k">N&uacute;cleo compartido</td><td>Dos contextos comparten un subconjunto del modelo. Genera acoplamiento; &uacute;salo poco</td></tr>
+<tr><td class="k">Servicio abierto</td><td>Un contexto publica un protocolo est&aacute;ndar para muchos consumidores</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>La <strong>capa anticorrupci&oacute;n</strong> merece atenci&oacute;n especial porque es la m&aacute;s &uacute;til en la pr&aacute;ctica: es un adaptador que traduce entre el modelo externo y el tuyo, de modo que si el proveedor cambia su API, el da&ntilde;o se detiene en esa capa. Es exactamente el mismo mecanismo del adaptador hexagonal, aplicado entre servicios.</p>
+
+<h5>Otras estrategias de descomposici&oacute;n</h5>
+<ul class="tight">
+<li><strong>Por capacidad de negocio</strong> &mdash; qu&eacute; hace la organizaci&oacute;n: gesti&oacute;n de pedidos, atenci&oacute;n al cliente, facturaci&oacute;n.</li>
+<li><strong>Por subdominio</strong> &mdash; distinguiendo el subdominio <em>central</em> (lo que te hace competitivo, aqu&iacute; pones tus mejores recursos), los <em>de soporte</em> y los <em>gen&eacute;ricos</em> (autenticaci&oacute;n, facturaci&oacute;n: c&oacute;mpralos hechos).</li>
+<li><strong>Por volatilidad</strong> &mdash; separar lo que cambia semanalmente de lo que cambia una vez al a&ntilde;o.</li>
+</ul>
+
+<h4>1.6.3 Modelo de referencia</h4>
+
+<p>Los componentes de infraestructura que casi cualquier plataforma de microservicios necesita. El programa lo llama &laquo;modelo de referencia&raquo; porque es el catalogo est&aacute;ndar de piezas.</p>
+
+<figure>
+<div class="fig-body">
+<svg viewBox="0 0 640 330" role="img" aria-label="Modelo de referencia con gateway, servicios y componentes transversales">
+  <defs>
+    <marker id="ar4" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto">
+      <path d="M0 0 L8 4 L0 8 z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+
+  <rect x="14" y="120" width="96" height="44" class="s-surface" stroke="var(--line-2)" stroke-width="1.2"/>
+  <text x="30" y="147" class="s-ts">Clientes</text>
+
+  <rect x="146" y="112" width="104" height="60" class="s-s2" stroke="var(--accent)" stroke-width="1.8"/>
+  <text x="198" y="138" class="s-t" text-anchor="middle" font-size="12">API</text>
+  <text x="198" y="154" class="s-t" text-anchor="middle" font-size="12">Gateway</text>
+
+  <path d="M110 142 L142 142" class="s-acc" marker-end="url(#ar4)"/>
+
+  <rect x="300" y="34" width="128" height="42" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="314" y="60" class="s-ts">Servicio Pedidos</text>
+  <rect x="300" y="92" width="128" height="42" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="314" y="118" class="s-ts">Servicio Cat&aacute;logo</text>
+  <rect x="300" y="150" width="128" height="42" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="314" y="176" class="s-ts">Servicio Usuarios</text>
+  <rect x="300" y="208" width="128" height="42" class="s-surface" stroke="var(--accent)" stroke-width="1.3"/>
+  <text x="314" y="234" class="s-ts">Servicio Pagos</text>
+
+  <path d="M250 136 L296 56"  class="s-acc" marker-end="url(#ar4)"/>
+  <path d="M250 140 L296 112" class="s-acc" marker-end="url(#ar4)"/>
+  <path d="M250 148 L296 170" class="s-acc" marker-end="url(#ar4)"/>
+  <path d="M250 154 L296 228" class="s-acc" marker-end="url(#ar4)"/>
+
+  <rect x="470" y="34" width="156" height="34" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="484" y="55" class="s-ts">Descubrimiento de servicios</text>
+  <rect x="470" y="80" width="156" height="34" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="484" y="101" class="s-ts">Configuraci&oacute;n centralizada</text>
+  <rect x="470" y="126" width="156" height="34" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="484" y="147" class="s-ts">Identidad y autorizaci&oacute;n</text>
+  <rect x="470" y="172" width="156" height="34" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="484" y="193" class="s-ts">Bus de eventos / colas</text>
+  <rect x="470" y="218" width="156" height="34" class="s-s2" stroke="var(--line-2)" stroke-width="1.1"/>
+  <text x="484" y="239" class="s-ts">Observabilidad</text>
+
+  <text x="14" y="300" class="s-ts">Transversal a todo: bit&aacute;coras correlacionadas, m&eacute;tricas, trazas distribuidas, CI/CD</text>
+  <rect x="14" y="272" width="612" height="1" fill="var(--line-2)"/>
+</svg>
+</div>
+<figcaption>El gateway es la &uacute;nica puerta p&uacute;blica. Todo lo de la derecha son servicios de plataforma que los servicios de negocio consumen.</figcaption>
+</figure>
+
+<div class="tw">
+<table>
+<thead><tr><th>Componente</th><th>Qu&eacute; resuelve</th><th>Ejemplos</th></tr></thead>
+<tbody>
+<tr><td class="k">API Gateway</td><td>Punto &uacute;nico de entrada: enrutado, autenticaci&oacute;n, l&iacute;mite de tasa, agregaci&oacute;n de respuestas, TLS</td><td>Kong, NGINX, Spring Cloud Gateway, AWS API Gateway</td></tr>
+<tr><td class="k">Descubrimiento</td><td>Saber d&oacute;nde est&aacute; cada instancia cuando las direcciones cambian solas</td><td>Consul, Eureka, DNS de Kubernetes</td></tr>
+<tr><td class="k">Balanceador</td><td>Repartir carga entre instancias del mismo servicio</td><td>NGINX, HAProxy, Service de Kubernetes</td></tr>
+<tr><td class="k">Configuraci&oacute;n</td><td>Configuraci&oacute;n externa al artefacto, distinta por entorno</td><td>Spring Cloud Config, ConfigMap y Secret</td></tr>
+<tr><td class="k">Interruptor</td><td>Dejar de llamar a un servicio ca&iacute;do en vez de acumular esperas</td><td>Resilience4j, Polly</td></tr>
+<tr><td class="k">Bus de eventos</td><td>Comunicaci&oacute;n as&iacute;ncrona y desacoplada</td><td>RabbitMQ, Kafka, NATS, SQS</td></tr>
+<tr><td class="k">Identidad</td><td>Autenticaci&oacute;n centralizada y emisi&oacute;n de tokens</td><td>Keycloak, Auth0, Cognito</td></tr>
+<tr><td class="k">Observabilidad</td><td>Saber qu&eacute; pas&oacute; cuando algo falla en cinco servicios a la vez</td><td>Prometheus, Grafana, Jaeger, OpenTelemetry</td></tr>
+</tbody>
+</table>
+</div>
+
+<h5>El patr&oacute;n de interruptor (circuit breaker)</h5>
+<p>Vale la pena entenderlo porque se pregunta y porque el nombre es literal. Si el servicio de pagos deja de responder, cada petici&oacute;n al servicio de pedidos se queda esperando el tiempo de espera completo, los hilos se agotan y el servicio de pedidos tambi&eacute;n cae: es un <strong>fallo en cascada</strong>. El interruptor lo evita con tres estados:</p>
+<ul class="tight">
+<li><strong>Cerrado</strong> &mdash; funcionamiento normal, las llamadas pasan.</li>
+<li><strong>Abierto</strong> &mdash; tras N fallos consecutivos, las llamadas fallan de inmediato sin intentar la red. Se responde con un valor alternativo o con un error controlado.</li>
+<li><strong>Semiabierto</strong> &mdash; pasado un tiempo, deja pasar una llamada de prueba. Si funciona, vuelve a cerrado; si no, vuelve a abierto.</li>
+</ul>
+
+<h5>Los tres pilares de la observabilidad</h5>
+<p><strong>Bit&aacute;coras</strong> (qu&eacute; pas&oacute;), <strong>m&eacute;tricas</strong> (cu&aacute;nto y con qu&eacute; frecuencia) y <strong>trazas</strong> (el recorrido completo de una petici&oacute;n a trav&eacute;s de todos los servicios). El elemento que las une es el <strong>identificador de correlaci&oacute;n</strong>: un id que se genera en el gateway y viaja en una cabecera por todas las llamadas subsiguientes, de modo que puedas reconstruir qu&eacute; hizo una petici&oacute;n concreta en cinco servicios distintos.</p>
+
+<h4>1.6.4 Modelo de implementaci&oacute;n</h4>
+
+<h5>Comunicaci&oacute;n s&iacute;ncrona frente a as&iacute;ncrona</h5>
+
+<div class="tw">
+<table>
+<thead><tr><th></th><th>S&iacute;ncrona</th><th>As&iacute;ncrona</th></tr></thead>
+<tbody>
+<tr><td class="k">Mecanismo</td><td>REST sobre HTTP, gRPC, GraphQL</td><td>Colas y temas de mensajes, eventos</td></tr>
+<tr><td class="k">El que llama</td><td>Espera la respuesta, bloqueado</td><td>Publica y sigue trabajando</td></tr>
+<tr><td class="k">Acoplamiento</td><td>Temporal: ambos deben estar arriba</td><td>Bajo: el receptor puede estar ca&iacute;do y procesar despu&eacute;s</td></tr>
+<tr><td class="k">Fallos</td><td>Se propagan en cadena</td><td>Quedan absorbidos por la cola</td></tr>
+<tr><td class="k">Complejidad</td><td>Baja, familiar</td><td>Alta: orden, duplicados, mensajes muertos</td></tr>
+<tr><td class="k">Buena para</td><td>Consultas que necesitan respuesta inmediata</td><td>Notificar hechos consumados, trabajo diferido</td></tr>
+</tbody>
+</table>
+</div>
+
+<h5>Consistencia eventual</h5>
+<p>Consecuencia directa de tener una base de datos por servicio: no puedes abrir una transacci&oacute;n que abarque dos servicios. El sistema pasa por estados temporalmente inconsistentes y converge despu&eacute;s. El pedido queda creado y el inventario se descuenta doscientos milisegundos m&aacute;s tarde; durante ese lapso el sistema est&aacute; &laquo;mal&raquo;, y hay que dise&ntilde;ar para que eso sea aceptable.</p>
+
+<div class="box exam">
+  <span class="box-tag">Para el examen</span>
+  <p><strong>BASE frente a ACID.</strong> Frente a las garant&iacute;as ACID de una base relacional, los sistemas distribuidos suelen ofrecer BASE: <em>Basically Available</em> (b&aacute;sicamente disponible), <em>Soft state</em> (estado blando, puede cambiar sin entrada nueva) y <em>Eventually consistent</em> (consistente con el tiempo). Es el intercambio que impone el teorema CAP en cuanto eliges disponibilidad sobre consistencia.</p>
+</div>
+
+<h5>El patr&oacute;n saga</h5>
+<p>Es la respuesta a &laquo;&iquest;c&oacute;mo hago una transacci&oacute;n que toca tres servicios?&raquo;. Una saga es una secuencia de transacciones locales, cada una en su propio servicio, donde cada paso publica un evento que dispara el siguiente. Si un paso falla, se ejecutan <strong>transacciones de compensaci&oacute;n</strong> que deshacen los pasos anteriores.</p>
+
+<pre><span class="pre-label">Saga de un pedido, con su camino de compensaci&oacute;n</span><code>  Pedido creado (estado: PENDIENTE)
+        |
+        v
+  Reservar inventario  ---- falla ----&gt;  Cancelar pedido
+        |                                      ^
+        v                                      |
+  Cobrar pago          ---- falla ----&gt;  Liberar inventario
+        |                                + Cancelar pedido
+        v
+  Programar env&iacute;o      ---- falla ----&gt;  Reembolsar pago
+        |                                + Liberar inventario
+        v                                + Cancelar pedido
+  Pedido CONFIRMADO</code></pre>
+
+<p>Hay dos variantes: la <strong>coreograf&iacute;a</strong>, donde cada servicio escucha eventos y reacciona sin coordinador central (bajo acoplamiento, pero el flujo global no est&aacute; escrito en ninguna parte y cuesta depurarlo); y la <strong>orquestaci&oacute;n</strong>, donde un componente coordinador dirige los pasos (el flujo es expl&iacute;cito y visible, a cambio de un punto central de dependencia).</p>
+
+<h5>Idempotencia</h5>
+<p>En una red poco fiable, los mensajes se reintentan y llegan por duplicado. Si &laquo;cobrar pago&raquo; se ejecuta dos veces, cobraste dos veces. La soluci&oacute;n est&aacute;ndar es la <strong>clave de idempotencia</strong>: el emisor manda un identificador &uacute;nico por operaci&oacute;n, el receptor lleva registro de las claves ya procesadas y, si ve una repetida, devuelve el resultado anterior sin volver a ejecutar. Es un tema que reaparece en la Unidad II.</p>
+
+<h5>Patr&oacute;n outbox</h5>
+<p>Problema sutil pero cl&aacute;sico: necesitas guardar el pedido en tu base de datos <em>y</em> publicar un evento en la cola, at&oacute;micamente. Si guardas y luego falla la publicaci&oacute;n, el resto del sistema nunca se entera. La soluci&oacute;n: dentro de la misma transacci&oacute;n de base de datos, escribes el evento en una tabla <code>outbox</code>; un proceso aparte lee esa tabla y publica en la cola. As&iacute; la atomicidad la garantiza la base de datos local.</p>
+
+<h5>Versionado de API y pruebas de contrato</h5>
+<p>Como los servicios se despliegan de forma independiente, en alg&uacute;n momento convivir&aacute;n la versi&oacute;n vieja de uno con la nueva de otro. De ah&iacute; dos disciplinas: <strong>versionar</strong> (<code>/api/v1/</code>, o negociaci&oacute;n por cabecera) y mantener <strong>compatibilidad hacia atr&aacute;s</strong> &mdash; a&ntilde;adir campos est&aacute; permitido, quitarlos o renombrarlos no. Las <strong>pruebas de contrato</strong> (Pact es la herramienta t&iacute;pica) verifican autom&aacute;ticamente que el proveedor sigue cumpliendo lo que el consumidor espera, sin necesidad de levantar los dos servicios juntos.</p>
+
+<h4>1.6.5 Modelo de despliegue</h4>
+
+<p>Aqu&iacute; el programa empieza a solaparse con la Unidad V, que retomar&aacute; contenedores y PaaS con m&aacute;s profundidad.</p>
+
+<h5>Patrones de despliegue</h5>
+<ul class="tight">
+<li><strong>Un servicio por contenedor</strong> &mdash; el est&aacute;ndar actual. Aislamiento, imagen reproducible, arranque r&aacute;pido.</li>
+<li><strong>Un servicio por m&aacute;quina virtual</strong> &mdash; m&aacute;s aislamiento, mucho m&aacute;s costo.</li>
+<li><strong>Sin servidor</strong> (<em>serverless</em>) &mdash; despliegas funciones y el proveedor gestiona todo lo dem&aacute;s. Excelente para cargas espor&aacute;dicas; sufre el arranque en fr&iacute;o.</li>
+<li><strong>Sidecar</strong> &mdash; un contenedor auxiliar junto al principal que se encarga de asuntos transversales (TLS, m&eacute;tricas, reintentos). Es la base de las mallas de servicios como Istio o Linkerd.</li>
+</ul>
+
+<h5>Orquestaci&oacute;n</h5>
+<p>Con veinte contenedores dejas de poder gestionarlos a mano. Un orquestador &mdash; Kubernetes en la pr&aacute;ctica, y hay un libro sobre &eacute;l en tu bibliograf&iacute;a &mdash; se encarga de programar contenedores en nodos, reiniciar los que mueren, escalar seg&uacute;n carga, descubrir servicios y hacer despliegues progresivos. El vocabulario m&iacute;nimo: <strong>Pod</strong> (la unidad m&aacute;s peque&ntilde;a, uno o varios contenedores juntos), <strong>Deployment</strong> (declara cu&aacute;ntas r&eacute;plicas quieres), <strong>Service</strong> (nombre estable y balanceo hacia esos pods), <strong>Ingress</strong> (entrada HTTP desde fuera del cl&uacute;ster), <strong>ConfigMap</strong> y <strong>Secret</strong> (configuraci&oacute;n y credenciales).</p>
+
+<h5>Estrategias de publicaci&oacute;n</h5>
+<div class="tw">
+<table>
+<thead><tr><th>Estrategia</th><th>C&oacute;mo funciona</th></tr></thead>
+<tbody>
+<tr><td class="k">Recreate</td><td>Apaga la vieja, levanta la nueva. Hay corte de servicio</td></tr>
+<tr><td class="k">Rolling update</td><td>Reemplaza instancias poco a poco. Sin corte, pero conviven dos versiones</td></tr>
+<tr><td class="k">Blue&ndash;green</td><td>Dos entornos completos; se conmuta el tr&aacute;fico de golpe. Reversi&oacute;n instant&aacute;nea</td></tr>
+<tr><td class="k">Canary</td><td>Se manda el 5% del tr&aacute;fico a la versi&oacute;n nueva y se observa antes de continuar</td></tr>
+</tbody>
+</table>
+</div>
+
+<h5>Los doce factores</h5>
+<p>Metodolog&iacute;a para aplicaciones que van a vivir en la nube (Heroku, 2011). No hace falta memorizar las doce, pero s&iacute; las que m&aacute;s se preguntan: <strong>configuraci&oacute;n en el entorno</strong> y no en el c&oacute;digo; <strong>procesos sin estado</strong> para poder escalar horizontalmente; <strong>paridad entre desarrollo y producci&oacute;n</strong>; <strong>bit&aacute;coras como flujo de eventos</strong> hacia la salida est&aacute;ndar en lugar de archivos; y <strong>servicios de respaldo como recursos conectables</strong>, de modo que cambiar la base de datos sea cambiar una variable de entorno.</p>
+
+<h5>PaaS</h5>
+<p>El programa exige publicar el proyecto en un PaaS (pr&aacute;cticas 11 y 12). Un PaaS te da ejecuci&oacute;n, escalado, red y TLS, y t&uacute; solo entregas c&oacute;digo o una imagen. Render, Railway, Fly.io, Heroku, Google App Engine, Azure App Service. Todos toman un repositorio de Git o un Dockerfile y te devuelven una URL p&uacute;blica.</p>
+
+<div class="box proj">
+  <span class="box-tag">En tu proyecto</span>
+  <p>Despliega un &laquo;hola mundo&raquo; en un PaaS <strong>en la primera semana</strong>, cuando no hay presi&oacute;n. Establecer la tuber&iacute;a completa &mdash; repositorio, contenedor, variables de entorno, base de datos gestionada, dominio &mdash; con una aplicaci&oacute;n trivial toma una tarde. Hacerlo con el proyecto terminado y a dos d&iacute;as de la entrega es donde se pierden calificaciones cada semestre.</p>
+</div>
+
+<h4>1.6.6 Dise&ntilde;o de aplicaciones web</h4>
+
+<p>El cierre de la unidad: c&oacute;mo se aterriza todo lo anterior en una aplicaci&oacute;n web real, que es exactamente lo que vas a entregar.</p>
+
+<h5>El frontend en un mundo de microservicios</h5>
+<ul class="tight">
+<li><strong>SPA contra el gateway</strong> &mdash; lo habitual y lo que deber&iacute;as hacer. Un cliente React o Angular consume una &uacute;nica URL base, y el gateway reparte hacia dentro.</li>
+<li><strong>BFF</strong> (<em>Backend for Frontend</em>) &mdash; un backend a medida por tipo de cliente: uno para web, otro para m&oacute;vil. Evita que la aplicaci&oacute;n m&oacute;vil tenga que hacer siete peticiones para pintar una pantalla.</li>
+<li><strong>Micro&ndash;frontends</strong> &mdash; llevar la divisi&oacute;n hasta la interfaz, con equipos que despliegan fragmentos de p&aacute;gina independientes. Existe, es complejo, y para esta materia basta con saber que existe.</li>
+</ul>
+
+<h5>Renderizado</h5>
+<p>Distinci&oacute;n que conviene manejar de cara a la Unidad IV: en el <strong>renderizado del lado del cliente</strong> el servidor manda un HTML casi vac&iacute;o y JavaScript construye la interfaz &mdash; el arranque inicial es m&aacute;s lento y el SEO sufre, pero la navegaci&oacute;n posterior es instant&aacute;nea. En el <strong>renderizado del lado del servidor</strong> el HTML llega ya construido &mdash; mejor para primera carga y para buscadores, a cambio de m&aacute;s trabajo en el servidor. Next.js y Nuxt combinan ambos.</p>
+
+<h5>Seguridad transversal</h5>
+<p>El gateway autentica y valida el token; los servicios internos conf&iacute;an en el gateway o revalidan el token por su cuenta. La tendencia actual es <strong>confianza cero</strong>: cada servicio verifica siempre, porque estar dentro de la red ya no se considera prueba de nada. Todo esto se desarrolla en el punto 2.6 del programa.</p>
+
+<h5>La receta pr&aacute;ctica</h5>
+<p>Para un proyecto de materia, la ruta que maximiza aprendizaje y minimiza riesgo:</p>
+<ol>
+<li>Un <strong>monolito modular con arquitectura hexagonal</strong>, dividido internamente por contextos delimitados con carpetas de fronteras estrictas.</li>
+<li>Una <strong>API REST</strong> bien dise&ntilde;ada como &uacute;nica interfaz de entrada, documentada con OpenAPI.</li>
+<li>Un <strong>frontend SPA</strong> separado que la consume.</li>
+<li>Todo <strong>en contenedores</strong>, con Docker Compose para desarrollo local.</li>
+<li><strong>Publicado en un PaaS</strong>, como exige el programa.</li>
+<li>En la exposici&oacute;n, presenta el <strong>diagrama de c&oacute;mo se extraer&iacute;an</strong> dos de esos m&oacute;dulos a microservicios: qu&eacute; base de datos se llevar&iacute;a cada uno, qu&eacute; llamadas pasar&iacute;an a ser de red, qu&eacute; se volver&iacute;a eventualmente consistente.</li>
+</ol>
+
+<div class="box exam">
+  <span class="box-tag">Por qu&eacute; esto funciona en la evaluaci&oacute;n</span>
+  <p>La unidad de competencia dice <em>&laquo;dise&ntilde;a una aplicaci&oacute;n web con base en la arquitectura de microservicios&raquo;</em>. El punto 6 de esa lista cumple el verbo <strong>dise&ntilde;a</strong> demostrando que entiendes d&oacute;nde est&aacute;n las fronteras y qu&eacute; costos implica cruzarlas, mientras entregas un sistema que de verdad funciona el d&iacute;a de la demostraci&oacute;n. Un alumno que intenta seis microservicios reales normalmente llega con tres a medias y ninguno desplegado.</p>
+</div>
+
+<h5>Antipatrones que hay que poder nombrar</h5>
+<ul class="tight">
+<li><strong>Monolito distribuido</strong> &mdash; servicios separados que comparten base de datos o que deben desplegarse juntos. Lo peor de ambos mundos.</li>
+<li><strong>Nanoservicios</strong> &mdash; servicios tan peque&ntilde;os que el costo de comunicaci&oacute;n y operaci&oacute;n supera cualquier beneficio.</li>
+<li><strong>Base de datos compartida</strong> &mdash; ya mencionado, y el m&aacute;s frecuente.</li>
+<li><strong>Cadena de llamadas</strong> &mdash; A llama a B que llama a C que llama a D. La latencia se suma y la probabilidad de fallo se multiplica.</li>
+<li><strong>Microservicios sin automatizaci&oacute;n</strong> &mdash; desplegar veinte servicios a mano es insostenible.</li>
+<li><strong>Empezar por microservicios</strong> &mdash; trazar fronteras antes de conocer el dominio garantiza trazarlas mal.</li>
+</ul>
+</section>
+
+<!-- ============ PARTE 3 ============ -->
+<div class="part" id="p3">
+  <span class="part-num">Parte 3</span>
+  <h2>De la teor&iacute;a a tu proyecto</h2>
+  <p class="part-lede">La Unidad I no se eval&uacute;a solo por escrito. El programa exige un proyecto publicado y verificable, y las decisiones que tomes en las primeras dos semanas te acompa&ntilde;an todo el semestre.</p>
+</div>
+
+<section id="s-proy">
+<h3><span class="h-num">3.1</span><span>Las decisiones que se toman una sola vez</span></h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>Decisi&oacute;n</th><th>Cu&aacute;ndo tomarla</th><th>Qu&eacute; pasa si la cambias despu&eacute;s</th></tr></thead>
+<tbody>
+<tr><td class="k">Lenguaje y framework</td><td>Semana 1</td><td>Reescritura completa</td></tr>
+<tr><td class="k">Monolito o microservicios</td><td>Semana 1&ndash;2</td><td>Semanas de trabajo</td></tr>
+<tr><td class="k">Estructura de carpetas</td><td>Semana 2</td><td>Doloroso pero factible</td></tr>
+<tr><td class="k">Relacional o documental</td><td>Semana 2&ndash;3</td><td>Migraci&oacute;n de datos y de repositorios</td></tr>
+<tr><td class="k">Esquema de autenticaci&oacute;n</td><td>Unidad II</td><td>Moderado si aislaste bien</td></tr>
+<tr><td class="k">Proveedor de PaaS</td><td>Semana 1</td><td>Bajo, si contenerizaste</td></tr>
+<tr><td class="k">Librer&iacute;a de interfaz</td><td>Unidad IV</td><td>Reescritura del frontend</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Las tres primeras son arquitectura en el sentido estricto de la Parte 2: caras de revertir. Las &uacute;ltimas son detalles &mdash; y que sean detalles es precisamente el resultado de haber aplicado bien los puntos 1.4 y 1.5.</p>
+
+<h4>Esqueleto recomendado</h4>
+
+<pre><span class="pre-label">Estructura completa del proyecto</span><code>proyecto/
+  backend/
+    src/
+      contextos/
+        pedidos/
+          dominio/          Pedido.js  Linea.js  errores.js
+          aplicacion/       CrearPedido.js  ConfirmarPedido.js
+          puertos/          RepositorioPedidos.js  PasarelaPagos.js
+          infraestructura/  RepositorioPedidosPg.js  rutas.js
+        catalogo/
+          dominio/ aplicacion/ puertos/ infraestructura/
+        usuarios/
+          dominio/ aplicacion/ puertos/ infraestructura/
+      compartido/           errores base, tipos, utilidades
+      config/               variables de entorno, conexiones
+      main.js               el ensamblador
+    tests/
+      unit/                 dominio y casos de uso, sin infraestructura
+      integration/          repositorios contra base real
+    Dockerfile
+    .env.example            NUNCA subas el .env real
+    package.json
+  frontend/
+    src/
+      componentes/
+      paginas/
+      servicios/            clientes HTTP hacia la API
+      hooks/
+    Dockerfile
+    package.json
+  docker-compose.yml        api + front + base de datos
+  docs/
+    arquitectura.md         diagramas y decisiones
+    api.yaml                especificaci&oacute;n OpenAPI
+  README.md</code></pre>
+
+<p>Lo importante de esa estructura: el primer nivel dentro de <code>src/</code> son <strong>contextos del negocio</strong>, no capas t&eacute;cnicas. Dentro de cada contexto s&iacute; aparecen las capas. As&iacute; la cohesi&oacute;n es alta por contexto, y si alg&uacute;n d&iacute;a extraes uno a microservicio, te llevas una carpeta completa.</p>
+
+<h4>Registro de decisiones de arquitectura</h4>
+
+<p>Un ADR (<em>Architecture Decision Record</em>) es un documento corto por cada decisi&oacute;n importante. El programa pide &laquo;reportes de indagaci&oacute;n&raquo; y &laquo;reporte de proyecto&raquo;; los ADR encajan perfectamente y cuestan diez minutos cada uno.</p>
+
+<pre><span class="pre-label">docs/adr/002-monolito-modular.md</span><code># ADR 002 &mdash; Monolito modular en lugar de microservicios
+
+## Estado
+Aceptada &mdash; 2026-02-10
+
+## Contexto
+Equipo de tres personas, un semestre de plazo, sin experiencia previa
+operando sistemas distribuidos. El programa exige publicar la aplicaci&oacute;n
+en un PaaS y demostrar dise&ntilde;o con base en microservicios.
+
+## Decisi&oacute;n
+Construir un monolito modular con arquitectura hexagonal, dividido
+internamente en contextos delimitados (pedidos, cat&aacute;logo, usuarios),
+empaquetado en un contenedor y desplegado en Render.
+
+## Consecuencias
++ Un solo despliegue y un solo pipeline: menos tiempo en operaci&oacute;n.
++ Transacciones ACID disponibles dentro de todo el sistema.
++ Fronteras ya trazadas: la extracci&oacute;n futura es viable.
+&minus; No demostramos operaci&oacute;n real de servicios distribuidos.
+  Se mitiga con un dise&ntilde;o documentado de la extracci&oacute;n en la exposici&oacute;n.</code></pre>
+
+<h4>Qu&eacute; llevar a la exposici&oacute;n</h4>
+<p>El programa incluye exposiciones como evidencia evaluable. Cuatro cosas que casi nadie lleva y que se notan:</p>
+<ol class="tight">
+<li>Un <strong>diagrama de contexto</strong> (nivel 1 de C4): tu sistema, sus usuarios y los sistemas externos con los que habla.</li>
+<li>Un <strong>diagrama de contenedores</strong> (nivel 2): frontend, API, base de datos, servicios de terceros, con los protocolos en cada flecha.</li>
+<li>El <strong>mapa de contextos delimitados</strong>, explicando por qu&eacute; cortaste donde cortaste.</li>
+<li>Uno o dos <strong>ADR</strong> que muestren que la decisi&oacute;n fue razonada y no accidental.</li>
+</ol>
+</section>
+
+<!-- ============ PARTE 4 ============ -->
+<div class="part" id="p4">
+  <span class="part-num">Parte 4</span>
+  <h2>Banco de preguntas</h2>
+  <p class="part-lede">Veinte preguntas del tipo que cae en la evaluaci&oacute;n escrita de esta unidad, con respuesta modelo. Int&eacute;ntalas antes de abrir cada una.</p>
+</div>
+
+<section id="s-qa">
+<div class="qa-wrap">
+
+<details class="qa"><summary><span class="qn">01</span><span>&iquest;Qu&eacute; es arquitectura de software y en qu&eacute; se distingue de un patr&oacute;n de dise&ntilde;o?</span></summary>
+<div class="qa-a"><p>La arquitectura es el conjunto de decisiones estructurales de alto nivel sobre un sistema &mdash; sus componentes principales, las relaciones entre ellos y los principios que gu&iacute;an su evoluci&oacute;n &mdash; y se caracteriza por ser costosa de revertir. Un patr&oacute;n de dise&ntilde;o es una soluci&oacute;n reutilizable a un problema recurrente en un &aacute;mbito mucho m&aacute;s local, normalmente entre unas pocas clases. La arquitectura decide que el acceso a datos estar&aacute; aislado; el patr&oacute;n Repository dice c&oacute;mo se implementa ese aislamiento.</p></div></details>
+
+<details class="qa"><summary><span class="qn">02</span><span>Diferencia entre capa (<em>layer</em>) y nivel (<em>tier</em>).</span></summary>
+<div class="qa-a"><p>Una capa es una divisi&oacute;n l&oacute;gica del c&oacute;digo por responsabilidad; un nivel es una divisi&oacute;n f&iacute;sica en procesos o m&aacute;quinas distintas. Una aplicaci&oacute;n de tres capas puede ejecutarse en un solo nivel &mdash; todo en una m&aacute;quina &mdash; o repartirse en tres niveles: navegador, servidor de aplicaci&oacute;n y servidor de base de datos. En espa&ntilde;ol ambos t&eacute;rminos se traducen &laquo;capa&raquo;, de ah&iacute; la confusi&oacute;n.</p></div></details>
+
+<details class="qa"><summary><span class="qn">03</span><span>&iquest;Por qu&eacute; se dice que en n&ndash;capas la base de datos es el centro de gravedad?</span></summary>
+<div class="qa-a"><p>Porque las dependencias apuntan hacia abajo: presentaci&oacute;n depende del negocio y el negocio depende del acceso a datos. En consecuencia, las decisiones de persistencia se propagan hacia arriba, el negocio no se puede probar sin base de datos, las entidades del ORM se filtran hacia las capas superiores y el dise&ntilde;o tiende a empezar por el esquema de tablas en lugar de por el modelo del dominio.</p></div></details>
+
+<details class="qa"><summary><span class="qn">04</span><span>Enuncia la regla de dependencia de la arquitectura limpia.</span></summary>
+<div class="qa-a"><p>Las dependencias del c&oacute;digo fuente solo pueden apuntar hacia adentro, hacia pol&iacute;ticas de mayor nivel. Ning&uacute;n elemento de un anillo interior puede conocer nada de un anillo exterior: ni nombres de clases, ni funciones, ni variables, ni formatos de datos.</p></div></details>
+
+<details class="qa"><summary><span class="qn">05</span><span>&iquest;C&oacute;mo puede el dominio usar una base de datos sin depender de ella?</span></summary>
+<div class="qa-a"><p>Mediante inversi&oacute;n de dependencias. El dominio declara una <em>interfaz</em> de repositorio expresada en su propio vocabulario, y la capa de infraestructura provee una <em>implementaci&oacute;n</em> concreta que usa el ORM o el SQL. En tiempo de ejecuci&oacute;n, el ensamblador inyecta la implementaci&oacute;n. As&iacute; la flecha de dependencia del c&oacute;digo fuente va de infraestructura hacia dominio, aunque el flujo de control vaya en sentido contrario.</p></div></details>
+
+<details class="qa"><summary><span class="qn">06</span><span>&iquest;Por qu&eacute; la arquitectura hexagonal se dibuja como un hex&aacute;gono?</span></summary>
+<div class="qa-a"><p>Por conveniencia de dibujo, no por significado. Cockburn quer&iacute;a representar que la aplicaci&oacute;n tiene m&uacute;ltiples puntos de entrada y salida alrededor de su n&uacute;cleo, y una figura con lados rectos permite colocarlos con claridad. El n&uacute;mero seis no corresponde a seis capas ni a seis tipos de puerto.</p></div></details>
+
+<details class="qa"><summary><span class="qn">07</span><span>Diferencia entre puerto primario y puerto secundario.</span></summary>
+<div class="qa-a"><p>Un puerto primario o de entrada es la interfaz por la que el exterior invoca a la aplicaci&oacute;n; la aplicaci&oacute;n lo define y lo implementa mediante sus servicios de aplicaci&oacute;n. Un puerto secundario o de salida es la interfaz que la aplicaci&oacute;n necesita para hablar con el exterior; la aplicaci&oacute;n lo define pero lo implementa un adaptador de infraestructura. La asimetr&iacute;a &mdash; definir ambos, implementar solo los primarios &mdash; es lo que materializa la inversi&oacute;n de dependencias.</p></div></details>
+
+<details class="qa"><summary><span class="qn">08</span><span>&iquest;Qu&eacute; tienen en com&uacute;n y en qu&eacute; difieren cebolla, limpia y hexagonal?</span></summary>
+<div class="qa-a"><p>Comparten el principio central: el dominio en el centro, dependencias apuntando hacia adentro y aislamiento de los detalles t&eacute;cnicos mediante inversi&oacute;n de dependencias. Difieren en met&aacute;fora y &eacute;nfasis: la hexagonal subraya la simetr&iacute;a entre quien nos llama y a quien llamamos con puertos y adaptadores, e incluye las pruebas como un adaptador m&aacute;s; la de cebolla subraya que el modelo del dominio, y no la base de datos, ocupa el centro, y sit&uacute;a las interfaces de repositorio dentro del dominio; la limpia enuncia la regla de dependencia de forma expl&iacute;cita y nombra cuatro anillos.</p></div></details>
+
+<details class="qa"><summary><span class="qn">09</span><span>&iquest;Qu&eacute; es un monolito modular y por qu&eacute; no es lo mismo que una bola de lodo?</span></summary>
+<div class="qa-a"><p>Un monolito modular se despliega como una sola unidad pero est&aacute; organizado internamente en m&oacute;dulos con fronteras expl&iacute;citas que se comunican por interfaces definidas. Una bola de lodo tambi&eacute;n se despliega como una unidad, pero carece de fronteras: cualquier parte accede a cualquier otra. Lo que define al monolito es la unidad de despliegue, no la calidad interna; confundir ambos conceptos es el error m&aacute;s com&uacute;n del tema.</p></div></details>
+
+<details class="qa"><summary><span class="qn">10</span><span>Los dos sentidos de la palabra &laquo;contenedor&raquo;.</span></summary>
+<div class="qa-a"><p>El contenedor de aplicaci&oacute;n es un entorno de ejecuci&oacute;n que aloja la aplicaci&oacute;n y le provee ciclo de vida, hilos, pool de conexiones, seguridad y transacciones &mdash; Tomcat, WildFly &mdash; operando por inversi&oacute;n de control. El contenedor de sistema operativo es un empaquetado aislado con la aplicaci&oacute;n y sus dependencias que comparte el kernel del anfitri&oacute;n &mdash; Docker &mdash; y resuelve la reproducibilidad del entorno. Un monolito empaquetado en Docker sigue siendo un monolito.</p></div></details>
+
+<details class="qa"><summary><span class="qn">11</span><span>Diferencias entre contenedor y m&aacute;quina virtual.</span></summary>
+<div class="qa-a"><p>La m&aacute;quina virtual virtualiza hardware completo y ejecuta su propio sistema operativo, lo que implica gigabytes de tama&ntilde;o y decenas de segundos de arranque, a cambio de un aislamiento muy fuerte. El contenedor virtualiza a nivel de sistema operativo mediante <em>namespaces</em> y <em>cgroups</em>, comparte el kernel del anfitri&oacute;n, pesa megabytes y arranca en segundos, con un aislamiento bueno pero menor.</p></div></details>
+
+<details class="qa"><summary><span class="qn">12</span><span>Define microservicios y da tres caracter&iacute;sticas.</span></summary>
+<div class="qa-a"><p>Estilo arquitect&oacute;nico en el que la aplicaci&oacute;n es un conjunto de servicios peque&ntilde;os y aut&oacute;nomos, cada uno en su propio proceso, desplegables de forma independiente y comunicados por mecanismos ligeros. Tres caracter&iacute;sticas: organizaci&oacute;n en torno a capacidades de negocio en lugar de capas t&eacute;cnicas; gesti&oacute;n de datos descentralizada, con una base de datos por servicio; y dise&ntilde;o para el fallo, asumiendo que los servicios remotos fallar&aacute;n.</p></div></details>
+
+<details class="qa"><summary><span class="qn">13</span><span>&iquest;Qu&eacute; es un monolito distribuido y por qu&eacute; es un antipatr&oacute;n?</span></summary>
+<div class="qa-a"><p>Un conjunto de servicios f&iacute;sicamente separados pero fuertemente acoplados: comparten base de datos, o deben desplegarse en conjunto, o cualquier cambio funcional obliga a modificar varios a la vez. Es un antipatr&oacute;n porque paga todos los costos de un sistema distribuido &mdash; latencia, fallos parciales, complejidad de despliegue y depuraci&oacute;n &mdash; sin obtener el beneficio principal, que es la independencia de despliegue y evoluci&oacute;n.</p></div></details>
+
+<details class="qa"><summary><span class="qn">14</span><span>&iquest;Con qu&eacute; criterio se decide d&oacute;nde dividir los microservicios?</span></summary>
+<div class="qa-a"><p>Por contextos delimitados del dominio, siguiendo DDD: fronteras dentro de las cuales un modelo y su vocabulario son consistentes. Tambi&eacute;n por capacidades de negocio o por volatilidad. Nunca por capas t&eacute;cnicas, porque un servicio &laquo;de acceso a datos&raquo; obligar&iacute;a a modificar varios servicios ante cualquier cambio funcional, reintroduciendo el acoplamiento que se buscaba eliminar.</p></div></details>
+
+<details class="qa"><summary><span class="qn">15</span><span>&iquest;Por qu&eacute; cada microservicio debe tener su propia base de datos?</span></summary>
+<div class="qa-a"><p>Porque compartir base de datos crea acoplamiento a nivel de esquema: ning&uacute;n servicio puede evolucionar su modelo de datos sin coordinar con los dem&aacute;s, y se pierde la independencia de despliegue que justifica toda la arquitectura. Adem&aacute;s permite que cada servicio elija la tecnolog&iacute;a de persistencia adecuada a su problema. El costo es renunciar a las transacciones distribuidas y a los joins entre servicios.</p></div></details>
+
+<details class="qa"><summary><span class="qn">16</span><span>&iquest;Qu&eacute; es el patr&oacute;n saga y para qu&eacute; sirve?</span></summary>
+<div class="qa-a"><p>Es la alternativa a las transacciones distribuidas: una secuencia de transacciones locales, cada una en su propio servicio, donde cada paso dispara el siguiente. Si un paso falla, se ejecutan transacciones de compensaci&oacute;n que deshacen los efectos de los pasos anteriores. Se implementa por coreograf&iacute;a &mdash; cada servicio reacciona a eventos, sin coordinador &mdash; o por orquestaci&oacute;n, con un coordinador que dirige la secuencia.</p></div></details>
+
+<details class="qa"><summary><span class="qn">17</span><span>Explica el teorema CAP y su consecuencia pr&aacute;ctica.</span></summary>
+<div class="qa-a"><p>En un sistema distribuido no se pueden garantizar simult&aacute;neamente consistencia, disponibilidad y tolerancia a particiones de red; a lo sumo dos. Como las particiones de red son inevitables en cualquier red real, la tolerancia a particiones no es opcional, de modo que la elecci&oacute;n real es entre consistencia y disponibilidad. Optar por disponibilidad conduce a la consistencia eventual y al modelo BASE.</p></div></details>
+
+<details class="qa"><summary><span class="qn">18</span><span>&iquest;Qu&eacute; hace un API Gateway?</span></summary>
+<div class="qa-a"><p>Es el punto &uacute;nico de entrada a un sistema de microservicios. Enruta cada petici&oacute;n al servicio correspondiente y concentra asuntos transversales: terminaci&oacute;n TLS, autenticaci&oacute;n y validaci&oacute;n de tokens, l&iacute;mite de tasa, agregaci&oacute;n de respuestas de varios servicios, traducci&oacute;n de protocolos y registro de bit&aacute;coras. Evita que el cliente conozca la topolog&iacute;a interna y que cada servicio reimplemente lo mismo.</p></div></details>
+
+<details class="qa"><summary><span class="qn">19</span><span>&iquest;Por qu&eacute; la testabilidad mejora con arquitectura hexagonal?</span></summary>
+<div class="qa-a"><p>Porque el dominio y los servicios de aplicaci&oacute;n dependen solo de interfaces, nunca de implementaciones concretas. Eso permite sustituir cada puerto secundario por un doble de prueba &mdash; t&iacute;picamente un repositorio en memoria &mdash; y probar toda la l&oacute;gica de negocio sin base de datos, sin red y sin servidor web. Las pruebas resultan r&aacute;pidas, deterministas y aisladas. En el enfoque de Cockburn, la propia suite de pruebas es un adaptador primario m&aacute;s.</p></div></details>
+
+<details class="qa"><summary><span class="qn">20</span><span>&iquest;Cu&aacute;ndo <em>no</em> conviene usar microservicios?</span></summary>
+<div class="qa-a"><p>Cuando el equipo es peque&ntilde;o, cuando el dominio a&uacute;n no se conoce lo bastante para trazar fronteras estables, cuando no existe automatizaci&oacute;n de despliegue y observabilidad, cuando el sistema no tiene requisitos de escalado que lo justifiquen, o cuando el proyecto est&aacute; empezando. La recomendaci&oacute;n habitual es &laquo;monolith first&raquo;: construir un monolito modular, descubrir las fronteras reales del dominio y extraer servicios cuando exista una raz&oacute;n concreta &mdash; escalado independiente, equipos separados o ciclos de vida distintos.</p></div></details>
+
+</div>
+</section>
+
+<!-- ============ PARTE 5 ============ -->
+<div class="part" id="p5">
+  <span class="part-num">Parte 5</span>
+  <h2>Glosario</h2>
+  <p class="part-lede">Los t&eacute;rminos de la unidad en una sola l&iacute;nea cada uno, para repasar la v&iacute;spera.</p>
+</div>
+
+<section id="s-gloss">
+<dl class="gloss">
+<div><dt>ACID</dt><dd>Atomicidad, consistencia, aislamiento y durabilidad. Las garant&iacute;as de una transacci&oacute;n en base de datos relacional.</dd></div>
+<div><dt>Adaptador</dt><dd>C&oacute;digo que conecta un puerto con una tecnolog&iacute;a concreta. Primario si nos invoca, secundario si lo invocamos.</dd></div>
+<div><dt>ADR</dt><dd>Documento breve que registra una decisi&oacute;n de arquitectura, su contexto y sus consecuencias.</dd></div>
+<div><dt>Agregado</dt><dd>Grupo de entidades y objetos de valor tratado como una unidad de consistencia, con una ra&iacute;z como &uacute;nica puerta de entrada.</dd></div>
+<div><dt>API Gateway</dt><dd>Punto &uacute;nico de entrada que enruta y concentra asuntos transversales en un sistema de microservicios.</dd></div>
+<div><dt>BASE</dt><dd>B&aacute;sicamente disponible, estado blando, consistencia eventual. El modelo t&iacute;pico de los sistemas distribuidos.</dd></div>
+<div><dt>BFF</dt><dd>Backend a la medida de un tipo de cliente concreto, para evitar que el cliente encadene muchas peticiones.</dd></div>
+<div><dt>Bola de lodo</dt><dd>Sistema sin fronteras internas donde cualquier parte accede a cualquier otra.</dd></div>
+<div><dt>CAP</dt><dd>Teorema seg&uacute;n el cual un sistema distribuido garantiza a lo sumo dos de consistencia, disponibilidad y tolerancia a particiones.</dd></div>
+<div><dt>Capa anticorrupci&oacute;n</dt><dd>Adaptador que traduce el modelo de un sistema externo al propio para no contaminarlo.</dd></div>
+<div><dt>Consistencia eventual</dt><dd>El sistema converge a un estado consistente tras un intervalo, en lugar de garantizarlo al instante.</dd></div>
+<div><dt>Contexto delimitado</dt><dd>Frontera dentro de la cual un modelo y su vocabulario son consistentes y sin ambig&uuml;edad.</dd></div>
+<div><dt>Ensamblador</dt><dd>El &uacute;nico punto del programa donde se instancian las clases concretas y se inyectan las dependencias.</dd></div>
+<div><dt>Entidad</dt><dd>Objeto de dominio con identidad propia que persiste aunque cambien sus atributos.</dd></div>
+<div><dt>Idempotencia</dt><dd>Propiedad de una operaci&oacute;n cuyo efecto es el mismo si se ejecuta una o muchas veces.</dd></div>
+<div><dt>Interruptor</dt><dd>Patr&oacute;n que corta las llamadas a un servicio ca&iacute;do para evitar fallos en cascada.</dd></div>
+<div><dt>Inversi&oacute;n de control</dt><dd>El framework o contenedor controla el flujo y llama a tu c&oacute;digo, no al rev&eacute;s.</dd></div>
+<div><dt>Lenguaje ubicuo</dt><dd>Vocabulario compartido entre negocio y c&oacute;digo dentro de un contexto delimitado.</dd></div>
+<div><dt>Monolito distribuido</dt><dd>Servicios separados pero acoplados. Todos los costos de lo distribuido, ninguna ventaja.</dd></div>
+<div><dt>N+1</dt><dd>Problema de rendimiento en que un ORM lanza una consulta por cada elemento de una colecci&oacute;n ya cargada.</dd></div>
+<div><dt>Objeto de valor</dt><dd>Objeto inmutable sin identidad, definido enteramente por sus atributos.</dd></div>
+<div><dt>Outbox</dt><dd>Patr&oacute;n que garantiza atomicidad entre guardar en base de datos y publicar un evento.</dd></div>
+<div><dt>PaaS</dt><dd>Plataforma como servicio: entregas c&oacute;digo o una imagen y el proveedor gestiona ejecuci&oacute;n, escalado y red.</dd></div>
+<div><dt>Puerto</dt><dd>Interfaz que define la aplicaci&oacute;n para comunicarse con el exterior, expresada en vocabulario de dominio.</dd></div>
+<div><dt>Regla de dependencia</dt><dd>Las dependencias del c&oacute;digo fuente solo apuntan hacia adentro, hacia pol&iacute;ticas de mayor nivel.</dd></div>
+<div><dt>Repositorio</dt><dd>Abstracci&oacute;n del almacenamiento como si fuera una colecci&oacute;n de objetos de dominio en memoria.</dd></div>
+<div><dt>Saga</dt><dd>Secuencia de transacciones locales con compensaciones, alternativa a la transacci&oacute;n distribuida.</dd></div>
+<div><dt>Sidecar</dt><dd>Contenedor auxiliar que corre junto al principal y asume responsabilidades transversales.</dd></div>
+</dl>
+</section>
+
+<!-- ============ PARTE 6 ============ -->
+<div class="part" id="p6">
+  <span class="part-num">Parte 6</span>
+  <h2>Plan de dos semanas</h2>
+  <p class="part-lede">Si tienes dos semanas antes de que arranque el semestre, este es el orden que rinde m&aacute;s por hora invertida.</p>
+</div>
+
+<section id="s-plan">
+<h4>Semana 1 &mdash; los cimientos</h4>
+<div class="tw">
+<table>
+<thead><tr><th>D&iacute;a</th><th>Tema</th><th>Entregable propio</th></tr></thead>
+<tbody>
+<tr><td class="k">1</td><td>HTTP a fondo: m&eacute;todos, c&oacute;digos, cabeceras, idempotencia</td><td>Media hora leyendo peticiones reales en la pesta&ntilde;a Network</td></tr>
+<tr><td class="k">2</td><td>JavaScript as&iacute;ncrono y m&oacute;dulos, o repaso de Java y Maven</td><td>Un script que consuma una API p&uacute;blica y maneje errores</td></tr>
+<tr><td class="k">3</td><td>SOLID con ejemplos propios, con &eacute;nfasis en inversi&oacute;n de dependencias</td><td>Un ejemplo escrito de cada letra, con c&oacute;digo tuyo</td></tr>
+<tr><td class="k">4</td><td>API REST CRUD con Express o Spring Boot</td><td>Cinco endpoints con c&oacute;digos de estado correctos</td></tr>
+<tr><td class="k">5</td><td>Postman: colecciones, variables de entorno, pruebas</td><td>Una colecci&oacute;n que ejercite tu API completa</td></tr>
+<tr><td class="k">6</td><td>SQL y modelo relacional: joins, 1:N, N:M, transacciones</td><td>Un esquema de cuatro tablas con sus relaciones</td></tr>
+<tr><td class="k">7</td><td>Docker: Dockerfile, build, run, compose</td><td>Tu API y su base de datos levantando con un solo comando</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>Semana 2 &mdash; la unidad</h4>
+<div class="tw">
+<table>
+<thead><tr><th>D&iacute;a</th><th>Tema</th><th>Entregable propio</th></tr></thead>
+<tbody>
+<tr><td class="k">8</td><td>Principios de arquitectura: cohesi&oacute;n, acoplamiento, atributos de calidad</td><td>Diagrama de un proyecto tuyo anterior, con sus flechas</td></tr>
+<tr><td class="k">9</td><td>Monolito y n&ndash;capas: ventajas, l&iacute;mites, estructura</td><td>Reorganiza tu API del d&iacute;a 4 en tres capas</td></tr>
+<tr><td class="k">10</td><td>Cebolla y limpia: la regla de dependencia</td><td>Extrae el dominio a su propia carpeta, sin imports externos</td></tr>
+<tr><td class="k">11</td><td>Hexagonal: puertos y adaptadores</td><td>Define tus puertos como interfaces y escribe dos adaptadores del mismo puerto</td></tr>
+<tr><td class="k">12</td><td>Pruebas con dobles</td><td>Prueba un caso de uso completo sin levantar la base de datos</td></tr>
+<tr><td class="k">13</td><td>Microservicios: fundamentos, DDD, comunicaci&oacute;n, despliegue</td><td>Mapa de contextos de una tienda en l&iacute;nea imaginaria</td></tr>
+<tr><td class="k">14</td><td>PaaS</td><td>Tu API desplegada en Render o Railway, con una URL p&uacute;blica que responde</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="box proj">
+  <span class="box-tag">El d&iacute;a 14 importa m&aacute;s de lo que parece</span>
+  <p>Llegar al primer d&iacute;a de clase con una API funcionando, en un contenedor y desplegada en la nube, te pone por delante de las pr&aacute;cticas 1, 2, 3, 4, 11 y 12 del programa &mdash; seis de doce. Y libera tu tiempo del semestre para lo que de verdad cuesta: el dise&ntilde;o y el proyecto.</p>
+</div>
+
+<h4>D&oacute;nde estudiar cada cosa</h4>
+
+<div class="tw">
+<table>
+<thead><tr><th>Fuente</th><th>Para qu&eacute; sirve aqu&iacute;</th></tr></thead>
+<tbody>
+<tr><td class="k">MDN Web Docs</td><td>La referencia de HTTP, CORS y APIs del navegador. Gratuita y exacta</td></tr>
+<tr><td class="k">Martin Fowler, art&iacute;culo &laquo;Microservices&raquo;</td><td>El texto fundacional con Lewis. Corto y citable en un examen</td></tr>
+<tr><td class="k">Cockburn, &laquo;Hexagonal Architecture&raquo;</td><td>El original de puertos y adaptadores. Se lee en veinte minutos</td></tr>
+<tr><td class="k">Martin, <em>Clean Architecture</em></td><td>La regla de dependencia desarrollada. Los cap&iacute;tulos de la parte V son los relevantes</td></tr>
+<tr><td class="k">Newman, <em>Building Microservices</em></td><td>El libro pr&aacute;ctico de referencia sobre descomposici&oacute;n y operaci&oacute;n</td></tr>
+<tr><td class="k">Holmes, <em>Getting MEAN</em></td><td>Est&aacute; en tu bibliograf&iacute;a oficial. Ruta JavaScript de extremo a extremo</td></tr>
+<tr><td class="k">Varanasi y Bartkov, <em>Spring REST</em></td><td>Est&aacute; en tu bibliograf&iacute;a oficial. Ruta Java para APIs y microservicios</td></tr>
+<tr><td class="k">Zammeti, <em>Modern Full-Stack Development</em></td><td>Est&aacute; en tu bibliograf&iacute;a oficial. Cubre TypeScript, React, Node, Webpack y Docker juntos</td></tr>
+<tr><td class="k">c4model.com</td><td>C&oacute;mo dibujar los diagramas que vas a necesitar en la exposici&oacute;n</td></tr>
+<tr><td class="k">12factor.net</td><td>Los doce factores completos. Se lee en media hora</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="footer">
+Gu&iacute;a de estudio de la Unidad I &mdash; <strong>Web client and backend development frameworks</strong> (C704)<br>
+Ingenier&iacute;a en Sistemas Computacionales, plan 2020 &middot; ESCOM y UPIIZ, Instituto Polit&eacute;cnico Nacional<br>
+Contenidos y numeraci&oacute;n tomados del programa de estudios vigente a partir de enero de 2023.<br>
+Las recomendaciones de stack, proyecto y plan de estudio son sugerencias, no parte del programa oficial.
+</p>
+</section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var secciones = [
+    ["p0",  "Parte 0", "C&oacute;mo leer esta gu&iacute;a", true],
+    ["s-mapa", "0.1", "El mapa del terreno", false],
+    ["s-hilo", "0.2", "La pregunta clave", false],
+    ["s-uso",  "0.3", "C&oacute;mo usar el documento", false],
+    ["p1",  "Parte 1", "Lo que debes venir estudiado", true],
+    ["s-http",     "A", "HTTP a fondo", false],
+    ["s-poo",      "B", "POO y SOLID", false],
+    ["s-patrones", "C", "Patrones de dise&ntilde;o", false],
+    ["s-datos",    "D", "Datos: SQL y NoSQL", false],
+    ["s-js",       "E", "Lenguaje y ecosistema", false],
+    ["s-herr",     "F", "Herramientas", false],
+    ["s-auto",     "G", "Autoevaluaci&oacute;n", false],
+    ["p2",  "Parte 2", "La Unidad I punto por punto", true],
+    ["s-11", "1.1", "Principios comunes", false],
+    ["s-12", "1.2", "Monol&iacute;tica", false],
+    ["s-13", "1.3", "N&ndash;capas", false],
+    ["s-14", "1.4", "Cebolla / limpia", false],
+    ["s-15", "1.5", "Hexagonal", false],
+    ["s-16", "1.6", "Microservicios", false],
+    ["p3",  "Parte 3", "De la teor&iacute;a a tu proyecto", true],
+    ["s-proy", "3.1", "Decisiones y esqueleto", false],
+    ["p4",  "Parte 4", "Banco de preguntas", true],
+    ["s-qa", "20", "Preguntas con respuesta", false],
+    ["p5",  "Parte 5", "Glosario", true],
+    ["s-gloss", "A-Z", "T&eacute;rminos", false],
+    ["p6",  "Parte 6", "Plan de dos semanas", true],
+    ["s-plan", "14", "Calendario y fuentes", false]
+  ];
+
+  function construir(ul) {
+    if (!ul) return;
+    var html = "";
+    secciones.forEach(function (s) {
+      if (s[3]) {
+        html += '<li class="toc-grp">' + s[1] + " &middot; " + s[2] + "</li>";
+      } else {
+        html += '<li><a href="#' + s[0] + '" data-t="' + s[0] + '">' +
+                '<span class="num">' + s[1] + "</span><span>" + s[2] + "</span></a></li>";
+      }
+    });
+    ul.innerHTML = html;
+  }
+
+  var deskList = document.getElementById("tocD");
+  var mobList  = document.getElementById("tocM");
+  construir(deskList);
+  construir(mobList);
+
+  var enlaces = Array.prototype.slice.call(document.querySelectorAll(".toc-list a"));
+  var objetivos = secciones.filter(function (s) { return !s[3]; })
+    .map(function (s) { return document.getElementById(s[0]); })
+    .filter(Boolean);
+
+  if ("IntersectionObserver" in window) {
+    var visibles = new Set();
+    var obs = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        if (e.isIntersecting) { visibles.add(e.target.id); }
+        else { visibles.delete(e.target.id); }
+      });
+      var activa = null;
+      for (var i = 0; i < objetivos.length; i++) {
+        if (visibles.has(objetivos[i].id)) { activa = objetivos[i].id; break; }
+      }
+      if (!activa) return;
+      enlaces.forEach(function (a) {
+        a.classList.toggle("on", a.getAttribute("data-t") === activa);
+      });
+    }, { rootMargin: "-8% 0px -70% 0px", threshold: 0 });
+    objetivos.forEach(function (t) { obs.observe(t); });
+  }
+
+  var barra = document.getElementById("prog");
+  function pintar() {
+    var alto = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = alto > 0 ? (window.scrollY / alto) * 100 : 0;
+    barra.style.width = Math.min(100, Math.max(0, pct)) + "%";
+  }
+  window.addEventListener("scroll", pintar, { passive: true });
+  window.addEventListener("resize", pintar);
+  pintar();
+})();
+</script>
