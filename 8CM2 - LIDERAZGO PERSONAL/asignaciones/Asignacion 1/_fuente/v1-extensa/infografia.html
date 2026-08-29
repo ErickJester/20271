@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Liderazgo — Fig. 01</title>
+<style>
+/*FONTS*/
+
+:root{
+  --paper:#F3F0E9;
+  --paper2:#EBE7DC;
+  --ink:#1E1C19;
+  --ink70:#54504A;
+  --ink45:#8B857B;
+  --ink20:#C9C3B6;
+  --guinda:#6E1F3E;
+  --hair:0.22mm;
+}
+@page{ size:297mm 420mm; margin:0; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ background:var(--paper); }
+body{
+  font-family:'CrimsonPro',Georgia,serif;
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+}
+.page{
+  width:297mm; height:420mm;
+  background:var(--paper);
+  padding:15mm 18mm 12mm;
+  display:flex; flex-direction:column;
+  position:relative; overflow:hidden;
+}
+
+/* ── micro typography ─────────────────────────────── */
+.mono.rt{ margin-right:-.18em; }
+.mono{
+  font-family:'DMMono',monospace;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  font-size:5.5pt;
+  color:var(--ink45);
+}
+.mono.dark{ color:var(--ink70); }
+.rule{ height:var(--hair); background:var(--ink); opacity:.55; }
+.rule.soft{ opacity:.22; }
+
+/* ── header ───────────────────────────────────────── */
+.head{ display:flex; justify-content:space-between; align-items:baseline; padding-bottom:2.2mm; }
+.headrule{ height:0.5mm; background:var(--ink); }
+
+/* ── hero ─────────────────────────────────────────── */
+.hero{ padding-top:5mm; }
+.hero .eyebrow{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:1mm; }
+h1{
+  font-family:'Italiana',serif;
+  font-weight:400;
+  font-size:143pt;
+  line-height:.86;
+  letter-spacing:.012em;
+  color:var(--ink);
+  white-space:nowrap;
+}
+.etym{
+  display:flex; justify-content:space-between; align-items:baseline;
+  margin-top:3.4mm; padding-bottom:2.6mm;
+}
+.etym .lead{ font-size:9.4pt; color:var(--ink70); font-style:italic; letter-spacing:.01em; }
+.etym .lead b{ font-style:normal; font-weight:400; color:var(--ink); }
+
+/* ── definiciones ─────────────────────────────────── */
+.defs{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; margin-top:4.5mm; }
+.def{ padding:0 6mm; border-left:var(--hair) solid var(--ink20); }
+.def:first-child{ padding-left:0; border-left:none; }
+.def:last-child{ padding-right:0; }
+.def .num{ display:block; margin-bottom:2.2mm; }
+.def .q{ font-size:10.4pt; line-height:1.34; letter-spacing:.002em; }
+.def .q em{ font-style:italic; }
+.def .sub{ font-size:7.6pt; line-height:1.42; color:var(--ink70); margin-top:2.6mm; }
+.def .cite{ font-family:'DMMono',monospace; font-size:5pt; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--ink45); margin-top:3mm; }
+.auth{ font-size:7.4pt; line-height:1.36; color:var(--ink70); margin-bottom:2.1mm; }
+.auth b{ font-family:'DMMono',monospace; font-size:5.4pt; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--guinda); font-weight:400; }
+
+/* ── banda unicidad ───────────────────────────────── */
+.unico{ display:grid; grid-template-columns:37% 1fr; gap:9mm; align-items:center; margin-top:6mm; }
+.unico .claim{ font-family:'Italiana',serif; font-size:23pt; line-height:1.06; letter-spacing:.01em; }
+.unico .claim .neq{ color:var(--guinda); }
+.unico .note{ font-size:7.5pt; line-height:1.44; color:var(--ink70); margin-top:2.8mm; }
+.matrixwrap .cap{ display:flex; justify-content:space-between; margin-top:2.2mm; }
+
+/* ── columnas medias ──────────────────────────────── */
+.mid{ display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:6.5mm; }
+.col{ padding:0 7mm; border-left:var(--hair) solid var(--ink20); }
+.col:first-child{ padding-left:0; border-left:none; }
+.col:last-child{ padding-right:0; }
+.sect{ display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:var(--hair) solid var(--ink); padding-bottom:1.6mm; margin-bottom:3.4mm; opacity:1; }
+.sect .t{ font-family:'DMMono',monospace; font-size:6.2pt; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--ink); }
+
+ol.rasgos{ list-style:none; }
+ol.rasgos li{ display:grid; grid-template-columns:8mm 1fr; gap:0;
+  font-size:8.1pt; line-height:1.32; padding:1.55mm 0;
+  border-bottom:var(--hair) solid var(--ink20); }
+ol.rasgos li:last-child{ border-bottom:none; }
+ol.rasgos li .i{ font-family:'DMMono',monospace; font-size:5.6pt; color:var(--guinda);
+  letter-spacing:.06em; padding-top:.7mm; }
+ol.rasgos li b{ font-weight:700; }
+
+.grid12{ display:grid; grid-template-columns:repeat(3,1fr); border-top:var(--hair) solid var(--ink20);
+  border-left:var(--hair) solid var(--ink20); }
+.cell{ border-right:var(--hair) solid var(--ink20); border-bottom:var(--hair) solid var(--ink20);
+  padding:2.5mm 2.2mm 2.8mm; }
+.cell .e{ font-family:'DMMono',monospace; font-size:5pt; letter-spacing:.1em; color:var(--ink45); }
+.cell .n{ font-size:8.2pt; line-height:1.14; margin-top:1.4mm; display:block; }
+.col .foot{ font-size:6.9pt; line-height:1.4; color:var(--ink70); margin-top:3mm; font-style:italic; }
+
+/* ── continuo ─────────────────────────────────────── */
+.cont{ margin-top:6.5mm; }
+.ticks{ display:grid; grid-template-columns:repeat(7,1fr); margin:0 6% 0 6%; }
+.ticks div{ padding:0 2.2mm; text-align:center; }
+.ticks .k{ font-family:'DMMono',monospace; font-size:5.2pt; color:var(--guinda); letter-spacing:.1em; }
+.ticks .l{ font-size:6.4pt; line-height:1.26; color:var(--ink70); margin-top:1.2mm; }
+.cont .cap{ font-size:7.2pt; line-height:1.4; color:var(--ink70); margin-top:3.4mm;
+  font-style:italic; max-width:170mm; }
+
+/* ── ejemplos ─────────────────────────────────────── */
+.ejs{ display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:6mm; }
+.ej{ padding:0 7mm; border-left:var(--hair) solid var(--ink20); }
+.ej:first-child{ padding-left:0; border-left:none; }
+.ej:last-child{ padding-right:0; }
+.ej .tag{ font-family:'DMMono',monospace; font-size:5.4pt; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--guinda); }
+.ej h3{ font-family:'Italiana',serif; font-weight:400; font-size:15pt; line-height:1.06;
+  margin:2mm 0 2.4mm; letter-spacing:.008em; }
+.ej p{ font-size:7.8pt; line-height:1.42; color:var(--ink70); }
+.ej p em{ font-style:italic; color:var(--ink); }
+.ej .src{ font-family:'DMMono',monospace; font-size:5pt; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--ink45); margin-top:2.6mm; }
+
+/* ── footer ───────────────────────────────────────── */
+.foot{ margin-top:auto; padding-top:3.4mm; }
+.footin{ display:flex; justify-content:space-between; gap:10mm; padding-top:2.4mm; }
+.footin .f{ font-family:'DMMono',monospace; font-size:5pt; letter-spacing:.09em;
+  color:var(--ink45); line-height:1.7; text-transform:uppercase; }
+.footin .f.r{ text-align:right; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="head">
+    <span class="mono dark">Instituto Politécnico Nacional · ESCOM–UPIIZ · Ing. en Sistemas Computacionales</span>
+    <span class="mono rt">8CM2 Liderazgo Personal · Asignación 01</span>
+  </div>
+  <div class="headrule"></div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">
+      <span class="mono">Fig. 01 — El concepto de</span>
+      <span class="mono rt">Unidad temática I · Fundamentos teóricos</span>
+    </div>
+    <h1>LIDERAZGO</h1>
+    <div class="etym">
+      <span class="lead">del inglés <b>to lead</b>&thinsp;: guiar, conducir</span>
+      <span class="mono rt">Dos lecturas de un mismo fenómeno</span>
+    </div>
+    <div class="rule"></div>
+  </div>
+
+  <!-- DEFINICIONES -->
+  <div class="defs">
+    <div class="def">
+      <span class="mono dark num">I · Acepción organizacional</span>
+      <p class="q">«Arte o proceso de <em>influir</em> en las personas para que se esfuercen con buena disposición y entusiasmo hacia la consecución de las <em>metas grupales</em>.»</p>
+      <p class="sub">Dirige las actividades de los miembros de un grupo. Involucra una desigualdad de poder entre el líder y los seguidores, usada para influir en su conducta.</p>
+      <p class="cite">Doc. Conceptos de Liderazgo</p>
+    </div>
+    <div class="def">
+      <span class="mono dark num">II · Acepción consciente</span>
+      <p class="q">«La <em>capacidad</em> que tiene un individuo de <em>implementar el sentido de su aporte</em>.»</p>
+      <p class="sub">Y líder es «aquel que es capaz de deducir el sentido único de su aporte». Es una condición de aplicación que comienza por uno mismo: el verdadero líder primero se lidera a sí mismo.</p>
+      <p class="cite">Video · Metainteligencia 02:42 / 05:49</p>
+    </div>
+    <div class="def">
+      <span class="mono dark num">III · Otras acepciones</span>
+      <p class="auth"><b>Archer</b> Habilidad que logra la unión de un grupo y lo motiva hacia ciertas metas.</p>
+      <p class="auth"><b>Davis&nbsp;K.</b> Habilidad de convencer a otros para que busquen con entusiasmo objetivos definidos.</p>
+      <p class="auth"><b>Schein&nbsp;H.</b> Conjunto de habilidades-funciones que pueden distribuirse entre todos los miembros.</p>
+      <p class="auth"><b>Madrigal&nbsp;T.</b> Relación interpersonal dinámica; el líder descubre y desarrolla sus habilidades al ejercerla.</p>
+      <p class="auth"><b>Santos&nbsp;J.</b> Proceso de influir sobre sí mismo, el grupo o la organización mediante la comunicación y la toma de decisiones.</p>
+    </div>
+  </div>
+
+  <!-- UNICIDAD -->
+  <div class="unico">
+    <div>
+      <p class="claim">Autoridad <span class="neq">&ne;</span><br>Liderazgo</p>
+      <p class="note">Tener jerarquía o una función de conducción respecto de otras personas no significa ejercer el liderazgo. Cada ser humano es un líder potencial si está dispuesto a encontrar su aporte y a implementarlo.</p>
+    </div>
+    <div class="matrixwrap">
+      <svg viewBox="0 0 400 62" width="100%" aria-hidden="true">
+        <g id="dots"></g>
+      </svg>
+      <div class="cap">
+        <span class="mono">n = 240 · único e irrepetible</span>
+        <span class="mono rt">Obs. 108 — el aporte propio</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARACTERÍSTICAS + ELEMENTOS -->
+  <div class="mid">
+    <div class="col">
+      <div class="sect"><span class="t">Características</span><span class="mono rt">08 rasgos</span></div>
+      <ol class="rasgos">
+        <li><span class="i">01</span><span><b>Es influencia, no imposición.</b> El seguidor actúa con buena disposición y entusiasmo.</span></li>
+        <li><span class="i">02</span><span><b>Es un proceso, no un rasgo fijo.</b> Se descubre y se desarrolla en su propio ejercicio.</span></li>
+        <li><span class="i">03</span><span><b>Opera en tres planos.</b> Impacta al individuo, al grupo y a la dinámica organizacional.</span></li>
+        <li><span class="i">04</span><span><b>Es independiente del puesto.</b> Se aplica en cualquier nivel jerárquico.</span></li>
+        <li><span class="i">05</span><span><b>Implica poder desigual,</b> que se usa de distintas formas para influir en la conducta.</span></li>
+        <li><span class="i">06</span><span><b>Es distribuible.</b> Sus habilidades pueden repartirse entre todos los miembros.</span></li>
+        <li><span class="i">07</span><span><b>Empieza en uno mismo.</b> La autodisciplina propia contagia como modelo a quienes rodean.</span></li>
+        <li><span class="i">08</span><span><b>Es contextual.</b> Varía con la época, el país y las necesidades de cada organización.</span></li>
+      </ol>
+      <p class="foot">Los rasgos 01–06 se desprenden de las definiciones del documento; 07 y 08, del planteamiento del liderazgo consciente y de la variación histórica del concepto.</p>
+    </div>
+    <div class="col">
+      <div class="sect"><span class="t">Elementos</span><span class="mono rt">12 componentes</span></div>
+      <div class="grid12">
+        <div class="cell"><span class="e">E-01</span><span class="n">Convencimiento</span></div>
+        <div class="cell"><span class="e">E-02</span><span class="n">Desarrollo</span></div>
+        <div class="cell"><span class="e">E-03</span><span class="n">Habilidad</span></div>
+        <div class="cell"><span class="e">E-04</span><span class="n">Unión de grupo</span></div>
+        <div class="cell"><span class="e">E-05</span><span class="n">Motivación</span></div>
+        <div class="cell"><span class="e">E-06</span><span class="n">Comunicación</span></div>
+        <div class="cell"><span class="e">E-07</span><span class="n">Capacidad</span></div>
+        <div class="cell"><span class="e">E-08</span><span class="n">Proceso</span></div>
+        <div class="cell"><span class="e">E-09</span><span class="n">Guía</span></div>
+        <div class="cell"><span class="e">E-10</span><span class="n">Influencia</span></div>
+        <div class="cell"><span class="e">E-11</span><span class="n">Objetivos</span></div>
+        <div class="cell"><span class="e">E-12</span><span class="n">División del trabajo</span></div>
+      </div>
+      <p class="foot">Componentes que las distintas definiciones comparten. La organización es el escenario donde el liderazgo los aplica, a partir del comportamiento, las habilidades y las interacciones del individuo.</p>
+    </div>
+  </div>
+
+  <!-- CONTINUO -->
+  <div class="cont">
+    <div class="sect"><span class="t">Fig. 02 — Continuo del liderazgo</span><span class="mono rt">Autoridad ↔ Libertad</span></div>
+    <svg viewBox="0 0 1000 196" width="100%" aria-hidden="true">
+      <rect x="60" y="6" width="880" height="132" fill="none" stroke="#1E1C19" stroke-width="1.1"/>
+      <line x1="60" y1="138" x2="940" y2="6" stroke="#1E1C19" stroke-width="1.1"/>
+      <g id="hatch"></g>
+      <text x="112" y="52" font-family="CrimsonPro" font-style="italic" font-size="19" fill="#1E1C19">Uso de la autoridad por el líder</text>
+      <text x="888" y="118" text-anchor="end" font-family="CrimsonPro" font-style="italic" font-size="19" fill="#6E1F3E">Libertad de los colaboradores</text>
+      <g id="arrows"></g>
+    </svg>
+    <div class="ticks">
+      <div><span class="k">01</span><p class="l">Toma la decisión y la anuncia</p></div>
+      <div><span class="k">02</span><p class="l">Vende la decisión</p></div>
+      <div><span class="k">03</span><p class="l">Presenta ideas e invita al cuestionamiento</p></div>
+      <div><span class="k">04</span><p class="l">Presenta una decisión tentativa sujeta a cambios</p></div>
+      <div><span class="k">05</span><p class="l">Presenta el problema, pide sugerencias y decide</p></div>
+      <div><span class="k">06</span><p class="l">Define límites y el grupo toma la decisión</p></div>
+      <div><span class="k">07</span><p class="l">El grupo decide dentro de límites definidos</p></div>
+    </div>
+    <p class="cap">A mayor uso de la autoridad, menor libertad de los colaboradores. El liderazgo no se ejerce en un punto fijo: se desplaza a lo largo de esta escala según la situación, el equipo y la decisión en juego.</p>
+  </div>
+
+  <!-- EJEMPLOS -->
+  <div class="ejs">
+    <div class="ej">
+      <span class="tag">Ejemplo A · Liderazgo con cargo</span>
+      <h3>El líder de líderes</h3>
+      <p>Un jefe de proyecto de software deja de repartir órdenes y busca en cada integrante la capacidad que lo hace único —quien documenta con claridad, quien depura rápido, quien negocia con el cliente— y la complementa con la propia. Define los límites y deja que el equipo tome la decisión: se ubica en los tramos <em>06–07</em> de la Fig. 02. Su autoridad existe, pero lo que conduce al grupo es la influencia.</p>
+      <p class="src">Video 04:08–04:54 · Fig. 02</p>
+    </div>
+    <div class="ej">
+      <span class="tag">Ejemplo B · Liderazgo sin cargo</span>
+      <h3>El autoliderazgo</h3>
+      <p>Un estudiante sin puesto ni autoridad formal dentro de su equipo sostiene su propia disciplina: entrega a tiempo, estudia lo que le toca y cumple lo que promete. Esa constancia <em>«contagia como modelo»</em> al resto y termina orientando al grupo sin que nadie lo haya nombrado. No hay poder formal en juego —solo el ejemplo—, y es aquí donde se ve que el liderazgo comienza por uno mismo.</p>
+      <p class="src">Video 05:49–06:29</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    <div class="rule soft"></div>
+    <div class="footin">
+      <div class="f">
+        Fuentes — Metainteligencia. «¿Qué significa ser líder? ¿Qué es el liderazgo consciente?», YouTube, y7gM4THDiqk.<br>
+        «Conceptos de Liderazgo», material ITESCAM Syllabus (Archer · Santos&nbsp;J. · Davis&nbsp;K. · Schein&nbsp;H. · Madrigal&nbsp;T.).
+      </div>
+      <div class="f r">
+        Nombre del alumno · Boleta<br>
+        Grupo 8CM2 · Agosto 2026
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* retícula de unicidad: 40 × 6 marcas idénticas, una sola diferenciada */
+(function(){
+  var g=document.getElementById('dots'), NS='http://www.w3.org/2000/svg';
+  var COLS=40, ROWS=6, SX=27, SY=2, k=0;
+  for(var j=0;j<ROWS;j++){
+    for(var i=0;i<COLS;i++){
+      var cx=5+i*10.0, cy=6+j*10, c=document.createElementNS(NS,'circle');
+      c.setAttribute('cx',cx.toFixed(2)); c.setAttribute('cy',cy);
+      if(i===SX&&j===SY){
+        c.setAttribute('r','3.5'); c.setAttribute('fill','#6E1F3E');
+        var ring=document.createElementNS(NS,'circle');
+        ring.setAttribute('cx',cx.toFixed(2)); ring.setAttribute('cy',cy);
+        ring.setAttribute('r','7.6'); ring.setAttribute('fill','none');
+        ring.setAttribute('stroke','#6E1F3E'); ring.setAttribute('stroke-width','.35');
+        g.appendChild(ring);
+      }else{
+        c.setAttribute('r','2.2'); c.setAttribute('fill','none');
+        c.setAttribute('stroke','#1E1C19'); c.setAttribute('stroke-width','.42');
+        c.setAttribute('opacity','.42');
+      }
+      g.appendChild(c); k++;
+    }
+  }
+})();
+
+/* continuo: trama de autoridad + 7 marcas de referencia */
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var hatch=document.getElementById('hatch'), arrows=document.getElementById('arrows');
+  /* trama diagonal en la zona de autoridad (arriba de la diagonal) */
+  for(var x=68;x<938;x+=11){
+    var t=(x-60)/880, ydiag=138-132*t;
+    if(ydiag<10) continue;
+    var l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x); l.setAttribute('y1',10);
+    l.setAttribute('x2',x); l.setAttribute('y2',ydiag.toFixed(1));
+    l.setAttribute('stroke','#1E1C19'); l.setAttribute('stroke-width','.5');
+    l.setAttribute('opacity','.13');
+    hatch.appendChild(l);
+  }
+  for(var k=0;k<7;k++){
+    var cx=60+880*((k+0.5)/7);
+    var l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',cx.toFixed(1)); l.setAttribute('y1','138');
+    l.setAttribute('x2',cx.toFixed(1)); l.setAttribute('y2','176');
+    l.setAttribute('stroke','#6E1F3E'); l.setAttribute('stroke-width','.9');
+    arrows.appendChild(l);
+    var d=document.createElementNS(NS,'path');
+    d.setAttribute('d','M'+(cx-3.4).toFixed(1)+',146 L'+cx.toFixed(1)+',137 L'+(cx+3.4).toFixed(1)+',146 Z');
+    d.setAttribute('fill','#6E1F3E');
+    arrows.appendChild(d);
+  }
+})();
+</script>
+</body>
+</html>

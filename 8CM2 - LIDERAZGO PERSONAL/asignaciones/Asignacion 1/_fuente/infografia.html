@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Liderazgo</title>
+<style>
+/*FONTS*/
+
+:root{
+  --paper:#F3F0E9;
+  --ink:#1E1C19;
+  --ink70:#54504A;
+  --ink45:#8B857B;
+  --ink20:#C9C3B6;
+  --guinda:#6E1F3E;
+  --hair:0.22mm;
+}
+@page{ size:297mm 420mm; margin:0; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ background:var(--paper); }
+body{ font-family:'CrimsonPro',Georgia,serif; color:var(--ink);
+  -webkit-font-smoothing:antialiased; text-rendering:geometricPrecision; }
+.page{ width:297mm; height:420mm; background:var(--paper);
+  padding:13mm 18mm 10mm; display:flex; flex-direction:column;
+  position:relative; overflow:hidden; }
+
+.mono{ font-family:'DMMono',monospace; text-transform:uppercase;
+  letter-spacing:.14em; font-size:7pt; color:var(--ink45); }
+.mono.dark{ color:var(--ink70); }
+.mono.rt{ margin-right:-.18em; }
+.rule{ height:var(--hair); background:var(--ink); opacity:.5; }
+.rule.soft{ opacity:.22; }
+
+/* header */
+.head{ display:flex; justify-content:space-between; align-items:baseline; padding-bottom:2.2mm; }
+.headrule{ height:0.5mm; background:var(--ink); }
+
+/* hero */
+.hero{ padding-top:3mm; }
+.hero .eyebrow{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.6mm; }
+h1{ font-family:'Italiana',serif; font-weight:400; font-size:143pt;
+  line-height:.86; letter-spacing:.012em; white-space:nowrap; }
+.etym{ display:flex; justify-content:space-between; align-items:baseline;
+  margin-top:2mm; padding-bottom:2mm; }
+.etym .lead{ font-size:11pt; color:var(--ink70); font-style:italic; }
+.etym .lead b{ font-style:normal; font-weight:400; color:var(--ink); }
+
+/* section headers */
+.sect{ display:flex; justify-content:space-between; align-items:baseline;
+  border-bottom:var(--hair) solid var(--ink); padding-bottom:1.5mm; margin-bottom:2.6mm; }
+.sect .t{ font-family:'DMMono',monospace; font-size:7.6pt; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--ink); }
+
+/* qué es */
+.ques{ margin-top:4mm; display:grid; grid-template-columns:33% 1fr; gap:10mm; align-items:center; }
+.ques .claim{ font-family:'Italiana',serif; font-size:27pt; line-height:1.16; letter-spacing:.01em; }
+.ques .claim .g{ color:var(--guinda); }
+.ques .tag{ margin-top:3.5mm; }
+
+/* autoridad */
+.auth{ margin-top:3.5mm; display:grid; grid-template-columns:33% 1fr; gap:10mm; align-items:center; }
+.auth .big{ font-family:'Italiana',serif; font-size:27pt; line-height:1.1; }
+.auth .big .g{ color:var(--guinda); }
+.auth .sub{ font-size:9.4pt; color:var(--ink70); margin-top:2.4mm; font-style:italic; }
+.mcap{ display:flex; justify-content:space-between; margin-top:2.4mm; }
+
+/* características */
+.rasgos{ margin-top:3.5mm; }
+.icons{ display:grid; grid-template-columns:repeat(3,1fr); row-gap:2.6mm; }
+.ico{ text-align:center; padding:0 4mm; }
+.ico svg{ width:14mm; height:14mm; display:block; margin:0 auto 1.8mm; }
+.ico .l{ font-size:10.4pt; line-height:1.2; }
+.ico .l span{ color:var(--ink45); }
+
+/* elementos */
+.elem{ margin-top:3.5mm; }
+.grid12{ display:grid; grid-template-columns:repeat(4,1fr);
+  border-top:var(--hair) solid var(--ink20); border-left:var(--hair) solid var(--ink20); }
+.cell{ border-right:var(--hair) solid var(--ink20); border-bottom:var(--hair) solid var(--ink20);
+  padding:1.8mm 2.6mm 2mm; }
+.cell .e{ font-family:'DMMono',monospace; font-size:6.4pt; letter-spacing:.1em; color:var(--guinda); }
+.cell .n{ font-size:11pt; line-height:1.1; margin-top:1.6mm; display:block; }
+
+/* continuo */
+.cont{ margin-top:3.5mm; }
+.ticks{ display:grid; grid-template-columns:repeat(7,1fr); margin:0 6%; }
+.ticks div{ padding:0 2mm; text-align:center; }
+.ticks .k{ font-family:'DMMono',monospace; font-size:6.4pt; color:var(--guinda); letter-spacing:.1em; }
+.ticks .l{ font-size:8.4pt; line-height:1.22; margin-top:1.2mm; }
+
+/* ejemplos */
+.ejs{ margin-top:3.5mm; display:grid; grid-template-columns:1fr 1fr; }
+.ej{ padding:0 9mm; border-left:var(--hair) solid var(--ink20); }
+.ej:first-child{ padding-left:0; border-left:none; }
+.ej:last-child{ padding-right:0; }
+.ej .tag{ font-family:'DMMono',monospace; font-size:6.8pt; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--guinda); }
+.ej svg{ width:82%; height:auto; display:block; margin:2.6mm auto 2.8mm; }
+.ej .l{ font-size:11pt; line-height:1.24; }
+
+/* footer */
+.foot{ margin-top:auto; padding-top:3mm; }
+.footin{ display:flex; justify-content:space-between; gap:10mm; padding-top:2.2mm; }
+.footin .f{ font-family:'DMMono',monospace; font-size:6.2pt; letter-spacing:.09em;
+  color:var(--ink45); line-height:1.7; text-transform:uppercase; }
+.footin .f.r{ text-align:right; white-space:nowrap; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="head">
+    <span class="mono dark">Instituto Politécnico Nacional · Ing. en Sistemas Computacionales</span>
+    <span class="mono rt">8CM2 Liderazgo Personal · Asignación 01</span>
+  </div>
+  <div class="headrule"></div>
+
+  <div class="hero">
+    <div class="eyebrow">
+      <span class="mono">El concepto de</span>
+      <span class="mono rt">Unidad temática I</span>
+    </div>
+    <h1>LIDERAZGO</h1>
+    <div class="etym">
+      <span class="lead">del inglés <b>to lead</b>&thinsp;: guiar</span>
+    </div>
+    <div class="rule"></div>
+  </div>
+
+  <!-- QUÉ ES -->
+  <div class="ques">
+    <div>
+      <p class="claim">Influir para<br>alcanzar una<br><span class="g">meta común</span>.</p>
+      <p class="mono tag">¿Qué es?</p>
+    </div>
+    <div>
+      <svg viewBox="0 0 560 120" aria-hidden="true">
+        <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7.2" refY="3" orient="auto">
+          <path d="M0,0 L7.4,3 L0,6 z" fill="#1E1C19"/></marker>
+          <marker id="arg" markerWidth="9" markerHeight="9" refX="7.2" refY="3" orient="auto">
+          <path d="M0,0 L7.4,3 L0,6 z" fill="#6E1F3E"/></marker></defs>
+        <circle cx="62" cy="52" r="30" fill="none" stroke="#6E1F3E" stroke-width="1.4"/>
+        <text x="62" y="56" text-anchor="middle" font-family="DMMono" font-size="13"
+              letter-spacing="1.9" fill="#6E1F3E">LÍDER</text>
+        <line x1="98" y1="52" x2="222" y2="52" stroke="#1E1C19" stroke-width="1.1" marker-end="url(#ar)"/>
+        <text x="160" y="42" text-anchor="middle" font-family="CrimsonPro" font-style="italic"
+              font-size="18" fill="#1E1C19">influye</text>
+        <circle cx="288" cy="52" r="30" fill="none" stroke="#1E1C19" stroke-width="1.1"/>
+        <text x="288" y="56" text-anchor="middle" font-family="DMMono" font-size="13"
+              letter-spacing="1.9" fill="#1E1C19">GRUPO</text>
+        <line x1="324" y1="52" x2="448" y2="52" stroke="#1E1C19" stroke-width="1.1" marker-end="url(#ar)"/>
+        <text x="386" y="42" text-anchor="middle" font-family="CrimsonPro" font-style="italic"
+              font-size="18" fill="#1E1C19">alcanza</text>
+        <circle cx="514" cy="52" r="30" fill="none" stroke="#1E1C19" stroke-width="1.1"/>
+        <text x="514" y="56" text-anchor="middle" font-family="DMMono" font-size="13"
+              letter-spacing="1.9" fill="#1E1C19">META</text>
+        <path d="M40,76 C26,104 98,104 84,80" fill="none" stroke="#6E1F3E"
+              stroke-width="1.1" marker-end="url(#arg)"/>
+        <text x="86" y="116" text-anchor="middle" font-family="CrimsonPro" font-style="italic"
+              font-size="18" fill="#6E1F3E">y primero, a sí mismo</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- AUTORIDAD -->
+  <div class="auth">
+    <div>
+      <p class="big">Autoridad <span class="g">&ne;</span><br>Liderazgo</p>
+      <p class="sub">Todos somos líderes en potencia.</p>
+    </div>
+    <div>
+      <svg viewBox="0 0 400 32" width="100%" aria-hidden="true"><g id="dots"></g></svg>
+      <div class="mcap">
+        <span class="mono">El puesto no da liderazgo</span>
+        <span class="mono rt">Cada quien, un aporte único</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARACTERÍSTICAS -->
+  <div class="rasgos">
+    <div class="sect"><span class="t">Características</span><span class="mono rt">09</span></div>
+    <div class="icons">
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="4.2" fill="#6E1F3E"/>
+          <circle cx="28" cy="28" r="10" fill="none" stroke="#1E1C19" stroke-width=".8" opacity=".5"/>
+          <circle cx="28" cy="28" r="17" fill="none" stroke="#1E1C19" stroke-width=".8" opacity=".34"/>
+          <circle cx="28" cy="28" r="24" fill="none" stroke="#1E1C19" stroke-width=".8" opacity=".2"/></svg>
+        <p class="l">Influye, <span>no impone</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56"><line x1="12" y1="46" x2="12" y2="34" stroke="#1E1C19" stroke-width="1.4"/>
+          <line x1="28" y1="46" x2="28" y2="24" stroke="#1E1C19" stroke-width="1.4"/>
+          <line x1="44" y1="46" x2="44" y2="14" stroke="#1E1C19" stroke-width="1.4"/>
+          <circle cx="44" cy="11" r="3.4" fill="#6E1F3E"/></svg>
+        <p class="l">Se aprende <span>y se desarrolla</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" fill="none" stroke="#1E1C19" stroke-width=".8" opacity=".34"/>
+          <circle cx="28" cy="28" r="15" fill="none" stroke="#1E1C19" stroke-width=".9" opacity=".6"/>
+          <circle cx="28" cy="28" r="6" fill="#6E1F3E"/></svg>
+        <p class="l">Individuo, grupo <span>y organización</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56">
+          <circle cx="28" cy="12" r="3.6" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <circle cx="18" cy="28" r="3.6" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <circle cx="38" cy="28" r="3.6" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <circle cx="8" cy="44" r="3.6" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <circle cx="28" cy="44" r="3.6" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <circle cx="48" cy="44" r="4.6" fill="#6E1F3E"/>
+          <line x1="28" y1="16" x2="18" y2="24" stroke="#1E1C19" stroke-width=".6" opacity=".45"/>
+          <line x1="28" y1="16" x2="38" y2="24" stroke="#1E1C19" stroke-width=".6" opacity=".45"/>
+          <line x1="18" y1="32" x2="8" y2="40" stroke="#1E1C19" stroke-width=".6" opacity=".45"/>
+          <line x1="18" y1="32" x2="28" y2="40" stroke="#1E1C19" stroke-width=".6" opacity=".45"/>
+          <line x1="38" y1="32" x2="48" y2="40" stroke="#1E1C19" stroke-width=".6" opacity=".45"/></svg>
+        <p class="l">No depende <span>del puesto</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56">
+          <line x1="6" y1="34" x2="50" y2="34" stroke="#1E1C19" stroke-width=".8" opacity=".45"/>
+          <circle cx="17" cy="25" r="9" fill="#6E1F3E"/>
+          <circle cx="41" cy="29" r="5" fill="none" stroke="#1E1C19" stroke-width="1.1"/></svg>
+        <p class="l">Implica <span>poder desigual</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56"><g id="ring6"></g></svg>
+        <p class="l">Se puede <span>compartir</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56">
+          <line x1="28" y1="8" x2="28" y2="48" stroke="#1E1C19" stroke-width=".7"
+                stroke-dasharray="2.4 3" opacity=".5"/>
+          <circle cx="15" cy="28" r="7.5" fill="#6E1F3E"/>
+          <circle cx="41" cy="28" r="7.5" fill="none" stroke="#6E1F3E" stroke-width="1.2"/></svg>
+        <p class="l">Empieza <span>en uno mismo</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56">
+          <circle cx="12" cy="30" r="7.5" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <rect x="20.5" y="22.5" width="15" height="15" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <path d="M44,21 L52,37 L36,37 Z" fill="none" stroke="#6E1F3E" stroke-width="1.1"/></svg>
+        <p class="l">Cambia con <span>el contexto</span></p>
+      </div>
+
+      <div class="ico">
+        <svg viewBox="0 0 56 56">
+          <path d="M36,14 A16,16 0 0 0 36,42" fill="none" stroke="#6E1F3E" stroke-width=".9" opacity=".8"/>
+          <path d="M36,8 A22,22 0 0 0 36,48" fill="none" stroke="#6E1F3E" stroke-width=".9" opacity=".45"/>
+          <path d="M36,2 A28,28 0 0 0 36,54" fill="none" stroke="#6E1F3E" stroke-width=".9" opacity=".22"/>
+          <circle cx="36" cy="28" r="5.4" fill="#6E1F3E"/>
+          <circle cx="7" cy="28" r="3.2" fill="none" stroke="#1E1C19" stroke-width="1"/>
+          <line x1="11.5" y1="28" x2="18" y2="28" stroke="#1E1C19" stroke-width=".7" opacity=".6"/>
+        </svg>
+        <p class="l">Seductor: <span>convence y atrae</span></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ELEMENTOS -->
+  <div class="elem">
+    <div class="sect"><span class="t">Elementos</span><span class="mono rt">12</span></div>
+    <div class="grid12">
+      <div class="cell"><span class="e">01</span><span class="n">Convencimiento</span></div>
+      <div class="cell"><span class="e">02</span><span class="n">Desarrollo</span></div>
+      <div class="cell"><span class="e">03</span><span class="n">Habilidad</span></div>
+      <div class="cell"><span class="e">04</span><span class="n">Unión de grupo</span></div>
+      <div class="cell"><span class="e">05</span><span class="n">Motivación</span></div>
+      <div class="cell"><span class="e">06</span><span class="n">Comunicación</span></div>
+      <div class="cell"><span class="e">07</span><span class="n">Capacidad</span></div>
+      <div class="cell"><span class="e">08</span><span class="n">Proceso</span></div>
+      <div class="cell"><span class="e">09</span><span class="n">Guía</span></div>
+      <div class="cell"><span class="e">10</span><span class="n">Influencia</span></div>
+      <div class="cell"><span class="e">11</span><span class="n">Objetivos</span></div>
+      <div class="cell"><span class="e">12</span><span class="n">División del trabajo</span></div>
+    </div>
+  </div>
+
+  <!-- CONTINUO -->
+  <div class="cont">
+    <div class="sect"><span class="t">Estilos de liderazgo</span><span class="mono rt">De mandar a delegar</span></div>
+    <svg viewBox="0 0 1000 138" width="100%" aria-hidden="true">
+      <rect x="60" y="6" width="880" height="88" fill="none" stroke="#1E1C19" stroke-width="1.1"/>
+      <line x1="60" y1="94" x2="940" y2="6" stroke="#1E1C19" stroke-width="1.1"/>
+      <g id="hatch"></g>
+      <text x="104" y="38" font-family="CrimsonPro" font-style="italic" font-size="21"
+            fill="#1E1C19">Autoridad del líder</text>
+      <text x="896" y="82" text-anchor="end" font-family="CrimsonPro" font-style="italic"
+            font-size="21" fill="#6E1F3E">Libertad del equipo</text>
+      <g id="arrows"></g>
+    </svg>
+    <div class="ticks">
+      <div><span class="k">01</span><p class="l">Decide<br>y anuncia</p></div>
+      <div><span class="k">02</span><p class="l">Vende su<br>decisión</p></div>
+      <div><span class="k">03</span><p class="l">Invita a<br>preguntar</p></div>
+      <div><span class="k">04</span><p class="l">Decisión<br>tentativa</p></div>
+      <div><span class="k">05</span><p class="l">Pide<br>sugerencias</p></div>
+      <div><span class="k">06</span><p class="l">Define<br>límites</p></div>
+      <div><span class="k">07</span><p class="l">El grupo<br>decide</p></div>
+    </div>
+  </div>
+
+  <!-- EJEMPLOS -->
+  <div class="ejs">
+    <div class="ej">
+      <span class="tag">Ejemplo A · Con cargo</span>
+      <svg viewBox="0 0 240 74" aria-hidden="true">
+        <circle cx="120" cy="15" r="12.5" fill="none" stroke="#6E1F3E" stroke-width="1.4"/>
+        <circle cx="120" cy="15" r="3.6" fill="#6E1F3E"/>
+        <line x1="48" y1="46" x2="109" y2="23" stroke="#1E1C19" stroke-width=".7" opacity=".5"/>
+        <line x1="96" y1="46" x2="114" y2="28" stroke="#1E1C19" stroke-width=".7" opacity=".5"/>
+        <line x1="144" y1="46" x2="126" y2="28" stroke="#1E1C19" stroke-width=".7" opacity=".5"/>
+        <line x1="192" y1="46" x2="131" y2="23" stroke="#1E1C19" stroke-width=".7" opacity=".5"/>
+        <circle cx="48" cy="55" r="8.4" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <rect x="87.6" y="46.6" width="16.8" height="16.8" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <path d="M144,46 L152.5,63 L135.5,63 Z" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <circle cx="192" cy="55" r="8.4" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <circle cx="192" cy="55" r="3.2" fill="#1E1C19"/>
+      </svg>
+      <p class="l">El jefe que reúne el aporte único de cada quien.</p>
+    </div>
+    <div class="ej">
+      <span class="tag">Ejemplo B · Sin cargo</span>
+      <svg viewBox="0 0 240 74" aria-hidden="true">
+        <circle cx="84" cy="37" r="12.5" fill="#6E1F3E"/>
+        <circle cx="84" cy="37" r="19.5" fill="none" stroke="#6E1F3E" stroke-width=".7" opacity=".55"/>
+        <circle cx="84" cy="37" r="26.5" fill="none" stroke="#6E1F3E" stroke-width=".7" opacity=".28"/>
+        <circle cx="28" cy="37" r="8.4" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <circle cx="144" cy="37" r="8.4" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <circle cx="190" cy="16" r="8.4" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <circle cx="190" cy="58" r="8.4" fill="none" stroke="#1E1C19" stroke-width="1"/>
+        <line x1="37" y1="37" x2="56" y2="37" stroke="#1E1C19" stroke-width=".7" opacity=".5"/>
+        <line x1="135" y1="37" x2="112" y2="37" stroke="#1E1C19" stroke-width=".7" opacity=".5"/>
+        <line x1="182" y1="20" x2="116" y2="31" stroke="#1E1C19" stroke-width=".7" opacity=".38"/>
+        <line x1="182" y1="54" x2="116" y2="43" stroke="#1E1C19" stroke-width=".7" opacity=".38"/>
+      </svg>
+      <p class="l">El compañero que arrastra con el ejemplo.</p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="rule soft"></div>
+    <div class="footin">
+      <div class="f">
+        Fuentes — Metainteligencia, «¿Qué significa ser líder?», YouTube y7gM4THDiqk<br>
+        «Conceptos de Liderazgo», material ITESCAM Syllabus
+      </div>
+      <div class="f r">
+        Angel Frausto Robles · 2019630177<br>
+        Grupo 8CM2
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* matriz de unicidad: 40 × 4, una sola marca diferenciada */
+(function(){
+  var g=document.getElementById('dots'), NS='http://www.w3.org/2000/svg';
+  for(var j=0;j<3;j++) for(var i=0;i<40;i++){
+    var cx=5+i*10, cy=6+j*10, c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy);
+    if(i===27&&j===1){
+      c.setAttribute('r','3.5'); c.setAttribute('fill','#6E1F3E');
+      var r=document.createElementNS(NS,'circle');
+      r.setAttribute('cx',cx); r.setAttribute('cy',cy); r.setAttribute('r','7.6');
+      r.setAttribute('fill','none'); r.setAttribute('stroke','#6E1F3E'); r.setAttribute('stroke-width','.35');
+      g.appendChild(r);
+    }else{
+      c.setAttribute('r','2.2'); c.setAttribute('fill','none');
+      c.setAttribute('stroke','#1E1C19'); c.setAttribute('stroke-width','.42'); c.setAttribute('opacity','.42');
+    }
+    g.appendChild(c);
+  }
+})();
+
+/* icono 06: anillo de seis, tres compartidos */
+(function(){
+  var g=document.getElementById('ring6'), NS='http://www.w3.org/2000/svg';
+  for(var k=0;k<6;k++){
+    var a=-Math.PI/2+k*Math.PI/3, cx=28+18*Math.cos(a), cy=28+18*Math.sin(a);
+    var c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',cx.toFixed(2)); c.setAttribute('cy',cy.toFixed(2));
+    if(k%2===0){ c.setAttribute('r','5.4'); c.setAttribute('fill','#6E1F3E'); }
+    else{ c.setAttribute('r','5'); c.setAttribute('fill','none');
+      c.setAttribute('stroke','#1E1C19'); c.setAttribute('stroke-width','1'); }
+    g.appendChild(c);
+  }
+})();
+
+/* continuo: trama de autoridad + 7 marcas */
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var hatch=document.getElementById('hatch'), arrows=document.getElementById('arrows');
+  for(var x=68;x<938;x+=11){
+    var t=(x-60)/880, yd=94-88*t;
+    if(yd<10) continue;
+    var l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',x); l.setAttribute('y1',10);
+    l.setAttribute('x2',x); l.setAttribute('y2',yd.toFixed(1));
+    l.setAttribute('stroke','#1E1C19'); l.setAttribute('stroke-width','.5'); l.setAttribute('opacity','.13');
+    hatch.appendChild(l);
+  }
+  for(var k=0;k<7;k++){
+    var cx=60+880*((k+0.5)/7);
+    var l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',cx.toFixed(1)); l.setAttribute('y1','94');
+    l.setAttribute('x2',cx.toFixed(1)); l.setAttribute('y2','126');
+    l.setAttribute('stroke','#6E1F3E'); l.setAttribute('stroke-width','.9');
+    arrows.appendChild(l);
+    var d=document.createElementNS(NS,'path');
+    d.setAttribute('d','M'+(cx-3.4).toFixed(1)+',102 L'+cx.toFixed(1)+',93 L'+(cx+3.4).toFixed(1)+',102 Z');
+    d.setAttribute('fill','#6E1F3E');
+    arrows.appendChild(d);
+  }
+})();
+</script>
+</body>
+</html>

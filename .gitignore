@@ -1,5 +1,14 @@
 # LaTeX build artifacts
 **/build/
+
+# macOS junk
+.DS_Store
+**/.DS_Store
+__MACOSX/
+
+# ReporteWAD (excluido a propósito)
+7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/ReporteWAD/
+7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/ReporteWAD.zip
 *.aux
 *.bbl
 *.bcf

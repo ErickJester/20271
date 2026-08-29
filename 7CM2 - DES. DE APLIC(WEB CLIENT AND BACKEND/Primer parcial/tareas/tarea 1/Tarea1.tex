@@ -1,0 +1,271 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Tarea 1: Arquitectura de cebolla (arquitectura limpia)}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Código}
+
+
+\lstset{
+	language=Java,
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+El apartado 1.4 del temario corresponde a la arquitectura de cebolla, llamada también arquitectura limpia. Esta investigación cubre su origen, la regla que la define y los cuatro elementos que el propio temario enumera: modelo del dominio, interfaz de usuario, infraestructura y pruebas.
+
+La arquitectura de cebolla responde a un problema concreto de la arquitectura tradicional de n capas, que el apartado 1.3 ya introduce. Ese problema es que la lógica de negocio acaba dependiendo de la base de datos. Lo que hace la cebolla es invertir esa dependencia, y de esa inversión se derivan tanto sus ventajas como su costo.
+
+%################################################
+\section{\color{colorIPN}{Conceptos previos}}
+
+\subsection{ \color{colorESCOM}{El acoplamiento hacia la base de datos}}
+
+En el esquema clásico de tres capas la interfaz de usuario llama a la capa de lógica de negocio, y ésta llama a la capa de acceso a datos. Cada capa depende de la que tiene debajo. Por transitividad, la lógica de negocio depende de la persistencia y la aplicación entera queda construida encima del esquema relacional.
+
+Palermo describió la consecuencia en 2008 \cite{palermo2008}: cambiar el motor de almacenamiento, el ORM o el nombre de una columna obliga a tocar código de negocio que no tiene relación con esa decisión técnica. La base de datos, que es un detalle de almacenamiento, acaba funcionando como cimiento del sistema.
+
+\subsection{ \color{colorESCOM}{El principio de inversión de dependencias}}
+
+El principio de inversión de dependencias, la letra D de SOLID, enuncia que los módulos de alto nivel no deben depender de los de bajo nivel y que ambos deben depender de abstracciones. Aplicado a un par de clases, el principio produce una interfaz entre quien llama y quien ejecuta. Aplicado al sistema completo, produce la arquitectura de cebolla.
+
+Dos nociones se confunden con frecuencia en este punto. La dependencia de código fuente es qué archivo necesita conocer a qué otro para compilar. El flujo de control es qué método llama a qué método durante la ejecución. La inversión consiste en hacer que ambos apunten en sentidos contrarios.
+
+%################################################
+\section{\color{colorIPN}{Desarrollo}}
+
+\subsection{ \color{colorESCOM}{Origen y formulaciones}}
+
+Jeffrey Palermo publicó en julio de 2008 la serie de artículos que dio nombre a la arquitectura de cebolla \cite{palermo2008}. Su propuesta se resume en cuatro postulados:
+
+\begin{itemize}
+	\item La aplicación se construye alrededor de un modelo de objetos independiente.
+	\item Las capas internas definen interfaces y las externas las implementan.
+	\item La dirección del acoplamiento apunta hacia el centro.
+	\item Todo el código del núcleo puede compilarse y ejecutarse por separado de la infraestructura.
+\end{itemize}
+
+Cuatro años después, Robert C. Martin publicó el artículo que popularizó el nombre de arquitectura limpia \cite{martin2012} y en 2017 lo desarrolló en un libro \cite{martin2017}. Su enunciado central es la regla de dependencia: las dependencias del código fuente \enquote{\textit{can only point inwards}}. Ningún elemento de un círculo interior puede nombrar algo de un círculo exterior, y la restricción alcanza a clases, funciones, variables y formatos de datos.
+
+Los dos autores describen la misma estructura con distinta nomenclatura. Palermo nombra sus anillos modelo del dominio, servicios de dominio, servicios de aplicación e infraestructura. Martin los nombra entidades, casos de uso, adaptadores de interfaz y frameworks. La figura \ref{img:cebolla} representa la versión de Palermo, que es la que sigue el temario.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}
+		\filldraw[fill=gray!5,  draw=colorESCOM, thick] (0,0) circle (4.1cm);
+		\filldraw[fill=gray!12, draw=colorESCOM, thick] (0,0) circle (3.1cm);
+		\filldraw[fill=gray!22, draw=colorESCOM, thick] (0,0) circle (2.1cm);
+		\filldraw[fill=colorIPN!18, draw=colorIPN, very thick] (0,0) circle (1.15cm);
+
+		\node[align=center, text=colorIPN] at (0,0)
+			{\scriptsize\bfseries Modelo del\\[-2pt] \scriptsize\bfseries dominio};
+		\node[fill=gray!22, inner sep=2pt] at (0,1.60)  {\scriptsize Servicios de dominio};
+		\node[fill=gray!12, inner sep=2pt] at (0,2.60)  {\scriptsize Servicios de aplicación};
+		\node[fill=gray!5,  inner sep=2pt] at (0,3.60)  {\scriptsize Interfaz de usuario};
+		\node[fill=gray!5,  inner sep=2pt] at (-2.30,-2.77) {\scriptsize Infraestructura};
+		\node[fill=gray!5,  inner sep=2pt] at (2.30,-2.77)  {\scriptsize Pruebas};
+
+		\draw[->, very thick, colorIPN] (3.95,0) -- (1.35,0);
+	\end{tikzpicture}
+	\caption{Anillos de la arquitectura de cebolla y dirección de las dependencias}
+	\label{img:cebolla}
+\end{figure}
+
+\subsection{ \color{colorESCOM}{Modelo del dominio}}
+
+El modelo del dominio ocupa el centro. Contiene las entidades y los objetos de valor que representan las reglas del negocio, aquellas que seguirían siendo ciertas aunque la aplicación no existiera como software. Entran aquí un pedido que calcula su total a partir de sus líneas, o una cuenta que rechaza cualquier operación que la deje por debajo del saldo mínimo. El vocabulario y la técnica provienen del diseño guiado por el dominio de Evans \cite{evans2003}.
+
+En Java esto significa clases sin anotaciones de framework, sin \texttt{@Entity}, sin \texttt{@Component} y sin importaciones de Spring ni de JPA. La restricción admite una comprobación objetiva: si el módulo del dominio compila con un descriptor de construcción que no declara ninguna dependencia de infraestructura, el núcleo está aislado \cite{foojay2023}, y si no compila existe una fuga que hay que localizar.
+
+Alrededor del modelo, Palermo coloca los servicios de dominio, que resuelven operaciones de negocio que no pertenecen a una sola entidad, y el primer anillo de interfaces, donde viven los repositorios. Un repositorio se declara dentro del núcleo como interfaz y se implementa fuera de él, de modo que el núcleo declara qué necesita mientras la forma de satisfacerlo queda en el exterior. El código \ref{lst:puerto} muestra esa separación.
+
+\begin{lstlisting}[caption={Interfaz declarada en el núcleo y caso de uso que la consume},label={lst:puerto}]
+// Nucleo: la interfaz vive junto al dominio
+public interface PedidoRepository {
+	Optional<Pedido> buscarPorId(PedidoId id);
+	void guardar(Pedido pedido);
+}
+
+// Caso de uso: depende de la abstraccion, no del ORM
+public class ConfirmarPedido {
+
+	private final PedidoRepository repositorio;
+
+	public ConfirmarPedido(PedidoRepository repositorio) {
+		this.repositorio = repositorio;
+	}
+
+	public void ejecutar(PedidoId id) {
+		Pedido pedido = repositorio.buscarPorId(id)
+				.orElseThrow(PedidoNoEncontrado::new);
+		pedido.confirmar();
+		repositorio.guardar(pedido);
+	}
+}
+\end{lstlisting}
+
+Ninguna de las dos clases menciona una tecnología de persistencia. La clase \texttt{ConfirmarPedido} corresponde al anillo de servicios de aplicación en la terminología de Palermo y al anillo de casos de uso en la de Martin. Orquesta entidades para cumplir un objetivo del usuario y decide la secuencia de pasos, sin saber de dónde llegan los datos ni dónde se guardan.
+
+\subsection{ \color{colorESCOM}{Interfaz de usuario}}
+
+La interfaz de usuario se sitúa en el anillo exterior, al mismo nivel que la infraestructura y las pruebas. Funciona como mecanismo de entrega y por eso es reemplazable: la misma aplicación puede exponerse como sitio web, como API consumida por un cliente de escritorio o como línea de comandos, sin que el núcleo cambie.
+
+En la pila que usa el curso, un cliente Angular consume una API REST publicada por controladores de Spring, y ambas piezas viven en el anillo exterior. El controlador recibe la petición HTTP, la traduce a una llamada al caso de uso y convierte el resultado en JSON, sin que el dominio necesite saber que HTTP existe.
+
+Martin llama a este anillo adaptadores de interfaz y le asigna los controladores, los presentadores y los conversores de formato \cite{martin2012}. De ahí sale un criterio práctico para ubicar una clase: si menciona \texttt{HttpServletRequest}, \texttt{ResponseEntity} o un DTO pensado para serializarse en JSON, pertenece al anillo exterior y no al núcleo.
+
+La dirección del acoplamiento se conserva aunque sea el usuario quien inicia la interacción. El controlador conoce al caso de uso y lo llama, mientras que el caso de uso ignora que el controlador existe.
+
+\subsection{ \color{colorESCOM}{Infraestructura}}
+
+El anillo de infraestructura agrupa todo lo que comunica a la aplicación con el exterior: persistencia, mensajería, correo, clientes HTTP hacia servicios de terceros, sistema de archivos y relojes del sistema. Su trabajo consiste en implementar las interfaces que el núcleo declaró.
+
+En tiempo de compilación el módulo de infraestructura depende del núcleo, porque necesita conocer la interfaz \texttt{PedidoRepository} para poder implementarla. En tiempo de ejecución el flujo de control va en sentido contrario, ya que el caso de uso invoca al repositorio y termina ejecutando código de JPA. Las dos flechas apuntan en direcciones opuestas, y ese cruce es todo el contenido del principio de inversión de dependencias.
+
+El ensamblado ocurre en un solo punto, la raíz de composición. En Spring corresponde a una clase de configuración o al escaneo de componentes, y es el único lugar del sistema donde se nombran a la vez la abstracción y la implementación concreta que la satisface \cite{foojay2023}.
+
+Sustituir PostgreSQL por MongoDB modifica el módulo de infraestructura y la configuración, y nada más. El dominio y los casos de uso no se recompilan por ese cambio, y sus pruebas siguen pasando sin tocarlas.
+
+\subsection{ \color{colorESCOM}{Pruebas}}
+
+El diagrama original de Palermo coloca las pruebas en el anillo exterior, junto a la interfaz de usuario y la infraestructura \cite{palermo2008}. Las sitúa ahí porque una prueba es otro cliente del núcleo, que ocupa el mismo lugar que la interfaz de usuario y entra al sistema por las mismas fronteras.
+
+Como el núcleo no depende de frameworks, sus pruebas son unitarias en sentido estricto y no requieren base de datos, contexto de Spring ni servidor de aplicaciones. Se construye la entidad, se invoca el método y se verifica el invariante. La testabilidad figura entre los objetivos declarados de la arquitectura \cite{martin2012} porque se sigue directamente de la regla de dependencia.
+
+La distribución de pruebas suele seguir una pirámide organizada por anillos:
+
+\begin{itemize}
+	\item Las pruebas del dominio son las más numerosas. Verifican invariantes, cálculos y transiciones de estado, y corren rápido porque no tocan nada externo.
+	\item Cada caso de uso tiene sus propias pruebas. Como los repositorios son interfaces del núcleo, se sustituyen por implementaciones en memoria o por dobles.
+	\item La infraestructura se prueba por integración contra la base de datos real, habitualmente con contenedores efímeros, para comprobar que el adaptador cumple el contrato que declaró.
+	\item Las pruebas de extremo a extremo son las menos, por costo de mantenimiento y tiempo de ejecución.
+\end{itemize}
+
+Bogdanović documenta un error frecuente al aplicar este esquema \cite{optivem2023}: los dobles deben sustituir dependencias externas al núcleo, no al dominio mismo. Cuando se reemplazan entidades por mocks, las pruebas dejan de verificar comportamiento y pasan a verificar llamadas, de modo que cualquier refactorización interna las rompe aunque el sistema siga siendo correcto.
+
+%################################################
+\section{\color{colorIPN}{Análisis comparativo}}
+
+\subsection{	\color{colorESCOM}{Tres nombres para la misma regla}}
+
+La arquitectura de cebolla tuvo un antecedente directo. Alistair Cockburn había publicado en 2005 la arquitectura hexagonal, también llamada de puertos y adaptadores \cite{cockburn2005}, y el propio Palermo la reconoce como tal. La tabla \ref{tabla:comparacion} resume las tres formulaciones.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{2.4cm} |p{3.8cm} |p{3.8cm} |p{4.2cm}}\hline \hline
+		& \textbf{Hexagonal (2005)} & \textbf{Cebolla (2008)} & \textbf{Limpia (2012)} \\ \hline \hline
+		Autor & Alistair Cockburn & Jeffrey Palermo & Robert C. Martin \\ \hline
+		Metáfora & Hexágono rodeado de puertos y adaptadores & Anillos concéntricos & Círculos concéntricos \\ \hline
+		Centro & La aplicación & Modelo del dominio & Entidades \\ \hline
+		Divisiones internas & No las prescribe & Dominio, servicios de dominio, servicios de aplicación & Entidades, casos de uso, adaptadores, frameworks \\ \hline
+		Énfasis propio & Simetría entre el lado que entra y el que sale & Disciplina de anillos y servicios de dominio & Casos de uso explícitos y enunciado de la regla de dependencia \\ \hline \hline
+	\end{tabular}
+	\caption{Comparación entre las tres arquitecturas centradas en el dominio}
+	\label{tabla:comparacion}
+\end{table}
+
+Las tres se apoyan en el principio de inversión de dependencias, ponen la lógica de negocio en el centro, dejan la tecnología en el borde y obtienen testabilidad como resultado \cite{graca2017}. Jovanović las comparó capa por capa y concluyó que la estructura de carpetas a la que llegan los tres enfoques es prácticamente la misma, y que la discusión sobre cuál adoptar importa menos que aplicar el criterio de forma consistente \cite{jovanovic2024}.
+
+\subsection{	\color{colorESCOM}{Costos y críticas}}
+
+El costo principal aparece en el mapeo entre fronteras. Un mismo concepto de negocio suele existir por triplicado: como entidad del dominio, como DTO de entrada o salida y como modelo de persistencia. Cada frontera exige un traductor, y ese código de traducción hay que escribirlo y mantenerlo.
+
+Three Dots Labs recoge los señalamientos habituales \cite{threedots2023}, que coinciden entre sí: interfaces con una sola implementación que nunca tendrán otra, capas que se limitan a reenviar la llamada a la siguiente sin agregar nada, y código de una misma funcionalidad repartido entre carpetas separadas por criterio técnico, de modo que entender una operación completa obliga a recorrer varios módulos. A esto se suma la indirección adicional en tiempo de ejecución, que en sistemas sensibles al rendimiento hay que medir en lugar de suponer.
+
+El criterio de decisión pasa por la complejidad de las reglas de negocio y por el tiempo de vida esperado del sistema, más que por el tamaño del código. Una aplicación que traslada formularios a tablas sin reglas propias no gana nada con cuatro anillos. Un sistema cuyas reglas cambian, con varios equipos trabajando en paralelo y años de mantenimiento por delante, amortiza el costo de la separación.
+
+%################################################
+\section{\color{colorIPN}{Conclusión}}
+
+La arquitectura de cebolla aplica el principio de inversión de dependencias a la escala del sistema completo. En lugar de invertir la relación entre dos clases, invierte la relación entre la lógica de negocio y la tecnología que la rodea, de manera que la base de datos, el framework web y el cliente pasan a ser detalles sustituibles en el borde.
+
+El resultado admite comprobación objetiva. El núcleo compila sin infraestructura en el classpath, sus pruebas corren sin base de datos, y cambiar de motor de almacenamiento afecta a un módulo identificable. Cuando alguna de esas afirmaciones deja de cumplirse, la regla de dependencia se rompió en algún punto del código.
+
+Las formulaciones hexagonal, de cebolla y limpia difieren en nomenclatura y en el grado de detalle con que prescriben los anillos interiores, pero coinciden en la regla y en la estructura resultante. Elegir entre ellas importa menos que sostener la dirección de las dependencias de forma consistente durante todo el proyecto.
+
+Para el proyecto del curso la traducción es directa. Las reglas de negocio se escriben en Java sin anotaciones, Spring y JPA quedan confinados al anillo exterior, Angular es un mecanismo de entrega más, y una raíz de composición se encarga de unir las piezas.
+
+
+%################################################
+\pagebreak
+
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}
