@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es" data-menu="cerrado">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda del semestre</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗓️</text></svg>">
+<link rel="stylesheet" href="css/agenda.css">
+<script>
+  /* Se aplica antes de pintar para que el menú fijo no dé un brinco al cargar. */
+  try {
+    var g = JSON.parse(localStorage.getItem("agenda-20271-v1") || "{}");
+    if (g.menu === "fijo") document.documentElement.setAttribute("data-menu", "fijo");
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<!-- ============ MENÚ DE TRES NIVELES ============ -->
+<aside class="menu" id="menu">
+
+  <div class="menu__top">
+    <button class="menu__toggle" id="menuToggle" aria-expanded="false" aria-controls="menu"
+            title="Un clic abre · dos clics lo dejan fijo">
+      <svg viewBox="0 0 24 24" class="ico"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="menu__marca">
+      <span class="menu__titulo">Agenda</span>
+      <span class="menu__sub"><b id="marcaSemestre">—</b> · <span id="marcaPeriodo">—</span></span>
+    </div>
+  </div>
+
+  <p class="menu__pista">
+    <span class="menu__nivel" id="menuNivel" data-nivel="cerrado">cerrado</span>
+    1 clic abre · 2 clics fija · clic afuera cierra
+  </p>
+
+  <nav class="menu__seccion">
+    <p class="menu__etiqueta">Vistas</p>
+    <button class="item" data-vista="mes">
+      <svg viewBox="0 0 24 24" class="ico"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <span class="item__txt">Calendario</span>
+    </button>
+    <button class="item" data-vista="semana">
+      <svg viewBox="0 0 24 24" class="ico"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M9 5v16M15 5v16"/></svg>
+      <span class="item__txt">Semana</span>
+    </button>
+    <button class="item" data-vista="lista">
+      <svg viewBox="0 0 24 24" class="ico"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg>
+      <span class="item__txt">Entregas</span>
+    </button>
+    <button class="item" data-vista="materias">
+      <svg viewBox="0 0 24 24" class="ico"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 18.5h16"/></svg>
+      <span class="item__txt">Materias</span>
+    </button>
+    <button class="item" data-vista="archivo">
+      <svg viewBox="0 0 24 24" class="ico"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9M10 13h4"/></svg>
+      <span class="item__txt">Archivo</span>
+    </button>
+  </nav>
+
+  <div class="menu__seccion">
+    <p class="menu__etiqueta">Materias</p>
+    <div id="menuCursos" class="menu__cursos"></div>
+  </div>
+
+  <div class="menu__seccion">
+    <p class="menu__etiqueta">Filtrar por estado</p>
+    <div id="menuEstados" class="menu__estados"></div>
+  </div>
+
+  <div class="menu__seccion menu__seccion--fin">
+    <button class="item item--accion" data-accion="nueva-tarea">
+      <svg viewBox="0 0 24 24" class="ico"><path d="M12 5v14M5 12h14"/></svg>
+      <span class="item__txt">Nueva entrega</span>
+    </button>
+  </div>
+</aside>
+
+<div class="velo" id="velo"></div>
+
+<!-- ============ CONTENIDO ============ -->
+<div class="contenido" id="contenido">
+
+  <header class="barra">
+    <div class="barra__izq">
+      <div class="nav-fechas" id="navFechas">
+        <button id="mesAnterior" class="redondo" aria-label="Anterior">
+          <svg viewBox="0 0 24 24" class="ico"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+        <button id="irHoy" class="btn btn--chico">Hoy</button>
+        <button id="mesSiguiente" class="redondo" aria-label="Siguiente">
+          <svg viewBox="0 0 24 24" class="ico"><path d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <h1 class="barra__titulo" id="tituloVista">—</h1>
+    </div>
+
+    <div class="barra__der">
+      <div class="resumen" id="resumen"></div>
+      <label class="buscador">
+        <svg viewBox="0 0 24 24" class="ico"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="buscar" type="search" placeholder="Buscar entrega…" aria-label="Buscar entrega">
+      </label>
+      <button class="btn btn--fuerte" id="btnNueva">+ Entrega</button>
+    </div>
+  </header>
+
+  <main class="vista" id="vista"></main>
+</div>
+
+<!-- ============ PANEL DE DETALLE ============ -->
+<aside class="detalle" id="detalle" aria-live="polite"></aside>
+
+<!-- ============ VENTANA MODAL ============ -->
+<div class="modal" id="modal"></div>
+
+<script src="js/datos.js"></script>
+<script src="js/tareas.js"></script>
+<script src="js/estado.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/calendario.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
