@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>La empresa: concepto, tipos, clasificación y evolución histórica</title>
+<style>
+/*FONTS*/
+/*LOGOS*/
+
+/* ====================================================================
+   DATOS DE LA PORTADA — editar aquí y volver a correr build.sh
+   ==================================================================== */
+:root{
+  --ink:      #16181d;
+  --ink-soft: #4a4f5a;
+  --ink-faint:#8a8f99;
+  --accent:   #7a003c;
+  --azul:     #006699;
+  --rule:     #cdd0d6;
+  --paper:    #ffffff;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+@page{
+  size: letter;
+  margin: 25mm 25mm 25mm 30mm;
+}
+@page portada{
+  margin: 30mm 25mm 25mm 25mm;
+}
+
+html{ font-size:16px; }
+
+body{
+  font-family:'CrimsonPro', Georgia, 'Times New Roman', serif;
+  font-size:11.7pt;
+  line-height:1.62;
+  color:var(--ink);
+  background:var(--paper);
+  text-rendering:optimizeLegibility;
+  font-feature-settings:"onum" 1, "kern" 1;
+}
+
+/* ============================ PORTADA ============================ */
+
+.portada{
+  page: portada;
+  height:222mm;
+  display:flex;
+  flex-direction:column;
+  page-break-after:always;
+  text-align:center;
+}
+
+.escudos{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  width:132mm;
+  margin:0 auto 11mm;
+}
+.escudos div{
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+}
+.logo-ipn{   width:29mm; height:30mm; }
+.logo-escom{ width:34mm; height:23mm; }
+
+.institucion{
+  font-family:'DMMono', 'Courier New', monospace;
+  font-size:8.4pt;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  line-height:2.05;
+}
+.institucion strong{ font-weight:400; color:var(--ink); }
+
+.portada hr{
+  border:0;
+  border-top:.6pt solid var(--rule);
+  width:64mm;
+  margin:9mm auto;
+}
+
+.bloque-titulo{ margin-top:4mm; }
+
+.portada h1{
+  font-family:'CrimsonPro', Georgia, serif;
+  font-weight:700;
+  font-size:25pt;
+  line-height:1.22;
+  letter-spacing:-.005em;
+  max-width:132mm;
+  margin:0 auto;
+  text-wrap:balance;
+}
+
+.subtitulo{
+  font-style:italic;
+  font-size:12.4pt;
+  color:var(--ink-soft);
+  margin-top:5mm;
+  max-width:118mm;
+  margin-left:auto; margin-right:auto;
+  line-height:1.45;
+}
+
+.espaciador{ flex:1 1 auto; min-height:10mm; }
+
+.datos{
+  display:grid;
+  grid-template-columns:auto auto;
+  gap:1.9mm 7mm;
+  justify-content:center;
+  text-align:left;
+  font-size:10.6pt;
+  margin-bottom:4mm;
+}
+.datos dt{
+  font-family:'DMMono', 'Courier New', monospace;
+  font-size:7.9pt;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  align-self:baseline;
+  padding-top:.9mm;
+  text-align:right;
+}
+.datos dd{ color:var(--ink); font-feature-settings:"lnum" 1, "kern" 1; }
+.datos dd em{ color:var(--ink-faint); font-style:italic; }
+
+/* ============================ CUERPO ============================ */
+
+main{ text-align:justify; hyphens:auto; }
+
+h2{
+  font-family:'CrimsonPro', Georgia, serif;
+  font-weight:700;
+  font-size:14.6pt;
+  line-height:1.28;
+  margin:9mm 0 3.4mm;
+  padding-bottom:1.6mm;
+  border-bottom:.6pt solid var(--rule);
+  text-align:left;
+  page-break-after:avoid;
+}
+h2:first-child{ margin-top:0; }
+h2 .num{
+  font-family:'DMMono', 'Courier New', monospace;
+  font-size:9.4pt;
+  color:var(--accent);
+  margin-right:3.4mm;
+  letter-spacing:.04em;
+  vertical-align:.12em;
+}
+
+h3{
+  font-family:'CrimsonPro', Georgia, serif;
+  font-weight:700;
+  font-size:11.9pt;
+  font-style:italic;
+  margin:6mm 0 2mm;
+  text-align:left;
+  page-break-after:avoid;
+}
+
+p{ margin-bottom:0; text-indent:0; orphans:2; widows:2; }
+p + p{ text-indent:6.5mm; }
+h2 + p, h3 + p, table + p, ul + p, .tabla-wrap + p{ text-indent:0; }
+
+em, i{ font-style:italic; }
+strong{ font-weight:700; }
+
+/* tabla */
+.tabla-wrap{ margin:5mm 0 2mm; page-break-inside:avoid; }
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:9.9pt;
+  text-align:left;
+}
+caption{
+  caption-side:top;
+  font-family:'DMMono', 'Courier New', monospace;
+  font-size:8pt;
+  letter-spacing:.11em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  text-align:left;
+  padding-bottom:2.2mm;
+}
+thead th{
+  font-family:'DMMono', 'Courier New', monospace;
+  font-size:7.9pt;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  font-weight:400;
+  color:var(--ink-soft);
+  border-top:1pt solid var(--ink);
+  border-bottom:.6pt solid var(--ink);
+  padding:2.2mm 3mm 2mm 0;
+  vertical-align:bottom;
+}
+tbody td{
+  padding:1.9mm 3mm 1.9mm 0;
+  border-bottom:.4pt solid var(--rule);
+  vertical-align:top;
+}
+tbody tr:last-child td{ border-bottom:1pt solid var(--ink); }
+td.num-col{ font-family:'DMMono', 'Courier New', monospace; font-size:9.1pt; white-space:nowrap; }
+.institucion, caption, thead th{ font-feature-settings:"lnum" 1; }
+.nota-tabla{
+  font-size:9.3pt;
+  color:var(--ink-soft);
+  margin-top:2.4mm;
+  text-align:left;
+  line-height:1.45;
+}
+
+/* referencias: sangría francesa */
+.referencias{ text-align:left; }
+.referencias p{
+  padding-left:9mm;
+  text-indent:-9mm !important;
+  margin-bottom:2.6mm;
+  font-size:10.7pt;
+  line-height:1.42;
+}
+
+.salto{ page-break-before:always; }
+</style>
+</head>
+<body>
+
+<!-- ================= PORTADA ================= -->
+<section class="portada">
+
+  <div class="escudos">
+    <div class="logo-ipn"   role="img" aria-label="Escudo del Instituto Politécnico Nacional"></div>
+    <div class="logo-escom" role="img" aria-label="Logotipo de la Escuela Superior de Cómputo"></div>
+  </div>
+
+  <div class="institucion">
+    <strong>Instituto Politécnico Nacional</strong><br>
+    Escuela Superior de Cómputo<br>
+    Ingeniería en Sistemas Computacionales
+  </div>
+
+  <hr>
+
+  <div class="bloque-titulo">
+    <h1>La empresa: concepto, tipos, clasificación y evolución histórica</h1>
+    <p class="subtitulo">
+      Antecedentes, desarrollo y transformación de la organización empresarial
+      desde el taller artesanal hasta la empresa digital
+    </p>
+  </div>
+
+  <div class="espaciador"></div>
+
+  <dl class="datos">
+    <dt>Unidad de aprendizaje</dt><dd>Gestión empresarial</dd>
+    <dt>Unidad temática</dt><dd>I. Aspectos básicos de la gestión empresarial</dd>
+    <dt>Alumno</dt><dd>Ángel Frausto Robles</dd>
+    <dt>Boleta</dt><dd>2019630177</dd>
+    <dt>Grupo</dt><dd>8CM1</dd>
+  </dl>
+
+</section>
+
+<!-- ================= CUERPO ================= -->
+<main>
+
+<h2><span class="num">1</span>Introducción</h2>
+
+<p>El estudio de la gestión empresarial empieza por delimitar su objeto. La palabra
+"empresa" se aplica por igual a un taller de dos personas y a una corporación que opera en cuarenta
+países, aunque las decisiones que enfrenta cada una tienen poco en común. Esta investigación revisa
+el concepto, los criterios con que se clasifica y el camino histórico que llevó de la producción
+artesanal a la empresa digital, con atención al caso mexicano y a las organizaciones de base
+tecnológica, que son el referente de esta unidad de aprendizaje.</p>
+
+<h2><span class="num">2</span>Concepto de empresa</h2>
+
+<p>Chiavenato (2019) define la empresa como una organización social que utiliza recursos para
+alcanzar objetivos, y precisa que su rasgo distintivo frente a otras organizaciones es el ánimo de
+lucro. Rubio (2008) la describe como la unidad económica que combina capital y trabajo para producir
+bienes o servicios destinados al mercado. Ambas definiciones coinciden en tres elementos: recursos,
+coordinación deliberada y un fin económico.</p>
+
+<p>La pregunta menos obvia es por qué existen las empresas. Si el mercado asigna recursos de manera
+eficiente mediante el sistema de precios, no sería necesario que alguien dirigiera el trabajo por
+autoridad en lugar de contratarlo transacción por transacción. Coase (1937) respondió que usar el
+mercado tiene un costo: buscar proveedores, negociar, redactar contratos y vigilar su cumplimiento.
+La empresa aparece cuando resulta más barato coordinar internamente que comprar cada insumo afuera,
+y crece hasta el punto en que el costo de una transacción adicional dentro de la organización iguala
+el costo de hacerla en el mercado. Ese argumento le valió a Coase el Premio Nobel de Economía en 1991
+y sigue siendo la explicación estándar de las fronteras de la empresa.</p>
+
+<p>En el plano jurídico mexicano conviene separar dos figuras que suelen confundirse. El comerciante
+o empresario es quien realiza la actividad; la sociedad mercantil es la persona moral a través de la
+cual se realiza. Una persona física con actividad empresarial es una empresa en sentido económico,
+pero no constituye una sociedad. La distinción importa porque de ella dependen el régimen fiscal, la
+responsabilidad patrimonial y la forma de admitir socios.</p>
+
+<h2><span class="num">3</span>Antecedentes: del taller familiar a la sociedad por acciones</h2>
+
+<p>Durante la mayor parte de la historia, la producción se organizó dentro de la unidad doméstica. El
+taller artesanal medieval reunía al maestro, los oficiales y los aprendices bajo el mismo techo, y
+los gremios regulaban precios, calidad y acceso al oficio. No había separación entre patrimonio
+familiar y patrimonio productivo, ni una organización que sobreviviera a la muerte de su titular.</p>
+
+<p>El comercio marítimo obligó a inventar algo distinto. La <em>commenda</em> italiana, documentada
+desde el siglo X en Venecia y Génova, separaba por primera vez a quien ponía el capital de quien
+realizaba el viaje: el inversionista arriesgaba solo lo aportado y el comerciante aportaba su
+trabajo, repartiéndose la ganancia según lo pactado. De ahí desciende la sociedad en comandita que
+todavía reconoce la legislación mexicana. Las compañías florentinas de los siglos XIV y XV, como la
+banca Medici, dieron un paso más al organizarse en sucursales jurídicamente independientes, de modo
+que la quiebra de una filial no arrastrara a las demás.</p>
+
+<p>El salto decisivo ocurrió en 1602 con la fundación de la Compañía Neerlandesa de las Indias
+Orientales (VOC). Fue la primera organización con capital permanente dividido en acciones
+transferibles que cualquier persona podía comprar y vender en un mercado secundario, el de Ámsterdam.
+Con ella aparecen rasgos que hoy damos por sentados: la personalidad jurídica independiente de los
+socios, la vida indefinida de la organización y la separación entre propiedad y administración.</p>
+
+<p>La responsabilidad limitada tardó otros dos siglos en generalizarse. En el Reino Unido se
+estableció con la <em>Limited Liability Act</em> de 1855 y la <em>Joint Stock Companies Act</em> de
+1856, que permitieron constituir sociedades por registro sin necesidad de una autorización
+parlamentaria específica. Esa reforma abarató la formación de empresas y volvió viable el
+financiamiento de proyectos industriales de gran escala.</p>
+
+<h2><span class="num">4</span>La empresa industrial y el nacimiento de la administración</h2>
+
+<p>La Revolución Industrial cambió el lugar donde se trabaja. El molino de algodón de Richard
+Arkwright en Cromford, operativo desde 1771, concentró a cientos de trabajadores alrededor de
+maquinaria movida por agua, con horarios fijos y supervisión directa. La máquina de vapor mejorada
+por James Watt, patentada en 1769, liberó a las fábricas de la necesidad de instalarse junto a un
+río. Adam Smith ya había observado en 1776, con el ejemplo de la fábrica de alfileres, que dividir
+una tarea en operaciones especializadas multiplicaba la producción muy por encima de lo que lograban
+los mismos trabajadores por separado.</p>
+
+<p>El crecimiento de esas fábricas creó un problema nuevo: nadie sabía cómo dirigirlas. Las
+respuestas llegaron a principios del siglo XX y todavía estructuran los planes de estudio de
+administración. Taylor (1911) propuso estudiar cada tarea con métodos cuantitativos para determinar
+la mejor forma de ejecutarla y pagar según el rendimiento. Ford llevó esa lógica al extremo en la
+planta de Highland Park, donde la línea de montaje móvil, instalada en 1913, redujo el tiempo de
+ensamble del chasis del Modelo T de más de doce horas a poco más de una hora y media. Fayol (1916)
+abordó el problema desde arriba y describió la administración como un conjunto de funciones (prever,
+organizar, dirigir, coordinar y controlar) aplicables a cualquier organización, no solo a las
+fábricas. Weber, en un texto publicado póstumamente en 1922, caracterizó la burocracia como la forma
+de organización basada en reglas escritas, jerarquía y competencia técnica, y explicó por qué resulta
+más predecible que la autoridad personal.</p>
+
+<p>Los experimentos realizados entre 1924 y 1932 en la planta Hawthorne de Western Electric, cerca de
+Chicago, abrieron una línea distinta. Los investigadores buscaban medir el efecto de la iluminación
+sobre la productividad y encontraron que los grupos informales, la atención recibida y las normas
+sociales del taller pesaban más que las condiciones físicas. De ahí surge la escuela de relaciones
+humanas y, con el tiempo, el estudio del comportamiento organizacional.</p>
+
+<h2><span class="num">5</span>El siglo XX: de la gran corporación a la producción flexible</h2>
+
+<p>Conforme las empresas se diversificaron, la estructura funcional dejó de servir. Alfred Sloan
+reorganizó General Motors en la década de 1920 en divisiones semiautónomas, cada una responsable de
+una línea de productos y de sus resultados, coordinadas por una oficina central dedicada a la
+estrategia y la asignación de capital. Chandler (1962) documentó ese proceso en DuPont, General
+Motors, Standard Oil y Sears, y formuló la tesis de que la estructura sigue a la estrategia: la forma
+de organizarse cambia después de que cambia el rumbo del negocio, no antes.</p>
+
+<p>El modelo de producción en masa empezó a agotarse en los años setenta. Toyota, bajo la dirección
+técnica de Taiichi Ohno, había desarrollado un sistema orientado a producir lotes pequeños con
+inventarios mínimos, deteniendo la línea ante cualquier defecto en lugar de corregirlo al final.
+Womack, Jones y Roos (1990) compararon plantas automotrices de todo el mundo y nombraron
+<em>producción esbelta</em> a ese conjunto de prácticas, mostrando que las plantas japonesas obtenían
+mejor calidad con menos horas de trabajo por vehículo. La calidad dejó de ser una inspección final
+para convertirse en una responsabilidad de todo el proceso, idea que se formalizó en la primera
+edición de la norma ISO 9001 en 1987.</p>
+
+<p>La década de 1990 trajo dos movimientos simultáneos. Hammer y Champy (1993) propusieron rediseñar
+los procesos de negocio desde cero en lugar de mejorarlos por partes, apoyándose en las tecnologías
+de información que entonces se abarataban. Al mismo tiempo, Prahalad y Hamel (1990) y Barney (1991)
+desplazaron la atención hacia adentro: la ventaja competitiva sostenible no viene de la posición en
+el mercado sino de recursos y capacidades difíciles de imitar. Porter (1985) había aportado el marco
+complementario con la cadena de valor y el análisis de las fuerzas competitivas.</p>
+
+<h2><span class="num">6</span>La empresa contemporánea</h2>
+
+<p>La corporación industrial que describieron Chandler y Sloan sigue existiendo, pero ya no es el
+modelo dominante. Lo que cambió puede resumirse en el reparto de la producción, la aparición de las
+plataformas y la ampliación de los criterios de evaluación.</p>
+
+<p>La desintegración de la cadena de valor es el cambio más visible. Empresas como Apple diseñan y
+comercializan productos que fabrican terceros en otros continentes, mientras que Nike no opera
+fábricas propias de calzado. La coordinación por contrato sustituyó a la integración vertical en
+industrias enteras, en buena medida porque las tecnologías de información redujeron el costo de
+supervisar a un proveedor lejano, justo el costo que según Coase justificaba internalizar la
+actividad.</p>
+
+<p>Junto a eso creció el modelo de plataforma. Parker, Van Alstyne y Choudary (2016) describen
+organizaciones cuyo activo principal no es la capacidad productiva sino la capacidad de conectar a
+dos grupos de usuarios y capturar valor de esa intermediación. El valor crece con el número de
+participantes, lo que produce dinámicas de concentración distintas a las de la industria tradicional
+y plantea problemas regulatorios que aún no se resuelven.</p>
+
+<p>Por último cambiaron los criterios con que se evalúa a la empresa. Elkington (1997) propuso medir
+el desempeño en las dimensiones económica, social y ambiental. Esa idea se institucionalizó en normas
+como ISO 14001 (1996) e ISO 26000 (2010), y hoy condiciona el acceso a financiamiento y a cadenas de
+suministro internacionales.</p>
+
+<p>En México, la Ley General de Sociedades Mercantiles, vigente desde 1934, incorporó en marzo de
+2016 la sociedad por acciones simplificada, que puede constituirse en línea, sin notario y con un
+solo accionista, siempre que los ingresos anuales no rebasen el límite que la Secretaría de Economía
+actualiza cada año. La reforma buscaba reducir el costo de formalizar microempresas, un problema
+relevante en un país donde, según los Censos Económicos del INEGI, las micro, pequeñas y medianas
+empresas representan alrededor del 99.8 por ciento de los establecimientos y generan cerca de siete
+de cada diez empleos.</p>
+
+<h2><span class="num">7</span>Tipos y clasificación de las empresas</h2>
+
+<p>No existe una clasificación única. Cada criterio responde a una pregunta distinta y conviene
+declarar cuál se está usando.</p>
+
+<h3>7.1 Por sector económico</h3>
+
+<p>El sector primario extrae recursos de la naturaleza: agricultura, ganadería, pesca y minería. El
+secundario los transforma e incluye manufactura, construcción y generación de energía. El terciario
+presta servicios, desde comercio y transporte hasta banca, salud y educación. Algunos autores agregan
+un sector cuaternario para las actividades intensivas en conocimiento, como investigación, desarrollo
+de software y consultoría especializada, aunque la clasificación oficial mexicana (SCIAN) no lo
+reconoce como categoría separada.</p>
+
+<h3>7.2 Por tamaño</h3>
+
+<p>México usa la estratificación publicada en el Diario Oficial de la Federación el 30 de junio de
+2009, que combina el número de trabajadores con las ventas anuales.</p>
+
+<div class="tabla-wrap">
+<table>
+  <caption>Estratificación oficial de empresas en México</caption>
+  <thead>
+    <tr><th>Tamaño</th><th>Sector</th><th>Trabajadores</th><th>Ventas anuales (mdp)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Micro</td><td>Todos</td><td class="num-col">Hasta 10</td><td class="num-col">Hasta 4</td></tr>
+    <tr><td>Pequeña</td><td>Comercio</td><td class="num-col">11 a 30</td><td class="num-col">4.01 a 100</td></tr>
+    <tr><td>Pequeña</td><td>Industria y servicios</td><td class="num-col">11 a 50</td><td class="num-col">4.01 a 100</td></tr>
+    <tr><td>Mediana</td><td>Comercio</td><td class="num-col">31 a 100</td><td class="num-col">100.01 a 250</td></tr>
+    <tr><td>Mediana</td><td>Servicios</td><td class="num-col">51 a 100</td><td class="num-col">100.01 a 250</td></tr>
+    <tr><td>Mediana</td><td>Industria</td><td class="num-col">51 a 250</td><td class="num-col">100.01 a 250</td></tr>
+  </tbody>
+</table>
+<p class="nota-tabla">Fuente: Secretaría de Economía, Acuerdo publicado en el Diario Oficial de la
+Federación el 30 de junio de 2009.</p>
+</div>
+
+<p>Cuando ambos criterios discrepan se aplica un tope combinado que pondera los trabajadores al 10
+por ciento y las ventas al 90 por ciento. Una empresa que rebase ese tope sube de categoría aunque
+cumpla el rango de personal.</p>
+
+<h3>7.3 Por origen del capital</h3>
+
+<p>Las empresas privadas pertenecen a particulares. Las públicas pertenecen al Estado, como Petróleos
+Mexicanos o la Comisión Federal de Electricidad. Las mixtas combinan ambas participaciones. Un cuarto
+grupo, el de la economía social, incluye cooperativas, sociedades de solidaridad social y ejidos,
+donde el reparto de excedentes y el control no se distribuyen en proporción al capital aportado sino
+al trabajo o al número de socios. También se distingue el capital por su procedencia geográfica:
+nacional, extranjero o mixto.</p>
+
+<h3>7.4 Por forma jurídica</h3>
+
+<p>El artículo 1 de la Ley General de Sociedades Mercantiles reconoce siete tipos: sociedad en nombre
+colectivo, sociedad en comandita simple, sociedad de responsabilidad limitada, sociedad anónima,
+sociedad en comandita por acciones, sociedad cooperativa y sociedad por acciones simplificada. En la
+práctica mexicana predominan la sociedad anónima, por su facilidad para admitir inversionistas y
+transmitir acciones, y la sociedad de responsabilidad limitada, frecuente en filiales de empresas
+estadounidenses por su tratamiento fiscal en el país de origen. Las sociedades civiles, reguladas por
+el Código Civil, se reservan para actividades con fin preponderantemente económico pero sin
+especulación comercial, como despachos profesionales.</p>
+
+<h3>7.5 Por ámbito geográfico</h3>
+
+<p>Una empresa local opera en una ciudad o región; una nacional cubre el territorio de un país; una
+multinacional instala filiales en varios países adaptando su oferta a cada mercado; una global opera
+con una estrategia integrada y trata al mundo como un solo mercado.</p>
+
+<h2><span class="num">8</span>Consideraciones finales</h2>
+
+<p>El recorrido histórico muestra que las formas de organización empresarial no aparecieron por
+diseño sino como respuesta a restricciones concretas. La comandita resolvió el problema de financiar
+viajes riesgosos, la sociedad anónima el de reunir capital de muchos desconocidos, la estructura
+divisional el de administrar negocios distintos bajo un mismo techo y la producción esbelta el de
+competir sin las economías de escala del mercado estadounidense. Entender cuál era el problema ayuda
+a reconocer cuándo una forma organizacional dejó de servir.</p>
+
+<p>Para las empresas de innovación tecnológica, que son el objeto de esta unidad de aprendizaje, la
+elección del tipo y la forma jurídica no es un trámite. Determina cómo se reparte la propiedad entre
+fundadores, si es posible incorporar inversionistas mediante acciones, cómo se protege el patrimonio
+personal ante el fracaso y qué régimen fiscal aplica a la propiedad intelectual que genere. Esas
+decisiones se toman al constituir la empresa y son costosas de revertir después.</p>
+
+<h2 class="salto"><span class="num">9</span>Referencias</h2>
+
+<div class="referencias">
+<p>Barney, J. (1991). Firm resources and sustained competitive advantage. <em>Journal of
+Management</em>, 17(1), 99-120.</p>
+
+<p>Chandler, A. D. (1962). <em>Strategy and structure: Chapters in the history of the industrial
+enterprise</em>. MIT Press.</p>
+
+<p>Chiavenato, I. (2019). <em>Introducción a la teoría general de la administración</em> (10a ed.).
+McGraw Hill.</p>
+
+<p>Coase, R. H. (1937). The nature of the firm. <em>Economica</em>, 4(16), 386-405.</p>
+
+<p>Elkington, J. (1997). <em>Cannibals with forks: The triple bottom line of 21st century
+business</em>. Capstone.</p>
+
+<p>Fayol, H. (1916). <em>Administration industrielle et générale</em>. Dunod.</p>
+
+<p>Hammer, M. y Champy, J. (1993). <em>Reengineering the corporation: A manifesto for business
+revolution</em>. HarperBusiness.</p>
+
+<p>Ley General de Sociedades Mercantiles. Diario Oficial de la Federación, 4 de agosto de 1934,
+reforma publicada el 14 de marzo de 2016.</p>
+
+<p>Parker, G., Van Alstyne, M. y Choudary, S. P. (2016). <em>Platform revolution</em>. W. W.
+Norton.</p>
+
+<p>Porter, M. E. (1985). <em>Competitive advantage: Creating and sustaining superior
+performance</em>. Free Press.</p>
+
+<p>Prahalad, C. K. y Hamel, G. (1990). The core competence of the corporation. <em>Harvard Business
+Review</em>, 68(3), 79-91.</p>
+
+<p>Rubio, P. (2008). <em>Introducción a la gestión empresarial</em>. Instituto Europeo de Gestión
+Empresarial.</p>
+
+<p>Secretaría de Economía. (2009, 30 de junio). Acuerdo por el que se establece la estratificación de
+las micro, pequeñas y medianas empresas. <em>Diario Oficial de la Federación</em>.</p>
+
+<p>Smith, A. (1776). <em>An inquiry into the nature and causes of the wealth of nations</em>. W.
+Strahan y T. Cadell.</p>
+
+<p>Taylor, F. W. (1911). <em>The principles of scientific management</em>. Harper &amp; Brothers.</p>
+
+<p>Weber, M. (1922). <em>Wirtschaft und Gesellschaft</em>. Mohr.</p>
+
+<p>Womack, J. P., Jones, D. T. y Roos, D. (1990). <em>The machine that changed the world</em>. Rawson
+Associates.</p>
+</div>
+
+</main>
+</body>
+</html>
