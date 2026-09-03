@@ -21,6 +21,14 @@
 
 **Diseño del HTML**: sigue las pautas de `artifact-design` (tipografía pareada, paleta propia por tema, ambos temas claro/oscuro, nada de plantillas genéricas de IA). Cada guía puede tener su propia identidad visual — no hace falta reutilizar la misma paleta entre unidades.
 
+## Artifacts de clase
+
+Distinto del material por unidad: hay **un artifact por sesión de clase**, que reconstruye esa clase
+desde su grabación (no sigue el programa, sigue el pizarrón). Viven en
+[`Primer parcial/clases/`](Primer%20parcial/clases/) y su reconstrucción, seguimiento y reglas de
+diseño están en [`Primer parcial/clases/CLAUDE.md`](Primer%20parcial/clases/CLAUDE.md). Cuando se
+traiga una grabación o transcripción de clase, ese archivo manda.
+
 ## Progreso de guías
 
 | Unidad | Archivo | Estado |

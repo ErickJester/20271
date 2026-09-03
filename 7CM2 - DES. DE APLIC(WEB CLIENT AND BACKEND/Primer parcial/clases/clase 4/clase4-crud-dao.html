@@ -1,0 +1,1719 @@
+<title>Clase 4 · El CRUD del DAO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFF1EE; --surface:#FFFFFF; --surface-2:#F7F8F5;
+    --text:#171B18; --text-muted:#59615B; --border:#DDE2DC;
+    --accent:#1F55B0; --accent-soft:#E4EBF8; --accent-ink:#FFFFFF;
+    --ok:#1B6E42; --ok-soft:#E2F0E7; --ok-bd:#8CC5A5;
+    --bad:#AF3227; --bad-soft:#F9E7E4; --bad-bd:#E0A79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --mk-blue:#1F55B0; --mk-green:#1B7A46; --mk-red:#BC3A2C; --mk-black:#2B2E2C;
+    --code-bg:#F1F3F0;
+    --shadow:0 1px 2px rgba(23,27,24,.06), 0 10px 26px -14px rgba(23,27,24,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#101311; --surface:#1A1E1B; --surface-2:#222722;
+      --text:#E7ECE7; --text-muted:#9BA49D; --border:#2E342F;
+      --accent:#8CB4F0; --accent-soft:#1B2739; --accent-ink:#101311;
+      --ok:#63C795; --ok-soft:#12291D; --ok-bd:#2F6045;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --mk-blue:#8CB4F0; --mk-green:#63C795; --mk-red:#EE8F84; --mk-black:#C9D0CA;
+      --code-bg:#161A17;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#101311; --surface:#1A1E1B; --surface-2:#222722;
+    --text:#E7ECE7; --text-muted:#9BA49D; --border:#2E342F;
+    --accent:#8CB4F0; --accent-soft:#1B2739; --accent-ink:#101311;
+    --ok:#63C795; --ok-soft:#12291D; --ok-bd:#2F6045;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --mk-blue:#8CB4F0; --mk-green:#63C795; --mk-red:#EE8F84; --mk-black:#C9D0CA;
+    --code-bg:#161A17;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  p.body b{font-weight:600;}
+  ul.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:19px; display:flex; flex-direction:column; gap:7px;}
+  ul.body b{font-weight:600;}
+  ol.steps{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    padding-left:19px; display:flex; flex-direction:column; gap:5px; margin:0 0 9px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.79rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .hl{background:var(--accent-soft); border-radius:3px; padding:1px 3px;}
+  pre .cm{color:var(--text-muted);}
+
+  .mkbar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .mk{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .mk::before{content:""; width:26px; height:8px; border-radius:2px; background:var(--c);
+    box-shadow:inset 0 -2px 0 rgba(0,0,0,.12);}
+  .method{border-left:3px solid var(--c); padding-left:16px;}
+  .method h2.sec{color:var(--c);}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul, details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.76rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.77rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .bugcode{background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:14px 16px; font-family:'IBM Plex Mono',monospace; font-size:.81rem;
+    line-height:1.85; overflow-x:auto; margin-bottom:11px;}
+  .bug{cursor:pointer; border-bottom:1px dotted var(--text-muted); padding:1px 2px; border-radius:3px;}
+  .bug:hover{background:var(--accent-soft);}
+  .bug.found{background:var(--ok-soft); border-bottom:1px solid var(--ok-bd); cursor:default;}
+  .bug.found::after{content:" \2713"; color:var(--ok); font-weight:600;}
+  .clean{cursor:pointer; padding:1px 2px; border-radius:3px;}
+  .clean:hover{background:var(--accent-soft);}
+  .clean.miss{background:var(--bad-soft);}
+  .bugcount{font-family:'IBM Plex Mono',monospace; font-size:.78rem;
+    color:var(--text-muted); margin-bottom:10px;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.78rem;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer; border-radius:3px;
+    padding:1px 3px;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.67rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.77rem; padding:7px 12px;
+    border-radius:8px; cursor:pointer; text-align:left;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .sqlrow{display:flex; gap:8px; flex-wrap:wrap;}
+  .sqlin{flex:1; min-width:250px; font-family:'IBM Plex Mono',monospace; font-size:.82rem;
+    padding:11px 13px; border-radius:8px; border:1px solid var(--border);
+    background:var(--code-bg); color:var(--text); outline:none;}
+  .sqlin:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  .sqlin.ok{border-color:var(--ok-bd); background:var(--ok-soft);}
+  .sqlin.no{border-color:var(--bad-bd); background:var(--bad-soft);}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+  .task ul{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.5;
+    margin:0 0 8px; padding-left:18px; display:flex; flex-direction:column; gap:5px;}
+  .task pre{font-size:.75rem; background:var(--surface); margin:9px 0;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:440px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+
+  .codehead{display:flex; justify-content:space-between; align-items:center; gap:10px;
+    margin-bottom:7px; flex-wrap:wrap;}
+  .codehead .cf{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    color:var(--text-muted); letter-spacing:.04em;}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Web Client · Clase 4</p>
+    <h1>El CRUD del DAO</h1>
+    <p class="lede">Esta clase fue el profesor escribiendo <code>CarreraDAO</code> completo en el pizarrón, de principio a fin. Arrancó donde quedó la clase 3 (las constantes SQL y la conexión) y terminó con los cinco métodos, la clase <code>Principal</code> que los usa, y un stored procedure de pilón.</p>
+    <p class="lede" style="margin-top:10px;">Escribió cada método en un color distinto de marcador, y así está organizada esta página: <b>azul</b> el <code>create</code>, <b>verde</b> el <code>update</code>, <b>rojo</b> el <code>delete</code>, <b>negro</b> el <code>read</code>. Entre bloque y bloque hay <b>nueve ejercicios</b> para que no sea nada más copiar el pizarrón, y las <b>cuatro tareas</b> aparecen justo en el minuto en que las dijo.</p>
+    <p class="lede" style="margin-top:10px;"><b style="color:var(--accent);">Los botones con <span style="font-family:'IBM Plex Mono',monospace;">?</span></b> explican los términos que dio por sabidos. Ábrelos cuando algo no te suene; no interrumpen la lectura.</p>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Dónde nos quedamos · minuto 00:32</p>
+      <h2 class="sec">El punto de partida</h2>
+      <p>Ni él se acordaba del nombre de la clase: "recuérdenme, ¿la clase era cursos, materias...?" — "Carrera", le contestaron. Vamos a seguir jugando con ese.</p>
+    </div>
+
+    <p class="body">De la clase 3 traemos dos cosas ya escritas: la clase <code>Carrera</code> (tres atributos privados, constructor vacío, getters, setters y <code>toString</code>) y el esqueleto de <code>CarreraDAO</code> con el método que se conecta a la base de datos. Todo lo de hoy se cuelga de ahí.</p>
+
+    <details class="dio"><summary>¿Por qué la clase se llama <code>CarreraDAO</code> y no nada más <code>Carrera</code>?</summary><div class="db">
+      <p>Son dos clases con trabajos distintos, y por eso son dos archivos distintos:</p>
+      <ul>
+        <li><code>Carrera</code> es el <b>dato</b>. Solo guarda un id, un nombre y una descripción. No sabe que existe una base de datos.</li>
+        <li><code>CarreraDAO</code> es <b>el que habla con la base de datos</b>. Sabe conectarse, sabe SQL, y sabe convertir filas de tabla en objetos <code>Carrera</code> y al revés.</li>
+      </ul>
+      <p>Esa separación es todo el <b>patrón DAO</b> (Data Access Object): si mañana cambias de MySQL a PostgreSQL, tocas <code>CarreraDAO</code> y nada más. La clase <code>Carrera</code> ni se entera, y el resto de tu aplicación tampoco.</p>
+      <p>El sufijo <code>DAO</code> en el nombre es puro convenio para que se lea de inmediato qué hace. Como él lo dijo: <em>"solo por el gusto de ponerle un identificador para tratar de dar a entender que vamos a escribir una variante del patrón de diseño"</em>. Ojo con esa palabra: <b>variante</b>. El patrón formal pide una interfaz más una implementación; aquí se está escribiendo la versión corta.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 1 · minuto 00:48 a 07:33</p>
+      <h2 class="sec">Las cinco constantes SQL</h2>
+      <p>Antes de cualquier método, arriba de la clase van las consultas guardadas como constantes. Una por operación del CRUD.</p>
+    </div>
+
+    <p class="body">La forma es siempre la misma y la escribió cinco veces:</p>
+
+<pre><code><span class="cm">// las cinco, arriba de todo, dentro de la clase CarreraDAO</span>
+private static final String SQL_INSERT =
+    "INSERT INTO Carrera (nombreCarrera, descripcionCarrera) VALUES (?, ?)";
+
+private static final String SQL_UPDATE =
+    "UPDATE Carrera SET nombreCarrera = ?, descripcionCarrera = ? WHERE idCarrera = ?";
+
+private static final String SQL_DELETE =
+    "DELETE FROM Carrera WHERE idCarrera = ?";
+
+private static final String SQL_SELECT =
+    "SELECT * FROM Carrera WHERE idCarrera = ?";
+
+private static final String SQL_SELECT_ALL =
+    "SELECT * FROM Carrera";</code></pre>
+
+    <details class="dio"><summary>Desármame <code>private static final String</code>, palabra por palabra</summary><div class="db">
+      <p>Son cuatro cosas apiladas y cada una dice algo distinto:</p>
+      <ul>
+        <li><code>private</code> — solo el código dentro de <code>CarreraDAO</code> puede verla. Nadie de fuera necesita saber qué SQL usas.</li>
+        <li><code>static</code> — <b>existe una sola copia, compartida por toda la clase</b>, no una por cada objeto. Si creas cien <code>CarreraDAO</code>, el texto del INSERT sigue estando una sola vez en memoria. Tiene sentido porque la consulta nunca cambia entre un objeto y otro.</li>
+        <li><code>final</code> — una vez asignada, no se puede reasignar. Intentar <code>SQL_INSERT = "otra cosa"</code> más adelante no compila.</li>
+        <li><code>String</code> — el tipo. Es texto, nada más. Java no sabe ni le importa que ese texto sea SQL; para él es una cadena cualquiera.</li>
+      </ul>
+      <p>Y sobre el nombre en <b>MAYÚSCULAS con guiones bajos</b>: eso no es obligación del compilador, es convención. Él lo dijo así: <em>"eso más que el nombre del atributo que esté en mayúsculas, se entiende que es una constante"</em>. En Java <b>no existe la palabra <code>const</code></b> — está reservada pero no se puede usar. <code>private static final</code> más el nombre en mayúsculas es lo más cercano que hay.</p>
+    </div></details>
+
+    <details class="dio"><summary>¿Qué hacen los signos <code>?</code> ahí sueltos?</summary><div class="db">
+      <p>Son <b>huecos</b>. La consulta queda escrita completa salvo por los valores, que se rellenan justo antes de ejecutarla.</p>
+      <p>Esto es lo que hace un <code>PreparedStatement</code>: manda la consulta al motor de base de datos <em>con los huecos vacíos</em>, el motor la analiza y la deja lista, y hasta después le pasas los valores por separado. Como el motor ya decidió qué es estructura y qué es dato, un valor malicioso no puede convertirse en instrucción.</p>
+      <p>Ese es el motivo real de que en la clase 3 dijera que <b>nunca usen <code>Statement</code></b>: con <code>Statement</code> concatenas el valor dentro del texto SQL, y ahí es donde vive la inyección SQL.</p>
+      <pre><code><span class="cm">// NO. Esto es concatenar: el valor entra al texto de la consulta.</span>
+"SELECT * FROM Carrera WHERE idCarrera = " + id
+
+<span class="cm">// SÍ. El hueco viaja aparte del valor.</span>
+"SELECT * FROM Carrera WHERE idCarrera = ?"</code></pre>
+    </div></details>
+
+    <p class="body"><b>Sobre escribirlas en una sola línea.</b> Insistió en eso: <em>"todo eso en una línea, porque si está en múltiples líneas, pues no se les olvide cerrar por acá, concatenar y demás cosas"</em>. Java no tiene cadenas de varias líneas en la sintaxis clásica: si partes el texto, tienes que cerrar comillas, poner <code>+</code>, abrir comillas otra vez, <b>y acordarte del espacio</b>. Ese espacio olvidado es el bug clásico:</p>
+
+<pre><code><span class="cm">// se convierte en "...FROM CarreraWHERE idCarrera = ?"  ->  error de sintaxis SQL</span>
+"SELECT * FROM Carrera" +
+"WHERE idCarrera = ?"</code></pre>
+
+    <p class="body">También mencionó que si necesitas más consultas —<em>"hacer joins, inner joins, lo que se les ocurra, left, outer"</em>— aquí es donde van: una constante más y un método más. El DAO crece por ahí, no por otro lado.</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 1</p>
+      <h3>¿Cuántos parámetros recibe cada consulta?</h3>
+      <p class="ask">Cuenta los <code>?</code>. Ese número es exactamente cuántas líneas <code>ps.set...()</code> vas a escribir después, así que conviene que salga automático. <b>Elige el número para cada una.</b></p>
+      <div class="qrows" id="q1"></div>
+      <div class="btnrow">
+        <button class="btn" id="q1go">Revisar</button>
+        <button class="btn ghost" id="q1rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q1fb"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Digresión · minuto 03:50 a 05:37</p>
+      <h2 class="sec">"Esta cosa no se debe de hacer"</h2>
+      <p>Escribió el <code>DELETE</code> y de inmediato se frenó a decir que en la vida real no lo van a usar.</p>
+    </div>
+
+    <p class="quote">"Solo para fines didácticos. Es decir, para cualquier materia que tengan en la escuela o cuando estén jugando. <b>Esta cosa no se debe de hacer.</b> Ustedes no deberían de eliminar nada por normatividad vigente."</p>
+
+    <p class="body">Un alumno contestó que la retención depende del giro, "de 5 a 10 años". El profesor corrigió: la ley de transparencia y acceso a la información marca <b>12</b>. Y añadió el matiz que importa: aunque tu giro pida 5, si el último día del año 5 llega una auditoría pidiendo 5 años más, estás obligado a entregar. <b>Aplica igual para documentos físicos y electrónicos.</b></p>
+
+    <p class="body">Traducido a código: el <code>DELETE FROM</code> literal borra la fila y ya no queda nada que auditar. Por eso lo que sigue es tarea.</p>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Tarea 1</span><span class="task-when">minuto 05:37</span></div>
+      <h3>Investigar el <em>soft delete</em></h3>
+      <p class="said">"Si bien es cierto esto es para fines didácticos, lo vamos a trabajar así; para fines del proyecto hay un concepto que se llama soft delete. <b>Averigüen qué es, con qué se come, cómo se adereza y cómo lo aplican.</b>"</p>
+      <p><b>El formato ya lo conoces.</b> Esas cuatro preguntas son siempre las mismas con él —<em>qué es, para qué sirve, con qué se come y cómo se adereza</em>— y son las que usó para DTO y DAO en la clase 3. Contéstalas en ese orden y agrega la cuarta que añadió aquí: <b>cómo lo aplican</b>.</p>
+      <p><b>La pista ya salió en clase.</b> Un alumno preguntó "¿tiene que ver con los grados de borrado, borrado suave y borrado duro?" y él confirmó: <em>"sí, justo. O borrado lógico, borrado físico"</em>.</p>
+      <p><b>Es para el proyecto, no solo para entregar.</b> Dijo textualmente "para fines del proyecto". Si tu equipo va a tener tablas con datos que se dan de baja, esto define cómo diseñas el esquema desde ahorita.</p>
+    </div>
+
+    <details class="dio"><summary>Adelanto: la idea del borrado lógico en una línea</summary><div class="db">
+      <p>En vez de sacar la fila de la tabla, le pones una marca de que ya no está vigente. Una columna extra, típicamente <code>activo BOOLEAN</code> o <code>fechaBaja DATETIME</code>.</p>
+      <p>El <code>DELETE</code> deja de ser un <code>DELETE</code> y se convierte en un <code>UPDATE</code>:</p>
+      <pre><code><span class="cm">-- borrado físico: la fila desaparece</span>
+DELETE FROM Carrera WHERE idCarrera = ?;
+
+<span class="cm">-- borrado lógico: la fila sigue ahí, marcada</span>
+UPDATE Carrera SET activo = false WHERE idCarrera = ?;</code></pre>
+      <p>El costo es que <b>todas</b> tus consultas de lectura tienen que empezar a filtrar (<code>WHERE activo = true</code>), y si se te olvida en una, aparecen registros fantasma. Ese trade-off es justo lo que la investigación tiene que discutir: no te quedes en la definición.</p>
+      <p>Un cabo que amarra con la clase 3: en el DTO de inserción, <code>activo</code> normalmente <b>no va</b>, porque la base de datos ya le pone su valor por defecto.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="mkbar"><span class="mk" style="--c:var(--mk-blue)">marcador azul</span></div>
+    <div class="method" style="--c:var(--mk-blue)">
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 2 · minuto 07:56 a 19:43</p>
+      <h2 class="sec">create() y la anatomía de un método DAO</h2>
+      <p>El primer método completo. Todos los demás son variaciones de esta misma plantilla, así que aquí es donde conviene entender de verdad.</p>
+    </div>
+
+    <p class="body">Antes de los métodos hay que declarar un atributo de la clase que guarde la conexión viva. Él lo puso a media pizarra buscando espacio: <code>Connection conexion;</code>. Con eso, el método queda:</p>
+
+<pre><code>public void create(Carrera c) throws SQLException {
+
+    obtenerConexion();                    <span class="cm">// 1. llena el atributo conexion</span>
+    PreparedStatement ps = null;          <span class="cm">// 2. lo declara vacío</span>
+
+    try {
+        ps = conexion.prepareStatement(SQL_INSERT);   <span class="cm">// 3. prepara la consulta</span>
+        ps.setString(1, c.getNombreCarrera());        <span class="cm">// 4. llena el hueco 1</span>
+        ps.setString(2, c.getDescripcionCarrera());   <span class="cm">//    y el hueco 2</span>
+        ps.executeUpdate();                           <span class="cm">// 5. la ejecuta</span>
+    } finally {
+        if (ps != null) ps.close();                   <span class="cm">// 6. cierra, pase lo que pase</span>
+        if (conexion != null) conexion.close();
+    }
+}</code></pre>
+
+    <p class="body">Seis pasos. Los cinco métodos del CRUD son este mismo esqueleto cambiando la constante, los <code>set</code> y la forma de ejecutar. Vamos uno por uno.</p>
+
+    <h3 class="sub">Pasos 1 y 2 · La conexión y el PreparedStatement</h3>
+
+    <p class="body">La primera línea del método llama al método de conexión que escribieron la clase pasada. Ni él se acordaba del nombre exacto: <em>"si el método que escribimos en esa ocasión se llama conéctate(), pues conéctate()"</em>. Ahí adentro está el <code>DriverManager.getConnection()</code> cuyo resultado se guarda en el atributo <code>conexion</code>.</p>
+
+    <details class="dio"><summary>¿Qué es exactamente un <code>PreparedStatement</code>?</summary><div class="db">
+      <p>Es el objeto de Java que representa <b>una consulta lista para ejecutarse</b> contra una conexión concreta.</p>
+      <p>La conexión sola no ejecuta nada: es apenas el cable hacia la base. El <code>PreparedStatement</code> es lo que viaja por ese cable. El flujo completo es:</p>
+      <ol>
+        <li>Le pides a la conexión que prepare un texto SQL: <code>conexion.prepareStatement(SQL_INSERT)</code>.</li>
+        <li>Te devuelve un objeto <code>PreparedStatement</code>. La base ya analizó la consulta y sabe qué va a hacer.</li>
+        <li>Le pasas los valores de los huecos con <code>setString</code>, <code>setInt</code>, etcétera.</li>
+        <li>Le dices que se ejecute.</li>
+      </ol>
+      <p>Se declara en <code>null</code> <b>afuera</b> del <code>try</code> a propósito. Si lo declararas adentro, el <code>finally</code> no podría verlo para cerrarlo: una variable solo vive dentro de las llaves donde se declaró.</p>
+      <p>Los tres verbos que usó para describir <code>prepareStatement</code> son buenos: <em>"¿qué consulta va a parametrizar, va a programar, va a planificar?"</em>.</p>
+    </div></details>
+
+    <h3 class="sub">Paso 4 · Los índices empiezan en 1</h3>
+
+    <p class="body">Aquí está la parte que más se equivoca. Numeró los <code>?</code> en el pizarrón y luego numeró los <code>set</code>:</p>
+
+    <p class="quote">"La lista de argumentos <b>empieza en 1 y termina en N</b>."</p>
+
+    <p class="body">No en cero. Es una de las poquísimas cosas en Java que no arranca en cero, y es precisamente porque ese índice no es de Java: es del SQL. La firma completa es <code>ps.setString(índice, valor)</code>: primero <b>cuál</b> hueco, después <b>qué</b> le metes.</p>
+
+    <p class="body">¿Y de dónde sale el valor? Del objeto <code>Carrera</code> que llegó como argumento. Preguntó en clase quién conoce el nombre de la carrera, y la respuesta es el propio objeto: <code>c.getNombreCarrera()</code>. Eso implica que <b>alguien tuvo que llenar ese objeto antes</b>, en otro lado:</p>
+
+<pre><code>Carrera c = new Carrera();
+c.setNombreCarrera("ISC");
+c.setDescripcionCarrera("La carrera de ISC");
+
+<span class="cm">// ahora c "conoce" esos datos, y es lo que se le pasa al DAO</span>
+dao.create(c);</code></pre>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 2</p>
+      <h3>Empareja cada hueco con su setter</h3>
+      <p class="ask">Esta es la consulta del <code>UPDATE</code>, la que tiene los tres huecos:</p>
+<pre><code>UPDATE Carrera
+   SET nombreCarrera = <span class="hl">?</span>, descripcionCarrera = <span class="hl">?</span>
+ WHERE idCarrera = <span class="hl">?</span></code></pre>
+      <p class="ask"><b>¿Qué línea corresponde a cada hueco?</b> Fíjate en el índice y en el tipo al mismo tiempo: hay opciones que fallan en uno y aciertan en el otro.</p>
+      <div class="qrows" id="q2"></div>
+      <div class="btnrow">
+        <button class="btn" id="q2go">Revisar</button>
+        <button class="btn ghost" id="q2rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q2fb"></div>
+    </div>
+
+    <h3 class="sub">El tipo del setter tiene que coincidir con el de la columna</h3>
+
+    <p class="body">Se detuvo un buen rato aquí, aunque en <code>Carrera</code> no se note porque los dos campos son texto —<em>"no es tan complejo: es copiar y pegar"</em>—. Así que se inventó un caso: supón que en lugar de <code>descripcion</code> tuvieras <code>duracion</code>, y fuera un entero, los años que dura la carrera.</p>
+
+    <p class="quote">"Que lo que nosotros pasemos como argumento uno <b>coincida con el tipo de dato</b> que estamos pasando. Si este es un VARCHAR, aquí tiene que ser un String. Si duración es un entero, aquí tendría que ser un int."</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 3</p>
+      <h3>¿Qué setter le toca a cada columna?</h3>
+      <p class="ask">La regla es mecánica una vez que la ves: <b>el tipo de la columna manda</b>. Elige el método correcto para cada una.</p>
+      <div class="qrows" id="q3"></div>
+      <div class="btnrow">
+        <button class="btn" id="q3go">Revisar</button>
+        <button class="btn ghost" id="q3rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q3fb"></div>
+    </div>
+
+    <h3 class="sub">Paso 5 · Solo hay dos formas de ejecutar</h3>
+
+    <p class="body">Preguntó qué tipos de consulta SQL les enseñaron en Bases de Datos, y fueron saliendo: inserción, actualización, eliminación, selección. Cuatro. Y entonces vino el remate:</p>
+
+    <p class="quote">"En teoría les presentaron al menos cuatro. <b>Para nosotros solo hay dos:</b> <code>ps.executeUpdate()</code> y san se acabó."</p>
+
+    <p class="body">Es la simplificación más útil de toda la clase. Desde JDBC, las cuatro familias de SQL colapsan en dos métodos según <b>qué te devuelven</b>:</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Método</th><th>Para qué SQL</th><th>Qué devuelve</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">executeUpdate()</td><td class="d">INSERT, UPDATE, DELETE — todo lo que modifica filas</td><td class="d">un <code>int</code>: cuántas filas cambió</td></tr>
+        <tr><td class="sym">executeQuery()</td><td class="d">SELECT, con o sin joins</td><td class="d">un <code>ResultSet</code>: las filas encontradas</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">El nombre <code>executeUpdate</code> confunde porque suena a que solo sirve para <code>UPDATE</code>. No: sirve para las tres que modifican. Piénsalo como "ejecutar una actualización <em>de la tabla</em>", no "ejecutar un UPDATE".</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 4</p>
+      <h3>executeUpdate o executeQuery</h3>
+      <p class="ask">Seis consultas. <b>Decide con cuál se ejecuta cada una.</b> Metí un par que él solo mencionó de pasada ("joins, inner joins, lo que se les ocurra") justo para ver si te quedó la regla o solo memorizaste las cuatro básicas.</p>
+      <div class="qrows" id="q4"></div>
+      <div class="btnrow">
+        <button class="btn" id="q4go">Revisar</button>
+        <button class="btn ghost" id="q4rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q4fb"></div>
+    </div>
+
+    <h3 class="sub">Paso 6 · finally, no catch</h3>
+
+    <p class="body">Aquí hizo algo que parece descuido y es decisión:</p>
+
+    <p class="quote">"Como todo bloque try, si intenta hacer algo y si no puedes lanza la excepción, debiera de haber un catch. <b>No le vamos a poner catch, le vamos a poner un finally.</b>"</p>
+
+    <details class="dio"><summary>try / catch / finally: qué hace cada uno</summary><div class="db">
+      <ul>
+        <li><code>try</code> — "intenta esto". Si algo truena adentro, el resto del bloque se salta.</li>
+        <li><code>catch</code> — "si tronó, haz esto en su lugar". <b>Atrapa el error y lo detiene ahí.</b></li>
+        <li><code>finally</code> — "esto se ejecuta pase lo que pase". Salga bien, truene, o incluso si hay un <code>return</code> en medio.</li>
+      </ul>
+      <p>Su formulación: <em>"el 'intenta', si no puedes lanza el error, y el otro es 'no me interesa si pudiste o no pudiste, esto se ejecuta'"</em>.</p>
+      <p>Poner <code>finally</code> <b>sin</b> <code>catch</code> es legal, y es exactamente lo que quieres aquí: no vas a resolver el error (no es tu trabajo), pero <b>sí</b> tienes que cerrar la conexión antes de irte. Si pusieras un <code>catch</code>, te tragarías el error y quien llamó al método creería que todo salió bien.</p>
+    </div></details>
+
+    <p class="body">Y adentro del <code>finally</code>, las dos preguntas. Primero el statement, después la conexión:</p>
+
+<pre><code>} finally {
+    if (ps != null) ps.close();
+    if (conexion != null) conexion.close();
+}</code></pre>
+
+    <details class="dio"><summary>¿Por qué el <code>if (ps != null)</code>? ¿Y por qué en ese orden?</summary><div class="db">
+      <p><b>El <code>if</code>:</b> el <code>finally</code> se ejecuta siempre, incluso si la conexión falló y <code>ps</code> se quedó en <code>null</code>. Llamar <code>.close()</code> sobre <code>null</code> revienta con un <code>NullPointerException</code>, y lo peor es que ese error nuevo <b>tapa</b> el error original que sí querías ver.</p>
+      <p><b>El orden:</b> al revés de como se abrieron. Primero se abrió la conexión, luego el statement; se cierran statement primero, conexión al último. El statement depende de la conexión, así que cerrar la conexión antes lo dejaría colgado.</p>
+      <p>Cerrar importa de verdad: cada conexión abierta ocupa un recurso del servidor de base de datos, y hay un límite. Un método que se olvida de cerrar cuando hay error va agotando el pozo hasta que la aplicación entera deja de poder conectarse. Eso se llama <b>fuga de conexiones</b> y es de los bugs más difíciles de rastrear, porque tarda horas en manifestarse.</p>
+    </div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3 · minuto 19:43 a 22:38</p>
+      <h2 class="sec">Las excepciones son una carrera de relevos</h2>
+      <p>Si el método no atrapa el error, ¿quién lo atrapa? Esta fue la mejor analogía de la clase.</p>
+    </div>
+
+    <p class="quote">"¿Qué pasa con los errores? 'Ah, bueno, es que no pude insertar'. Se lanza una excepción. <b>¿Quién le va a dar tratamiento? La capa de arriba.</b> Imagínense que están jugando carreras de relevos. ¿Aquí le tiran la estafeta a quién? Pues al que sigue."</p>
+
+    <p class="body">El <code>throws SQLException</code> en la firma del método es precisamente eso: el aviso de que este método <b>no</b> resuelve el problema, solo lo pasa. Y quién es "el que sigue" depende del tipo de aplicación:</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Tipo de aplicación</th><th>Quién recibe la estafeta</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Escritorio</td><td class="d">La capa que genera la interfaz gráfica: Swing, JavaFX</td></tr>
+        <tr><td class="sym">Web</td><td class="d">El Servlet, el JSP — y en el stack del curso, el controlador de Spring</td></tr>
+        <tr><td class="sym">Móvil</td><td class="d">La capa que comunica y pinta el error al cliente</td></tr>
+      </tbody>
+    </table></div>
+
+    <details class="dio"><summary>¿Qué es una "excepción" y qué significa <code>throws</code> en la firma?</summary><div class="db">
+      <p>Ya lo había dicho en la clase 3: <em>en Java no hay errores, hay excepciones</em>. Una excepción es un objeto que representa "algo salió mal", que interrumpe el flujo normal y va subiendo por la cadena de quién llamó a quién hasta que alguien la atrape.</p>
+      <p><code>SQLException</code> es una excepción <b>checked</b>: el compilador te <em>obliga</em> a hacer algo con ella. Solo tienes dos opciones y no hay tercera:</p>
+      <ul>
+        <li><b>Atraparla</b> aquí mismo con <code>try/catch</code>.</li>
+        <li><b>Declararla</b> con <code>throws SQLException</code> en la firma, que es decir "yo no, que la atrape el que me llamó".</li>
+      </ul>
+      <p>El DAO elige la segunda. Por eso, en cuanto escribas <code>dao.create(c)</code> en otro lado, el compilador te va a marcar error hasta que <em>ahí</em> pongas el <code>try/catch</code>. Él lo describió como si el compilador te reclamara: <em>"oye, espérate, el método que tú pretendes ejecutar dice que probablemente genere una excepción. No lo estás tratando allá, lo tengo que tratar yo"</em>.</p>
+    </div></details>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 5</p>
+      <h3>¿Quién trata el error?</h3>
+      <p class="ask">Cuatro preguntas sobre el reparto de responsabilidades. <b>Elige una opción en cada una.</b></p>
+      <div class="qrows" id="q5"></div>
+      <div class="btnrow">
+        <button class="btn" id="q5go">Revisar</button>
+        <button class="btn ghost" id="q5rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q5fb"></div>
+    </div>
+
+    <h3 class="sub">Y cuando por fin la atrapas, no pongas printStackTrace</h3>
+
+    <p class="body">En el <code>main</code>, el <code>catch</code> más directo sería <code>catch (SQLException e)</code>, o el genérico <code>catch (Exception e)</code>. Y adentro, lo que todo mundo escribe: <code>e.printStackTrace()</code>. Sobre eso fue tajante:</p>
+
+    <p class="quote">"La realidad dicta que <b>el printStackTrace() no lo pongan.</b> Ahí tendrían que poner un log en SLF4J, que es un Simple Logging Facade for Java. O el manejador de logs específico, para que eso lo mande al server y no sea tan escandaloso para el usuario."</p>
+
+    <details class="dio"><summary>Stack trace, log y SLF4J: qué es cada cosa</summary><div class="db">
+      <p>Un <b>stack trace</b> es la lista de métodos que estaban en curso cuando reventó, del más profundo al más superficial. Es utilísimo para depurar y es exactamente lo que <b>no</b> quieres que vea un usuario final: le enseña nombres de tus clases, rutas de archivos y a veces datos.</p>
+      <p><code>printStackTrace()</code> lo escupe en la consola. Problemas: en un servidor no hay una consola que alguien esté mirando, no queda registrado en ningún lado con fecha, y no puedes apagarlo ni filtrarlo.</p>
+      <p>Un <b>log</b> es un registro con fecha, nivel de severidad (ERROR, WARN, INFO, DEBUG) y destino configurable: archivo, servidor central, lo que sea. Puedes decir "en producción solo quiero ERROR" sin tocar el código.</p>
+      <p><b>SLF4J</b> (Simple Logging Facade for Java) es una <em>fachada</em>: una capa intermedia con la que tu código habla, para que la librería de logging real (Logback, Log4j) se pueda cambiar sin tocar tus clases. Es el mismo razonamiento del patrón DAO: hablar con una abstracción, no con la implementación.</p>
+      <p>Y el detalle que agregó al final: <code>printStackTrace()</code> no es lo único que trae la excepción; también está <code>e.getMessage()</code>, que da el mensaje específico del error y suele ser lo que sí quieres mostrar o registrar.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Pregunta de clase · minuto 23:14 a 25:34</p>
+      <h2 class="sec">"¿Para qué sirven los constructores vacíos?"</h2>
+      <p>Un alumno la lanzó como "pregunta de cultura general" y se llevó dos minutos de respuesta. Vale la pena porque toca algo que ya venían usando sin pensar.</p>
+    </div>
+
+    <p class="body">La respuesta corta fue "para inicializar valores", pero la explicación larga distingue tres momentos que se confunden todo el tiempo:</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Momento</th><th>Con primitivos</th><th>Con objetos</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Declarar</td><td class="d"><code>int x;</code></td><td class="d"><code>Carrera c;</code></td></tr>
+        <tr><td class="sym">Crear</td><td class="d">no aplica, ya existe</td><td class="d"><code>new Carrera()</code></td></tr>
+        <tr><td class="sym">Inicializar</td><td class="d"><code>x = 10;</code></td><td class="d"><code>c.setNombreCarrera("ISC")</code></td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">Su explicación del <code>new</code>: <em>"okay, va, mira, hay una plantilla por ahí que se llama el objeto Carrera, tiene estos atributos... bueno, pues créame una instancia de ese objeto"</em>. La clase es la plantilla; el <code>new</code> fabrica un ejemplar.</p>
+
+    <p class="body">Sobre qué se puede meter en un constructor vacío, dio dos usos concretos: asignar valores por defecto, y crear instancias de otras clases que el objeto vaya a necesitar. Y remató con los constructores <b>con</b> argumentos, que pueden ser tantos como quieras mientras las listas de parámetros sean distintas:</p>
+
+<pre><code>Carrera c1 = new Carrera();                              <span class="cm">// vacío: se llena después con setters</span>
+Carrera c2 = new Carrera("ISC");                         <span class="cm">// solo el nombre</span>
+Carrera c3 = new Carrera("ISC", "La carrera de ISC");    <span class="cm">// todo de golpe</span></code></pre>
+
+    <details class="dio"><summary>La trampa del constructor que Java te regala</summary><div class="db">
+      <p>Si <b>no escribes ningún</b> constructor, Java te crea uno vacío gratis, y por eso <code>new Carrera()</code> funciona aunque no lo hayas puesto.</p>
+      <p>Pero en cuanto escribes <b>cualquier</b> constructor con argumentos, el regalo desaparece. Si escribes solo <code>Carrera(String nombre)</code>, entonces <code>new Carrera()</code> deja de compilar hasta que declares también el vacío a mano.</p>
+      <p>Y es justo lo que rompería el DAO: el método <code>obtenerResultados()</code> hace <code>new Carrera()</code> por cada fila que encuentra. Sin constructor vacío, todo el <code>readAll()</code> se cae.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="mkbar"><span class="mk" style="--c:var(--mk-green)">marcador verde</span></div>
+    <div class="method" style="--c:var(--mk-green)">
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 4 · minuto 25:34 a 28:28</p>
+      <h2 class="sec">update()</h2>
+      <p>"Necesito colorcitos." A partir de aquí cambió de marcador por cada método, y por eso esta página está dividida así.</p>
+    </div>
+
+    <p class="body">Su descripción fue literalmente "lo mismo": obtiene la conexión, genera un <code>PreparedStatement</code>, recibe una <code>Carrera</code>. Solo cambian tres cosas.</p>
+
+<pre><code>public void update(Carrera c) throws SQLException {
+
+    obtenerConexion();
+    PreparedStatement ps = null;
+
+    try {
+        ps = conexion.prepareStatement(<span class="hl">SQL_UPDATE</span>);       <span class="cm">// cambio 1: la constante</span>
+        ps.setString(1, c.getNombreCarrera());
+        ps.setString(2, c.getDescripcionCarrera());
+        <span class="hl">ps.setInt(3, c.getIdCarrera());</span>                    <span class="cm">// cambio 2: un tercer parámetro</span>
+        ps.executeUpdate();
+    } finally {
+        if (ps != null) ps.close();
+        if (conexion != null) conexion.close();
+    }
+}</code></pre>
+
+    <p class="body">El tercer parámetro es el que trae la novedad, y trae las dos cosas juntas: <b>índice 3</b> porque es el tercer <code>?</code> de la consulta, y <b>setInt</b> porque <code>idCarrera</code> es un entero, no texto. Los dos primeros son copiar y pegar del <code>create</code>.</p>
+
+    <h3 class="sub">La pregunta que salió: ¿dónde se manda el nombre nuevo?</h3>
+
+    <p class="body">Un alumno preguntó algo que suena básico y no lo es: <em>"¿en qué parte le mandamos, por ejemplo, el nuevo nombre?"</em>. Es la confusión natural, porque en el método no aparece por ningún lado un "nombre nuevo".</p>
+
+    <p class="body">La respuesta es que el método <b>no distingue</b> entre viejo y nuevo. El objeto <code>Carrera</code> que le llega ya trae los valores que van a quedar. Quien lo llama es el que decide:</p>
+
+<pre><code>Carrera c1 = new Carrera();
+c1.setIdCarrera(1);                                   <span class="cm">// A CUÁL registro le pega</span>
+c1.setNombreCarrera("LCD");                           <span class="cm">// los valores NUEVOS</span>
+c1.setDescripcionCarrera("La carrera de LCD");
+
+dao.update(c1);</code></pre>
+
+    <p class="body">Ese objeto lleva dos cosas de naturaleza distinta y conviene no revolverlas: el <b>id</b> dice <em>a cuál fila</em> pegarle, y los otros dos campos dicen <em>con qué valores</em> dejarla.</p>
+
+    <details class="dio"><summary>Ojo con esto: es una actualización completa</summary><div class="db">
+      <p>Él lo dijo de pasada y es importante: <em>"ya tenemos un método que permite actualizar valores, pero <b>hace una actualización completa</b>"</em>.</p>
+      <p>El <code>SET</code> reescribe <b>las dos columnas siempre</b>. Si solo querías cambiar la descripción y mandas el objeto con <code>nombreCarrera</code> en <code>null</code>, no es que el nombre se quede como estaba: <b>se borra</b> y queda en <code>null</code>.</p>
+      <p>Por eso el flujo correcto es: primero <em>lee</em> el registro completo con <code>read()</code>, luego cambias en el objeto solo lo que quieres cambiar, y ese objeto completo se lo mandas al <code>update()</code>. Es exactamente la razón por la que en el bloque siguiente insiste en que actualizar <b>incluye</b> buscar.</p>
+    </div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="mkbar"><span class="mk" style="--c:var(--mk-red)">marcador rojo</span></div>
+    <div class="method" style="--c:var(--mk-red)">
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 5 · minuto 30:16 a 32:58</p>
+      <h2 class="sec">delete()</h2>
+      <p>El más corto de los cinco, y donde se ve mejor que el índice del parámetro no se hereda: se recalcula por consulta.</p>
+    </div>
+
+    <p class="body">Borró del pizarrón las dos primeras líneas del <code>update</code> porque el <code>DELETE</code> solo necesita el id, y luego reescribió la tercera. Ese fue el punto:</p>
+
+    <p class="quote">"El único detalle: <b>el índice no es el 3, el índice es único</b>, entonces sería 1."</p>
+
+<pre><code>public void delete(Carrera c) throws SQLException {
+
+    obtenerConexion();
+    PreparedStatement ps = null;
+
+    try {
+        ps = conexion.prepareStatement(SQL_DELETE);
+        <span class="hl">ps.setInt(1, c.getIdCarrera());</span>     <span class="cm">// 1, no 3: en ESTA consulta es el único ?</span>
+        ps.executeUpdate();                    <span class="cm">// DELETE también es executeUpdate</span>
+    } finally {
+        if (ps != null) ps.close();
+        if (conexion != null) conexion.close();
+    }
+}</code></pre>
+
+    <p class="body">El índice cuenta <b>los huecos de la consulta que estás ejecutando</b>, no la posición del atributo en la clase ni el orden de las columnas en la tabla. En <code>SQL_UPDATE</code> el id es el tercer <code>?</code>; en <code>SQL_DELETE</code> es el único, así que es el 1.</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 6</p>
+      <h3>Caza los errores en este delete()</h3>
+      <p class="ask">Alguien escribió el <code>delete()</code> con <b>cinco errores</b>. Todos son de los que salieron en clase o de los que él previno explícitamente. <b>Tócalos para marcarlos.</b></p>
+      <div class="bugcount" id="bugCount">0 de 5 encontrados</div>
+      <div class="bugcode" id="bugCode"></div>
+      <div class="fb" id="bugFb"></div>
+    </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 6 · minuto 33:00 a 37:15</p>
+      <h2 class="sec">"¿Cómo sabe Carrera cuál es su ID?"</h2>
+      <p>La mejor pregunta de la clase, y él mismo la calificó de "muy inocente" en el buen sentido: la respuesta cambia cómo diseñas la aplicación entera.</p>
+    </div>
+
+    <p class="body">El planteamiento del alumno: si el <code>idCarrera</code> es <code>auto_increment</code> y lo genera la base de datos, ¿cómo va a saber tu objeto <code>Carrera</code> cuál id le tocó, para poder actualizarlo o borrarlo después?</p>
+
+    <p class="quote">"La lógica dice esta: <b>lo primero que tienes que hacer es buscar lo que vas a borrar.</b>"</p>
+
+    <p class="body">Y lo bajó a un ejemplo de pantalla. Imagínate una tabla con un renglón por registro:</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>id</th><th>Nombre</th><th>Acciones</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">1</td><td class="d">Pedro Picapiedra</td><td class="d">ver · actualizar · eliminar</td></tr>
+        <tr><td class="sym">2</td><td class="d">Pablo Mármol</td><td class="d">ver · actualizar · eliminar</td></tr>
+        <tr><td class="sym">N</td><td class="d">…</td><td class="d">ver · actualizar · eliminar</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">Su pregunta al grupo: <em>"¿cómo sabes tú que si le picas a esto va a actualizar a Pedro Picapiedra?"</em>. La respuesta que dio un alumno es la correcta: <b>por el identificador</b>. Cada botón de cada renglón lleva pegado el id de <em>su</em> registro. El id viaja con el botón, no lo adivina nadie.</p>
+
+    <details class="dio"><summary>¿Qué es <code>auto_increment</code> y por qué complica esto?</summary><div class="db">
+      <p>Es una propiedad de columna en MySQL: cada vez que insertas una fila sin darle valor a esa columna, la base le pone el siguiente número disponible ella sola.</p>
+      <p>Por eso el <code>SQL_INSERT</code> no menciona <code>idCarrera</code>: si se lo mandaras, estarías peleando con la base por quién decide. El objeto <code>Carrera</code> que le pasas al <code>create()</code> tiene su <code>idCarrera</code> en 0 y así se queda, porque el número real se genera <em>del otro lado</em> y ese objeto ya no se entera.</p>
+      <p>De ahí la pregunta del alumno. Y de ahí la respuesta: si necesitas el id, tienes que <b>volver a consultarlo</b>. (JDBC tiene además un mecanismo para pedir la clave recién generada, <code>getGeneratedKeys()</code>, pero eso no se vio en clase.)</p>
+    </div></details>
+
+    <h3 class="sub">Y esto tiene nombre en Ingeniería de Software: &lt;&lt;include&gt;&gt;</h3>
+
+    <p class="body">Amarró la respuesta con los diagramas de casos de uso: <em>"el actualizar forzosamente tiene que tener un <code>&lt;&lt;include&gt;&gt;</code>, y el <code>&lt;&lt;include&gt;&gt;</code> es buscar el registro que quieren actualizar"</em>.</p>
+
+    <details class="dio"><summary>Caso de uso y <code>&lt;&lt;include&gt;&gt;</code>, explicados desde cero</summary><div class="db">
+      <p>Un <b>caso de uso</b> es una cosa que un usuario quiere lograr con el sistema, escrita en verbo: "Actualizar carrera", "Registrar alumno". En UML se dibuja como un óvalo.</p>
+      <p><code>&lt;&lt;include&gt;&gt;</code> es una relación entre dos casos de uso que significa <b>"este otro siempre pasa como parte de este"</b>. No es opcional, no es un caso especial: siempre ocurre.</p>
+      <p>Aquí: <em>Actualizar carrera</em> <code>&lt;&lt;include&gt;&gt;</code> <em>Buscar carrera</em>. No hay forma de actualizar sin buscar primero, así que la relación es de inclusión y no una alternativa.</p>
+      <p>Su ejemplo de la escuela para que quedara claro, y es bueno: el caso de uso es <em>presentar el protocolo de TT</em>, y el caso incluido es <em>entregar el reporte 15 días antes</em>. Si no entregas el reporte, no presentas. No es opcional: está incluido.</p>
+      <p>(Sobre la dirección de la flecha él mismo dijo "ahí ustedes me recordarán si es para allá o para allá". Va del caso base al incluido: de <em>Actualizar</em> apunta hacia <em>Buscar</em>.)</p>
+    </div></details>
+
+    <h3 class="sub">El happy path del DELETE</h3>
+
+    <p class="body">Más adelante (minuto 43:38) volvió al mismo tema desde el SQL, y ahí soltó el término:</p>
+
+    <p class="quote">"El cachito del <code>WHERE</code> funciona como 've y busca a alguien que tenga el ID tal y elimínalo'. Solo que funciona <b>muy happy path</b>. Si no encuentra el ID, no hace nada. Tendría que informarles."</p>
+
+    <details class="dio"><summary>¿Qué es el "happy path"?</summary><div class="db">
+      <p>El <b>happy path</b> (o camino feliz) es el recorrido en el que todo sale bien: los datos existen, el usuario escribió bien, la red respondió. Es el caso que uno programa primero y a veces el único que programa.</p>
+      <p>El problema del <code>DELETE ... WHERE idCarrera = 99</code> cuando el 99 no existe es que <b>no falla</b>. No lanza excepción, no avisa nada. Simplemente afecta cero filas y se va tan tranquilo. Tu programa cree que borró.</p>
+      <p>Dos formas de resolverlo, y las dos son válidas:</p>
+      <ul>
+        <li>La que él propuso: hacer un <code>SELECT</code> antes para confirmar que existe, y luego borrar. Es de hecho el mismo <code>&lt;&lt;include&gt;&gt;</code> de arriba.</li>
+        <li>Aprovechar que <code>executeUpdate()</code> <b>devuelve el número de filas afectadas</b>. Si te devuelve 0, no había nada que borrar. En el pizarrón se ignoró ese valor de retorno, pero está ahí gratis.</li>
+      </ul>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 7 · minuto 39:18 a 44:46</p>
+      <h2 class="sec">La clase Principal: quién usa el DAO</h2>
+      <p>Un alumno dijo que no ubicaba dónde encajaban las piezas ("este sería el DAO, el main, y la parte de allá no veo dónde está"). Entonces borró medio pizarrón y escribió la clase que las junta.</p>
+    </div>
+
+<pre><code><span class="cm">// si Carrera y CarreraDAO están en otro paquete, hay que importarlos</span>
+import com.ipn.mx.modelo.Carrera;
+import com.ipn.mx.dao.CarreraDAO;
+
+public class Principal {
+
+    public static void main(String[] args) {
+
+        <span class="cm">// 1. se arma el objeto con los datos</span>
+        Carrera c = new Carrera();
+        c.setNombreCarrera("LCD");
+        c.setDescripcionCarrera("Licenciatura en Ciencia de Datos");
+
+        <span class="cm">// 2. se crea el DAO</span>
+        CarreraDAO dao = new CarreraDAO();
+
+        <span class="cm">// 3. se usa, y AQUÍ sí va el try/catch</span>
+        try {
+            dao.create(c);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+
+    <p class="body">Tres clases, tres trabajos, y ninguna hace el del otro: <code>Carrera</code> guarda los datos, <code>CarreraDAO</code> habla con la base, <code>Principal</code> decide qué se hace. Esa es toda la arquitectura por capas en miniatura.</p>
+
+    <details class="dio"><summary><code>public static void main(String[] args)</code>: qué significa cada palabra</summary><div class="db">
+      <p>Es la puerta de entrada: cuando corres el programa, Java busca exactamente este método y empieza ahí.</p>
+      <ul>
+        <li><code>public</code> — Java tiene que poder llamarlo desde fuera de tu clase.</li>
+        <li><code>static</code> — se ejecuta <b>sin necesidad de crear un objeto</b> de la clase. Tiene que ser así, porque al arrancar todavía no existe ningún objeto.</li>
+        <li><code>void</code> — no devuelve nada.</li>
+        <li><code>main</code> — el nombre es obligatorio, Java busca ese exacto.</li>
+        <li><code>String[] args</code> — los argumentos que le pasarías desde la línea de comandos. Casi nunca se usan, pero la firma los pide.</li>
+      </ul>
+      <p>Él comentó al pasar que <em>"para la versión 25 y 26 de Java ese ya no es la firma del main, ya es directo"</em>. Es cierto: Java moderno permite un <code>void main()</code> simplificado. Pero escribió la larga a propósito, y esa es la que vas a ver en el 99% del código existente y en el examen.</p>
+    </div></details>
+
+    <details class="dio"><summary>Paquetes e imports: por qué esas dos líneas de arriba</summary><div class="db">
+      <p>Un <b>paquete</b> es una carpeta con nombre largo que agrupa clases. <code>com.ipn.mx.modelo</code> es una carpeta real: <code>com/ipn/mx/modelo/</code>.</p>
+      <p>La regla es simple: si tus clases están <b>en el mismo paquete</b>, se ven entre ellas sin hacer nada —"si está en el mismo paquete, pues va a funcionar de lo lindo"—. Si están en paquetes distintos, hay que importarlas.</p>
+      <p>Fíjate en los nombres que usó, porque describen la separación de responsabilidades: <code>.modelo</code> para las clases de datos, <code>.dao</code> para las de acceso a base. Esa convención la vas a volver a ver en Spring, con <code>.controlador</code>, <code>.servicio</code> y <code>.repositorio</code>.</p>
+    </div></details>
+
+    <p class="body">Y luego mostró cómo se van rotando las llamadas: para probar cada método, comentas los otros. Para el <code>delete</code> hay que agregar el id, que es donde se conecta con la pregunta del bloque anterior:</p>
+
+<pre><code><span class="cm">// dao.create(c);</span>
+<span class="cm">// dao.update(c);</span>
+c.setIdCarrera(1);        <span class="cm">// aquí es donde decides QUÉ vas a borrar</span>
+dao.delete(c);</code></pre>
+  </section>
+
+  <section>
+    <div class="mkbar"><span class="mk" style="--c:var(--mk-black)">marcador negro</span></div>
+    <div class="method" style="--c:var(--mk-black)">
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 8 · minuto 45:13 a 56:35</p>
+      <h2 class="sec">readAll() y el método que arma la lista</h2>
+      <p>Aquí sí cambia la plantilla. Los tres anteriores no devolvían nada; este devuelve datos, y eso obliga a dos piezas nuevas: un <code>ResultSet</code> y un método auxiliar.</p>
+    </div>
+
+<pre><code>public List readAll() throws SQLException {
+
+    obtenerConexion();
+    PreparedStatement ps = null;
+    <span class="hl">ResultSet rs = null;</span>              <span class="cm">// pieza nueva 1</span>
+    List resultados = null;
+
+    try {
+        ps = conexion.prepareStatement(SQL_SELECT_ALL);
+        <span class="cm">// esta consulta NO tiene ?, así que no hay ningún ps.set...</span>
+        <span class="hl">rs = ps.executeQuery();</span>           <span class="cm">// executeQuery, porque es SELECT</span>
+
+        resultados = <span class="hl">obtenerResultados(rs);</span>  <span class="cm">// pieza nueva 2</span>
+
+        if (resultados.size() &gt; 0) {
+            return resultados;
+        } else {
+            return null;
+        }
+    } finally {
+        if (rs != null) rs.close();          <span class="cm">// ahora son TRES cierres</span>
+        if (ps != null) ps.close();
+        if (conexion != null) conexion.close();
+    }
+}</code></pre>
+
+    <p class="body">Tres detalles que cambian respecto a los métodos anteriores:</p>
+
+    <ul class="body">
+      <li><b>No recibe argumentos.</b> Su explicación: <em>"¿qué argumentos necesita? Ninguno. Porque la consulta es un SELECT * FROM lo que sea, punto. No hay parámetros"</em>. Cero <code>?</code>, cero <code>set</code>.</li>
+      <li><b>Devuelve una lista.</b> Sobre el tipo dijo <em>"ustedes determinen si es una lista tipada o no"</em> y la dejó genérica. En tu código conviene <code>List&lt;Carrera&gt;</code>, que es la versión tipada.</li>
+      <li><b>Ahora se cierran tres cosas</b>, y en orden inverso al de apertura: <code>rs</code>, <code>ps</code>, <code>conexion</code>.</li>
+    </ul>
+
+    <details class="dio"><summary>¿Qué es un <code>ResultSet</code>?</summary><div class="db">
+      <p>Es lo que devuelve un <code>SELECT</code>: las filas que encontró. Pero <b>no es una lista</b> y ahí está la trampa.</p>
+      <p>Un <code>ResultSet</code> es un <b>cursor</b>: un dedo apuntando a una fila a la vez, que solo sabe avanzar. Arranca <em>antes</em> de la primera fila, y cada <code>rs.next()</code> lo mueve una posición y devuelve <code>true</code> si cayó en una fila real, o <code>false</code> si ya se acabaron. Por eso el recorrido siempre se escribe igual:</p>
+      <pre><code>while (rs.next()) {
+    <span class="cm">// aquí rs apunta a UNA fila; se leen sus columnas</span>
+}</code></pre>
+      <p>Y por eso hay que convertirlo a una lista de objetos: el <code>ResultSet</code> <b>deja de servir en cuanto cierras la conexión</b>. Si lo devolvieras tal cual desde el DAO, quien lo recibe tendría un objeto muerto. La lista de <code>Carrera</code> sí sobrevive porque son objetos de Java normales.</p>
+      <p>Y de paso, devolver un <code>ResultSet</code> rompería el patrón DAO: el resto de la aplicación se enteraría de que existe JDBC.</p>
+    </div></details>
+
+    <details class="dio"><summary>¿Por qué <code>List</code> y qué es <code>List&lt;Carrera&gt;</code>?</summary><div class="db">
+      <p><code>List</code> es una colección ordenada que crece sola, a diferencia de un arreglo, que nace con tamaño fijo. Como no sabes cuántas carreras hay en la tabla, un arreglo no sirve.</p>
+      <p><code>List</code> es una <b>interfaz</b> (dice qué se puede hacer) y <code>ArrayList</code> es la <b>implementación</b> (dice cómo). Por eso se escribe <code>List r = new ArrayList();</code>: declaras por la interfaz, instancias con la implementación. Así puedes cambiar a otra implementación después tocando una sola línea.</p>
+      <p>Los <code>&lt;Carrera&gt;</code> son <b>genéricos</b>: le dicen al compilador que ahí solo caben objetos <code>Carrera</code>. Sin ellos, la lista acepta cualquier cosa y al sacar elementos tienes que hacer <em>cast</em> a mano, con riesgo de reventar en tiempo de ejecución. Con genéricos, el error salta al compilar.</p>
+      <pre><code>List sin = new ArrayList();                   <span class="cm">// cabe lo que sea</span>
+Carrera c = (Carrera) sin.get(0);             <span class="cm">// cast obligatorio, puede tronar</span>
+
+List&lt;Carrera&gt; con = new ArrayList&lt;&gt;();        <span class="cm">// solo Carreras</span>
+Carrera c2 = con.get(0);                      <span class="cm">// sin cast, seguro</span></code></pre>
+      <p>Él cerró diciendo <em>"ustedes lo pueden hacer con lo que quieran: tienen Set, Vector, Collection, lo que se les ocurra"</em>. Cierto, pero para esto <code>List</code> es la correcta: mantiene el orden y admite repetidos.</p>
+    </div></details>
+
+    <h3 class="sub">obtenerResultados(): donde las filas se vuelven objetos</h3>
+
+    <p class="body">Cuando llegó a la línea de <code>obtenerResultados(rs)</code> hizo algo que vale la pena copiarle como técnica:</p>
+
+    <p class="quote">"¿Qué hace obtenerResultados()? No sé. <b>En este punto no me interesa</b>, solo sé que me regresa una lista y se la asigna a resultados."</p>
+
+    <p class="body">Escribió el método de arriba como si el de abajo ya existiera, y hasta después lo escribió. Es la forma sana de atacar un problema: resuelves un nivel a la vez y confías en que el de abajo cumplirá su contrato.</p>
+
+<pre><code>private List obtenerResultados(ResultSet rs) throws SQLException {
+
+    List r = new ArrayList();
+
+    while (rs.next()) {                                          <span class="cm">// mientras haya filas</span>
+        Carrera c = new Carrera();                               <span class="cm">// una instancia POR fila</span>
+        c.setIdCarrera(rs.getInt("idCarrera"));                  <span class="cm">// getInt: es entero</span>
+        c.setNombreCarrera(rs.getString("nombreCarrera"));       <span class="cm">// getString: es VARCHAR</span>
+        c.setDescripcionCarrera(rs.getString("descripcionCarrera"));
+        r.add(c);                                                <span class="cm">// se agrega a la lista</span>
+    }
+    return r;
+}</code></pre>
+
+    <p class="body">Es <b>privado</b> porque nadie fuera del DAO lo necesita: es plomería interna. Y fíjate en la simetría con lo que ya sabes: al escribir usabas <code>ps.setString(1, valor)</code> con índice numérico; al leer usas <code>rs.getString("nombreCarrera")</code> con el <b>nombre de la columna</b> entre comillas. Mismos tipos, misma lógica, dirección contraria.</p>
+
+    <details class="dio"><summary>Cuidado: ese nombre entre comillas es de la tabla, no de Java</summary><div class="db">
+      <p><code>rs.getString("nombreCarrera")</code> le pregunta a la fila por su columna llamada <code>nombreCarrera</code>. Ese texto tiene que coincidir con <b>el nombre de la columna en la base de datos</b>, no con el nombre del atributo en tu clase.</p>
+      <p>Aquí coinciden porque las nombraron igual a propósito. El día que la columna se llame <code>nombre_carrera</code> y el atributo <code>nombreCarrera</code>, el que manda es el de la base.</p>
+      <p>Y como es un texto entre comillas, <b>el compilador no lo revisa</b>: si te equivocas de nombre, Java compila feliz y truena en tiempo de ejecución con un <code>SQLException</code> diciendo que esa columna no existe. Es de los errores más comunes en JDBC.</p>
+    </div></details>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 7</p>
+      <h3>Arma el método readAll() en orden</h3>
+      <p class="ask">Las nueve líneas están revueltas. <b>Tócalas en el orden correcto</b> para construir el método. Si te equivocas te aviso de inmediato; toca una línea ya colocada para quitarla.</p>
+      <div class="built" id="built"><span class="ph">Aquí se va armando el método…</span></div>
+      <div class="bank" id="bank"></div>
+      <div class="btnrow">
+        <button class="btn ghost" id="bldRs">Reiniciar</button>
+      </div>
+      <div class="fb" id="bldFb"></div>
+    </div>
+
+    <h3 class="sub">read(): el mismo camino, pero devolviendo uno solo</h3>
+
+    <p class="body">El quinto y último. <em>"No necesito una lista. ¿Qué hace el SELECT con WHERE? Me devuelve un registro. Un registro es una instancia de Carrera."</em></p>
+
+<pre><code>public Carrera read(Carrera c) throws SQLException {      <span class="cm">// devuelve Carrera, no List</span>
+
+    obtenerConexion();
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    List resultados = null;
+
+    try {
+        ps = conexion.prepareStatement(<span class="hl">SQL_SELECT</span>);   <span class="cm">// el que lleva WHERE</span>
+        <span class="hl">ps.setInt(1, c.getIdCarrera());</span>                <span class="cm">// este SÍ tiene un ?</span>
+        rs = ps.executeQuery();
+
+        resultados = obtenerResultados(rs);            <span class="cm">// el mismo método auxiliar</span>
+
+        if (resultados.size() &gt; 0) {
+            return (Carrera) <span class="hl">resultados.get(0);</span>          <span class="cm">// la primera coincidencia</span>
+        } else {
+            return null;
+        }
+    } finally {
+        if (rs != null) rs.close();
+        if (ps != null) ps.close();
+        if (conexion != null) conexion.close();
+    }
+}</code></pre>
+
+    <p class="body">Reusa <code>obtenerResultados()</code> tal cual, y el truco está en la última parte: como la consulta filtra por clave primaria, la lista va a traer un solo elemento. <code>resultados.get(0)</code> lo saca. <b>Aquí sí es cero</b>, porque <code>get(0)</code> es un índice de lista de Java, no un parámetro de SQL. Los dos conviven en el mismo método y no se contradicen.</p>
+
+    <details class="dio"><summary>Los dos "índices" del método, para que no se te revuelvan</summary><div class="db">
+      <p>En este método aparecen un 1 y un 0 muy juntos y significan cosas distintas:</p>
+      <ul>
+        <li><code>ps.setInt(<b>1</b>, ...)</code> — el <b>primer hueco de la consulta SQL</b>. Los parámetros de JDBC empiezan en 1.</li>
+        <li><code>resultados.get(<b>0</b>)</code> — el <b>primer elemento de una lista de Java</b>. Las colecciones de Java empiezan en 0.</li>
+      </ul>
+      <p>Regla para no dudar: <b>si el número se lo estás dando a SQL, empieza en 1. Si se lo estás dando a Java, empieza en 0.</b></p>
+    </div></details>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Tarea 2</span><span class="task-when">minuto 60:57</span></div>
+      <h3>Reporte de lectura — "Lectura rápida JDBC"</h3>
+      <p class="said">"Pregunta inocente de nuevo: ¿ya hicieron su lectura rápida de JDBC? <b>Se los voy a pedir de tarea.</b>"</p>
+      <p><b>No es nueva, es la misma que ya venía arrastrándose.</b> Ya la había dejado como reporte de lectura en la clase 3. Aquí volvió a preguntarla, nadie contestó que sí, y la confirmó. Si ya la tenías pendiente, sigue pendiente.</p>
+      <p><b>Y sí importa para esta clase:</b> el <code>CallableStatement</code> del último ejercicio sale justo de esa lectura. Él lo dijo así: <em>"según su lectura rápida JDBC, el otro es este cuate"</em>. O sea que el ejercicio da por hecho que ya la leíste.</p>
+    </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Ejercicio del jefe de grupo · minuto 63:35 a 67:00</p>
+      <h2 class="sec">"Hoy ando en modo tareas"</h2>
+      <p>Lo dijo él mismo antes de escribir las especificaciones en el pizarrón. Y sí: la reacción del grupo al oír "interfaz gráfica para Windows" fue un "¡Nooo!" colectivo.</p>
+    </div>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Tarea 3</span><span class="task-when">minuto 64:44</span></div>
+      <h3>Ejercicio 1 — Aplicación de escritorio con interfaz gráfica</h3>
+      <p class="said">"Interfaz gráfica de usuario con botoncitos para Windows. Aplicación de escritorio para darle soporte a la carrera. Así, bien vintage. Échenle a volar la imaginación."</p>
+      <p><b>Qué significa "para Windows".</b> Alguien preguntó si podía ser en otra cosa y aclaró que era genérico: <em>"al decir para Windows es el genérico, o sea, es con ventanitas y botones, nada más. Interfaz gráfica de usuario basada en Swing, en JavaFX o lo que quieran. <b>No web, no móvil.</b>"</em></p>
+      <p><b>Qué tiene que hacer.</b> Darle soporte al CRUD de <code>Carrera</code> que ya escribieron. La lógica ya está en <code>CarreraDAO</code>: esto solo le pone cara. Donde en <code>Principal</code> comentabas y descomentabas líneas, ahora hay botones.</p>
+      <p><b>El flujo que describió</b>, con el detalle de habilitar y deshabilitar controles, que es la parte que quiere ver:</p>
+      <ul>
+        <li>Al cargar, el único botón activo es <b>Nuevo</b>. Todo lo demás, bloqueado.</li>
+        <li>Le picas a <b>Nuevo</b>: se oculta el campo de <code>idCarrera</code> (no lo necesitas, lo genera la base), se habilitan nombre y descripción, y aparece <b>Guardar</b>. Un <b>Cancelar</b> si quieres.</li>
+        <li>Llenas, le picas a <b>Guardar</b>, el registro se va a la tabla, y todo se deshabilita otra vez: vuelve al estado inicial.</li>
+        <li><b>Buscar</b> hace lo simétrico: habilita unos campos, oculta otros.</li>
+      </ul>
+      <p><b>Sin traumas.</b> Lo dijo dos veces: <em>"nada más no se traumen con eso, simplemente que tenga interfaz gráfica de usuario. Nosotros no vamos a hacer cosas de escritorio, pero simplemente se puede"</em>. No es el proyecto del semestre; es para que veas que el DAO no depende de quién lo llame.</p>
+    </div>
+
+    <details class="dio"><summary>Swing y JavaFX: cuál es cuál</summary><div class="db">
+      <p>Las dos son librerías de Java para hacer ventanas de escritorio. Ninguna tiene que ver con web.</p>
+      <ul>
+        <li><b>Swing</b> — la vieja, de finales de los 90. Viene incluida en el JDK, así que no instalas nada. Fea de fábrica pero funcional, y hay ejemplos por todos lados. Es la más rápida para salir del paso.</li>
+        <li><b>JavaFX</b> — la moderna. Se ve mucho mejor, permite estilizar con CSS y diseñar la ventana en un archivo aparte (FXML). Ya no viene en el JDK: hay que agregarla como dependencia.</li>
+      </ul>
+      <p>Para esta tarea, Swing te va a costar menos. Si tu IDE tiene diseñador visual de formularios (NetBeans lo trae para Swing), arrastras los botones y ya.</p>
+      <p>El concepto que sí importa que entiendas es <b>habilitar y deshabilitar</b>: cada control tiene un método (<code>setEnabled(true/false)</code>) que lo prende o lo apaga, y otro (<code>setVisible</code>) que lo muestra u oculta. Todo el flujo que describió es prender y apagar controles según en qué momento va el usuario. Deshabilitar es una forma de evitar errores: si el botón no se puede picar, no hay nada que validar después.</p>
+    </div></details>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Pendiente administrativo</span><span class="task-when">minuto 28:52</span></div>
+      <h3>Cursos externos: subir tus datos al Excel</h3>
+      <p>Un alumno reportó que al registrarse en el curso de Red Hat les manda error. La aclaración: <b>los cursos todavía no están creados</b>, por eso falla.</p>
+      <p>Lo que él necesita de ustedes, en el Excel compartido: <b>usuario, correo electrónico y qué curso quieren</b>. Con eso los da de alta.</p>
+      <p>Recuerda por qué conviene: al inicio de clase mencionó que son tres exámenes, y con <b>85 o más en los tres</b> quedas como candidato al examen de certificación. El catálogo completo está disponible; el curso que pidan, se abre.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 9 · minuto 67:49 a 71:34</p>
+      <h2 class="sec">Stored procedures: la misma inserción, del lado de la base</h2>
+      <p>"¿A quién le gusta ser DBA aquí? A ninguno de ustedes les gustan las bases de datos, ¿no? ¡Qué bárbaro!" Y con eso arrancó la última parte, que existe para preparar el ejercicio 2.</p>
+    </div>
+
+    <details class="dio"><summary>¿Qué es un stored procedure? ¿Y un DBA?</summary><div class="db">
+      <p>Un <b>stored procedure</b> (procedimiento almacenado) es código SQL con nombre que vive <b>guardado dentro de la base de datos</b>, no en tu aplicación. Lo escribes una vez, se queda ahí, y desde Java solo lo mandas llamar por su nombre.</p>
+      <p>Es como un método, pero del lado de la base: recibe parámetros, ejecuta instrucciones y puede devolver resultados.</p>
+      <p>Ventajas: la lógica queda en un solo lugar aunque la usen varias aplicaciones, viaja menos texto por la red, y la base puede tenerlo pre-optimizado. Desventajas: queda amarrado a ese manejador, es más difícil de versionar en Git, y te reparte la lógica de negocio entre dos lugares.</p>
+      <p>Un <b>DBA</b> (Database Administrator) es la persona encargada de la base de datos: diseño, respaldos, permisos, rendimiento. Los stored procedures suelen ser su territorio, y por eso preguntó a quién le gustaba serlo.</p>
+    </div></details>
+
+    <p class="body">La advertencia antes de escribirlo, que es la que va al examen:</p>
+
+    <p class="quote">"Aquí es literal: <b>depende del manejador de datos.</b> No es lo mismo esto que vamos a apuntar que va a funcionar en un MySQL que si se lo quieren llevar a un PostgreSQL, a un Oracle o lo que sea. Ahí el ANSI SQL dejó de ser tú."</p>
+
+    <details class="dio"><summary>¿Qué es "ANSI SQL" y por qué "dejó de ser tú"?</summary><div class="db">
+      <p><b>ANSI SQL</b> es el SQL estándar, el que todos los manejadores acordaron soportar igual. Los <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code> y <code>DELETE</code> básicos que llevas escribiendo toda la clase son ANSI: los mueves de MySQL a PostgreSQL y funcionan sin tocarlos.</p>
+      <p>Los procedimientos y funciones <b>no</b>. Cada manejador se inventó su propio lenguaje: Oracle usa PL/SQL, SQL Server usa T-SQL, PostgreSQL usa PL/pgSQL, MySQL el suyo. Cambia la sintaxis para declarar parámetros, para el cuerpo, y hasta la palabra para invocarlo.</p>
+      <p>La consecuencia práctica: en cuanto usas stored procedures, <b>cambiar de base de datos deja de ser gratis</b>. Y eso choca de frente con la razón de existir del patrón DAO, que era justamente aislar ese cambio.</p>
+    </div></details>
+
+<pre><code>DELIMITER //
+
+CREATE PROCEDURE sp_crear(nombre VARCHAR(50), descripcion VARCHAR(100))
+BEGIN
+    INSERT INTO Carrera (nombreCarrera, descripcionCarrera)
+    VALUES (nombre, descripcion);
+END //
+
+DELIMITER ;</code></pre>
+
+    <p class="body">Fíjate en que <b>adentro no hay ni un <code>?</code></b>. Los huecos se volvieron parámetros con nombre (<code>nombre</code>, <code>descripcion</code>) y se usan directo. Los tipos y tamaños los sacó de cómo esté definida la tabla —<em>"no me acuerdo qué tamaños tenía esa cosa, depende de cómo esté definido en bases de datos"</em>—, así que revisa los tuyos.</p>
+
+    <details class="dio"><summary>El <code>DELIMITER</code>: por qué sin él "les va a decir de groserías"</summary><div class="db">
+      <p>Normalmente el punto y coma le dice a MySQL "aquí termina la instrucción, ejecútala".</p>
+      <p>El problema es que el cuerpo del procedimiento <b>tiene punto y comas adentro</b> (los del <code>INSERT</code>). Sin protección, MySQL lee hasta el primer <code>;</code>, cree que ahí terminó el <code>CREATE PROCEDURE</code>, e intenta ejecutar algo incompleto. De ahí el error.</p>
+      <p><code>DELIMITER //</code> cambia temporalmente el terminador a <code>//</code>. Ahora los <code>;</code> de adentro son texto normal, y el procedimiento termina cuando aparece <code>//</code>. Al final, <code>DELIMITER ;</code> lo regresa a la normalidad para que el resto de tu sesión siga funcionando.</p>
+      <p>Ese último <code>DELIMITER ;</code> se olvida muchísimo, y el síntoma es raro: todo lo que escribas después parece no ejecutarse.</p>
+    </div></details>
+
+    <p class="body">Y una cosa que dejó abierta: <em>"aquí pueden poner todas las condicionales que quieran, todo el manejo de error que quieran propio del SQL para determinar que lo que están recibiendo realmente sea una cadena de texto válida. Pero eso ya les toca a ustedes"</em>.</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 8</p>
+      <h3>Escribe la llamada al procedimiento</h3>
+      <p class="ask">Ya está creado el <code>sp_crear</code>. Desde la línea de comandos de MySQL, <b>invócalo</b> pasándole <code>'LCD'</code> como nombre y <code>'LCD'</code> como descripción, tal como lo escribió él en el pizarrón.</p>
+      <div class="sqlrow">
+        <input class="sqlin" id="spIn" type="text" spellcheck="false" autocomplete="off" placeholder="escribe la instrucción completa">
+      </div>
+      <div class="btnrow">
+        <button class="btn" id="spGo">Revisar</button>
+        <button class="btn ghost" id="spRs">Limpiar</button>
+      </div>
+      <div class="fb" id="spFb"></div>
+    </div>
+
+    <p class="body">Un alumno preguntó si no era <code>EXEC</code>. La respuesta define bien el punto del bloque entero:</p>
+
+    <p class="quote">"No, porque no es SQL Server. Eso es para SQL Server, para Oracle también creo. <b>Para MySQL es CALL.</b> Por eso les decía, aquí sí es diferente."</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 9</p>
+      <h3>Lo que cambia entre manejadores</h3>
+      <p class="ask">Cuatro preguntas de cierre sobre stored procedures y sobre el detalle que corrigió el compañero atento al final de la clase.</p>
+      <div class="qrows" id="q9"></div>
+      <div class="btnrow">
+        <button class="btn" id="q9go">Revisar</button>
+        <button class="btn ghost" id="q9rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q9fb"></div>
+    </div>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Tarea 4</span><span class="task-when">minuto 71:34</span><span class="task-when">· para la próxima semana</span></div>
+      <h3>Ejercicio 2 — Cambiar PreparedStatement por CallableStatement</h3>
+      <p class="said">"Esto lo tienen con PreparedStatement, <b>cámbienlo con CallableStatement</b>. Según su lectura rápida JDBC, el otro es este cuate: el CallableStatement. <b>¿Para cuándo? Para la próxima semana.</b>"</p>
+      <p><b>Es la única tarea con fecha explícita.</b> Las otras tres no la llevan; esta sí.</p>
+      <p><b>Qué implica.</b> Los cinco métodos del DAO se quedan igual en estructura. Lo que cambia es que en vez de preparar SQL suelto, mandas llamar procedimientos almacenados. O sea que primero tienes que crear los procedimientos en MySQL: él solo escribió el de insertar, los otros cuatro te tocan.</p>
+      <p>La forma general del cambio, para que veas que es menos de lo que parece:</p>
+      <pre><code><span class="cm">// antes</span>
+PreparedStatement ps = conexion.prepareStatement(SQL_INSERT);
+
+<span class="cm">// después</span>
+CallableStatement cs = conexion.prepareCall("{call sp_crear(?, ?)}");</code></pre>
+      <p>Los <code>?</code> siguen ahí y los <code>setString</code> / <code>setInt</code> se usan igual, con la misma numeración desde 1. Cuando señaló qué se iba a cambiar dijo <em>"ah, pues sí, sí, sí, ese, ese, ese"</em> apuntando a esas líneas: es un reemplazo bastante mecánico.</p>
+      <p><b>Y la razón de que la Tarea 2 importe:</b> <code>CallableStatement</code> tiene una capacidad que los otros no —los parámetros de salida (<code>OUT</code>)— y eso viene explicado en la lectura rápida de JDBC. Ahí es donde deja de ser mecánico.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Referencia</p>
+      <h2 class="sec">El DAO completo, de corrido</h2>
+      <p>Todo lo del pizarrón junto y en orden, ya con los imports que hacen falta y con la lista tipada. Esta es la versión contra la que puedes comparar tu archivo.</p>
+    </div>
+
+    <div class="codehead"><span class="cf">CarreraDAO.java</span></div>
+<pre><code>import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CarreraDAO {
+
+    private static final String SQL_INSERT =
+        "INSERT INTO Carrera (nombreCarrera, descripcionCarrera) VALUES (?, ?)";
+    private static final String SQL_UPDATE =
+        "UPDATE Carrera SET nombreCarrera = ?, descripcionCarrera = ? WHERE idCarrera = ?";
+    private static final String SQL_DELETE =
+        "DELETE FROM Carrera WHERE idCarrera = ?";
+    private static final String SQL_SELECT =
+        "SELECT * FROM Carrera WHERE idCarrera = ?";
+    private static final String SQL_SELECT_ALL =
+        "SELECT * FROM Carrera";
+
+    private Connection conexion;
+
+    private void obtenerConexion() throws SQLException, ClassNotFoundException {
+        String usuario = "root";
+        String clave = "tu_password";
+        String urlBD = "jdbc:mysql://localhost:3306/MisCursos";
+        String driverMySQL = "com.mysql.cj.jdbc.Driver";
+
+        Class.forName(driverMySQL);
+        conexion = DriverManager.getConnection(urlBD, usuario, clave);
+    }
+
+    <span class="cm">// ---------- create ----------</span>
+    public void create(Carrera c) throws SQLException {
+        obtenerConexion();
+        PreparedStatement ps = null;
+        try {
+            ps = conexion.prepareStatement(SQL_INSERT);
+            ps.setString(1, c.getNombreCarrera());
+            ps.setString(2, c.getDescripcionCarrera());
+            ps.executeUpdate();
+        } finally {
+            if (ps != null) ps.close();
+            if (conexion != null) conexion.close();
+        }
+    }
+
+    <span class="cm">// ---------- update ----------</span>
+    public void update(Carrera c) throws SQLException {
+        obtenerConexion();
+        PreparedStatement ps = null;
+        try {
+            ps = conexion.prepareStatement(SQL_UPDATE);
+            ps.setString(1, c.getNombreCarrera());
+            ps.setString(2, c.getDescripcionCarrera());
+            ps.setInt(3, c.getIdCarrera());
+            ps.executeUpdate();
+        } finally {
+            if (ps != null) ps.close();
+            if (conexion != null) conexion.close();
+        }
+    }
+
+    <span class="cm">// ---------- delete ----------</span>
+    public void delete(Carrera c) throws SQLException {
+        obtenerConexion();
+        PreparedStatement ps = null;
+        try {
+            ps = conexion.prepareStatement(SQL_DELETE);
+            ps.setInt(1, c.getIdCarrera());
+            ps.executeUpdate();
+        } finally {
+            if (ps != null) ps.close();
+            if (conexion != null) conexion.close();
+        }
+    }
+
+    <span class="cm">// ---------- readAll ----------</span>
+    public List&lt;Carrera&gt; readAll() throws SQLException {
+        obtenerConexion();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List&lt;Carrera&gt; resultados = null;
+        try {
+            ps = conexion.prepareStatement(SQL_SELECT_ALL);
+            rs = ps.executeQuery();
+            resultados = obtenerResultados(rs);
+            if (resultados.size() &gt; 0) {
+                return resultados;
+            } else {
+                return null;
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (conexion != null) conexion.close();
+        }
+    }
+
+    <span class="cm">// ---------- read ----------</span>
+    public Carrera read(Carrera c) throws SQLException {
+        obtenerConexion();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        List&lt;Carrera&gt; resultados = null;
+        try {
+            ps = conexion.prepareStatement(SQL_SELECT);
+            ps.setInt(1, c.getIdCarrera());
+            rs = ps.executeQuery();
+            resultados = obtenerResultados(rs);
+            if (resultados.size() &gt; 0) {
+                return resultados.get(0);
+            } else {
+                return null;
+            }
+        } finally {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (conexion != null) conexion.close();
+        }
+    }
+
+    <span class="cm">// ---------- auxiliar ----------</span>
+    private List&lt;Carrera&gt; obtenerResultados(ResultSet rs) throws SQLException {
+        List&lt;Carrera&gt; r = new ArrayList&lt;&gt;();
+        while (rs.next()) {
+            Carrera c = new Carrera();
+            c.setIdCarrera(rs.getInt("idCarrera"));
+            c.setNombreCarrera(rs.getString("nombreCarrera"));
+            c.setDescripcionCarrera(rs.getString("descripcionCarrera"));
+            r.add(c);
+        }
+        return r;
+    }
+}</code></pre>
+
+    <details class="dio"><summary>Tres diferencias entre esta versión y lo que quedó en el pizarrón</summary><div class="db">
+      <p>No son correcciones a lo que él dijo: son los cabos que dejó sueltos a propósito por tiempo, y conviene que sepas cuáles son.</p>
+      <ul>
+        <li><b>Las listas van tipadas</b> (<code>List&lt;Carrera&gt;</code>). Él las dejó genéricas y dijo explícitamente <em>"ustedes determinen si es una lista tipada o no"</em>. Tipadas te ahorran los <em>casts</em> y los errores en tiempo de ejecución.</li>
+        <li><b><code>obtenerConexion()</code> declara sus excepciones</b> en vez de atraparlas con <code>printStackTrace()</code>. Es coherente con la estafeta que él mismo explicó: si la conexión falla, el método no debería seguir como si nada.</li>
+        <li><b><code>read()</code> usa <code>SQL_SELECT</code></b>, el que lleva <code>WHERE</code>. Es fácil dejar pegado el <code>SQL_SELECT_ALL</code> al copiar el método de arriba, y el síntoma es feo: te devuelve la primera carrera de la tabla en vez de la que pediste, sin lanzar ningún error.</li>
+      </ul>
+      <p>Sobre lo que sí quedó pendiente de verdad: el <code>create()</code> no recupera el id que generó la base, y el <code>delete()</code> ignora el número de filas afectadas. Los dos temas salieron en clase pero no se resolvieron en código.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Las cuatro tareas, juntas</h2>
+      <p>Cerró seis minutos antes, después de que un alumno le cachara el índice faltante en un <code>setInt</code>. Aquí están las cuatro tareas más el pendiente de los cursos, para ir marcándolas.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 5</div>
+    </div>
+
+    <div class="final" id="finalTasks"></div>
+
+    <p class="body" style="margin-top:18px;"><b>Cuál urge.</b> La única con fecha es el <b>Ejercicio 2</b> (CallableStatement), para la próxima semana. Pero depende de la <b>Tarea 2</b> (lectura de JDBC) y de que tengas los procedimientos creados en MySQL, así que en la práctica el orden es: leer JDBC, escribir los cinco stored procedures, y hasta entonces cambiar el DAO.</p>
+
+    <p class="body">La <b>Tarea 1</b> (soft delete) es investigación corta y va con el formato de siempre. La <b>Tarea 3</b> (interfaz gráfica) es la más larga en horas, pero él insistió en que no se traumen: es para comprobar que el DAO funciona igual sin importar quién lo llame.</p>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ motor genérico de quizzes de opciones ============ */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt";
+          b.textContent=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click",function(){
+      var rows=root.children, right=0, answered=0;
+      Array.prototype.forEach.call(rows,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length
+        ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  /* ============ 1. cuántos parámetros ============ */
+  quiz("q1",[
+    {q:'SQL_INSERT<br><em>INSERT INTO Carrera (nombreCarrera, descripcionCarrera) VALUES (?, ?)</em>',
+     opts:["0","1","2","3"], ans:2,
+     why:"<b>2.</b> Nombre y descripción. El <code>idCarrera</code> no va porque es <code>auto_increment</code>: lo genera la base."},
+    {q:'SQL_UPDATE<br><em>UPDATE Carrera SET nombreCarrera = ?, descripcionCarrera = ? WHERE idCarrera = ?</em>',
+     opts:["1","2","3","4"], ans:2,
+     why:"<b>3.</b> Dos del <code>SET</code> más uno del <code>WHERE</code>. Es la única consulta con tres, y por eso es la que usa el índice 3."},
+    {q:'SQL_DELETE<br><em>DELETE FROM Carrera WHERE idCarrera = ?</em>',
+     opts:["0","1","2","3"], ans:1,
+     why:"<b>1.</b> Solo el id. Por eso su índice es 1 y no 3, aunque en el UPDATE ese mismo id fuera el tercero."},
+    {q:'SQL_SELECT<br><em>SELECT * FROM Carrera WHERE idCarrera = ?</em>',
+     opts:["0","1","2","3"], ans:1,
+     why:"<b>1.</b> El <code>SELECT *</code> no aporta parámetros; el único hueco está en el <code>WHERE</code>."},
+    {q:'SQL_SELECT_ALL<br><em>SELECT * FROM Carrera</em>',
+     opts:["0","1","2","3"], ans:0,
+     why:"<b>0.</b> Ninguno. Por eso <code>readAll()</code> no recibe argumentos y no lleva ni una línea <code>ps.set...</code>: <em>\"la consulta es un SELECT * FROM lo que sea, punto\"</em>."}
+  ],"q1go","q1rs","q1fb",
+  "<b>Las cinco.</b> Ese conteo es lo primero que deberías hacer antes de escribir cualquier método del DAO: te dice exactamente cuántas líneas <code>set</code> vas a necesitar y con qué índices.");
+
+  /* ============ 2. índices y setters ============ */
+  quiz("q2",[
+    {q:'Hueco <b>1</b> &nbsp;<em>(nombreCarrera = ?)</em>',
+     opts:["ps.setString(1, c.getNombreCarrera())","ps.setString(0, c.getNombreCarrera())","ps.setInt(1, c.getNombreCarrera())"],
+     ans:0,
+     why:"<b>Índice 1 y setString.</b> La opción con 0 falla porque los parámetros de JDBC empiezan en 1. La de <code>setInt</code> falla porque el nombre es texto."},
+    {q:'Hueco <b>2</b> &nbsp;<em>(descripcionCarrera = ?)</em>',
+     opts:["ps.setString(1, c.getDescripcionCarrera())","ps.setString(2, c.getDescripcionCarrera())","ps.setString(2, c.getNombreCarrera())"],
+     ans:1,
+     why:"<b>Índice 2.</b> Cuidado con la tercera: el índice está bien pero el getter está mal, y eso <b>compila</b> sin problema. Terminarías guardando el nombre en la columna de descripción y nadie te avisa."},
+    {q:'Hueco <b>3</b> &nbsp;<em>(WHERE idCarrera = ?)</em>',
+     opts:["ps.setString(3, c.getIdCarrera())","ps.setInt(1, c.getIdCarrera())","ps.setInt(3, c.getIdCarrera())"],
+     ans:2,
+     why:"<b>setInt con índice 3.</b> El <code>WHERE</code> también cuenta como hueco, y va después de los del <code>SET</code>. La opción con índice 1 es el error clásico de copiar la línea desde el <code>delete()</code>."}
+  ],"q2go","q2rs","q2fb",
+  "<b>Los tres.</b> Fíjate en el patrón: el índice sale de <b>contar los <code>?</code> de izquierda a derecha</b>, incluyendo los del <code>WHERE</code>; el tipo sale de la columna. Son dos decisiones independientes en la misma línea.");
+
+  /* ============ 3. tipos ============ */
+  quiz("q3",[
+    {q:'nombreCarrera &nbsp;<em>VARCHAR(150)</em>',
+     opts:["setString","setInt","setDouble","setBoolean"], ans:0,
+     why:"<b>setString.</b> VARCHAR es texto. Su regla textual: <em>\"si este es un VARCHAR, aquí tiene que ser un String\"</em>."},
+    {q:'idCarrera &nbsp;<em>INT</em>',
+     opts:["setString","setInt","setDouble","setBoolean"], ans:1,
+     why:"<b>setInt.</b> Es el caso del <code>update()</code> y el <code>delete()</code>: el único campo de <code>Carrera</code> que no es texto."},
+    {q:'duracion &nbsp;<em>INT — los años que dura la carrera</em>',
+     opts:["setString","setInt","setDouble","setBoolean"], ans:1,
+     why:"<b>setInt.</b> Este es justo el ejemplo que se inventó en el pizarrón para que se notara el cambio de tipo: <em>\"si duración es un entero, aquí tendría que ser un int\"</em>."},
+    {q:'duracion &nbsp;<em>DOUBLE — porque hay carreras de 4.5 años</em>',
+     opts:["setString","setInt","setDouble","setBoolean"], ans:2,
+     why:"<b>setDouble.</b> También lo mencionó: <em>\"si duración es un double porque a lo mejor es fraccionario, aquí tendría que ser un double\"</em>. Con <code>setInt</code> perderías el .5 sin ningún aviso."},
+    {q:'activo &nbsp;<em>BOOLEAN — la columna del soft delete</em>',
+     opts:["setString","setInt","setDouble","setBoolean"], ans:3,
+     why:"<b>setBoolean.</b> Esta columna es la que vas a necesitar cuando implementes la Tarea 1. Ojo: pasarle la cadena <code>\"true\"</code> con <code>setString</code> es un error clásico."}
+  ],"q3go","q3rs","q3fb",
+  "<b>Las cinco.</b> La regla completa es la que dio él: el tipo del setter lo manda <b>la columna de la tabla</b>, no el atributo de Java. Cuando los dos coinciden no se nota; el día que no coincidan, gana la base.");
+
+  /* ============ 4. executeUpdate vs executeQuery ============ */
+  quiz("q4",[
+    {q:"INSERT INTO Carrera (nombreCarrera) VALUES (?)",
+     opts:["executeUpdate","executeQuery"], ans:0,
+     why:"<b>executeUpdate.</b> Modifica filas. Que se llame <em>Update</em> no significa que sea solo para <code>UPDATE</code>."},
+    {q:"SELECT * FROM Carrera",
+     opts:["executeUpdate","executeQuery"], ans:1,
+     why:"<b>executeQuery.</b> Devuelve filas, así que necesita un <code>ResultSet</code> donde recibirlas."},
+    {q:"DELETE FROM Carrera WHERE idCarrera = ?",
+     opts:["executeUpdate","executeQuery"], ans:0,
+     why:"<b>executeUpdate.</b> Aunque borre, sigue siendo una modificación de la tabla. Su frase: <em>\"vamos a insertar, borrar y eliminar: la consulta es una consulta de actualización\"</em>."},
+    {q:"SELECT c.nombreCarrera, a.nombre FROM Carrera c INNER JOIN Alumno a ON a.idCarrera = c.idCarrera",
+     opts:["executeUpdate","executeQuery"], ans:1,
+     why:"<b>executeQuery.</b> Un join sigue siendo un <code>SELECT</code>: te devuelve filas. <em>\"Vamos a seleccionar uno, seleccionar todos, hacer joins, inner joins, lo que se les ocurra: es un executeQuery\"</em>."},
+    {q:"UPDATE Carrera SET activo = false WHERE idCarrera = ?",
+     opts:["executeUpdate","executeQuery"], ans:0,
+     why:"<b>executeUpdate.</b> Este es exactamente el soft delete de la Tarea 1: por dentro es un <code>UPDATE</code>, no un <code>DELETE</code>, y se ejecuta igual que cualquier otra modificación."},
+    {q:"SELECT COUNT(*) FROM Carrera",
+     opts:["executeUpdate","executeQuery"], ans:1,
+     why:"<b>executeQuery.</b> Aunque devuelva un solo número, sigue siendo un <code>SELECT</code>: llega como un <code>ResultSet</code> de una fila y una columna, y lo lees con <code>rs.next()</code> y luego <code>rs.getInt(1)</code>."}
+  ],"q4go","q4rs","q4fb",
+  "<b>Las seis.</b> La regla no depende de la palabra con la que empieza el SQL, sino de <b>qué te devuelve</b>: si te regresa filas, <code>executeQuery</code>; si cambia filas, <code>executeUpdate</code>. Con eso resuelves cualquier consulta que te inventen.");
+
+  /* ============ 5. quién trata el error ============ */
+  quiz("q5",[
+    {q:"<em>El método create() del DAO lleva <code>throws SQLException</code>. ¿Qué significa eso?</em>",
+     opts:["Que atrapa el error","Que lo pasa a quien lo llamó","Que lo ignora"], ans:1,
+     why:"<b>Lo pasa hacia arriba.</b> Es la estafeta: <em>\"¿quién le va a dar tratamiento? La capa de arriba\"</em>. El DAO sabe que algo falló pero no tiene con qué decidir qué hacer, así que no lo intenta."},
+    {q:"<em>El DAO usa <code>finally</code> sin <code>catch</code>. ¿Por qué?</em>",
+     opts:["Es un descuido del pizarrón","Para cerrar la conexión sin tragarse el error","Porque catch y finally no pueden ir juntos"], ans:1,
+     why:"<b>Para cerrar sin tragarse el error.</b> El <code>finally</code> se ejecuta pase lo que pase, así que la conexión se cierra siempre; y al no haber <code>catch</code>, la excepción sigue subiendo. Sí pueden ir juntos los tres, simplemente aquí no se quería el <code>catch</code>."},
+    {q:"<em>Es una aplicación web con Spring. ¿Quién recibe la estafeta?</em>",
+     opts:["El Servlet o el controlador","La clase Carrera","La base de datos"], ans:0,
+     why:"<b>El Servlet, la JSP o el controlador.</b> Es la capa que habla con el cliente, y la única que sabe cómo se le comunica un fallo a un usuario: un código HTTP, un mensaje en pantalla. El DAO no tiene forma de saberlo."},
+    {q:"<em>Ya atrapaste la excepción en la capa de arriba. ¿Qué NO deberías poner?</em>",
+     opts:["Un log con SLF4J","e.getMessage() en un mensaje","e.printStackTrace()"], ans:2,
+     why:"<b>printStackTrace().</b> Fue explícito: <em>\"la realidad dicta que el printStackTrace() no lo pongan\"</em>. No queda registrado, no se puede filtrar, y le enseña las tripas de tu sistema al usuario. Va un log, y para el usuario un mensaje construido a partir de <code>getMessage()</code>."}
+  ],"q5go","q5rs","q5fb",
+  "<b>Las cuatro.</b> El principio de fondo: <b>cada capa maneja lo que sí sabe manejar</b>. El DAO sabe de SQL y de cerrar conexiones; no sabe de usuarios ni de pantallas, así que no inventa una respuesta.");
+
+  /* ============ 6. caza el error en delete() ============ */
+  var LINES=[
+    [{t:"public void delete(Carrera c) throws SQLException {"}],
+    [{t:""}],
+    [{t:"    obtenerConexion();"}],
+    [{t:"    PreparedStatement ps = null;"}],
+    [{t:""}],
+    [{t:"    try {"}],
+    [{t:"        ps = conexion.prepareStatement("},{t:"SQL_SELECT",bug:"constante"},{t:");"}],
+    [{t:"        ps.setInt("},{t:"c.getIdCarrera()",bug:"indice"},{t:");"}],
+    [{t:"        ps."},{t:"executeQuery()",bug:"execute"},{t:";"}],
+    [{t:"    } "},{t:"catch (SQLException e) { }",bug:"catchvacio"}],
+    [{t:"    finally {"}],
+    [{t:"        ps.close();",bug:"sinnull"}],
+    [{t:"        if (conexion != null) conexion.close();"}],
+    [{t:"    }"}],
+    [{t:"}"}]
+  ];
+  var BUGWHY={
+    "constante":"<b>Constante equivocada.</b> Es un <code>delete()</code>: va <code>SQL_DELETE</code>. Con <code>SQL_SELECT</code> el método compila, corre y no borra nada. Es el mismo tropiezo que hay que cuidar al copiar métodos de uno en otro.",
+    "indice":"<b>Falta el índice del parámetro.</b> Tiene que ser <code>ps.setInt(1, c.getIdCarrera())</code>. Este es literalmente el error que un alumno le cachó al final de la clase, en el minuto 72: <em>\"aquí me hizo falta el número del índice del argumento. Si no, no les iba a funcionar\"</em>.",
+    "execute":"<b>executeQuery en un DELETE.</b> Un <code>DELETE</code> modifica filas, no las devuelve: va <code>executeUpdate()</code>. Su regla: insertar, borrar y actualizar son consultas de actualización.",
+    "catchvacio":"<b>Un <code>catch</code> vacío se traga el error.</b> El DAO ya declara <code>throws SQLException</code> precisamente para pasar la estafeta hacia arriba. Con este <code>catch</code>, si el borrado falla nadie se entera nunca: quien llamó al método cree que todo salió bien.",
+    "sinnull":"<b>Falta el <code>if (ps != null)</code>.</b> Si la conexión falla, <code>ps</code> se queda en <code>null</code> y este <code>close()</code> revienta con un <code>NullPointerException</code> que <em>tapa</em> el error original. Fíjate en que la línea de abajo sí trae su <code>if</code>."
+  };
+  var TOTALBUGS=5, found={},
+      bugCode=document.getElementById("bugCode"),
+      bugCount=document.getElementById("bugCount"),
+      bugFb=document.getElementById("bugFb");
+
+  LINES.forEach(function(line){
+    var div=document.createElement("div");
+    line.forEach(function(part){
+      var s=document.createElement("span");
+      s.textContent=part.t;
+      if(part.bug){
+        s.className="bug"; s.setAttribute("role","button"); s.tabIndex=0;
+        var hit=function(){
+          if(found[part.bug]) return;
+          found[part.bug]=true; s.classList.add("found");
+          var n=Object.keys(found).length;
+          bugCount.textContent=n+" de "+TOTALBUGS+" encontrados";
+          bugFb.className="fb show good"; bugFb.innerHTML=BUGWHY[part.bug];
+          if(n===TOTALBUGS){
+            bugFb.innerHTML=BUGWHY[part.bug]+"<br><br><b>Los cinco.</b> Ninguno de estos hace que el programa truene al compilar: los cinco compilan. Tres hacen algo distinto de lo que crees en silencio, y dos solo se manifiestan el día que algo más falla. Por eso insistió tanto en la plantilla: se sigue mecánicamente para no depender de acordarte.";
+          }
+        };
+        s.addEventListener("click",hit);
+        s.addEventListener("keydown",function(ev){
+          if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();hit();}
+        });
+      } else if(part.t.trim()){
+        s.className="clean";
+        s.addEventListener("click",function(){
+          s.classList.add("miss");
+          bugFb.className="fb show bad";
+          bugFb.innerHTML="<b>Esa línea está bien.</b> Sigue buscando, quedan "+(TOTALBUGS-Object.keys(found).length)+".";
+          setTimeout(function(){ s.classList.remove("miss"); },600);
+        });
+      }
+      div.appendChild(s);
+    });
+    if(!line[0].t) div.innerHTML="&nbsp;";
+    bugCode.appendChild(div);
+  });
+
+  /* ============ 7. armar readAll() ============ */
+  var STEPS=[
+    "obtenerConexion();",
+    "PreparedStatement ps = null;",
+    "ResultSet rs = null;",
+    "try {",
+    "    ps = conexion.prepareStatement(SQL_SELECT_ALL);",
+    "    rs = ps.executeQuery();",
+    "    return obtenerResultados(rs);",
+    "} finally {",
+    "    if (rs != null) rs.close();"
+  ];
+  var STEPWHY=[
+    "Primero la conexión: sin ella no hay de dónde colgar el statement.",
+    "El <code>PreparedStatement</code> se declara <b>antes</b> del <code>try</code>, para que el <code>finally</code> pueda verlo y cerrarlo.",
+    "El <code>ResultSet</code> igual, y por la misma razón. Los tres cierres del <code>finally</code> necesitan que las variables existan afuera.",
+    "Ahora sí abre el <code>try</code>: de aquí en adelante todo puede lanzar <code>SQLException</code>.",
+    "Se prepara la consulta. Como <code>SQL_SELECT_ALL</code> no tiene ningún <code>?</code>, no va ninguna línea <code>ps.set...</code> después.",
+    "<code>executeQuery()</code> porque es un <code>SELECT</code>, y su resultado se guarda en el <code>ResultSet</code>.",
+    "Se convierte el <code>ResultSet</code> en lista y se devuelve. El <code>finally</code> se ejecuta igual, aunque haya <code>return</code> aquí.",
+    "El <code>finally</code>: lo que va aquí se ejecuta pase lo que pase.",
+    "Se cierra primero el <code>ResultSet</code>, que es el último que se abrió. Después irían <code>ps</code> y <code>conexion</code>, en ese orden."
+  ];
+  var placed=[], bank=document.getElementById("bank"),
+      built=document.getElementById("built"), bldFb=document.getElementById("bldFb");
+
+  function shuffled(){
+    var idx=STEPS.map(function(_,i){return i;});
+    for(var i=idx.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), t=idx[i]; idx[i]=idx[j]; idx[j]=t;
+    }
+    return idx;
+  }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled().forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS[i].trim(); b.dataset.i=i;
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          if(placed.length===STEPS.length){
+            bldFb.className="fb show good";
+            bldFb.innerHTML="<b>Completo.</b> Ese es el orden y no es arbitrario: se declara afuera lo que el <code>finally</code> va a tener que cerrar, se abre el <code>try</code>, se prepara, se ejecuta, y se cierra en orden inverso al de apertura. Los cinco métodos del DAO siguen este mismo esqueleto.";
+          } else {
+            bldFb.className="fb show good";
+            bldFb.innerHTML="<b>Va.</b> "+STEPWHY[i];
+          }
+        } else {
+          bldFb.className="fb show bad";
+          bldFb.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed.length===0
+              ? "Empieza por lo primero que hace cualquier método del DAO: conseguir la conexión."
+              : "Antes de esa va otra cosa. Pista: "+STEPWHY[placed.length].replace(/<[^>]+>/g,""));
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando el método…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){
+        placed=placed.slice(0,n); renderBuilt(); renderBank();
+        bldFb.className="fb";
+      });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){
+    placed=[]; renderBuilt(); renderBank(); bldFb.className="fb";
+  });
+  renderBuilt(); renderBank();
+
+  /* ============ 8. llamada al stored procedure ============ */
+  function norm(s){
+    return s.trim().toLowerCase()
+      .replace(/;+\s*$/,"")
+      .replace(/\s+/g," ")
+      .replace(/\s*([(),])\s*/g,"$1")
+      .replace(/"/g,"'");
+  }
+  var spIn=document.getElementById("spIn"), spFb=document.getElementById("spFb");
+  document.getElementById("spGo").addEventListener("click",function(){
+    var v=norm(spIn.value);
+    spIn.classList.remove("ok","no");
+    if(/^call sp_crear\('lcd','lcd'\)$/.test(v)){
+      spIn.classList.add("ok");
+      spFb.className="fb show good";
+      spFb.innerHTML="<b>Correcto:</b> <code>CALL sp_crear('LCD', 'LCD');</code> Esa instrucción ejecuta el procedimiento y por dentro hace el <code>INSERT</code>. Fíjate en que ya no escribes SQL: solo el nombre y los argumentos.";
+      return;
+    }
+    spIn.classList.add("no");
+    spFb.className="fb show bad";
+    if(/^exec/.test(v)){
+      spFb.innerHTML="<b>Esa es la de SQL Server.</b> Fue justo la pregunta del compañero, y la respuesta fue: <em>\"no, porque no es SQL Server. Para MySQL es CALL\"</em>. Cambia <code>EXEC</code> por <code>CALL</code>.";
+    } else if(/^(execute|run)/.test(v)){
+      spFb.innerHTML="<b>No es esa palabra.</b> En MySQL, invocar un procedimiento almacenado se hace con <code>CALL</code>.";
+    } else if(/^call/.test(v) && !/'/.test(v)){
+      spFb.innerHTML="<b>Vas bien con <code>CALL</code>, pero faltan las comillas.</b> Los dos parámetros son <code>VARCHAR</code>, así que van como texto: <code>'LCD'</code>.";
+    } else if(/^call/.test(v) && !/sp_crear/.test(v)){
+      spFb.innerHTML="<b>El <code>CALL</code> está bien, revisa el nombre.</b> El procedimiento se llama <code>sp_crear</code>.";
+    } else if(/^call sp_crear\(/.test(v)){
+      spFb.innerHTML="<b>Casi.</b> Son <b>dos</b> parámetros, en el orden en que los declara el procedimiento: primero el nombre, luego la descripción. Los dos con el valor <code>'LCD'</code>, como en el pizarrón.";
+    } else if(/insert/.test(v)){
+      spFb.innerHTML="<b>Ese es el SQL de adentro.</b> El chiste del procedimiento es que ese <code>INSERT</code> ya está guardado en la base: desde fuera solo lo mandas llamar por su nombre.";
+    } else {
+      spFb.innerHTML="<b>Revisa la forma.</b> La estructura es <code>CALL nombre_del_procedimiento(argumento1, argumento2);</code>";
+    }
+  });
+  document.getElementById("spRs").addEventListener("click",function(){
+    spIn.value=""; spIn.classList.remove("ok","no"); spFb.className="fb"; spIn.focus();
+  });
+  spIn.addEventListener("keydown",function(e){
+    if(e.key==="Enter") document.getElementById("spGo").click();
+  });
+
+  /* ============ 9. cierre ============ */
+  quiz("q9",[
+    {q:"<em>¿Para qué sirve el <code>DELIMITER //</code> antes del <code>CREATE PROCEDURE</code>?</em>",
+     opts:["Para separar parámetros","Para que los ; de adentro no corten la instrucción","Para comentar el bloque"], ans:1,
+     why:"<b>Para que los <code>;</code> internos no la corten.</b> Sin él, MySQL cree que la instrucción terminó en el primer punto y coma del cuerpo. Y no olvides el <code>DELIMITER ;</code> al final para dejarlo como estaba."},
+    {q:"<em>Escribiste el procedimiento en MySQL y lo quieres llevar a PostgreSQL. ¿Funciona igual?</em>",
+     opts:["Sí, es ANSI SQL","No, el lenguaje de procedimientos cambia por manejador"], ans:1,
+     why:"<b>No.</b> <em>\"Ahí el ANSI SQL dejó de ser tú.\"</em> Los <code>SELECT</code> e <code>INSERT</code> básicos sí son portables; los procedimientos no. Cada manejador tiene su propio lenguaje."},
+    {q:"<em>En MySQL, ¿cómo se invoca un procedimiento almacenado?</em>",
+     opts:["EXEC sp_crear(...)","CALL sp_crear(...)","RUN sp_crear(...)"], ans:1,
+     why:"<b>CALL.</b> <code>EXEC</code> es de SQL Server. Fue la corrección que hizo cuando un alumno preguntó."},
+    {q:"<em>La Tarea 4 pide cambiar a <code>CallableStatement</code>. ¿Qué NO cambia?</em>",
+     opts:["Los índices de parámetros siguen empezando en 1","Se sigue usando prepareStatement()","Ya no hay que cerrar nada"], ans:0,
+     why:"<b>Los índices siguen empezando en 1.</b> Los <code>setString</code> y <code>setInt</code> se usan igual. Lo que sí cambia es el método de la conexión (<code>prepareCall</code> en vez de <code>prepareStatement</code>) y el texto que le pasas: <code>\"{call sp_crear(?, ?)}\"</code>. Y por supuesto que hay que seguir cerrando todo."}
+  ],"q9go","q9rs","q9fb",
+  "<b>Las cuatro.</b> Con esto tienes lo necesario para arrancar la Tarea 4: los procedimientos primero en MySQL, y después el cambio en el DAO, que es más mecánico de lo que parece.");
+
+  /* ============ checklist ============ */
+  var FINAL=[
+    {id:"c4-softdelete", t:"Tarea 1 · Investigación: soft delete",
+     d:"Qué es, para qué sirve, con qué se come, cómo se adereza y cómo lo aplican. Borrado lógico contra borrado físico. Es para el proyecto, no solo para entregar."},
+    {id:"c4-jdbc", t:"Tarea 2 · Reporte de lectura: \"Lectura rápida JDBC\"",
+     d:"Venía arrastrándose desde la clase 3 y aquí la reconfirmó. El CallableStatement de la Tarea 4 sale de esta lectura, así que va primero."},
+    {id:"c4-gui", t:"Tarea 3 · Ejercicio 1: aplicación de escritorio con interfaz gráfica",
+     d:"Swing o JavaFX, no web ni móvil. CRUD de Carrera con botones que se habilitan y deshabilitan según el momento. Reusa el CarreraDAO tal cual."},
+    {id:"c4-callable", t:"Tarea 4 · Ejercicio 2: cambiar PreparedStatement por CallableStatement",
+     d:"La única con fecha: para la próxima semana. Implica crear antes los cinco stored procedures en MySQL; él solo escribió el de insertar."},
+    {id:"c4-redhat", t:"Pendiente · Subir tus datos para el curso externo",
+     d:"Usuario, correo y qué curso quieres, en el Excel. Los cursos aún no están creados, por eso marca error al registrarse. Da punto extra en el examen."}
+  ];
+  var KEY="clase4-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var fh=document.getElementById("finalTasks"), bar=document.getElementById("bar"),
+      pc=document.getElementById("pcount");
+  FINAL.forEach(function(it){
+    var l=document.createElement("label"); l.className="ftask";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!st[it.id];
+    var b=document.createElement("div");
+    b.innerHTML='<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent=it.t;
+    b.querySelector(".td2").textContent=it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if(cb.checked) l.classList.add("done");
+    cb.addEventListener("change",function(){
+      st[it.id]=cb.checked; l.classList.toggle("done",cb.checked);
+      try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+  function refresh(){
+    var done=0, boxes=fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes,function(c){ if(c.checked) done++; });
+    pc.textContent=done+" / "+FINAL.length;
+    bar.style.width=Math.round(done/FINAL.length*100)+"%";
+  }
+  refresh();
+})();
+</script>
