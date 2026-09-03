@@ -1,0 +1,10 @@
+# No copiar los archivos de Docker dentro de la imagen
+Dockerfile
+.dockerignore
+
+# Basura del SO / editores
+.DS_Store
+Thumbs.db
+*.swp
+.git
+.gitignore
