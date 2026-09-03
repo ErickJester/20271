@@ -1,0 +1,231 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Actividad 3: Reporte de lectura (JDBC)}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Código}
+
+\lstset{
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+Este reporte cubre el modelo relacional, las sentencias SQL básicas, la conexión a una base de datos con JDBC, los \texttt{PreparedStatement}, los \texttt{CallableStatement} para invocar procedimientos almacenados, y el manejo de transacciones.
+
+Queda fuera la construcción de una interfaz gráfica en Swing que muestra, ordena y filtra los resultados de una consulta dentro de una tabla visual, porque corresponde a una forma de presentar datos distinta a la que necesita una aplicación que expone sus datos como servicio; lo demás sí es material directo para cualquier programa que hable con una base de datos desde Java. Este reporte lo organiza en cinco partes: el modelo relacional, SQL, la conexión con JDBC, los \texttt{PreparedStatement} y las transacciones, y usa como ejemplo una clase \texttt{Carrera} con su correspondiente \texttt{CarreraDAO}.
+
+%################################################
+\section{\color{colorIPN}{El modelo relacional}}
+
+Una base de datos relacional organiza la información en tablas compuestas de filas y columnas. Cada tabla tiene una llave primaria: una columna, o un conjunto de columnas, cuyo valor identifica de manera única a cada fila y no se puede repetir. Esto se conoce como la regla de integridad de entidad: toda fila debe tener un valor de llave primaria, y ese valor debe ser único dentro de la tabla.
+
+Cuando una tabla necesita referirse a una fila de otra tabla, lo hace con una llave foránea: una columna cuyo valor debe existir como llave primaria en la tabla referida. Esto se conoce como la regla de integridad referencial. Un caso típico usa tres tablas: dos tablas principales (por ejemplo autores y títulos) y una tabla intermedia que solo contiene las dos llaves foráneas. Esa tabla intermedia es la manera estándar de representar una relación de muchos a muchos (un autor puede escribir varios libros, y un libro puede tener varios autores) cuando ninguna de las dos tablas principales puede contener directamente a la otra.
+
+Para una relación más simple, de uno a muchos, no hace falta una tabla intermedia: basta con que la tabla del lado \enquote{muchos} tenga una columna que sea llave foránea hacia la tabla del lado \enquote{uno}. La figura \ref{img:relacion-1n} muestra el caso con las tablas de este reporte: si cada carrera pudiera tener varios planes de estudio, pero cada plan perteneciera exactamente a una carrera, la tabla de planes llevaría una columna \texttt{idCarrera} que apunta a la llave primaria de \texttt{Carrera}, sin necesitar una tabla adicional.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+		tbl/.style={draw, colorIPN, thick, rounded corners, align=left, font=\scriptsize, inner sep=7pt}
+	]
+		\node[tbl] (carrera) at (0,0) {
+			\textbf{Carrera}\\[2pt]
+			\textit{idCarrera} (PK)\\
+			nombreCarrera\\
+			descripcionCarrera
+		};
+		\node[tbl] (plan) at (7.2,0) {
+			\textbf{PlanDeEstudios}\\[2pt]
+			\textit{idPlan} (PK)\\
+			idCarrera (FK)\\
+			nombrePlan
+		};
+		\draw[colorESCOM, thick] (carrera.east) -- (plan.west)
+			node[midway, above, font=\scriptsize] {idCarrera = idCarrera}
+			node[pos=0.08, below, font=\scriptsize] {1}
+			node[pos=0.92, below, font=\scriptsize] {N};
+	\end{tikzpicture}
+	\caption{Relación de uno a muchos entre \texttt{Carrera} y \texttt{PlanDeEstudios} mediante una llave foránea}
+	\label{img:relacion-1n}
+\end{figure}
+
+%################################################
+\section{\color{colorIPN}{SQL: consultas y sentencias}}
+
+Hay un conjunto de verbos con los que se arma cualquier operación sobre una base de datos relacional. \texttt{SELECT * FROM tabla} trae todas las columnas; sustituir el asterisco por una lista de nombres trae solo las que interesan, y hay una razón concreta para preferir la lista explícita: si el orden de las columnas de la tabla cambia, o se agrega una columna nueva, un programa que dependa de la posición de cada columna en el resultado de \texttt{SELECT *} puede terminar leyendo el dato equivocado en el lugar equivocado. Con una lista explícita, el orden del resultado siempre es el que se pidió.
+
+La cláusula \texttt{WHERE} filtra filas con operadores de comparación (\texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{=}, \texttt{<>}) y con \texttt{LIKE} para patrones de texto: el signo de porcentaje (\texttt{\%}) sustituye cualquier cantidad de caracteres, y el guion bajo (\texttt{\_}) sustituye exactamente uno. \texttt{WHERE nombreCarrera LIKE 'Ing\%'} encuentra cualquier carrera cuyo nombre empiece con \enquote{Ing}, sin importar lo que siga.
+
+\texttt{ORDER BY} ordena el resultado por una o varias columnas, cada una con \texttt{ASC} (ascendente, el valor por defecto) o \texttt{DESC} (descendente) de forma independiente. \texttt{INNER JOIN} combina filas de dos tablas que comparten un valor en la columna indicada por \texttt{ON}, que es exactamente el mecanismo que resuelve una llave foránea: para saber el nombre de la carrera de un plan de estudios, se une la tabla de planes con \texttt{Carrera} por la columna \texttt{idCarrera}.
+
+\begin{lstlisting}[language=SQL, caption={Las tres sentencias que modifican datos, sobre la tabla \texttt{Carrera}}]
+INSERT INTO Carrera (nombreCarrera, descripcionCarrera)
+VALUES ('ISC', 'Ingenieria en Sistemas Computacionales');
+
+UPDATE Carrera
+SET descripcionCarrera = 'Programa actualizado 2020'
+WHERE idCarrera = 1;
+
+DELETE FROM Carrera
+WHERE idCarrera = 1;
+\end{lstlisting}
+
+En los tres casos aplica el mismo principio: el \texttt{WHERE} no es opcional en la práctica, aunque el lenguaje lo permita omitir. Un \texttt{UPDATE} o un \texttt{DELETE} sin \texttt{WHERE} se aplica a todas las filas de la tabla, y la única forma de garantizar que la operación afecte exactamente una fila es filtrar por la llave primaria. También es un error común con el \texttt{INSERT}: si la tabla tiene una columna autoincrementada como \texttt{idCarrera}, nunca se le debe asignar un valor a mano; el motor la genera solo, y forzar un valor ahí suele terminar en un error del manejador.
+
+%################################################
+\section{\color{colorIPN}{Conexión con JDBC}}
+
+Del lado de Java, todo empieza con un objeto \texttt{Connection}, que se obtiene con \texttt{DriverManager.getConnection(url, usuario, contraseña)}. La URL tiene una forma fija: el protocolo \texttt{jdbc}, el subprotocolo del manejador y la ubicación de la base de datos. La tabla \ref{tabla:urls} recoge el formato para varios manejadores comunes.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{3.2cm} | p{9.5cm}}\hline \hline
+		\textbf{Manejador} & \textbf{Formato de la URL} \\ \hline \hline
+		MySQL & \texttt{jdbc:mysql://servidor:puerto/nombreBaseDatos} \\ \hline
+		PostgreSQL & \texttt{jdbc:postgresql://servidor:puerto/nombreBaseDatos} \\ \hline
+		Oracle & \texttt{jdbc:oracle:thin:@servidor:puerto:nombreBaseDatos} \\ \hline
+		Java DB / Derby & \texttt{jdbc:derby://servidor:puerto/nombreBaseDatos} \\ \hline \hline
+	\end{tabular}
+	\caption{Formato de la URL de conexión según el manejador}
+	\label{tabla:urls}
+\end{table}
+
+Sobre ese objeto \texttt{Connection} se crea un \texttt{Statement} con \texttt{connection.createStatement()}, y con \texttt{statement.executeQuery(sql)} se manda una consulta que regresa un \texttt{ResultSet}: un cursor que se recorre con \texttt{resultSet.next()} y del que se leen columnas por nombre o por posición. Desde JDBC 4 ya no es necesario cargar el driver a mano con \texttt{Class.forName()} antes de conectar; el descubrimiento automático de drivers lo hace innecesario, aunque el archivo del driver correspondiente sí tiene que estar disponible en el classpath del programa.
+
+Un detalle notable de este patrón es que cierra la conexión, el \texttt{Statement} y el \texttt{ResultSet} a mano, dentro de un bloque \texttt{finally}, cada uno en su propio \texttt{try} interno para que un error al cerrar el primero no impida cerrar los demás. Así se manejaban los recursos antes de Java 7; con \textit{try-with-resources} el mismo cierre ordenado ocurre de forma automática al declarar los recursos entre paréntesis después de \texttt{try}, sin necesitar el bloque \texttt{finally} explícito.
+
+%################################################
+\section{\color{colorIPN}{PreparedStatement}}
+
+Un \texttt{PreparedStatement} se crea con \texttt{connection.prepareStatement(sql)}, y en vez de llevar los valores escritos dentro de la cadena SQL, los sustituye por signos de interrogación que se llenan después con métodos como \texttt{setString}, \texttt{setInt} o \texttt{setDouble}, uno por cada posición contando desde 1. Tiene dos ventajas concretas. La primera es de rendimiento: el motor compila la consulta una sola vez y la reutiliza cada vez que cambian los parámetros, lo que conviene cuando la misma consulta se ejecuta muchas veces con valores distintos. La segunda es de seguridad: los métodos \texttt{set} escapan automáticamente los caracteres especiales del valor que reciben, así que un apóstrofo dentro de un nombre no rompe la sentencia ni se puede usar para inyectar SQL adicional.
+
+\begin{lstlisting}[language=Java, caption={PreparedStatement con parámetros, sobre \texttt{CarreraDAO}}]
+PreparedStatement ps = conexion.prepareStatement(
+    "INSERT INTO Carrera (nombreCarrera, descripcionCarrera) VALUES (?, ?)");
+ps.setString(1, nombreCarrera);
+ps.setString(2, descripcionCarrera);
+ps.executeUpdate();
+\end{lstlisting}
+
+Es el mismo patrón que sigue \texttt{CarreraDAO} para todas sus operaciones: la consulta se declara una sola vez con los signos de interrogación, y cada método solo se encarga de asignar los valores antes de ejecutarla.
+
+%################################################
+\section{\color{colorIPN}{CallableStatement y procedimientos almacenados}}
+
+Cuando la lógica de una consulta vive guardada dentro del propio manejador, en vez de escrita en la aplicación, se le llama procedimiento almacenado. JDBC los invoca con un \texttt{CallableStatement}, que hereda los mismos métodos \texttt{set} de \texttt{PreparedStatement} y además admite parámetros de salida, para procedimientos que devuelven un valor además de, o en vez de, un \texttt{ResultSet}. Aunque la sintaxis para crear un procedimiento almacenado cambia de un manejador a otro, la forma de invocarlo desde Java con \texttt{CallableStatement} es uniforme.
+
+%################################################
+\section{\color{colorIPN}{Transacciones}}
+
+Hay operaciones que solo tienen sentido si se completan por entero o no se completan en absoluto. Un ejemplo clásico es el de una transferencia bancaria: si el banco retira el dinero de una cuenta y falla antes de depositarlo en la otra, el saldo del cliente queda mal sin que haya un error visible en ninguna de las dos operaciones por separado. Tratar el retiro y el depósito como una sola unidad, de modo que ambos ocurran o ninguno ocurra, es lo que se conoce como una transacción.
+
+\texttt{Connection} ofrece \texttt{setAutoCommit(false)} para agrupar varias sentencias en una sola transacción; por defecto, cada sentencia se confirma sola apenas se ejecuta. Con el autocommit desactivado, la transacción termina con \texttt{commit()}, que hace permanentes todos los cambios, o con \texttt{rollback()}, que revierte la base de datos al estado anterior a la transacción. En \texttt{CarreraDAO}, cada método ejecuta una sola sentencia, así que no necesita coordinarlas; el caso donde una transacción importaría es uno que involucre más de una operación, como registrar una carrera y su primer plan de estudios a la vez: si el segundo paso falla, la carrera no debería quedar registrada a medias.
+
+\begin{lstlisting}[language=Java, caption={Transacción con dos operaciones dependientes}]
+conexion.setAutoCommit(false);
+try {
+    // primera operacion
+    // segunda operacion
+    conexion.commit();
+} catch (SQLException e) {
+    conexion.rollback();
+}
+\end{lstlisting}
+
+%################################################
+\section{\color{colorIPN}{Conclusión}}
+
+Con esto, una aplicación Java tiene lo necesario para hablar con una base de datos relacional de principio a fin: el modelo de tablas con llaves primarias y foráneas, las cinco operaciones básicas de SQL, la conexión y el manejo de resultados con JDBC, la diferencia práctica entre un \texttt{Statement} y un \texttt{PreparedStatement}, y las transacciones para cuando una operación necesita ser todo o nada. Ninguno de estos temas depende de una interfaz gráfica en particular; son la base de cualquier aplicación, de escritorio o de servidor, que necesite guardar y consultar datos de forma confiable.
+
+\color{colorIPN}{
+	\begin{flushright}
+		\textit{
+			Angel Frausto Robles
+		}
+	\end{flushright} \hfill \break
+}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\nocite{*}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}

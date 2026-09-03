@@ -1,0 +1,228 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Actividad 2: Reporte de lectura (Java Syntax)}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Código}
+
+\lstset{
+	language=Java,
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+Este reporte cubre la sintaxis base de Java: la estructura de un archivo fuente, el encapsulamiento, los constructores, la herencia con clases abstractas e interfaces, los enums, las excepciones y los generics.
+
+Está organizado alrededor de los conceptos que sostienen el resto de la sintaxis (el diseño de clases, el manejo de errores y la reutilización de tipos) y los ilustra con un ejemplo propio: una clase \texttt{Carrera} y su correspondiente \texttt{CarreraDAO} para el acceso a datos.
+
+%################################################
+\section{\color{colorIPN}{Estructura de un archivo Java}}
+
+Todo archivo fuente de Java empieza con la declaración de \texttt{package}, que agrupa las clases en un espacio de nombres y corresponde a la ruta de carpetas donde viven. Después va la sección de \texttt{import}, con los nombres completos de las clases, interfaces y enums que el archivo usa. Hay una distinción entre el import normal y el import estático: este último permite usar variables y métodos estáticos de otra clase sin escribir el nombre de esa clase cada vez, como en \texttt{import static java.lang.Math.PI}, que deja escribir \texttt{PI} en lugar de \texttt{Math.PI}. Cuando se usan muchas clases del mismo paquete, o muchos miembros estáticos de la misma clase, el import se puede compactar con un asterisco.
+
+El resto de las reglas son básicas pero exigentes: Java distingue mayúsculas de minúsculas, así que \texttt{miVariable} y \texttt{mivariable} son dos identificadores distintos; todo excepto \texttt{import}, \texttt{package} y las declaraciones de clase, interfaz o enum va encerrado entre llaves; y cada instrucción termina en punto y coma. Son reglas fáciles de pasar por alto al empezar, y el error más común es justamente confundir los dos delimitadores: cerrar un constructor vacío con punto y coma en vez de llevarlo entre llaves, que es una declaración incompleta y no compila.
+
+%################################################
+\section{\color{colorIPN}{Identificadores y tipos de variable}}
+
+Un identificador no puede ser una palabra reservada ni un literal booleano, y por convención se escribe en camelCase: minúscula inicial para atributos y métodos, mayúscula inicial para nombres de clase. Hay tres tipos de variable según dónde se declaran: los \textit{fields} viven en el cuerpo de la clase, fuera de cualquier método; las \textit{local variables} viven dentro de un método y solo existen ahí; y las \textit{static variables} llevan el modificador \texttt{static} y pertenecen a la clase completa, no a cada instancia por separado.
+
+Esta última categoría es la que sostiene el patrón que se usó para declarar el SQL en \texttt{CarreraDAO}:
+
+\begin{lstlisting}[caption={Campo estático, final y privado usado como constante}]
+private static final String SQL_INSERT =
+    "INSERT INTO Carrera (nombreCarrera, descripcionCarrera) VALUES (?, ?)";
+\end{lstlisting}
+
+\texttt{static} hace que exista una sola copia del texto para toda la clase, no una por cada objeto \texttt{CarreraDAO} que se cree. \texttt{final} impide que se reasigne después de la primera vez. Java no tiene la palabra reservada \texttt{const}; esta combinación es lo más cercano que el lenguaje ofrece a una constante, y de ahí sale también la convención de escribirlas en mayúsculas.
+
+%################################################
+\section{\color{colorIPN}{Encapsulamiento: mutators y accessors}}
+
+El encapsulamiento es uno de los principios de la programación orientada a objetos y consiste en esconder el estado interno de un objeto detrás de métodos controlados. A los métodos que modifican un atributo (los \texttt{set}) se les llama \textit{mutators}, y a los que lo leen (los \texttt{get}), \textit{accessors}. La convención de nombres es directa: un mutator se llama \texttt{setNombreDelCampo}, recibe un parámetro del mismo tipo que el campo y no devuelve nada; un accessor se llama \texttt{getNombreDelCampo}, no recibe parámetros y devuelve el valor.
+
+Cuando el parámetro del mutator se llama igual que el campo que modifica, hace falta la palabra clave \texttt{this} para distinguir uno de otro dentro del cuerpo del método:
+
+\begin{lstlisting}[caption={Uso de \texttt{this} cuando el parámetro repite el nombre del campo}]
+public void setIdCarrera(int idCarrera) {
+    this.idCarrera = idCarrera;
+}
+\end{lstlisting}
+
+Sin el \texttt{this} a la izquierda, la línea sería \texttt{idCarrera = idCarrera}, una asignación del parámetro a sí mismo que compila sin error mientras el campo de la clase nunca cambia. Es un error fácil de cometer y difícil de detectar precisamente porque no truena en tiempo de compilación.
+
+Una clase que sigue este patrón por completo (campos privados, un constructor sin argumentos, y accessors y mutators públicos para cada campo) recibe el nombre de \textit{JavaBean}. No es una curiosidad de nomenclatura: muchas herramientas de Java dan por hecho que las clases tienen esta forma, porque necesitan poder crear el objeto con el constructor vacío y llenarlo después llamando a los setters uno por uno. Esa es la razón por la que el constructor vacío importa tanto una vez que se llega a Hibernate o a JPA.
+
+%################################################
+\section{\color{colorIPN}{Constructores}}
+
+Si una clase no declara ningún constructor, el compilador genera uno vacío de forma automática, que además invoca implícitamente a \texttt{super()} e inicializa los campos con sus valores por defecto (\texttt{0} para los numéricos, \texttt{null} para los objetos). Ese constructor generado desaparece en cuanto se escribe cualquier constructor explícito, aunque tenga parámetros distintos; si se necesita seguir creando objetos sin argumentos, hay que declarar ese constructor vacío a mano.
+
+Se puede evitar repetir la misma asignación de campos en varios constructores: uno puede llamar a otro con \texttt{this(...)} como primera línea de su cuerpo, delegando la parte común y añadiendo solo lo que le falta. Es el mismo principio que evita duplicar código en cualquier otra parte de la clase.
+
+%################################################
+\section{\color{colorIPN}{Herencia, clases abstractas e interfaces}}
+
+Java permite que una clase extienda una sola superclase (\texttt{extends}). Esta restricción se explica con el llamado problema del diamante: si una clase pudiera heredar de dos clases que a su vez heredan de una tercera en común, no habría forma de decidir de cuál de las dos rutas hereda los miembros compartidos. La solución que ofrece el lenguaje son las interfaces, que sí se pueden implementar en cualquier número.
+
+Una clase abstracta (\texttt{abstract class}) no se puede instanciar directamente, pero puede tener constructores, campos y métodos con implementación completa junto a métodos abstractos sin cuerpo, que las subclases están obligadas a completar. Una interfaz, en cambio, no puede tener campos de instancia ni constructores; hasta Java 8 solo podía declarar firmas de método, y desde entonces también admite métodos \texttt{default} con implementación, pensados para no romper a las clases que ya implementaban la interfaz cuando se le agrega un método nuevo. La tabla \ref{tabla:abstracta-interfaz} resume las diferencias entre ambas.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{4cm} | p{5cm} | p{5cm}}\hline \hline
+		& \textbf{Clase abstracta} & \textbf{Interfaz} \\ \hline \hline
+		Instanciación & No, aunque puede tener constructores & No, y no tiene constructores \\ \hline
+		Herencia & Una sola superclase & Una clase puede implementar varias \\ \hline
+		Miembros & Métodos abstractos y concretos, campos de cualquier tipo & Solo métodos (abstractos, \texttt{default} o \texttt{static}) y campos \texttt{static final} \\ \hline
+		Visibilidad por defecto & La que declare cada miembro & \texttt{public} y \texttt{abstract} de forma implícita \\ \hline \hline
+	\end{tabular}
+	\caption{Diferencias entre clase abstracta e interfaz}
+	\label{tabla:abstracta-interfaz}
+\end{table}
+
+Esta distinción es la misma que separa a la interfaz de la implementación en el patrón DAO (Data Access Object): la interfaz declara qué operaciones existen (guardar, buscar, actualizar) sin decir cómo se hacen, y una clase como \texttt{CarreraDAO} provee la implementación concreta contra MySQL. Cambiar de manejador de base de datos, en teoría, solo debería requerir escribir otra implementación de la misma interfaz.
+
+%################################################
+\section{\color{colorIPN}{Enums}}
+
+Un \texttt{enum} es un tipo de clase especial que solo se puede instanciar un número fijo de veces, una por cada constante que declara. Su constructor es implícitamente privado, porque nadie fuera del propio enum puede crear instancias nuevas, y cada instancia puede llevar sus propios campos y hasta sobrescribir un método declarado en el enum. El patrón encaja con cualquier campo que solo pueda tomar un conjunto fijo y conocido de valores, como el estatus de un registro o el rol de un usuario dentro de un sistema.
+
+%################################################
+\section{\color{colorIPN}{Excepciones: checked y unchecked}}
+
+Todas las condiciones excepcionales en Java cuelgan de \texttt{Throwable}, que se divide en \texttt{Error} (fallas de la máquina virtual de las que no tiene sentido intentar recuperarse, como quedarse sin memoria) y \texttt{Exception} (situaciones que el programa puede y debe manejar), como se ve en la figura \ref{img:excepciones}. Nunca se debe atrapar \texttt{Throwable} en general ni \enquote{tragarse} una excepción con un bloque \texttt{catch} vacío, porque eso oculta el problema en vez de resolverlo.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+		every node/.style={draw, rounded corners, align=center, font=\scriptsize, inner sep=5pt},
+		level distance=1.6cm,
+		sibling distance=4cm,
+		edge from parent/.style={draw, colorIPN, thick, ->}
+	]
+		\node[draw=colorIPN, thick] {Throwable}
+			child { node[draw=gray, fill=gray!10] {Error \\ \tiny no recuperable}}
+			child { node[draw=colorESCOM, thick] {Exception}
+				child { node[draw=colorESCOM] {checked \\ \tiny SQLException \\ \tiny ClassNotFoundException}}
+				child { node[draw=colorIPN, fill=colorIPN!8] {RuntimeException \\ \tiny unchecked \\ \tiny NullPointerException}}
+			};
+	\end{tikzpicture}
+	\caption{Jerarquía de \texttt{Throwable} y ubicación de las excepciones checked y unchecked}
+	\label{img:excepciones}
+\end{figure}
+
+Dentro de \texttt{Exception} hay una segunda división que importa para cualquier código que dependa de recursos externos, como una conexión a base de datos. Las excepciones \textit{unchecked} extienden \texttt{RuntimeException} (la más común es \texttt{NullPointerException}) y el compilador no obliga a tratarlas. Las excepciones \textit{checked} son las que un método declara explícitamente con \texttt{throws}, y ahí el compilador sí exige que quien llame a ese método las atrape o las vuelva a declarar como propias. Es la razón por la que el bloque \texttt{try/catch} del método de conexión no es opcional:
+
+\begin{lstlisting}[caption={Manejo obligatorio de dos excepciones checked distintas}]
+try {
+    Class.forName(driverMySQL);
+    conexion = DriverManager.getConnection(urlBD, usuario, clave);
+} catch (ClassNotFoundException | SQLException e) {
+    // registrar en un log, nunca imprimir el stack trace completo
+}
+\end{lstlisting}
+
+\texttt{ClassNotFoundException} y \texttt{SQLException} son ambas checked, así que sin el \texttt{try/catch} el código no compila. La barra vertical entre los dos tipos de excepción se llama multi-catch y evita escribir dos bloques \texttt{catch} idénticos para tratarlas igual. Sobre qué hacer dentro del bloque, lo recomendable es no imprimir el \textit{stack trace} completo en la consola de producción; lo correcto es mandarlo a un registro que alguien pueda revisar después.
+
+%################################################
+\section{\color{colorIPN}{Generics}}
+
+Los generics se introdujeron en Java 5 para escribir clases que procesan cualquier tipo sin perder la verificación de tipos en tiempo de compilación. Un caso clásico es una clase \texttt{Pair<X, Y>} capaz de guardar dos valores de tipos distintos. Un caso más simple y frecuente es \texttt{List<Carrera>} como tipo de retorno de un método que trae todos los registros de una tabla: \texttt{List} es la clase genérica y \texttt{Carrera} es el tipo concreto con el que se está usando en ese punto del código.
+
+%################################################
+\section{\color{colorIPN}{Conclusión}}
+
+Nada de esto es exótico: es la sintaxis con la que Java construye sus clases, con el vocabulario correcto para cada pieza. Distinguir un mutator de un accessor, saber por qué desaparece el constructor por defecto en cuanto se declara uno propio, entender qué hace que una clase sea un JavaBean, y separar una excepción checked de una unchecked son la base mínima para leer y escribir Java con criterio, antes de pasar a herramientas más complejas, como los frameworks de acceso a datos, que se construyen encima de estas reglas.
+
+\color{colorIPN}{
+	\begin{flushright}
+		\textit{
+			Angel Frausto Robles
+		}
+	\end{flushright} \hfill \break
+}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\nocite{*}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}
