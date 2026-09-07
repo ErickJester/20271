@@ -1,0 +1,276 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Investigación: los códigos de respuesta del protocolo HTTP}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{Boleta: 2019630177}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Código}
+
+\lstset{
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+Toda respuesta HTTP empieza con un número de tres dígitos. Ese número es lo primero que lee el cliente y, en muchos casos, lo único que necesita leer: dice si la petición salió bien, si el recurso se movió, si quien preguntó se equivocó o si el problema ocurrió del lado del servidor. El cuerpo de la respuesta viene después y a veces ni siquiera existe.
+
+Este documento trata sobre esos números. Empieza por lo que es HTTP y por qué su diseño obliga a que cada respuesta se explique sola. Sigue con las cinco familias de códigos y con lo que significa cada una. Después baja al detalle de cuáles corresponden a cada operación en una interfaz de tipo REST y cuáles se eligen mal con frecuencia. Cierra con lo que agrega la S de HTTPS y, sobre todo, con lo que no cambia.
+
+El ejemplo que recorre el texto es una interfaz sobre un recurso llamado \texttt{carreras}, con las operaciones de crear, consultar, actualizar y eliminar. Sirve para tener un caso concreto donde cada código aparezca en la situación que le toca.
+
+Queda fuera el detalle del transporte: cómo se negocia una conexión TLS, cómo HTTP/2 multiplexa varios flujos sobre una sola conexión y cómo HTTP/3 los traslada a QUIC. Esos temas aparecen solo donde hacen falta para entender el contexto. El asunto del documento es la semántica de la respuesta, que es idéntica en las tres versiones del protocolo.
+
+%################################################
+\section{\color{colorIPN}{Qué es HTTP}}
+
+HTTP es un protocolo de capa de aplicación para transferir representaciones de recursos entre un cliente y un servidor \cite{rfc9110}. Funciona por turnos: el cliente manda una petición, el servidor devuelve una respuesta, y ahí termina el intercambio.
+
+La característica que más consecuencias tiene es que el protocolo no guarda estado. Cada petición llega sin memoria de las anteriores, y el servidor no está obligado a recordar nada entre una y otra. Todo lo que el servidor necesita para atender una petición tiene que venir dentro de esa misma petición. Las sesiones de usuario, los carritos de compra y las banderas de \enquote{ya inició sesión} existen porque alguien las construyó encima, con cookies o con tokens, no porque HTTP las provea.
+
+Una petición tiene un método, un destino, la versión del protocolo, una lista de encabezados y un cuerpo opcional. Una respuesta tiene una línea de estado, encabezados y un cuerpo también opcional. La línea de estado es donde vive el código:
+
+\begin{lstlisting}[caption={Un intercambio completo, con la linea de estado en la primera linea de la respuesta}]
+GET /api/carreras/7 HTTP/1.1
+Host: localhost:8080
+Accept: application/json
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 96
+
+{"idCarrera":7,"nombre":"Ingenieria en Sistemas Computacionales","clave":"ISC"}
+\end{lstlisting}
+
+El \texttt{200} es el código. El \texttt{OK} que lo acompaña se llama frase de razón y está pensado para que una persona lea el intercambio, no para que el programa decida con ella. RFC 9110 es explícito en esto: un cliente no debe tomar decisiones a partir de la frase, porque puede venir en cualquier idioma o venir vacía \cite{rfc9110}.
+
+Ese detalle deja de ser teórico en cuanto se cambia de versión. HTTP/1.1 manda todo eso como texto, tal como se ve arriba. HTTP/2 y HTTP/3 comprimen los encabezados en formato binario y eliminaron la frase de razón por completo: en esas versiones lo único que viaja es el número. Un cliente que hubiera hecho depender su lógica del texto \enquote{OK} deja de funcionar al actualizar el protocolo, mientras que uno que solo mira el 200 sigue igual.
+
+%################################################
+\section{\color{colorIPN}{Para qué sirve el código de respuesta}}
+
+El código responde a una pregunta muy concreta: qué debe hacer ahora quien recibió la respuesta. Y la responde en un formato que sirve tanto para el programa que hizo la petición como para todo lo que hay en medio.
+
+Eso último es lo que suele pasarse por alto. Entre el cliente y el servidor casi nunca hay un cable directo. Hay cachés, proxies inversos, balanceadores de carga y redes de distribución de contenido, y ninguno de ellos entiende de carreras ni de categorías. Lo único que pueden interpretar es el código, y con él toman decisiones reales: una caché guarda por su cuenta una respuesta 200 para reutilizarla, y no guarda una 503 porque sabe que describe una falla pasajera. Un balanceador que recibe varias respuestas 502 seguidas de la misma máquina puede sacarla de rotación.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+		caja/.style={draw, colorIPN, thick, rounded corners, align=center, font=\scriptsize, inner sep=7pt, minimum height=1cm},
+		flecha/.style={colorESCOM, thick, -{Latex[length=2mm]}},
+		nota/.style={align=center, font=\scriptsize, color=colorIPN}
+	]
+		\node[caja] (cliente) at (0,0) {\textbf{Cliente}};
+		\node[caja] (cache)   at (5,0) {\textbf{Caché intermedia}\\ no conoce la aplicación};
+		\node[caja] (servidor) at (10.4,0) {\textbf{Servidor}};
+
+		\draw[flecha] (cliente.north east) -- ++(0,0.55) -| (cache.north west)
+			node[pos=0.25, above, font=\scriptsize] {GET /api/carreras/7};
+		\draw[flecha] (cache.north east) -- ++(0,0.55) -| (servidor.north west)
+			node[pos=0.25, above, font=\scriptsize] {GET /api/carreras/7};
+
+		\draw[flecha] (servidor.south west) -- ++(0,-0.55) -| (cache.south east)
+			node[pos=0.25, below, font=\scriptsize] {200 OK};
+		\draw[flecha] (cache.south west) -- ++(0,-0.55) -| (cliente.south east)
+			node[pos=0.25, below, font=\scriptsize] {200 OK};
+
+		\node[nota] at (5,-2.2) {lee el 200 y guarda la respuesta;\\ con un 503 la deja pasar sin guardarla};
+	\end{tikzpicture}
+	\caption{El código de estado es la única parte de la respuesta que los intermediarios pueden interpretar}
+	\label{img:intermediarios}
+\end{figure}
+
+La figura \ref{img:intermediarios} explica por qué el código es un número y no una descripción libre. Un texto sirve para que alguien lo lea; un número de un conjunto acotado sirve para que una máquina que no sabe nada del dominio actúe correctamente.
+
+Hay una segunda propiedad del diseño que conviene conocer. El primer dígito, por sí solo, es un contrato. RFC 9110 obliga a que un cliente que recibe un código desconocido lo trate como el código \texttt{x00} de su familia \cite{rfc9110}. Si mañana aparece un 452 que nadie ha visto, el cliente correcto lo maneja como un 400 genérico y sigue funcionando. Por eso el registro oficial de códigos que mantiene la IANA puede crecer sin romper a nadie \cite{iana_status}.
+
+%################################################
+\section{\color{colorIPN}{Las cinco familias}}
+
+Los códigos van del 100 al 599 y se agrupan por su primer dígito. La tabla \ref{tabla:familias} resume qué afirma cada grupo y qué se espera que haga el cliente al recibirlo.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{1.6cm} | p{3.2cm} | p{5.2cm} | p{3.6cm}}\hline \hline
+		\textbf{Familia} & \textbf{Nombre} & \textbf{Qué afirma} & \textbf{Qué hace el cliente} \\ \hline \hline
+		1xx & Informativa & La petición se recibió y el proceso continúa & Esperar; no es la respuesta final \\ \hline
+		2xx & Éxito & La petición se recibió, se entendió y se atendió & Seguir adelante \\ \hline
+		3xx & Redirección & Hace falta un paso más para completarla & Ir a donde indique el encabezado \\ \hline
+		4xx & Error del cliente & La petición está mal formada o no procede & Corregir y volver a intentar \\ \hline
+		5xx & Error del servidor & La petición parecía válida pero el servidor falló & Reintentar más tarde o avisar \\ \hline \hline
+	\end{tabular}
+	\caption{Las cinco familias de códigos de respuesta y su significado}
+	\label{tabla:familias}
+\end{table}
+
+La frontera entre 4xx y 5xx es la más importante de las cuatro, porque reparte la culpa. Un 4xx dice que reintentar la misma petición tal cual va a fallar otra vez. Un 5xx dice que la petición estaba bien y que reintentarla más tarde tiene sentido. Confundirlas hace que los clientes reintenten lo que nunca va a funcionar o que se rindan ante algo que se habría resuelto solo.
+
+Los códigos que aparecen en la práctica son pocos. Vale la pena conocer estos:
+
+\textbf{100 Continue} le dice al cliente que puede mandar el cuerpo que anunció. \textbf{101 Switching Protocols} es la respuesta a un cambio de protocolo, y es la que se ve al abrir un WebSocket. En una interfaz REST común no se escriben a mano.
+
+\textbf{200 OK} es la respuesta con éxito genérica. \textbf{201 Created} indica que se creó un recurso, y lo habitual es acompañarlo del encabezado \texttt{Location} con la dirección del recurso nuevo. \textbf{202 Accepted} sirve cuando el trabajo se encoló y todavía no termina. \textbf{204 No Content} significa que todo salió bien y que a propósito no hay cuerpo que devolver.
+
+\textbf{301 Moved Permanently} avisa que la dirección cambió para siempre y que conviene actualizar el enlace. \textbf{302} y \textbf{307} indican un desvío temporal, con la diferencia de que 307 obliga a conservar el método original. \textbf{304 Not Modified} es la respuesta a una petición condicional cuando el recurso no ha cambiado, y viaja sin cuerpo porque la copia que tiene el cliente sigue siendo válida.
+
+\textbf{400 Bad Request} es el error de cliente genérico y el que se usa para datos que no pasan validación. \textbf{401 Unauthorized} indica falta de credenciales. \textbf{403 Forbidden} indica credenciales válidas sin permiso suficiente. \textbf{404 Not Found} dice que el recurso no existe. \textbf{405 Method Not Allowed} dice que la ruta existe pero no acepta ese método. \textbf{409 Conflict} corresponde a un choque con el estado actual, como intentar dar de alta algo cuya clave ya está ocupada. \textbf{429 Too Many Requests} indica que se excedió un límite de peticiones.
+
+\textbf{500 Internal Server Error} es el error de servidor genérico y suele significar que una excepción llegó hasta arriba sin que nadie la atendiera. \textbf{502 Bad Gateway} y \textbf{504 Gateway Timeout} los devuelve un intermediario cuando el servicio de atrás respondió mal o no respondió. \textbf{503 Service Unavailable} indica indisponibilidad temporal.
+
+%################################################
+\section{\color{colorIPN}{Qué código devolver en cada operación}}
+
+Con las cinco operaciones sobre el recurso \texttt{carreras} se cubren casi todas las situaciones que se presentan. La tabla \ref{tabla:crud} las reúne.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{4.6cm} | p{2.6cm} | p{6cm}}\hline \hline
+		\textbf{Petición} & \textbf{Éxito} & \textbf{Errores esperables} \\ \hline \hline
+		POST /api/carreras & 201 Created & 400 si no valida, 409 si la clave ya existe \\ \hline
+		GET /api/carreras & 200 OK & 500 si algo falla del lado del servidor \\ \hline
+		GET /api/carreras/7 & 200 OK & 404 si no existe esa carrera \\ \hline
+		PUT /api/carreras/7 & 200 OK o 204 & 400 si no valida, 404 si no existe \\ \hline
+		DELETE /api/carreras/7 & 204 No Content & 404 si no existe, 409 si tiene dependencias \\ \hline \hline
+	\end{tabular}
+	\caption{Códigos que corresponden a cada operación sobre el recurso \texttt{carreras}}
+	\label{tabla:crud}
+\end{table}
+
+Dos casos de esa tabla merecen explicación.
+
+El alta devuelve 201 y no 200 porque el código dice algo que el cuerpo no dice: que existe un recurso nuevo. Conviene que la respuesta traiga además el encabezado \texttt{Location} apuntando a él, para que el cliente sepa dónde quedó sin tener que armar la ruta por su cuenta:
+
+\begin{lstlisting}[caption={Respuesta al alta de una carrera}]
+HTTP/1.1 201 Created
+Location: /api/carreras/12
+Content-Type: application/json
+
+{"idCarrera":12,"nombre":"Ingenieria en Inteligencia Artificial","clave":"IIA"}
+\end{lstlisting}
+
+El listado vacío es 200 y no 404. La colección \texttt{/api/carreras} existe siempre, aunque hoy no tenga elementos, y la respuesta correcta es un 200 con un arreglo vacío. El 404 queda reservado para cuando se pide un elemento concreto que no está. Es una distinción sutil que rompe a los clientes cuando se decide mal: quien recibe un 404 al pedir el listado no puede saber si la base está vacía o si escribió mal la ruta.
+
+%################################################
+\section{\color{colorIPN}{Los errores de elección más frecuentes}}
+
+Elegir mal el código no suele romper nada de inmediato, y por eso los errores sobreviven mucho tiempo. Estos cuatro son los que más se repiten.
+
+El primero es devolver 200 con un cuerpo que dice que hubo un error, algo del estilo \texttt{\{"exito": false, "mensaje": "no se encontro"\}}. Para todo lo que hay entre el cliente y el servidor esa respuesta es un éxito, así que una caché la puede guardar y servirla después a alguien más. El cliente queda obligado a leer y entender el cuerpo para saber qué pasó, que es justo lo que el código de estado existía para evitar.
+
+Tratar 401 y 403 como sinónimos es el segundo. Un 401 significa que el servidor no sabe quién está preguntando, y RFC 9110 exige que venga acompañado del encabezado \texttt{WWW-Authenticate} indicando cómo autenticarse \cite{rfc9110}. Un 403 significa lo contrario: el servidor sí sabe quién es y aun así no lo deja pasar. Mandar 403 a un usuario sin sesión lo deja sin enterarse de que lo que le falta es iniciarla.
+
+El tercero aparece cuando un error de validación termina saliendo como 500. El 500 afirma que el servidor falló, y eso desvía la atención hacia donde no está el problema. También manda la señal equivocada al cliente, que va a reintentar una petición condenada a fallar otra vez. Un campo obligatorio que llegó vacío es un 400.
+
+Queda el de contestar 404 con la ruta correcta y el método equivocado. Si \texttt{/api/carreras/7} responde a GET pero no a PATCH, la respuesta a un PATCH es 405, con el encabezado \texttt{Allow} listando los métodos que sí se aceptan. Con un 404 el cliente concluye que el recurso no existe, cuando el problema era otro.
+
+Conviene mencionar una excepción, porque parece un error y no lo es. Algunos servicios devuelven 404 en lugar de 403 a propósito, para no revelar que un recurso existe a quien no tiene permiso de verlo. Es una decisión de seguridad deliberada, y la diferencia con el descuido está en que se toma a conciencia y se documenta.
+
+%################################################
+\section{\color{colorIPN}{Qué cambia con HTTPS}}
+
+HTTPS no es un protocolo distinto. Es el mismo HTTP transportado sobre una conexión TLS, y RFC 9110 lo define exactamente así al describir el esquema de URI \texttt{https} \cite{rfc9110}. Los métodos son los mismos, los encabezados son los mismos y los códigos de respuesta son los mismos. Un 404 sobre HTTPS es el mismo 404.
+
+Lo que cambia está debajo. El puerto por omisión pasa de 80 a 443. Antes del primer byte de HTTP se realiza un saludo TLS en el que el servidor presenta un certificado firmado por una autoridad en la que el cliente confía, y las dos partes acuerdan las llaves con las que van a cifrar el resto de la conversación \cite{rfc8446}. A partir de ahí, cualquiera que observe la red ve tráfico cifrado en vez de texto: no puede leer las rutas, ni los encabezados, ni los cuerpos, ni las cookies, y tampoco puede modificarlos sin que se note.
+
+Lo que no cambia importa igual. TLS protege el tramo entre el cliente y el servidor, y nada más. No autentica al usuario, que sigue necesitando su propio mecanismo de sesión. No valida lo que llega, así que un cuerpo malicioso viaja cifrado con la misma comodidad que uno legítimo. No oculta con quién se está hablando, porque la dirección IP del servidor es visible y el nombre del sitio viaja en claro dentro del saludo TLS salvo que se active una extensión adicional que lo cifre. Y no dice nada sobre lo que ocurre una vez que los datos llegaron: si el servidor guarda contraseñas sin cifrar, el certificado no lo remedia.
+
+%################################################
+\section{\color{colorIPN}{Conclusión}}
+
+El código de estado va separado del cuerpo a propósito. Quien tiene que entenderlo no siempre entiende la aplicación: el cliente decide con él si continuar o reintentar, y una caché decide si guardar la respuesta o dejarla pasar de largo. Ninguno de los dos necesita abrir el JSON para eso.
+
+Por eso escogerlo mal cuesta más de lo que parece. Un 200 encima de un error convierte una falla en algo que las cachés van a repartir. Un 500 encima de un dato mal escrito manda a buscar el problema al lugar equivocado, y de paso invita al cliente a reintentar una petición que nunca va a pasar. Un 403 donde iba un 401 deja al usuario sin enterarse de que lo único que le faltaba era iniciar sesión. Y un 404 donde iba un 405 le hace creer que el recurso no existe. En los cuatro casos el sistema sigue de pie, que es justamente lo que permite que el error sobreviva años.
+
+Para las dudas del día a día basta con acertarle al primer dígito, que es el que reparte la responsabilidad entre el cliente y el servidor. El segundo y el tercero afinan el motivo, y para eso conviene tener a la mano el registro de la IANA \cite{iana_status}.
+
+\color{colorIPN}{
+	\begin{flushright}
+		\textit{
+			Angel Frausto Robles
+		}
+	\end{flushright} \hfill \break
+}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\nocite{*}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}

@@ -1,0 +1,335 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Investigación: el patrón de diseño Builder}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{Boleta: 2019630177}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Código}
+
+\lstset{
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+El nombre \enquote{Builder} señala dos cosas distintas en la literatura de Java, y confundirlas es la fuente más común de malentendidos sobre este patrón. La primera es la definición original del catálogo de Gamma, Helm, Johnson y Vlissides \cite{gamma1994}, donde Builder es un patrón creacional que separa el proceso de construir un objeto complejo de la representación final que produce. La segunda es la recomendación de Joshua Bloch para clases con demasiados parámetros de constructor \cite{bloch2018}, que es la que aparece en casi todo el código Java que dice usar builders, aunque su estructura y su motivación no son las del catálogo.
+
+Este documento cubre las dos. Empieza por la definición formal, sigue con el problema concreto que resuelve la variante de Bloch, muestra cómo se escribe una y otra, y termina con los casos donde la respuesta correcta es no usar el patrón. El ejemplo que recorre el texto es una clase \texttt{Carrera}, una entidad con pocos campos al principio y con varios opcionales después, que sirve para ver en qué momento el patrón empieza a valer la pena.
+
+Queda fuera la generación automática de builders con bibliotecas externas como Lombok, más allá de una mención en la sección de variantes, porque depende de una herramienta que se instala aparte y no del lenguaje ni de su biblioteca estándar.
+
+%################################################
+\section{\color{colorIPN}{Qué es el patrón Builder}}
+
+Gamma et al. lo clasifican entre los patrones creacionales, junto con Abstract Factory, Factory Method, Prototype y Singleton. El propósito, en su formulación original, es separar la construcción de un objeto complejo de su representación, de modo que el mismo proceso de construcción pueda producir representaciones distintas.
+
+La estructura tiene cuatro participantes. El Builder declara una interfaz con un método por cada parte que compone el producto. Cada ConcreteBuilder implementa esa interfaz y arma su propia versión del resultado. El Director conoce el orden en que hay que llamar esos métodos, pero no sabe qué tipo concreto está saliendo del otro lado. El Product es el objeto terminado.
+
+El ejemplo del libro es un conversor de documentos en formato RTF. El Director recorre el documento una sola vez, y según qué ConcreteBuilder reciba, ese mismo recorrido produce texto plano, TeX o un componente de interfaz gráfica. El proceso de lectura no cambia. Lo que cambia es quién responde a cada paso.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+		caja/.style={draw, colorIPN, thick, rounded corners, align=left, font=\scriptsize, inner sep=7pt},
+		flecha/.style={colorESCOM, thick, -{Latex[length=2mm]}},
+		herencia/.style={colorESCOM, thick, dashed, -{Latex[length=2mm]}}
+	]
+		\node[caja] (director) at (0,0) {
+			\textbf{Director}\\[2pt]
+			construir()
+		};
+		\node[caja] (builder) at (4.6,0) {
+			\textbf{Builder}\\[2pt]
+			construirParteA()\\
+			construirParteB()
+		};
+		\node[caja] (concreto) at (4.6,-2.6) {
+			\textbf{ConcreteBuilder}\\[2pt]
+			construirParteA()\\
+			construirParteB()\\
+			obtenerProducto()
+		};
+		\node[caja] (producto) at (9.6,-2.6) {
+			\textbf{Product}
+		};
+		\draw[flecha] (director.east) -- (builder.west)
+			node[midway, above, font=\scriptsize] {usa};
+		\draw[herencia] (concreto.north) -- (builder.south)
+			node[midway, right, font=\scriptsize] {implementa};
+		\draw[flecha] (concreto.east) -- (producto.west)
+			node[midway, above, font=\scriptsize] {crea};
+	\end{tikzpicture}
+	\caption{Los cuatro participantes del patrón Builder según el catálogo original}
+	\label{img:estructura-gof}
+\end{figure}
+
+La figura \ref{img:estructura-gof} deja ver por qué el Director importa en esta versión: es el único que sabe la secuencia, y al depender solo de la interfaz Builder puede repetir esa secuencia con cualquier implementación. Cambiar el formato de salida no implica tocar el recorrido.
+
+%################################################
+\section{\color{colorIPN}{Para qué sirve: el problema de los constructores telescópicos}}
+
+Una clase de tres atributos no necesita nada de esto. La clase \texttt{Carrera} con identificador, nombre y descripción se construye bien con un constructor normal, y agregarle un builder sería trabajo perdido. El problema empieza cuando la clase crece.
+
+Supóngase que la misma entidad termina con clave, nombre, descripción, número de semestres, créditos totales, modalidad y un indicador de si sigue vigente. Solo dos de esos campos son obligatorios. Los demás tienen valores razonables por defecto o pueden faltar. La salida tradicional es escribir un constructor por cada combinación útil, cada uno llamando al siguiente:
+
+\begin{lstlisting}[language=Java, caption={Constructores telescópicos: cada uno delega en el que tiene un parámetro más}]
+public Carrera(String clave, String nombre) {
+    this(clave, nombre, "");
+}
+
+public Carrera(String clave, String nombre, String descripcion) {
+    this(clave, nombre, descripcion, 9);
+}
+
+public Carrera(String clave, String nombre, String descripcion, int semestres) {
+    this(clave, nombre, descripcion, semestres, 450, true);
+}
+
+public Carrera(String clave, String nombre, String descripcion,
+               int semestres, int creditos, boolean vigente) {
+    this.clave = clave;
+    this.nombre = nombre;
+    this.descripcion = descripcion;
+    this.semestres = semestres;
+    this.creditos = creditos;
+    this.vigente = vigente;
+}
+\end{lstlisting}
+
+Compila y funciona, pero tiene dos defectos que se agravan conforme se agregan campos. El primero es de lectura: en la llamada \texttt{new Carrera("ISC", "Ingenieria en Sistemas", "Plan 2020", 9, 450, true)} no hay forma de saber qué significan el 9, el 450 y el \texttt{true} sin abrir la definición de la clase. El segundo es más serio, porque el compilador no ayuda: dos parámetros consecutivos del mismo tipo se pueden intercambiar por accidente y el programa compila igual. Escribir \texttt{new Carrera(nombre, clave)} en vez de \texttt{new Carrera(clave, nombre)} produce un objeto con los valores cruzados y ningún aviso hasta que alguien lo note en tiempo de ejecución.
+
+La otra salida conocida es el estilo JavaBean: un constructor vacío y un \texttt{set} por atributo. Se lee mucho mejor, porque cada valor queda etiquetado con el nombre del método. A cambio aparecen dos problemas nuevos. El objeto existe en un estado incompleto durante todo el tramo entre el constructor y la última llamada a un \texttt{set}, así que cualquier código que lo reciba a medio llenar lo va a tratar como si estuviera listo. Y como los \texttt{set} tienen que ser públicos para poder usarse desde fuera, la clase no puede ser inmutable. Bloch señala ambos costos al presentar la alternativa \cite{bloch2018}.
+
+El builder da lo que tienen las dos opciones sin lo que les sobra: las llamadas quedan etiquetadas como en el estilo JavaBean, y el objeto aparece completo en un solo momento, el de la llamada final, con lo cual puede ser inmutable.
+
+%################################################
+\section{\color{colorIPN}{Cómo se implementa}}
+
+La forma que describe Bloch usa una clase estática anidada dentro de la clase que se quiere construir. Los parámetros obligatorios entran por el constructor del builder, los opcionales por métodos que devuelven el propio builder, y un método final entrega el objeto terminado.
+
+\begin{lstlisting}[language=Java, caption={La clase \texttt{Carrera} con su builder anidado}]
+public class Carrera {
+
+    private final String clave;
+    private final String nombre;
+    private final String descripcion;
+    private final int semestres;
+    private final boolean vigente;
+
+    private Carrera(Builder builder) {
+        this.clave = builder.clave;
+        this.nombre = builder.nombre;
+        this.descripcion = builder.descripcion;
+        this.semestres = builder.semestres;
+        this.vigente = builder.vigente;
+    }
+
+    public static class Builder {
+
+        // obligatorios: van en el constructor del builder
+        private final String clave;
+        private final String nombre;
+
+        // opcionales: cada uno arranca con un valor por defecto
+        private String descripcion = "";
+        private int semestres = 9;
+        private boolean vigente = true;
+
+        public Builder(String clave, String nombre) {
+            this.clave = clave;
+            this.nombre = nombre;
+        }
+
+        public Builder descripcion(String descripcion) {
+            this.descripcion = descripcion;
+            return this;
+        }
+
+        public Builder semestres(int semestres) {
+            this.semestres = semestres;
+            return this;
+        }
+
+        public Builder vigente(boolean vigente) {
+            this.vigente = vigente;
+            return this;
+        }
+
+        public Carrera build() {
+            if (semestres <= 0) {
+                throw new IllegalArgumentException("Los semestres deben ser positivos");
+            }
+            return new Carrera(this);
+        }
+    }
+}
+\end{lstlisting}
+
+Del lado de quien la usa, la construcción queda así:
+
+\begin{lstlisting}[language=Java, caption={Uso del builder}]
+Carrera isc = new Carrera.Builder("ISC", "Ingenieria en Sistemas Computacionales")
+        .semestres(9)
+        .descripcion("Plan de estudios 2020")
+        .build();
+\end{lstlisting}
+
+Cuatro decisiones de ese código son las que hacen que el patrón funcione, y conviene no perderlas de vista al escribirlo.
+
+Cada método opcional termina con \texttt{return this}, y eso es todo lo que hace posible encadenar las llamadas. A ese estilo de encadenamiento se le llama interfaz fluida, y no es exclusivo del patrón, pero es lo que le da la legibilidad por la que se elige.
+
+El constructor de \texttt{Carrera} es privado y recibe el builder. Como es el único constructor que existe, no hay manera de crear una \texttt{Carrera} sin pasar por \texttt{build()}. Eso convierte al builder en la única puerta de entrada.
+
+Los campos del producto son \texttt{final}. Una vez que \texttt{build()} devuelve el objeto, nadie puede modificarlo, y por eso se puede compartir entre hilos o usar como llave de un mapa sin sobresaltos.
+
+La validación vive en \texttt{build()}, en un solo lugar, y ahí puede revisar invariantes que involucren a varios campos a la vez, algo que un \texttt{set} suelto no alcanza a comprobar porque solo ve el valor que le llega.
+
+%################################################
+\section{\color{colorIPN}{Las dos versiones, lado a lado}}
+
+Las dos cosas que se llaman Builder resuelven problemas diferentes con estructuras diferentes. La tabla \ref{tabla:comparacion} resume en qué se apartan.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{3.4cm} | p{4.6cm} | p{4.6cm}}\hline \hline
+		 & \textbf{Catálogo original (1994)} & \textbf{Variante de Bloch} \\ \hline \hline
+		Problema que ataca & El mismo proceso debe producir representaciones distintas & La clase tiene demasiados parámetros de constructor \\ \hline
+		Director & Existe y coordina los pasos & No existe; el orden lo decide quien llama \\ \hline
+		Interfaz Builder & Sí, con varias implementaciones & No; una sola clase anidada \\ \hline
+		Tipo del producto & Cambia según el ConcreteBuilder & Siempre el mismo \\ \hline
+		Resultado típico & Un documento o un árbol en varios formatos & Un objeto inmutable con muchos campos \\ \hline \hline
+	\end{tabular}
+	\caption{Diferencias entre la formulación original del patrón y la variante de uso común en Java}
+	\label{tabla:comparacion}
+\end{table}
+
+Vale la pena tener presente cuál se está usando al hablar del tema, porque muchos tutoriales presentan el código de Bloch bajo el diagrama del catálogo, con un Director que en ese código no aparece por ningún lado.
+
+%################################################
+\section{\color{colorIPN}{Dónde aparece en la biblioteca estándar}}
+
+El patrón no es una construcción de manual sin uso real. La propia biblioteca de Java lo aplica en varios lugares, y reconocerlos ayuda a ubicar cuándo tiene sentido escribir uno propio.
+
+\texttt{HttpRequest.newBuilder()}, del paquete \texttt{java.net.http} disponible desde Java 11, es la variante de Bloch casi textual: se encadenan la URI, el método, los encabezados y el tiempo de espera, y \texttt{build()} devuelve un \texttt{HttpRequest} inmutable \cite{oracle_httprequest}. \texttt{DateTimeFormatterBuilder} se acerca más al catálogo original, porque se le van agregando piezas de formato una por una y al final \texttt{toFormatter()} entrega el objeto armado. \texttt{Locale.Builder}, \texttt{Calendar.Builder} y \texttt{Stream.builder()} siguen la misma idea.
+
+\texttt{StringBuilder} merece un comentario aparte, porque se cita como ejemplo del patrón con más frecuencia de la que le corresponde. Comparte el encadenamiento de \texttt{append} y tiene un paso final que produce el resultado, que es \texttt{toString()}. No tiene Director, ni interfaz con varias implementaciones, ni produce representaciones alternativas. Es un acumulador mutable con interfaz fluida, que se parece al patrón en la forma de escribirlo pero no en su estructura.
+
+%################################################
+\section{\color{colorIPN}{Variantes y ajustes}}
+
+Un builder plano no obliga a nada en tiempo de compilación: quien lo use puede llamar \texttt{build()} antes de tiempo y enterarse del faltante hasta que se lance la excepción. Meter los campos obligatorios en el constructor del builder, como en el ejemplo de arriba, cubre buena parte del problema. Para los casos donde además importa el orden, existe el builder por etapas, que devuelve una interfaz distinta en cada paso, de manera que \texttt{build()} solo aparece como opción cuando ya se llenó todo lo necesario. Cuesta más clases y se justifica cuando el objeto es delicado de construir.
+
+Para jerarquías de clases, Bloch describe un builder abstracto con genéricos recursivos, del estilo \texttt{Builder<T extends Builder<T>{>}} más un método \texttt{self()}, para que los builders de las subclases puedan encadenar los métodos heredados sin perder el tipo concreto \cite{bloch2018}. Sin ese arreglo, encadenar un método del padre devuelve el tipo del padre y rompe el resto de la cadena.
+
+Otro ajuste frecuente en objetos inmutables es un método \texttt{toBuilder()}, que devuelve un builder ya cargado con los valores actuales del objeto. Sirve para producir copias modificadas sin escribir todos los campos otra vez.
+
+La anotación \texttt{@Builder} de Lombok genera todo este código en tiempo de compilación a partir de la clase. Ahorra la escritura, a cambio de una dependencia externa y de que el código que realmente se ejecuta no esté a la vista en el archivo fuente.
+
+%################################################
+\section{\color{colorIPN}{Cuándo no conviene usarlo}}
+
+El costo del patrón es visible: cada campo se declara dos veces, una en el producto y otra en el builder, y encima lleva un método propio. Una clase de dos o tres parámetros queda más clara con un constructor normal o con un método estático de fábrica. Bloch ubica el punto de equilibrio alrededor de cuatro parámetros, y advierte que conviene decidirlo al diseñar la clase, porque migrar de constructores a builder después implica tocar todas las llamadas existentes \cite{bloch2018}.
+
+Cada construcción crea además un objeto intermedio que se descarta enseguida. En la mayoría de los programas eso es irrelevante, pero en código muy sensible al rendimiento es un dato a considerar.
+
+Hay un caso más donde el patrón aporta poco: cuando el objeto va a ser mutable de todos modos. Buena parte del beneficio viene de poder cerrar el objeto al terminar de construirlo, y si de cualquier forma va a exponer métodos \texttt{set}, el builder agrega código sin resolver el problema que justifica su existencia.
+
+%################################################
+\section{\color{colorIPN}{Conclusión}}
+
+Builder resuelve dos problemas emparentados pero distintos. En su forma original aísla el proceso de construcción de la representación que produce, y ahí el Director es la pieza central. En la forma que se usa a diario en Java, sustituye un constructor con demasiados parámetros por una secuencia de llamadas con nombre, y su ganancia real es que el objeto nace completo y puede quedar inmutable.
+
+La decisión de usarlo depende de una cuenta bastante concreta: cuántos parámetros tiene la clase, cuántos de ellos son opcionales, y si el objeto debe poder cambiar después de creado. Con pocos campos y un objeto mutable, el patrón agrega trabajo sin devolver nada. Con muchos campos opcionales y un objeto que conviene congelar, ahorra los errores silenciosos que produce una lista larga de argumentos posicionales.
+
+\color{colorIPN}{
+	\begin{flushright}
+		\textit{
+			Angel Frausto Robles
+		}
+	\end{flushright} \hfill \break
+}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\nocite{*}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}
