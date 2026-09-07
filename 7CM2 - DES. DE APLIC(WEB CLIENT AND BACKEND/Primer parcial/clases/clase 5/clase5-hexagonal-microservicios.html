@@ -1,0 +1,1152 @@
+<title>Clase 5 · Hexagonal y Microservicios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDEFF0; --surface:#FFFFFF; --surface-2:#F5F8F8;
+    --text:#15181A; --text-muted:#58636A; --border:#D9DFE1;
+    --accent:#1F5D7A; --accent-soft:#E1EDF3; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --dominio:#9A6407; --dominio-soft:#F7EEDD;
+    --aplic:#4A5FA8; --aplic-soft:#E6E9F6;
+    --infra:#2E7D6B; --infra-soft:#E0F0EB;
+    --code-bg:#F0F3F3;
+    --shadow:0 1px 2px rgba(21,24,26,.06), 0 10px 26px -14px rgba(21,24,26,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1214; --surface:#181D1F; --surface-2:#1F2528;
+      --text:#E6EBEC; --text-muted:#9AA5AA; --border:#2C3438;
+      --accent:#7FB9D4; --accent-soft:#152B36; --accent-ink:#0F1214;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --dominio:#E0A94A; --dominio-soft:#302510;
+      --aplic:#94A5E4; --aplic-soft:#1D2238;
+      --infra:#59C4A9; --infra-soft:#122E28;
+      --code-bg:#141A1C;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1214; --surface:#181D1F; --surface-2:#1F2528;
+    --text:#E6EBEC; --text-muted:#9AA5AA; --border:#2C3438;
+    --accent:#7FB9D4; --accent-soft:#152B36; --accent-ink:#0F1214;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --dominio:#E0A94A; --dominio-soft:#302510;
+    --aplic:#94A5E4; --aplic-soft:#1D2238;
+    --infra:#59C4A9; --infra-soft:#122E28;
+    --code-bg:#141A1C;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+  pre .hl{background:var(--accent-soft); border-radius:3px; padding:1px 3px;}
+
+  /* --- las tres capas: el dispositivo estructural de la pagina --- */
+  .capa{border-left:3px solid var(--c); padding-left:16px;}
+  .capa.swap{border-left-style:dashed;}
+  .capa h2.sec{color:var(--c);}
+  .capabar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .capachip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .capachip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--c);}
+  .capachip.swap::before{background:none; border:2px dashed var(--c); height:10px;}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  /* --- resumen de arranque --- */
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.76rem; padding:7px 12px;
+    border-radius:8px; cursor:pointer; text-align:left;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+  .task pre{font-size:.74rem; background:var(--surface); margin:9px 0;}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:460px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:460px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+
+  .arbol{font-family:'IBM Plex Mono',monospace; font-size:.75rem; line-height:1.75;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:14px 16px; overflow-x:auto; margin:0 0 13px;}
+  .arbol .dom{color:var(--dominio); font-weight:600;}
+  .arbol .app{color:var(--aplic); font-weight:600;}
+  .arbol .inf{color:var(--infra); font-weight:600;}
+  .arbol .cm{color:var(--text-muted);}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Web Client · Clase 5 · lunes 7 de septiembre</p>
+    <h1>Hexagonal y Microservicios</h1>
+    <p class="lede">Con esta sesión se cierra la Unidad I. El profesor recapituló de la tabla a la clase, explicó <b>arquitectura hexagonal</b> primero en el pizarrón y luego con diapositivas, recorrió un proyecto real en el IDE, y terminó con microservicios y micro frontends.</p>
+    <p class="lede" style="margin-top:10px;">La página está organizada por las tres capas de la arquitectura, con el color de cada una en el riel izquierdo: <b style="color:var(--dominio)">ocre el Dominio</b>, <b style="color:var(--aplic)">índigo la Aplicación</b>, <b style="color:var(--infra)">verde la Infraestructura</b>. El riel de Infraestructura va punteado a propósito, porque es la única capa que la arquitectura considera desechable.</p>
+    <p class="lede" style="margin-top:10px;"><b style="color:var(--accent);">Los botones con <span style="font-family:'IBM Plex Mono',monospace;">?</span></b> explican los términos que dio por sabidos. Hay seis ejercicios intercalados y dos tareas nuevas.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="arranque">
+    <h2>Lo que salió de esta clase</h2>
+    <ol>
+      <li><span class="t">~44:00</span><span class="d"><b>Tarea:</b> investigación del patrón de diseño <b>Builder</b>. Las cuatro preguntas de siempre. <em>"Para algún día. Váyanlo trabajando."</em></span></li>
+      <li><span class="t">~46:20</span><span class="d"><b>Tarea:</b> <b>códigos de respuesta del protocolo HTTP</b>, para tenerlos a la mano. Sin fecha.</span></li>
+      <li><span class="t">00:30</span><span class="d"><b>Confirmado:</b> la réplica del minisitio de nuevo ingreso ya quedó entregada, y es con la que se va a trabajar.</span></li>
+      <li><span class="t">de clase 4</span><span class="d"><b>Sigue vivo:</b> el cambio de <code>PreparedStatement</code> a <code>CallableStatement</code>, que puso "para la próxima semana".</span></li>
+    </ol>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Repaso · minuto 02:45 a 05:30</p>
+      <h2 class="sec">De la tabla a la clase, y de ahí a Lombok</h2>
+      <p>Mientras iba por un adaptador para el proyector, recapituló en el pizarrón lo que ya habían construido, y de paso presentó la herramienta que borra todo ese código repetitivo.</p>
+    </div>
+
+    <p class="body">El punto de partida es el mismo de las clases anteriores: a partir de una tabla se escribe una clase equivalente a la entidad, con atributos privados, al menos un constructor, los <em>getters</em>, los <em>setters</em> y un <code>toString()</code>. Después vienen <code>equals()</code> y <code>hashCode()</code> si hacen falta.</p>
+
+    <p class="quote">"Cuando nosotros escribimos código o hacer esto, la verdad a veces como que <b>da hueva porque es muy repetitivo</b>, sí es cierto."</p>
+
+    <p class="body">De ahí saltó a la alternativa. La misma clase <code>Category</code> puede quedarse en tres atributos y nada más, si una dependencia de terceros genera el resto:</p>
+
+<pre><code>@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class Category {
+    private Long idCategory;
+    private String name;
+    private String description;
+}</code></pre>
+
+    <details class="dio"><summary>¿Qué es Lombok y qué hace cada anotación?</summary><div class="db">
+      <p><b>Lombok</b> es una biblioteca externa que se agrega al proyecto y genera código en tiempo de compilación. Tú escribes la anotación, y en el archivo <code>.class</code> aparecen los métodos completos aunque no estén en tu archivo fuente.</p>
+      <ul>
+        <li><code>@Getter</code> y <code>@Setter</code> generan un <em>get</em> y un <em>set</em> por atributo.</li>
+        <li><code>@Data</code> es el paquete completo: getters, setters, <code>toString()</code>, <code>equals()</code> y <code>hashCode()</code>.</li>
+        <li><code>@NoArgsConstructor</code> genera el constructor vacío, <code>@AllArgsConstructor</code> el que recibe todos los atributos.</li>
+        <li><code>@Builder</code> genera el patrón Builder para esa clase. De ahí salió la tarea de esta sesión.</li>
+      </ul>
+      <p>El costo es el que él mismo señaló al llamarla "dependencia de terceros": el código que de verdad se ejecuta no está a la vista en el archivo, y si alguien abre el proyecto sin el plugin de Lombok instalado, el IDE marca errores por todos lados.</p>
+    </div></details>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Contexto</span><span class="task-when">minuto 04:50</span></div>
+      <h3>Aquí nace la tarea del Builder</h3>
+      <p>La anotación <code>@Builder</code> que escribió en el pizarrón es la que después, al recorrer el código en el IDE, convirtió en tarea formal. La tienes completa más abajo, en el bloque del minuto 44:00.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 1 · minuto 05:30 a 15:30</p>
+      <h2 class="sec">Hexagonal, primero en el pizarrón</h2>
+      <p>Sin proyector todavía, explicó la arquitectura completa a mano. Esta primera pasada es la más clara de las dos, porque no tenía láminas de las cuales agarrarse.</p>
+    </div>
+
+    <p class="quote">"¿Y esa cosa en qué divide? Pues por definición divide en <b>Dominio</b>, en <b>Aplicación</b> y en <b>Infraestructura</b>. A final de cuentas siguen siendo tres capas. El detalle es que <b>cada capa tiene su chiste</b>."</p>
+
+    <p class="body">Son tres capas, como las que ya vieron, pero acomodadas de otra forma: en vez de apilarse una encima de otra, se anidan. El dominio queda al centro y no depende de nada. Todo lo que huela a tecnología queda por fuera, conectado con lo que él llamó <b>puertos</b> y <b>adaptadores</b>.</p>
+
+    <figure>
+      <svg viewBox="0 0 560 300" role="img" aria-label="Diagrama de la arquitectura hexagonal: tres hexágonos concéntricos, el Dominio al centro, la Aplicación alrededor y la Infraestructura afuera con borde punteado, más dos adaptadores conectados por puertos a los lados">
+        <polygon points="410,150 345,262.6 215,262.6 150,150 215,37.4 345,37.4"
+          fill="none" stroke-dasharray="6 4" style="stroke:var(--infra)" stroke-width="2"></polygon>
+        <polygon points="368,150 324,226.2 236,226.2 192,150 236,73.8 324,73.8"
+          fill="none" style="stroke:var(--aplic)" stroke-width="2"></polygon>
+        <polygon points="328,150 304,191.6 256,191.6 232,150 256,108.4 304,108.4"
+          style="fill:var(--dominio-soft); stroke:var(--dominio)" stroke-width="2"></polygon>
+
+        <text x="280" y="57" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5"
+          style="fill:var(--infra)">INFRAESTRUCTURA</text>
+        <text x="280" y="93" text-anchor="middle" font-family="IBM Plex Mono" font-size="9.5"
+          style="fill:var(--aplic)">APLICACIÓN</text>
+        <text x="280" y="154" text-anchor="middle" font-family="IBM Plex Mono" font-size="10"
+          font-weight="600" style="fill:var(--dominio)">DOMINIO</text>
+
+        <circle cx="192" cy="150" r="5" style="fill:var(--bg); stroke:var(--aplic)" stroke-width="2"></circle>
+        <circle cx="368" cy="150" r="5" style="fill:var(--bg); stroke:var(--aplic)" stroke-width="2"></circle>
+        <text x="192" y="136" text-anchor="middle" font-family="IBM Plex Mono" font-size="8"
+          style="fill:var(--aplic)">puerto</text>
+        <text x="368" y="136" text-anchor="middle" font-family="IBM Plex Mono" font-size="8"
+          style="fill:var(--aplic)">puerto</text>
+
+        <rect x="18" y="128" width="112" height="44" rx="7" fill="none"
+          style="stroke:var(--infra)" stroke-width="1.6"></rect>
+        <text x="74" y="147" text-anchor="middle" font-family="IBM Plex Sans" font-size="10"
+          font-weight="600" style="fill:var(--infra)">Controlador REST</text>
+        <text x="74" y="162" text-anchor="middle" font-family="IBM Plex Sans" font-size="8.5"
+          style="fill:var(--text-muted)">o GraphQL, o consola</text>
+        <line x1="130" y1="150" x2="187" y2="150" style="stroke:var(--infra)" stroke-width="1.6"></line>
+
+        <rect x="430" y="128" width="112" height="44" rx="7" fill="none"
+          style="stroke:var(--infra)" stroke-width="1.6"></rect>
+        <text x="486" y="147" text-anchor="middle" font-family="IBM Plex Sans" font-size="10"
+          font-weight="600" style="fill:var(--infra)">Adaptador JPA</text>
+        <text x="486" y="162" text-anchor="middle" font-family="IBM Plex Sans" font-size="8.5"
+          style="fill:var(--text-muted)">a MySQL, o a Postgres</text>
+        <line x1="373" y1="150" x2="430" y2="150" style="stroke:var(--infra)" stroke-width="1.6"></line>
+
+        <text x="280" y="288" text-anchor="middle" font-family="IBM Plex Sans" font-size="9"
+          style="fill:var(--text-muted)">Las flechas siempre apuntan hacia adentro. El centro no sabe qué hay afuera.</text>
+      </svg>
+      <figcaption>El borde punteado del hexágono exterior es el mismo código visual que usan los rieles de esta página: la infraestructura es la capa que se cambia. Los puertos son las interfaces por donde entra y sale todo, y los adaptadores de los lados son intercambiables sin tocar el centro.</figcaption>
+    </figure>
+
+    <details class="dio"><summary>Puerto y adaptador: los dos términos que sostienen todo</summary><div class="db">
+      <p>El nombre original del patrón es <b>Puertos y Adaptadores</b>, y describe mejor lo que hace que la palabra "hexagonal". El hexágono es solo la forma que se usó para dibujarlo.</p>
+      <p>Un <b>puerto</b> es una interfaz de Java: declara qué se puede hacer, sin decir cómo. <code>guardar(Category)</code>, <code>buscarPorId(Long)</code>. El dominio y la aplicación solo conocen esa interfaz.</p>
+      <p>Un <b>adaptador</b> es la clase que implementa ese puerto usando una tecnología concreta: un adaptador de JPA que habla con MySQL, otro de JDBC, otro que escribe en un archivo. Se enchufan y se desenchufan sin que el centro se entere.</p>
+      <p>La razón de que esto funcione es la <b>inversión de dependencias</b>: normalmente el código de arriba depende del de abajo, pero aquí la interfaz la declara el dominio y la implementa la infraestructura, así que la flecha de dependencia apunta al revés de lo que uno esperaría, hacia adentro.</p>
+    </div></details>
+
+    <h3 class="sub">Qué le toca a cada capa</h3>
+
+    <p class="body">En esa primera pasada dejó claro el reparto. El dominio lleva el objeto que se está modelando, sus reglas de validación y sus excepciones propias. La aplicación lleva los casos de uso. La infraestructura lleva todo lo que toca el mundo exterior.</p>
+
+    <p class="body">Sobre las reglas de negocio dio un ejemplo que vale la pena tener presente, porque distingue dos validaciones que se parecen y no son lo mismo: si ya existe una categoría llamada <em>Deportes</em>, no debería poder agregarse otra igual. La base de datos puede impedirlo con un <code>UNIQUE</code>, pero como el identificador es autonumérico, sin esa restricción se pueden tener cinco <em>Deportes</em> del 1 al 5 sin que nada truene.</p>
+
+    <p class="quote">"Si bien aquí validamos, eso no quiere decir que a lo mejor a nivel base de datos pues pongamos cláusulas <b>CHECK</b> para determinar que realmente sea una cadena, que sea de una longitud, que tenga un valor. Por ejemplo, si es un precio, <b>que no sea negativo</b>."</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 1</p>
+      <h3>¿En qué capa vive cada clase?</h3>
+      <p class="ask">Esta es la decisión que se toma cien veces al escribir un proyecto hexagonal, y la que más se equivoca al principio. <b>Ubica cada clase en su capa.</b> Todas salieron del proyecto que mostró en pantalla.</p>
+      <div class="qrows" id="q1"></div>
+      <div class="btnrow">
+        <button class="btn" id="q1go">Revisar</button>
+        <button class="btn ghost" id="q1rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q1fb"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 2 · minuto 19:00 a 27:00</p>
+      <h2 class="sec">Ya con proyector: por qué existe esta arquitectura</h2>
+      <p>Con las diapositivas arriba, retomó desde el problema. Antes de eso dejó una aclaración sobre el proyecto que conviene no perder.</p>
+    </div>
+
+    <p class="quote">"Todo lo que tenga que ver con cuestiones de arquitectura <b>es chamba de ustedes</b>. Es decir, agarran, se echan un volado y deciden cuál es la mejor arquitectura para su propuesta de desarrollo. Punto."</p>
+
+    <p class="body">Y remató con una honestidad que ordena todo lo que dijo después: la arquitectura que va a parecer la mejor es la que se esté explicando ese día.</p>
+
+    <p class="quote">"Hoy les estoy vendiendo Arquitectura Hexagonal. Obviamente para la tarea que ustedes hicieron, donde me están vendiendo arquitecturas limpias o arquitectura en cebolla, pues a lo mejor es arquitectura en cebolla. El día que tocó hablar de arquitectura en tres capas, pues obviamente <b>lo mejor fue la arquitectura en tres capas</b>."</p>
+
+    <p class="body">El problema que ataca es el <b>acoplamiento</b> de las arquitecturas en capas tradicionales. Cuando cada capa conoce directamente a la de abajo, y la de abajo está casada con una tecnología, cambiar el framework significa tocar prácticamente todo. Probar también se vuelve difícil, porque no hay forma de aislar una pieza sin arrastrar las demás.</p>
+
+    <p class="body">Citó al Tío Bob para enmarcar de qué se trata decidir una arquitectura:</p>
+
+    <p class="quote">"La arquitectura trata sobre <b>las decisiones que son difíciles de cambiar más adelante</b>. Una buena arquitectura no impide el cambio, simplemente lo permite."</p>
+
+    <details class="dio"><summary>¿Quiénes son el "Tío Bob" y Alistair Cockburn?</summary><div class="db">
+      <p><b>Robert C. Martin</b>, conocido como <em>Uncle Bob</em>, es el autor de <em>Clean Code</em> y <em>Clean Architecture</em>, y quien popularizó los principios SOLID. La arquitectura limpia que investigaron es suya.</p>
+      <p><b>Alistair Cockburn</b> es quien propuso el patrón original, en 2005, con el nombre <b>Puertos y Adaptadores</b>. Su formulación es la que citó en clase:</p>
+      <p><em>"Crea tu aplicación para que funcione sin interfaz de usuario, sin bases de datos, de tal forma que puedas ejecutar pruebas de lo que se les ocurra contra tu aplicación."</em></p>
+      <p>Esa frase es la prueba práctica de si la arquitectura está bien aplicada: si para correr una prueba del dominio necesitas levantar una base de datos, algo se filtró hacia adentro.</p>
+    </div></details>
+
+    <h3 class="sub">Digresión: el cable de la Plaza de la Computación</h3>
+
+    <p class="body">Para explicar qué es un adaptador se fue a un ejemplo del fin de semana. Fue a comprar un cargador y le ofrecieron un cable USB a USB con una pieza intercambiable: la levantabas y se volvía USB a USB-C, la quitabas del otro extremo y quedaba C a C.</p>
+
+    <p class="quote">"Entonces, ese es un adaptador. ¿Qué necesito? 'Ah, pues es que necesito conectar MySQL'. Está bien, <b>ponle el adaptador y san se acabó</b>."</p>
+
+    <p class="body">El segundo ejemplo es el de los contactos de pared de dos entradas cuando tu computadora trae tres patas: compras la piecita naranja y ya. En los dos casos el aparato no cambia, y el enchufe de la pared tampoco. Lo único que se agrega es la pieza de en medio.</p>
+
+    <h3 class="sub">Los principios que se persiguen</h3>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Principio</th><th>Qué significa aquí</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Bajo acoplamiento</td><td class="d">Cambiar una pieza no obliga a tocar las demás.</td></tr>
+        <tr><td class="sym">Alta cohesión</td><td class="d">Cada clase hace una cosa y todo lo suyo vive junto.</td></tr>
+        <tr><td class="sym">Independencia del dominio</td><td class="d">El centro no conoce base de datos, ni HTTP, ni framework.</td></tr>
+        <tr><td class="sym">Separación de responsabilidades</td><td class="d">Cada capa tiene un trabajo y no invade el de al lado.</td></tr>
+        <tr><td class="sym">Inversión de dependencias</td><td class="d">Se programa contra interfaces. <em>"Jugamos contra interfaces, nada más."</em></td></tr>
+        <tr><td class="sym">Facilidad de pruebas</td><td class="d">Se puede probar el centro sin levantar nada. JUnit, Mockito, ArchUnit.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="quote">"Regla: el dominio de negocio <b>jamás</b> debe depender de bases de datos, de interfaces de usuario, de nada."</p>
+
+    <details class="dio"><summary>JUnit, Mockito y ArchUnit: para qué sirve cada uno</summary><div class="db">
+      <p><b>JUnit</b> es la biblioteca estándar de pruebas de Java. Escribes métodos marcados con <code>@Test</code> que comprueban que tu código hace lo que debe.</p>
+      <p><b>Mockito</b> crea objetos falsos. Si tu servicio necesita un repositorio para funcionar, Mockito te da un repositorio de mentiras que devuelve lo que tú le digas, y así pruebas el servicio sin base de datos. Esto es exactamente lo que la arquitectura hexagonal vuelve fácil: como el servicio depende de una interfaz, se le puede pasar una implementación falsa.</p>
+      <p><b>ArchUnit</b> es el más curioso de los tres: prueba la arquitectura misma. Escribes una regla del estilo "ninguna clase del paquete <code>domain</code> puede importar nada de <code>infrastructure</code>" y falla la compilación si alguien la rompe. Es la forma de que la regla no dependa de que todos se acuerden.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="capabar"><span class="capachip" style="--c:var(--dominio)">capa de dominio</span></div>
+    <div class="capa" style="--c:var(--dominio)">
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3a · minuto 27:00 a 29:30</p>
+      <h2 class="sec">Dominio: la clase que no sabe nada del mundo</h2>
+      <p>El centro del hexágono. Aquí vive el objeto que se está modelando y sus reglas, y nada más.</p>
+    </div>
+
+    <p class="body">La descripción que dio del objeto de dominio es la misma definición de entidad que usaron al modelar la base de datos: aquella persona, idea o cosa con características propias que existe en el mundo real y que se puede distinguir de las demás. Lo importante es cómo se escribe:</p>
+
+    <p class="quote">"Es una clase Java pura con atributos privados a la clase, mutators, accessors, un <code>toString()</code>, un <code>equals()</code> y con sus respectivas reglas de negocio. Una clase Java completita, <b>sin decoradores</b> y sin más."</p>
+
+<pre><code><span class="cm">// domain/model/Category.java — sin una sola anotación</span>
+public class Category {
+
+    private Long idCategory;
+    private String name;
+    private String description;
+
+    public Category(Long idCategory, String name, String description) {
+        this.idCategory = idCategory;
+        this.name = name;
+        this.description = description;
+        validar();                    <span class="cm">// la regla de negocio vive aquí adentro</span>
+    }
+
+    private void validar() {
+        if (name == null || name.isBlank()) {
+            throw new CategoryException("El nombre de la categoría es obligatorio");
+        }
+    }
+    <span class="cm">// getters, toString(), equals()...</span>
+}</code></pre>
+
+    <p class="body">Junto a la clase van dos cosas más. La excepción propia del dominio, <code>CategoryException</code>, que él describió como una clase que solo recibe un mensaje y lo muestra, y que extiende de <code>RuntimeException</code>. Y los <b>puertos</b>: las interfaces que declaran qué se va a poder hacer, sin decir cómo.</p>
+
+    <details class="dio"><summary>¿Por qué <code>RuntimeException</code> y no una excepción normal?</summary><div class="db">
+      <p>Java tiene dos familias. Las <b>checked</b>, como <code>SQLException</code>, obligan a quien las llama a atraparlas o declararlas; el compilador no te deja ignorarlas. Las <b>unchecked</b>, que heredan de <code>RuntimeException</code>, no obligan a nada.</p>
+      <p>Para el dominio se elige la segunda a propósito. Si <code>CategoryException</code> fuera <em>checked</em>, cada capa que la atraviese tendría que declararla en su firma, y eso ensucia las interfaces de los casos de uso con detalles de errores. Siendo <em>unchecked</em>, sube sola hasta quien de verdad sabe qué hacer con ella, que en este proyecto es el manejador global de errores de la capa de infraestructura.</p>
+      <p>Es la misma lógica de la estafeta que explicó en la clase 4, solo que aquí ninguna capa intermedia tiene que firmar el pase.</p>
+    </div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="capabar"><span class="capachip" style="--c:var(--aplic)">capa de aplicación</span></div>
+    <div class="capa" style="--c:var(--aplic)">
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3b · minuto 29:30 a 31:00</p>
+      <h2 class="sec">Aplicación: una interfaz por cada caso de uso</h2>
+      <p>Aquí está la decisión que dispara el conteo de clases, y la razón por la que la dio.</p>
+    </div>
+
+    <p class="body">La capa de aplicación define los casos de uso: crear categoría, consultar, listar, actualizar, eliminar, cambiar el estado. Y la regla que puso es literal, no una aproximación:</p>
+
+    <p class="quote">"Esto de aquí implica que cada uno sea una clase, curiosamente. Específicamente <b>una interfaz</b>. Que exista uno por cada una de las acciones. ¿Por qué? Porque hay uno de los principios de lo que ya leyeron que dice que <b>cada cosa debería de tener solo una única responsabilidad</b>."</p>
+
+<pre><code><span class="cm">// application/usecase/CreateCategoryUseCase.java</span>
+public interface CreateCategoryUseCase {
+    Category createCategory(Category category);
+}
+
+<span class="cm">// ...y otra interfaz igual de pequeña para listar,</span>
+<span class="cm">// otra para buscar, otra para actualizar, otra para eliminar.</span></code></pre>
+
+    <p class="quote">"Entonces de arranque <b>un CRUD tiene cinco</b>. Aquí deberían de haber cinco de estas cosas."</p>
+
+    <details class="dio"><summary>El principio que citó: Single Responsibility</summary><div class="db">
+      <p>Es la <b>S</b> de SOLID, los cinco principios de diseño orientado a objetos. Dice que una clase debe tener una sola razón para cambiar.</p>
+      <p>Aplicado aquí: si <code>CategoryService</code> tuviera los cinco métodos del CRUD, cualquier cambio en las reglas de creación obligaría a recompilar y volver a probar una clase que también sabe borrar y listar. Separándolos, la interfaz de crear solo cambia cuando cambia la forma de crear.</p>
+      <p>La contra es evidente y él no la escondió: cinco archivos donde cabía uno. Es el mismo intercambio que aparece en toda la sesión, estructura contra volumen de código.</p>
+    </div></details>
+
+    <p class="body">Aquí también viven DTOs propios de la capa. Y sobre reutilizarlos entre capas fue tajante cuando alguien podría tener la tentación de ahorrarse clases:</p>
+
+    <p class="quote">"¿Puedo crear una clase con todos los atributos y lo reciclo? O sea, sí, pero <b>la arquitectura dice que no debe de ser</b>. Si no, estarían violando otra vez alguno que otro principio."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="capabar"><span class="capachip swap" style="--c:var(--infra)">capa de infraestructura · la desechable</span></div>
+    <div class="capa swap" style="--c:var(--infra)">
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3c · minuto 31:00 a 32:30</p>
+      <h2 class="sec">Infraestructura: aquí sí entra la tecnología</h2>
+      <p>Todo lo que el dominio no quiere conocer. Es la capa que se cambia sin miedo, y por eso su riel va punteado en toda esta página.</p>
+    </div>
+
+    <p class="body">Persistencia, llamadas a APIs externas, bases de datos, JDBC, JPA, controladores REST, interfaces por línea de comandos. Y la clase que representa la tabla, que aquí sí carga con todos los decoradores:</p>
+
+<pre><code><span class="cm">// infrastructure/persistence/CategoryEntity.java — la casada con la tecnología</span>
+@Entity
+@Table(name = "categories")
+@Data
+public class CategoryEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_categoria")
+    private Long idCategory;
+
+    private String name;
+    private String description;
+}</code></pre>
+
+    <p class="body">Cuando mostró esta clase en pantalla hizo la pregunta que resume el costo del patrón, y él mismo se contestó:</p>
+
+    <p class="quote">"¿Cuál es la diferencia entre ese y el objeto de dominio en términos de atributos definidos? <b>Ninguno.</b> Son los mismos atributos. La diferencia es que aquí ya tiene cosas específicas casadas con la tecnología."</p>
+
+    <p class="body">Dos clases con exactamente los mismos tres campos. Una limpia, otra anotada. Y como son dos, hace falta alguien que traduzca de una a otra: el <b>mapper</b>.</p>
+
+    <details class="dio"><summary>Mapper, MapStruct y ModelMapper</summary><div class="db">
+      <p>Un <b>mapper</b> convierte un objeto de dominio en uno de entidad y al revés. Hecho a mano es un método por dirección, con un <em>get</em> y un <em>set</em> por campo. Trabajo mecánico y fácil de olvidar cuando se agrega un atributo.</p>
+      <p><b>MapStruct</b>, que es el que usó en el proyecto, genera ese código al compilar a partir de una interfaz anotada. Tú escribes la firma, él escribe los <em>set</em>. <b>ModelMapper</b> hace lo mismo pero en tiempo de ejecución por reflexión, lo que lo hace más flexible y más lento.</p>
+      <p>Como dijo él: si no quieres mapper, "pues literalmente hay que escribir métodos para decir: pasar de DTO a entidad y pasar de entidad a DTO, y por cada <em>set</em> el <em>get</em> correspondiente".</p>
+    </div></details>
+
+    <p class="body">Del lado de entrada está el controlador REST, y con él un DTO más, distinto de los otros dos, que es donde se validan los datos que llegan del cliente:</p>
+
+<pre><code><span class="cm">// infrastructure/rest/dto/CreateCategoryRequestDto.java</span>
+public class CreateCategoryRequestDto {
+
+    @NotBlank(message = "El nombre de la categoría es obligatorio")
+    @Size(min = 4, max = 50,
+          message = "El nombre debe estar entre 4 y 50 caracteres")
+    private String name;
+
+    private String description;
+}</code></pre>
+
+    <details class="dio"><summary>Bean Validation: las anotaciones que revisan lo que llega</summary><div class="db">
+      <p>Es un estándar de Java, hoy llamado <b>Jakarta Validation</b>, que valida objetos de forma declarativa. En vez de escribir <em>ifs</em>, marcas el campo y el framework revisa antes de que tu código se ejecute.</p>
+      <ul>
+        <li><code>@NotNull</code> el campo no puede venir nulo.</li>
+        <li><code>@NotBlank</code> además no puede venir vacío ni con puros espacios.</li>
+        <li><code>@Size(min, max)</code> longitud permitida.</li>
+        <li><code>@Email</code> tiene forma de correo.</li>
+        <li><code>@Pattern</code> cumple una expresión regular.</li>
+      </ul>
+      <p>Ojo con la duplicidad que esto crea: la validación del nombre obligatorio está aquí <em>y</em> dentro de la clase de dominio. No es un error. La de aquí atrapa al cliente que manda basura y le devuelve un 400 con un mensaje claro; la del dominio garantiza que ningún camino, ni siquiera uno interno, cree un objeto inválido.</p>
+    </div></details>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 2</p>
+      <h3>¿Esa anotación va en esa clase?</h3>
+      <p class="ask">Las tres clases tienen los mismos campos y responsabilidades distintas, y eso se nota justo en qué anotaciones admite cada una. <b>Decide si cada anotación corresponde a la clase indicada.</b></p>
+      <div class="qrows" id="q2"></div>
+      <div class="btnrow">
+        <button class="btn" id="q2go">Revisar</button>
+        <button class="btn ghost" id="q2rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q2fb"></div>
+    </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 4 · minuto 32:30 a 37:35</p>
+      <h2 class="sec">La cuenta: 22 clases para un CRUD</h2>
+      <p>Aquí llegó la parte más útil de la sesión, porque puso números al costo en vez de solo vender las ventajas.</p>
+    </div>
+
+    <p class="body">Primero contó lo que costaría el mismo CRUD sin arquitectura hexagonal, en voz alta y sumando: un controlador, un servicio. Siendo decentes, la interfaz del servicio y su implementación, van tres. Un repositorio, cuatro. Si quieres ser purista, interfaz e implementación del repositorio, cinco. Más la clase de entidad, seis.</p>
+
+    <p class="body">Después contó las del proyecto hexagonal en pantalla, una por una, y el número final es el que hay que recordar:</p>
+
+    <p class="quote">"Entonces cuenten las clases: son 3, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19... y este que no está expandido que se me olvidó debe de tener como otras tres más. <b>Son como 22 clases.</b>"</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 3</p>
+      <h3>Pon los números y saca la conclusión</h3>
+      <p class="ask">Tres preguntas con las cifras que él mismo dio en clase. <b>La última es la que importa.</b></p>
+      <div class="qrows" id="q3"></div>
+      <div class="btnrow">
+        <button class="btn" id="q3go">Revisar</button>
+        <button class="btn ghost" id="q3rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q3fb"></div>
+    </div>
+
+    <h3 class="sub">El cambio de chip que cuesta más que las clases</h3>
+
+    <p class="body">Señaló que lo difícil no es escribir 22 archivos, sino desacostumbrarse a algo que ya tenían aprendido. En un ORM normal hay una tabla y una clase que le corresponde: un atributo aquí, un atributo allá, y listo. Si un campo es calculado, como la edad de un alumno, se marca con <code>@Transient</code> y JPA lo ignora.</p>
+
+    <p class="quote">"Pero aquí no, aquí es diferente. Tengo mi clase que representa la tabla <b>a nivel objeto de dominio</b>, a nivel conceptual; pero tengo mi clase que representa la tabla <b>para hacer el mapeo</b> entre tabla y objeto. Entonces tengo que hacer un mapeo justo entre mi objeto de dominio y mi objeto entidad."</p>
+
+    <p class="body">Sobre la dificultad general fue directo: la curva de aprendizaje existe, y lo que sigue después es aburrido en el buen sentido. <em>"Ah, no, pues sí, solo es crear un montón de clases y poner las cosas donde van."</em></p>
+
+    <h3 class="sub">Qué se toca al cambiar de tecnología, y qué no</h3>
+
+    <p class="body">Esta es la promesa del patrón, y la matizó bastante. Cambiar de MySQL a otro manejador no es gratis: hay que cambiar la dependencia del <code>pom.xml</code> para que traiga el driver correcto, y la cadena de conexión del <code>application.properties</code>, más usuario y contraseña si son distintos. El dialecto, en versiones recientes, ya lo detecta solo al obtener la conexión.</p>
+
+    <p class="quote">"<b>¿Qué cosa no va a cambiar nunca?</b> Ninguna clase del dominio va a cambiar. Ninguna clase que se encargue de determinar qué casos de uso va a implementar va a cambiar. El adaptador, para este caso JPA, pues tampoco, porque no es específico del SQL; trabaja a nivel objeto."</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 4</p>
+      <h3>Cambias MySQL por PostgreSQL: ¿qué archivos abres?</h3>
+      <p class="ask">El escenario exacto que planteó en clase. <b>Marca si cada archivo hay que tocarlo o no.</b> Es la prueba de si el patrón está cumpliendo lo que promete.</p>
+      <div class="qrows" id="q4"></div>
+      <div class="btnrow">
+        <button class="btn" id="q4go">Revisar</button>
+        <button class="btn ghost" id="q4rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q4fb"></div>
+    </div>
+
+    <p class="body">Y para el cambio del otro lado, de REST a GraphQL, la respuesta es todavía más limpia: se crea un adaptador nuevo y ya. El viejo se puede borrar o dejar, porque tener los dos no hace daño, solo significa que le estás dando soporte a otra tecnología más. <em>"Los casos de uso siempre son reutilizables."</em></p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 5 · minuto 37:35 a 42:20</p>
+      <h2 class="sec">cURL, porque el navegador solo sabe pedir</h2>
+      <p>Aprovechó para adelantar un tema de la unidad siguiente: las herramientas para probar servicios.</p>
+    </div>
+
+    <p class="body">Mencionó Insomnia, Postman y los clientes REST de los editores, y luego se fue a la más básica de todas por una razón medio en broma y medio en serio:</p>
+
+    <p class="quote">"Pero bueno, como buenos ingenieros que son... <b>las cosas se hacen a mano</b>. Escribiendo codiguito en consola para que les diga de groserías y bueno, vean cómo se corrige."</p>
+
+    <p class="body">La razón técnica de necesitar una herramienta aparte la puso como pregunta al grupo: en el navegador se puede ver un <code>GET</code>, porque escribir una dirección en la barra es justamente eso. Pero para un <code>POST</code> no hay forma de adjuntar el objeto sin escribir código o usar una herramienta.</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 5</p>
+      <h3>Arma el cURL que crea una categoría</h3>
+      <p class="ask">Es el mismo comando que mostró en pantalla, con la categoría "Cómputo" que usó de ejemplo. <b>Toca las piezas en orden.</b> Si te equivocas te aviso; toca una línea ya puesta para quitarla.</p>
+      <div class="built" id="built"><span class="ph">Aquí se va armando el comando…</span></div>
+      <div class="bank" id="bank"></div>
+      <div class="btnrow"><button class="btn ghost" id="bldRs">Reiniciar</button></div>
+      <div class="fb" id="bldFb"></div>
+    </div>
+
+    <details class="dio"><summary>Las banderas de cURL, una por una</summary><div class="db">
+      <ul>
+        <li><code>-X POST</code> el verbo HTTP. Sin esto, cURL manda un <code>GET</code>.</li>
+        <li><code>-H</code> agrega un encabezado. <code>Content-Type: application/json</code> le avisa al servidor que lo que va en el cuerpo es JSON, no un formulario.</li>
+        <li><code>-d</code> el cuerpo de la petición, o sea el objeto que mandas.</li>
+        <li><code>\</code> al final de línea es solo para partir el comando en varios renglones y que se lea mejor.</li>
+      </ul>
+      <p>Para el resto del CRUD se cambia el verbo: <code>-X PUT</code> para actualizar, <code>-X DELETE</code> para borrar (que no devuelve cuerpo, "nada más hace el brinco"), y sin <code>-X</code> para consultar.</p>
+    </div></details>
+
+    <p class="body">Mostró también qué debe pasar cuando algo sale mal: si manda un objeto sin nombre, la respuesta no es un error genérico sino <em>"Error de validación: nameCategory: el nombre de la categoría es obligatorio"</em>. Ese mensaje sale de las anotaciones del DTO de entrada.</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 6 · minuto 42:20 a 48:40</p>
+      <h2 class="sec">Recorrido por el proyecto, y las dos tareas</h2>
+      <p>Abrió el IDE y fue clase por clase. En el camino soltó las dos tareas de la sesión.</p>
+    </div>
+
+    <p class="body">Al ver el objeto de dominio confirmó lo que había dicho en el pizarrón: <em>"<code>Category</code> en el dominio <b>no tiene decoradores</b>, es una clase Java limpia, lo más limpia que se pueda"</em>. Los DTOs de creación, en cambio, sí los tienen.</p>
+
+    <p class="body">Un detalle práctico que explicó al pasar: en el puerto solo hay <code>guardar</code>, sin un <code>actualizar</code> aparte. La razón es que Hibernate resuelve las dos con el mismo método: si el objeto ya existe lo actualiza, si no lo crea. Por eso el puerto no necesita duplicar la operación.</p>
+
+    <p class="body">También apareció <code>Optional</code> al ver el caso de uso de buscar por identificador:</p>
+
+    <details class="dio"><summary><code>Optional</code>, <code>orElse</code> y <code>orElseThrow</code></summary><div class="db">
+      <p><code>Optional&lt;Category&gt;</code> es una caja que puede traer un objeto o venir vacía. Existe para que el método diga en su firma "esto puede no encontrar nada", en vez de devolver <code>null</code> y que el que llama se entere con un <code>NullPointerException</code>.</p>
+      <pre><code>Category existente = repositorio.buscarPorId(id)
+        .orElseThrow(() -> new CategoryException("No se encontró la categoría"));</code></pre>
+      <p><code>orElse(null)</code> devuelve un valor de respaldo si viene vacío. <code>orElseThrow(...)</code> lanza la excepción que le indiques. La segunda es la que usó en el servicio, y conecta directo con la <code>CategoryException</code> del dominio.</p>
+      <p>Esto responde además la pregunta que un compañero había hecho en la clase 4 sobre cómo saber qué se va a actualizar: primero se busca por id, y si no está, se lanza la excepción antes de intentar nada.</p>
+    </div></details>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Tarea 1</span><span class="task-when">minuto ~44:00</span></div>
+      <h3>Investigación: el patrón de diseño Builder</h3>
+      <p class="said">"Y ahí en la pizarra les puse un <code>@Builder</code>. <b>Tarea: ¿qué es, para qué sirve, con qué se come y cómo se adereza el patrón de diseño Builder?</b> Que es otro patrón curiosamente. ¿Para cuándo? <b>Para algún día. Váyanlo trabajando.</b>"</p>
+      <p><b>Formato.</b> Las mismas cuatro preguntas de siempre, iguales a las que pidió para DTO y DAO en la clase 3.</p>
+      <p><b>De dónde salió.</b> De la anotación <code>@Builder</code> de Lombok que escribió al recapitular al principio de la clase. Vale la pena que la investigación distinga las dos cosas que se llaman Builder: la del catálogo de patrones, con Director e interfaz, y la que popularizó Joshua Bloch para clases con muchos parámetros de constructor, que es la que Lombok genera.</p>
+      <p><b>Sin fecha.</b> "Para algún día" es literal. Aun así conviene no dejarla, porque las tareas sin fecha suelen aparecer juntas cuando sí la ponen.</p>
+    </div>
+
+    <p class="body">Siguió con el adaptador de persistencia, el repositorio de Spring Data y el mapper, y llegó al controlador. Ahí, al mostrar cómo se devuelve la respuesta con <code>ResponseEntity.status(HttpStatus.CREATED)</code>, dejó la segunda tarea.</p>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Tarea 2</span><span class="task-when">minuto ~46:20</span></div>
+      <h3>Códigos de respuesta del protocolo HTTP</h3>
+      <p class="said">"<b>Jefe de grupo, tarea:</b> no sé si ya se los pedí, si no pues ahí ténganlo a la mano: <b>códigos de respuesta del protocolo HTTP.</b> Se requieren, desafortunadamente."</p>
+      <p><b>Los que ya usó en clase</b>, y que sirven de arranque: <code>201 CREATED</code> al crear, <code>200 OK</code> al consultar, <code>204 NO CONTENT</code> al borrar, <code>400 BAD REQUEST</code> cuando la validación falla, <code>404 NOT FOUND</code> cuando no existe el registro, <code>500 INTERNAL SERVER ERROR</code> cuando truena del lado del servidor.</p>
+      <p><b>Por dónde va la cosa.</b> Los códigos se agrupan en familias por su primer dígito, y esa estructura es lo que conviene entender antes que memorizar la lista.</p>
+    </div>
+
+    <p class="body">Cerró el recorrido con el manejador global de errores, que es la pieza que traduce una excepción del dominio en un código HTTP:</p>
+
+    <details class="dio"><summary><code>@RestControllerAdvice</code>: el que decide qué ve el usuario</summary><div class="db">
+      <p>Es una clase que atrapa las excepciones que se escapan de cualquier controlador y decide con qué responder. Aquí se llama <code>GlobalExceptionHandler</code>, que es el nombre convencional.</p>
+      <p>Su trabajo es exactamente el que quedó pendiente en la clase 4, cuando dijo que el DAO lanza la excepción y "la capa de arriba" la trata. Esta <em>es</em> la capa de arriba en una aplicación web: recibe <code>CategoryException</code> y devuelve un 404 con un mensaje entendible, en lugar de un volcado de error.</p>
+      <p>Y es la razón práctica de que <code>CategoryException</code> extienda de <code>RuntimeException</code>: puede subir desde el dominio hasta aquí sin que ninguna capa intermedia la declare.</p>
+    </div></details>
+    </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Referencia · minuto 32:30</p>
+      <h2 class="sec">El árbol de paquetes completo</h2>
+      <p>La estructura que mostró en pantalla, con las tres capas marcadas con su color. Esta es la foto que dijo que tomaran.</p>
+    </div>
+
+    <div class="arbol">com.ejemplo.tienda
+└── category                        <span class="cm">← un paquete por feature</span>
+    │
+    ├── <span class="dom">domain</span>
+    │   ├── <span class="dom">model</span>/           Category.java
+    │   ├── <span class="dom">exception</span>/       CategoryException.java
+    │   └── <span class="dom">port</span>/            CategoryRepositoryPort.java
+    │
+    ├── <span class="app">application</span>
+    │   ├── <span class="app">usecase</span>/         CreateCategoryUseCase.java
+    │   │                     GetCategoryUseCase.java
+    │   │                     ListCategoriesUseCase.java
+    │   │                     UpdateCategoryUseCase.java
+    │   │                     DeleteCategoryUseCase.java
+    │   ├── <span class="app">service</span>/         CategoryService.java
+    │   └── <span class="app">dto</span>/             CategoryDto.java
+    │
+    └── <span class="inf">infrastructure</span>
+        ├── <span class="inf">persistence</span>/     CategoryEntity.java
+        │                     CategoryJpaRepository.java
+        │                     CategoryRepositoryAdapter.java
+        ├── <span class="inf">mapper</span>/          CategoryMapper.java
+        ├── <span class="inf">rest</span>/            CategoryController.java
+        │   └── <span class="inf">dto</span>/         CreateCategoryRequestDto.java
+        │                     UpdateCategoryRequestDto.java
+        │                     CategoryResponseDto.java
+        └── <span class="inf">config</span>/          BeanConfiguration.java
+                              GlobalExceptionHandler.java</div>
+
+    <p class="body">Y después de <code>category</code> viene <code>product</code> con la misma estructura completa, y <code>users</code> con la suya, y <code>clientes</code> si hay ventas. Esa repetición por <em>feature</em> es lo que hace crecer el proyecto.</p>
+
+    <p class="quote">"¿Un CRUD con hexagonal? Todas esas. Solo para un simple CRUD, así queda. <b>Tu proyecto, ¿qué tan complejo es para tener algo como eso? ¿Es muy simple? Agárrate un MVC y ya</b>, evítate de problemas."</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 7 · minuto 48:40 a 57:00</p>
+      <h2 class="sec">Microservicios, y por qué lo anterior no lo era</h2>
+      <p>Cambio de tema para cerrar la unidad. Arrancó deshaciendo una confusión.</p>
+    </div>
+
+    <p class="quote">"Lo que sí, y es un hecho: lo que estaba hace ratito por ahí <b>es un API, no es un microservicio</b>. Aclaremos el punto."</p>
+
+    <p class="body">La idea de fondo la puso en una frase: agarrar una aplicación grandota y trozarla en partes autosuficientes. Su ejemplo fue un sistema de facturación con las reglas del SAT, donde cada módulo (clientes, inventarios, facturación, compras) se convierte en una aplicación aparte, y a cada equipo le toca la suya.</p>
+
+    <p class="body">Con eso aparecen dos libertades que en un monolito no existen. Cada microservicio puede estar escrito en un lenguaje distinto, y cada uno puede tener su propia base de datos, incluso de tipos distintos: MySQL relacional, MongoDB documental, y lo que se ocupe.</p>
+
+    <p class="body">Pero también aparece un problema nuevo, y lo señaló con claridad:</p>
+
+    <p class="quote">"Ahí el reto es para el <b>DBA</b>. 'A ver, sí, pero la categoría está en MySQL y el producto está en Postgres. Agregué un producto, debe de pertenecer a esta categoría, entonces voy por los datos de la categoría que está en otra cosa'. Eso es chamba de garantizar cuestiones de <b>integridad</b>."</p>
+
+    <p class="body">Es el precio directo de partir la base de datos: la llave foránea que antes garantizaba el motor ahora hay que sostenerla a mano entre dos servidores distintos.</p>
+
+    <h3 class="sub">Las tres piezas mínimas</h3>
+
+    <p class="body">La respuesta a por qué el API de la primera mitad de la clase no era un microservicio está aquí. No basta con exponer un servicio: hace falta la infraestructura que los coordine.</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Pieza</th><th>Qué hace</th><th>Con qué, en Spring</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Discovery Server</td><td class="d">Cada servicio se registra al arrancar: "hola, soy yo, estoy vivo y hago esto". Así nadie necesita saber direcciones fijas.</td><td class="d">Eureka</td></tr>
+        <tr><td class="sym">API Gateway</td><td class="d">Recibe todas las peticiones de fuera y decide a qué servicio mandarlas. Es el único que da la cara.</td><td class="d">Spring Cloud Gateway</td></tr>
+        <tr><td class="sym">El microservicio</td><td class="d">La aplicación en sí, que escucha en algún puerto y se registra en el Discovery Server.</td><td class="d">Spring Boot</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">Y esas tres piezas son <b>tres proyectos distintos</b>, no tres clases ni tres paquetes. Ese es el salto de escala respecto a todo lo anterior de la clase.</p>
+
+    <details class="dio"><summary>Los patrones de microservicios que mencionó</summary><div class="db">
+      <p>Dijo que a los patrones de diseño que ya conocían hay que agregarles otros, específicos de esta arquitectura, clasificados por lo que resuelven:</p>
+      <ul>
+        <li><b>Descomposición por capacidad empresarial</b>: se parte según lo que hace el negocio. Gestión de clientes, gestión de proveedores.</li>
+        <li><b>Descomposición por dominio</b>, que es <b>Domain-Driven Design</b>. Se parte según los dominios del modelo, y ahí el dominio es justo lo que estuvo al centro del hexágono toda la clase.</li>
+        <li><b>De integración</b>: el API Gateway, y el <b>Backend for Frontend</b>, que es un gateway hecho a la medida de cada tipo de cliente (uno para la web, otro para el móvil).</li>
+        <li><b>De bases de datos</b>: una base por servicio, o una compartida. Preguntó cuál es la correcta y se contestó "sí a los dos, depende de ustedes".</li>
+        <li><b>De observabilidad</b>: métricas y trazabilidad, que es de las desventajas que listó.</li>
+      </ul>
+    </div></details>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 6</p>
+      <h3>¿API o microservicio?</h3>
+      <p class="ask">Cuatro preguntas de cierre sobre la distinción que le importaba dejar clara, y sobre lo que cuesta partir un sistema. <b>Elige una opción en cada una.</b></p>
+      <div class="qrows" id="q6"></div>
+      <div class="btnrow">
+        <button class="btn" id="q6go">Revisar</button>
+        <button class="btn ghost" id="q6rs">Reiniciar</button>
+      </div>
+      <div class="fb" id="q6fb"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Cierre · minuto 57:00 a 58:00</p>
+      <h2 class="sec">Micro frontends, y fin de la Unidad I</h2>
+      <p>El último minuto, ya sobre la hora.</p>
+    </div>
+
+    <p class="body">El mismo principio de partir en piezas aplica del lado del cliente. Se puede tener una aplicación donde el encabezado esté hecho en Vue, la barra lateral en React y el cuerpo en Angular, partido por funcionalidades o por dominios, con los mismos patrones.</p>
+
+    <p class="quote">"Señores, con esto terminamos, más la investigación que se echaron, <b>terminamos la primera unidad</b>."</p>
+
+    <p class="body">Vale la pena ver el arco completo de la unidad, porque las cinco clases cuentan una sola historia: se arrancó con el monolito y su problema de quedar amarrado a un stack, se pasó por contenedores y por las arquitecturas en capas, y se llegó aquí, a dos formas distintas de romper ese amarre. La hexagonal lo hace dentro de una sola aplicación, moviendo la tecnología a los bordes. Los microservicios lo hacen partiendo la aplicación en varias.</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Las tareas, juntas</h2>
+      <p>Las dos de esta clase más lo que sigue arrastrándose de la anterior. Se guardan en este navegador.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 3</div>
+    </div>
+
+    <div class="final" id="finalTasks"></div>
+
+    <p class="body" style="margin-top:18px;"><b>Cuál urge.</b> Ninguna de las dos nuevas trae fecha, pero el <code>CallableStatement</code> de la clase 4 sí la tenía, y sigue pendiente. Ese va primero.</p>
+
+    <p class="body">Con la Unidad I cerrada, lo que viene es la Unidad II, de APIs y servicios web. El adelanto de cURL de esta clase ya era parte de ese temario, así que la tarea de los códigos HTTP se va a necesitar pronto aunque no tenga fecha.</p>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- motor de quiz, reusado de la clase 4 ---------- */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt";
+          b.textContent=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click",function(){
+      var rows=root.children, right=0, answered=0;
+      Array.prototype.forEach.call(rows,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length
+        ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  var CAPAS=["Dominio","Aplicación","Infraestructura"];
+
+  /* ---------- 1. en que capa vive cada clase ---------- */
+  quiz("q1",[
+    {q:"Category.java<br><em>La clase con nombre y descripción, con su validación adentro</em>",
+     opts:CAPAS, ans:0,
+     why:"<b>Dominio.</b> Es el objeto que se está modelando, con sus reglas de negocio. Clase Java pura, sin una sola anotación."},
+    {q:"CategoryEntity.java<br><em>Lleva @Entity, @Table, @Id, @Column</em>",
+     opts:CAPAS, ans:2,
+     why:"<b>Infraestructura.</b> Tiene exactamente los mismos campos que la del dominio, pero está casada con JPA. Por eso son dos clases distintas y hace falta un mapper entre ellas."},
+    {q:"CreateCategoryUseCase.java<br><em>interface con un solo método: Category createCategory(Category c)</em>",
+     opts:CAPAS, ans:1,
+     why:"<b>Aplicación.</b> Un caso de uso, una interfaz. Es la regla que hace que un CRUD arranque con cinco de estas."},
+    {q:"CategoryException.java<br><em>extends RuntimeException, recibe un mensaje</em>",
+     opts:CAPAS, ans:0,
+     why:"<b>Dominio.</b> Lo dijo al buscarla en el IDE: <em>\"CategoryException está en el objeto de dominio\"</em>. Los errores propios del negocio pertenecen al negocio."},
+    {q:"CategoryController.java<br><em>Recibe las peticiones REST y devuelve ResponseEntity</em>",
+     opts:CAPAS, ans:2,
+     why:"<b>Infraestructura.</b> HTTP es una tecnología del mundo exterior. Es un adaptador de entrada, y cambiarlo por uno de GraphQL no debería tocar nada más."},
+    {q:"CategoryRepositoryPort.java<br><em>interface: guardar, buscarPorId, eliminar</em>",
+     opts:CAPAS, ans:0,
+     why:"<b>Dominio.</b> Esta es la parte que cuesta más al principio: el puerto lo <em>declara</em> el dominio y lo <em>implementa</em> la infraestructura. Eso es la inversión de dependencias, y es lo que hace que la flecha apunte hacia adentro."}
+  ],"q1go","q1rs","q1fb",
+  "<b>Las seis.</b> Fíjate en el patrón: si la clase menciona una tecnología concreta, va afuera. Si describe qué se puede hacer sin decir cómo, va en el centro. El caso difícil es el puerto, porque siendo una interfaz de persistencia uno la pondría en infraestructura, y va en el dominio.");
+
+  /* ---------- 2. decoradores ---------- */
+  quiz("q2",[
+    {q:"@Entity en <b>Category</b> (dominio)",
+     opts:["Va","No va"], ans:1,
+     why:"<b>No va.</b> Fue de lo que más repitió: <em>\"es una clase Java completita, sin decoradores\"</em>. Ponerle @Entity la ata a JPA y rompe la independencia del dominio."},
+    {q:"@Entity y @Table en <b>CategoryEntity</b> (infraestructura)",
+     opts:["Va","No va"], ans:0,
+     why:"<b>Va.</b> Esta clase existe justamente para representar la tabla. Aquí las anotaciones no estorban porque la capa entera es reemplazable."},
+    {q:"@NotBlank y @Size en <b>CreateCategoryRequestDto</b>",
+     opts:["Va","No va"], ans:0,
+     why:"<b>Va.</b> Es el DTO que recibe datos del cliente, y ahí es donde se validan antes de que entren al sistema. De ahí sale el mensaje de error que mostró con cURL."},
+    {q:"La validación del nombre obligatorio dentro de <b>Category</b> (dominio), aunque el DTO ya la tenga",
+     opts:["Va, aunque se repita","Sobra, ya está en el DTO"], ans:0,
+     why:"<b>Va.</b> No es duplicación por descuido. La del DTO protege contra el cliente y devuelve un 400 con mensaje. La del dominio garantiza que ningún camino, ni interno ni de otro adaptador, cree un objeto inválido."},
+    {q:"@GeneratedValue(strategy = IDENTITY) en <b>CategoryEntity</b>",
+     opts:["Va","No va"], ans:0,
+     why:"<b>Va.</b> Es la traducción a JPA del <code>AUTO_INCREMENT</code> que definieron en SQL. Como dijo: <em>\"esta cosa funciona a nivel de metadatos\"</em>."}
+  ],"q2go","q2rs","q2fb",
+  "<b>Las cinco.</b> La regla corta: entre más adentro, más limpia la clase. El dominio no admite ni una anotación; la infraestructura las lleva todas.");
+
+  /* ---------- 3. la cuenta ---------- */
+  quiz("q3",[
+    {q:"<em>Sin arquitectura hexagonal, ¿cuántas clases contó para el mismo CRUD?</em>",
+     opts:["2 o 3","5 o 6","10"], ans:1,
+     why:"<b>Cinco o seis.</b> Las fue sumando: controlador, servicio, interfaz del servicio, repositorio, interfaz del repositorio, y la entidad."},
+    {q:"<em>Con hexagonal, ¿cuántas contó en pantalla?</em>",
+     opts:["Unas 12","Unas 22","Más de 40"], ans:1,
+     why:"<b>Unas 22.</b> Las contó una por una en voz alta y agregó tres del paquete que se le olvidó expandir."},
+    {q:"<em>Entonces, ¿cuándo conviene usarla?</em>",
+     opts:["Siempre, es la más moderna","Depende de qué tan complejo sea el proyecto","Nunca para proyectos escolares"], ans:1,
+     why:"<b>Depende de la complejidad.</b> Su remate fue literal: <em>\"Tu proyecto, ¿qué tan complejo es para tener algo como eso? ¿Es muy simple? Agárrate un MVC y ya\"</em>. La arquitectura se elige, no se aplica por costumbre."}
+  ],"q3go","q3rs","q3fb",
+  "<b>Las tres.</b> Ese contraste de 6 contra 22 es lo más útil que dio en toda la sesión, porque es el argumento con el que vas a justificar tu decisión de arquitectura en el proyecto, en cualquiera de las dos direcciones.");
+
+  /* ---------- 4. cambiar de motor ---------- */
+  quiz("q4",[
+    {q:"pom.xml <em>(la dependencia del driver)</em>",
+     opts:["Se toca","No se toca"], ans:0,
+     why:"<b>Se toca.</b> El driver de MySQL no sirve para PostgreSQL. Hay que cambiar la dependencia para que traiga el correcto."},
+    {q:"application.properties <em>(la cadena de conexión)</em>",
+     opts:["Se toca","No se toca"], ans:0,
+     why:"<b>Se toca.</b> Cambia la URL, y si el usuario y la contraseña son distintos, también. Si el equipo acordó dejar el mismo nombre de base, usuario y contraseña, entonces solo la cadena."},
+    {q:"Category.java <em>(la clase de dominio)</em>",
+     opts:["Se toca","No se toca"], ans:1,
+     why:"<b>No se toca.</b> Es la promesa completa del patrón: <em>\"ninguna clase del dominio va a cambiar\"</em>. El dominio no sabe que existe una base de datos."},
+    {q:"Las cinco interfaces de casos de uso",
+     opts:["Se tocan","No se tocan"], ans:1,
+     why:"<b>No se tocan.</b> Describen qué hace el sistema, no con qué. <em>\"Los casos de uso siempre son reutilizables.\"</em>"},
+    {q:"CategoryRepositoryAdapter.java <em>(el adaptador de JPA)</em>",
+     opts:["Se toca","No se toca"], ans:1,
+     why:"<b>No se toca</b>, y esta es la que más sorprende. JPA trabaja a nivel objeto, no a nivel SQL: recibe un objeto y lo persiste. El que cambia es el driver que está por debajo, no el adaptador."},
+    {q:"El dialecto de Hibernate",
+     opts:["Hay que declararlo a mano","En versiones recientes lo detecta solo"], ans:1,
+     why:"<b>Lo detecta solo.</b> Su respuesta fue <em>\"sí y no\"</em>: se puede declarar, pero al obtener la conexión ya deduce si es Postgres, MySQL u Oracle."}
+  ],"q4go","q4rs","q4fb",
+  "<b>Las seis.</b> Se tocan dos archivos de configuración y ni una sola clase de Java. Ese es exactamente el resultado que la arquitectura promete, y por eso vale la pena pagar las 22 clases cuando el proyecto lo amerita.");
+
+  /* ---------- 5. armar el cURL ---------- */
+  var STEPS=[
+    "curl -X POST \\",
+    "  http://localhost:8080/api/categories \\",
+    "  -H \"Content-Type: application/json\" \\",
+    "  -d '{\"name\": \"Cómputo\",",
+    "       \"description\": \"Artículos de cómputo\"}'"
+  ];
+  var STEPWHY=[
+    "El comando y el verbo. Sin <code>-X</code>, cURL manda un <code>GET</code>, y aquí queremos crear.",
+    "La dirección del recurso. En plural y sin verbo en la ruta: el verbo ya va en <code>-X</code>.",
+    "El encabezado que avisa que el cuerpo viene en JSON. Sin esto el servidor no sabe cómo leerlo.",
+    "El cuerpo de la petición, con <code>-d</code>. Aquí empieza el objeto que se manda.",
+    "El resto del objeto. La respuesta va a devolver esto mismo más el <code>idCategory</code> que generó la base."
+  ];
+  var placed=[], bank=document.getElementById("bank"),
+      built=document.getElementById("built"), bldFb=document.getElementById("bldFb");
+
+  function shuffled(){
+    var idx=STEPS.map(function(_,i){return i;});
+    for(var i=idx.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), t=idx[i]; idx[i]=idx[j]; idx[j]=t;
+    }
+    return idx;
+  }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled().forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS[i].trim(); b.dataset.i=i;
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          if(placed.length===STEPS.length){
+            bldFb.className="fb show good";
+            bldFb.innerHTML="<b>Ese es el comando.</b> Para el resto del CRUD cambia el verbo y quita el cuerpo cuando no haga falta: <code>-X PUT</code> para actualizar, <code>-X DELETE</code> para borrar, y sin <code>-X</code> ni <code>-d</code> para consultar.";
+          } else {
+            bldFb.className="fb show good";
+            bldFb.innerHTML="<b>Va.</b> "+STEPWHY[i];
+          }
+        } else {
+          bldFb.className="fb show bad";
+          bldFb.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed.length===0
+              ? "Empieza por el comando y el verbo."
+              : "Antes va otra. Pista: "+STEPWHY[placed.length].replace(/<[^>]+>/g,""));
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando el comando…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){
+        placed=placed.slice(0,n); renderBuilt(); renderBank(); bldFb.className="fb";
+      });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){
+    placed=[]; renderBuilt(); renderBank(); bldFb.className="fb";
+  });
+  renderBuilt(); renderBank();
+
+  /* ---------- 6. API o microservicio ---------- */
+  quiz("q6",[
+    {q:"<em>El API REST de categorías que mostró en el IDE, ¿es un microservicio?</em>",
+     opts:["Sí","No"], ans:1,
+     why:"<b>No.</b> Abrió el tema justo con eso: <em>\"es un API, no es un microservicio\"</em>. Le faltan las piezas de coordinación."},
+    {q:"<em>¿Cuántos proyectos, como mínimo, para poder hablar de microservicios?</em>",
+     opts:["Uno","Dos","Tres"], ans:2,
+     why:"<b>Tres.</b> El Discovery Server, el API Gateway y el microservicio en sí. Proyectos distintos, no paquetes distintos."},
+    {q:"<em>¿Pueden dos microservicios usar bases de datos de motores distintos?</em>",
+     opts:["Sí, y hasta de tipos distintos","No, tienen que compartir motor"], ans:0,
+     why:"<b>Sí.</b> Puso el ejemplo de cuentas en MySQL, inventario en PostgreSQL y distribución en MongoDB. Relacional y no relacional conviviendo."},
+    {q:"<em>¿Cuál es el costo directo de partir la base de datos entre servicios?</em>",
+     opts:["Se vuelve más lento","Alguien tiene que garantizar la integridad a mano","Ya no se pueden hacer consultas"], ans:1,
+     why:"<b>La integridad queda a cargo del DBA.</b> Si la categoría vive en MySQL y el producto en PostgreSQL, la llave foránea que antes garantizaba el motor ahora hay que sostenerla entre dos servidores."}
+  ],"q6go","q6rs","q6fb",
+  "<b>Las cuatro.</b> La distinción que le importaba: exponer un servicio no es hacer microservicios. Lo que define la arquitectura es la infraestructura de coordinación, y esa es la que cuesta.");
+
+  /* ---------- checklist ---------- */
+  var FINAL=[
+    {id:"c5-builder", t:"Tarea 1 · Investigación: patrón de diseño Builder",
+     d:"Las cuatro preguntas de siempre. Salió de la anotación @Builder de Lombok. Sin fecha: \"para algún día, váyanlo trabajando\"."},
+    {id:"c5-http", t:"Tarea 2 · Códigos de respuesta del protocolo HTTP",
+     d:"Para tenerlos a la mano. Sin fecha, pero la Unidad II es de APIs y servicios, así que se van a necesitar pronto."},
+    {id:"c5-callable", t:"Arrastre de la clase 4 · PreparedStatement a CallableStatement",
+     d:"La única con fecha de las tres. Requiere crear antes los cinco stored procedures en MySQL."}
+  ];
+  var KEY="clase5-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var fh=document.getElementById("finalTasks"), bar=document.getElementById("bar"),
+      pc=document.getElementById("pcount");
+  FINAL.forEach(function(it){
+    var l=document.createElement("label"); l.className="ftask";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!st[it.id];
+    var b=document.createElement("div");
+    b.innerHTML='<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent=it.t;
+    b.querySelector(".td2").textContent=it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if(cb.checked) l.classList.add("done");
+    cb.addEventListener("change",function(){
+      st[it.id]=cb.checked; l.classList.toggle("done",cb.checked);
+      try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+  function refresh(){
+    var done=0, boxes=fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes,function(c){ if(c.checked) done++; });
+    pc.textContent=done+" / "+FINAL.length;
+    bar.style.width=Math.round(done/FINAL.length*100)+"%";
+  }
+  refresh();
+})();
+</script>

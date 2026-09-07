@@ -18,6 +18,7 @@ es un artifact de clase siguiendo este archivo**. El contenido de estudio por un
 | 2 | Contenedores/Docker, arquitectura N-capas y 3-capas | [`f5f6f4a5`](https://claude.ai/code/artifact/f5f6f4a5-5f80-4df8-a8d0-6ef6a6dd0d75) | **falta** | 12 pendientes (checklist en el artifact) |
 | 3 | Taller: clase `Carrera` desde UML, JavaBean, DTO, `Statement`/`PreparedStatement`/`CallableStatement`, CRUD en SQL, inicio de `CarreraDAO` | [`80cfa706`](https://claude.ai/code/artifact/80cfa706-6afe-4df4-96c8-669fe594f007) | **falta** (solo el código: [`clase 3/`](clase%203/)) | Lectura rápida Java · investigación DTO · investigación DAO · Lectura rápida JDBC · (repaso BD, no calificado) |
 | 4 | `CarreraDAO` completo en el pizarrón: los 5 métodos del CRUD, `Principal`, stored procedure MySQL | [`c88de2f6`](https://claude.ai/code/artifact/c88de2f6-f18f-44af-ba67-d4347ecd9ffa) | [`clase 4/clase4-crud-dao.html`](clase%204/clase4-crud-dao.html) | soft delete · reporte "Lectura rápida JDBC" · GUI de escritorio · `PreparedStatement`→`CallableStatement` (**con fecha: próxima semana**) · subir datos al Excel del curso externo |
+| 5 | Arquitectura hexagonal (puertos y adaptadores) y microservicios · **cierra la Unidad I** | [`bbce12dc`](https://claude.ai/code/artifact/bbce12dc-3214-4224-ac48-861fcf209233) | [`clase 5/clase5-hexagonal-microservicios.html`](clase%205/clase5-hexagonal-microservicios.html) | investigación patrón Builder · códigos de respuesta HTTP (las dos **sin fecha**) |
 
 **Pendiente de mantenimiento**: bajar la copia local de las clases 1–3 (`Artifact` con `action:"read"`
 sobre cada URL, guardar como `clase N/claseN-tema.html`). La regla del curso es que el material vive
@@ -130,7 +131,7 @@ Antes de escribir el HTML, cargar la skill `artifact-design`.
 ## Publicar y versionar
 
 - **Publicar como Artifact.** Título `Clase N · <tema corto>`. Favicon estable por clase
-  (1 🔍 · 2 📦 · 3 🗃️ · 4 🖍️); en un redeploy se omite el favicon para no cambiarlo.
+  (1 🔍 · 2 📦 · 3 🗃️ · 4 🖍️ · 5 🔌); en un redeploy se omite el favicon para no cambiarlo.
 - **Actualizar un artifact existente**: pasar su URL de la tabla de arriba como `url`, o republicar
   el mismo `file_path`. Publicar sin `url` crea un artifact aparte — recuperar la URL, no anunciar
   un link nuevo.
