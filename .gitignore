@@ -22,3 +22,6 @@ __MACOSX/
 *.run.xml
 *.synctex.gz
 *.toc
+
+# Compilados de Java (practicas de 7CM2/7CM4)
+*.class

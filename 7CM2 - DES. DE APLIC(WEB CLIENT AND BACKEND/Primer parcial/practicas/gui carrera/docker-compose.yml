@@ -1,0 +1,12 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-carrera
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: tu_password
+      MYSQL_DATABASE: MisCursos
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d
