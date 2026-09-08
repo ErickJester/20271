@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Los 14 principios de la administración · Introducción</title>
+<style>
+/*FONTS*/
+/*LOGOS*/
+
+/* Paleta tomada del PPTX de referencia */
+:root{
+  --navy:   #3d5e89;
+  --azul:   #d4e1f6;
+  --hueso:  #f6f8fa;
+  --blanco: #ffffff;
+  --navy-50:rgba(61,94,137,.55);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+@page{ size: 13.333in 7.5in; margin:0; }
+
+body{
+  font-family:'Raleway', 'Segoe UI', Arial, sans-serif;
+  color:var(--navy);
+  background:var(--hueso);
+}
+
+.slide{
+  width:13.333in;
+  height:7.5in;
+  position:relative;
+  overflow:hidden;
+  background:var(--hueso);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:0.72in 0.95in;
+}
+.slide + .slide{ page-break-before:always; }
+.slide.azul{ background:var(--azul); }
+
+/* capa decorativa de manchas */
+.deco{ position:absolute; inset:0; width:100%; height:100%; z-index:0; }
+.slide > *:not(.deco){ position:relative; z-index:1; }
+
+/* ---------- tipografia ---------- */
+h1, h2, .pill{
+  font-family:'LeagueSpartan', 'Segoe UI', Arial, sans-serif;
+  font-weight:700;
+  color:var(--navy);
+  letter-spacing:-.005em;
+}
+
+h1{ font-size:47pt; line-height:1.1; text-transform:uppercase; }
+h2{ font-size:33pt; line-height:1.12; }
+
+.pill{
+  display:inline-block;
+  background:var(--blanco);
+  border-radius:999px;
+  padding:.13in .46in .19in;
+  font-size:33pt;
+  line-height:1.1;
+}
+
+p{ font-size:15.5pt; line-height:1.62; }
+.justo{ text-align:justify; }
+.lead{ font-size:17pt; }
+
+.kicker{
+  font-family:'Raleway'; font-weight:700;
+  font-size:11pt; letter-spacing:.19em; text-transform:uppercase;
+  color:var(--navy-50); margin-bottom:.16in;
+}
+
+/* ---------- portada ---------- */
+.portada{ align-items:center; text-align:center; }
+.portada h1{ max-width:10.2in; }
+.portada .sub{
+  font-family:'LeagueSpartan', sans-serif; font-weight:700;
+  font-size:19pt; color:var(--navy); opacity:.8; margin-top:.24in;
+}
+.portada .firma{
+  margin-top:.5in;
+  background:var(--blanco); border-radius:999px;
+  padding:.16in .5in;
+  font-size:13pt; font-weight:700; letter-spacing:.03em;
+}
+.portada .escudos{
+  position:absolute; top:.5in; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:.34in; z-index:1;
+}
+.portada .escudos div{ background-repeat:no-repeat; background-position:center; background-size:contain; }
+.portada .logo-ipn{   width:.56in; height:.6in; }
+.portada .logo-escom{ width:.72in; height:.48in; }
+
+/* ---------- rejillas ---------- */
+.split{ display:flex; gap:.7in; align-items:flex-start; }
+.split .izq{ flex:0 0 4.1in; }
+.split .der{ flex:1; }
+
+.cols{ display:flex; gap:.6in; margin-top:.24in; }
+.cols > div{ flex:1; }
+.cols h3{
+  font-family:'LeagueSpartan', sans-serif; font-weight:700;
+  font-size:17pt; margin-bottom:.08in;
+}
+.cols p{ font-size:14pt; line-height:1.5; }
+
+/* ---------- graficos ---------- */
+figure{ margin:.22in 0 .1in; }
+figure svg{ width:100%; height:auto; display:block; }
+.svg-h{ font-family:'LeagueSpartan', sans-serif; font-weight:700; }
+.svg-b{ font-family:'Raleway', sans-serif; }
+.svg-bb{ font-family:'Raleway', sans-serif; font-weight:700; }
+
+/* ---------- tarjeta blanca ---------- */
+.tarjeta{
+  background:var(--blanco);
+  border-radius:.18in;
+  padding:.24in .32in;
+  margin-top:.22in;
+  font-size:15pt; line-height:1.55;
+}
+.tarjeta strong{ font-weight:700; }
+
+/* ---------- cita ---------- */
+.cita{
+  font-family:'LeagueSpartan', sans-serif; font-weight:700;
+  font-size:23pt; line-height:1.28;
+  background:var(--blanco);
+  border-radius:.18in;
+  padding:.26in .34in;
+}
+.cita .quien{
+  display:block; margin-top:.13in;
+  font-family:'Raleway', sans-serif; font-weight:700;
+  font-size:11pt; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--navy-50);
+}
+
+/* ---------- los catorce ---------- */
+.catorce{ display:flex; gap:.09in; margin:.26in 0 .1in; }
+.catorce > div{
+  flex:1; text-align:center; padding:.15in 0;
+  background:var(--blanco); border-radius:.09in;
+  font-family:'LeagueSpartan', sans-serif; font-weight:700;
+  font-size:15pt; color:var(--navy);
+}
+
+/* ---------- lista de la transicion ---------- */
+.lista{ list-style:none; margin-top:.24in; }
+.lista li{
+  font-family:'LeagueSpartan', sans-serif; font-weight:700;
+  font-size:22pt; line-height:1.1;
+  background:var(--blanco); border-radius:999px;
+  padding:.15in .42in; margin-bottom:.15in;
+  display:inline-block;
+}
+.lista li span{ color:var(--navy-50); margin-right:.16in; }
+
+/* ---------- pie ---------- */
+.folio{
+  position:absolute; right:.7in; bottom:.5in; z-index:1;
+  font-family:'LeagueSpartan', sans-serif; font-weight:700;
+  font-size:12pt; color:var(--navy); opacity:.45;
+}
+</style>
+</head>
+<body>
+
+<!-- ============ 1 · portada ============ -->
+<section class="slide azul portada">
+  <svg class="deco" viewBox="0 0 1280 720">
+    <circle cx="105" cy="35" r="245" fill="#3d5e89"/>
+    <path d="M0,250 C70,238 128,268 132,318 C136,372 92,398 40,392 C14,389 0,380 0,362 Z" fill="#f6f8fa"/>
+    <circle cx="1180" cy="695" r="235" fill="#3d5e89"/>
+    <path d="M1280,262 C1210,272 1160,318 1178,372 C1194,420 1258,432 1280,420 Z" fill="#f6f8fa"/>
+  </svg>
+
+  <div class="escudos">
+    <div class="logo-ipn"></div>
+    <div class="logo-escom"></div>
+  </div>
+
+  <h1>14 principios de la administración y cómo se aplican en la empresa</h1>
+  <div class="sub">Punto 1 · Introducción</div>
+  <div class="firma">ÁNGEL FRAUSTO ROBLES · 8CM1 · GESTIÓN EMPRESARIAL</div>
+</section>
+
+<!-- ============ 2 · que es administrar ============ -->
+<section class="slide azul">
+  <svg class="deco" viewBox="0 0 1280 720">
+    <circle cx="1248" cy="-28" r="168" fill="#3d5e89"/>
+  </svg>
+
+  <div><span class="pill">Qué es la administración</span></div>
+
+  <p class="lead" style="margin-top:.22in; max-width:10.4in;">
+    Fayol define administrar con cinco verbos. La definición es de 1916 y los libros de administración
+    que se usan actualmente conservan ese mismo ordenamiento.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 1180 218" role="img"
+         aria-label="Los cinco elementos del proceso administrativo encadenados, con el control realimentando la previsión">
+      <defs>
+        <marker id="fn" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#3d5e89"/>
+        </marker>
+      </defs>
+
+      <g fill="#ffffff">
+        <rect x="6"   y="14" width="206" height="92" rx="14"/>
+        <rect x="248" y="14" width="206" height="92" rx="14"/>
+        <rect x="490" y="14" width="206" height="92" rx="14"/>
+        <rect x="732" y="14" width="206" height="92" rx="14"/>
+        <rect x="974" y="14" width="200" height="92" rx="14"/>
+      </g>
+
+      <g class="svg-h" text-anchor="middle" font-size="27" fill="#3d5e89">
+        <text x="109"  y="56">Prever</text>
+        <text x="351"  y="56">Organizar</text>
+        <text x="593"  y="56">Dirigir</text>
+        <text x="835"  y="56">Coordinar</text>
+        <text x="1074" y="56">Controlar</text>
+      </g>
+      <g class="svg-b" text-anchor="middle" font-size="16" fill="#3d5e89" opacity=".72">
+        <text x="109"  y="85">Trazar el plan</text>
+        <text x="351"  y="85">Dotar de recursos</text>
+        <text x="593"  y="85">Hacer funcionar</text>
+        <text x="835"  y="85">Armonizar</text>
+        <text x="1074" y="85">Verificar</text>
+      </g>
+
+      <g stroke="#3d5e89" stroke-width="2.6" fill="none" marker-end="url(#fn)">
+        <path d="M214,60 L242,60"/>
+        <path d="M456,60 L484,60"/>
+        <path d="M698,60 L726,60"/>
+        <path d="M940,60 L968,60"/>
+      </g>
+
+      <path d="M1074,106 L1074,160 L109,160 L109,112"
+            stroke="#3d5e89" stroke-width="2.6" fill="none"
+            stroke-dasharray="8 6" marker-end="url(#fn)"/>
+      <text class="svg-bb" x="591" y="185" text-anchor="middle" font-size="15"
+            letter-spacing="1.6" fill="#3d5e89" opacity=".7">
+        EL CONTROL REALIMENTA LA PREVISIÓN
+      </text>
+    </svg>
+  </figure>
+
+  <div class="tarjeta">
+    Robbins y Coulter lo formulan en términos actuales: coordinar y supervisar el trabajo de otras
+    personas para que se realice con <strong>eficiencia</strong>, esto es, con uso adecuado de los
+    recursos, y con <strong>eficacia</strong>, esto es, con cumplimiento de la meta.
+  </div>
+
+  <div class="folio">02</div>
+</section>
+
+<!-- ============ 3 · quien fue fayol ============ -->
+<section class="slide">
+  <svg class="deco" viewBox="0 0 1280 720">
+    <circle cx="-30" cy="762" r="176" fill="#3d5e89"/>
+    <path d="M1280,0 L1082,0 C1064,58 1094,112 1136,142 C1178,172 1188,224 1156,262 C1218,272 1280,228 1280,148 Z" fill="#d4e1f6"/>
+  </svg>
+
+  <div class="kicker">Quién fue Henri Fayol</div>
+  <h2>El libro sale de adentro de<br>treinta años de dirección</h2>
+
+  <figure>
+    <svg viewBox="0 0 1180 268" role="img"
+         aria-label="Línea de vida de Henri Fayol de 1841 a 1925, con la etapa de dirección general de 1888 a 1918 y la publicación del libro en 1916 dentro de esa etapa">
+      <line x1="46" y1="146" x2="1134" y2="146" stroke="#3d5e89" stroke-width="3" opacity=".28"/>
+
+      <rect x="654" y="126" width="388" height="40" rx="20" fill="#3d5e89"/>
+      <text class="svg-bb" x="820" y="152" text-anchor="middle" font-size="15"
+            letter-spacing="1.5" fill="#ffffff">DIRECCIÓN GENERAL · 30 AÑOS</text>
+
+      <line x1="1016" y1="136" x2="1016" y2="88" stroke="#3d5e89" stroke-width="2"/>
+      <circle cx="1016" cy="146" r="10" fill="#ffffff" stroke="#3d5e89" stroke-width="3"/>
+      <text class="svg-h" x="1016" y="74"  text-anchor="middle" font-size="20" fill="#3d5e89">1916</text>
+      <text class="svg-b" x="1016" y="50"  text-anchor="middle" font-size="17" fill="#3d5e89">Publica el libro</text>
+
+      <g stroke="#3d5e89" stroke-width="2" opacity=".55">
+        <line x1="46"   y1="146" x2="46"   y2="180"/>
+        <line x1="292"  y1="146" x2="292"  y2="180"/>
+        <line x1="654"  y1="166" x2="654"  y2="180"/>
+        <line x1="1042" y1="166" x2="1042" y2="180"/>
+        <line x1="1134" y1="146" x2="1134" y2="180"/>
+      </g>
+      <g class="svg-h" font-size="20" fill="#3d5e89">
+        <text x="46"   y="208" text-anchor="start">1841</text>
+        <text x="292"  y="208" text-anchor="middle">1860</text>
+        <text x="654"  y="208" text-anchor="middle">1888</text>
+        <text x="1042" y="208" text-anchor="middle">1918</text>
+        <text x="1134" y="208" text-anchor="end">1925</text>
+      </g>
+      <g class="svg-b" font-size="15" fill="#3d5e89" opacity=".78">
+        <text x="46"   y="234" text-anchor="start">Nace en Francia</text>
+        <text x="292"  y="234" text-anchor="middle">Egresa de la Escuela de Minas</text>
+        <text x="292"  y="254" text-anchor="middle">de Saint-Étienne, a los 19 años</text>
+        <text x="654"  y="234" text-anchor="middle">Toma la dirección de una</text>
+        <text x="654"  y="254" text-anchor="middle">empresa minera en quiebra</text>
+        <text x="1042" y="234" text-anchor="middle">Se retira con la</text>
+        <text x="1042" y="254" text-anchor="middle">empresa recuperada</text>
+      </g>
+    </svg>
+  </figure>
+
+  <div class="tarjeta" style="background:var(--azul);">
+    El libro se publicó en 1916, cuando Fayol tenía 75 años y concluía su carrera directiva. Los
+    catorce principios proceden de esos treinta años al frente de la empresa.
+  </div>
+
+  <div class="folio">03</div>
+</section>
+
+<!-- ============ 4 · las seis funciones ============ -->
+<section class="slide azul">
+  <svg class="deco" viewBox="0 0 1280 720">
+    <path d="M1280,720 L1280,470 C1214,462 1150,500 1136,556 C1122,612 1064,636 1010,626 C1000,676 1046,720 1116,720 Z" fill="#3d5e89"/>
+  </svg>
+
+  <div class="kicker">Por qué los escribe</div>
+  <h2>Seis funciones en toda empresa,<br>y solo una sin doctrina</h2>
+
+  <figure>
+    <svg viewBox="0 0 1180 300" role="img"
+         aria-label="Las seis funciones de la empresa según Fayol, con la administrativa resaltada, de la que se desprenden los cinco elementos y los catorce principios">
+      <defs>
+        <marker id="fn2" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#3d5e89"/>
+        </marker>
+      </defs>
+
+      <g fill="#ffffff" opacity=".62">
+        <rect x="6"   y="8" width="176" height="70" rx="13"/>
+        <rect x="204" y="8" width="176" height="70" rx="13"/>
+        <rect x="402" y="8" width="176" height="70" rx="13"/>
+        <rect x="600" y="8" width="176" height="70" rx="13"/>
+        <rect x="798" y="8" width="176" height="70" rx="13"/>
+      </g>
+      <g class="svg-b" text-anchor="middle" font-size="19" fill="#3d5e89" opacity=".62">
+        <text x="94"  y="50">Técnicas</text>
+        <text x="292" y="50">Comerciales</text>
+        <text x="490" y="50">Financieras</text>
+        <text x="688" y="50">De seguridad</text>
+        <text x="886" y="50">Contables</text>
+      </g>
+      <text class="svg-bb" x="490" y="100" text-anchor="middle" font-size="14"
+            letter-spacing="1.3" fill="#3d5e89" opacity=".55">
+        TENÍAN ESCUELAS, LIBROS Y UNA MATERIA QUE ESTUDIAR
+      </text>
+
+      <rect x="996" y="8" width="178" height="70" rx="13" fill="#3d5e89"/>
+      <text class="svg-h" x="1085" y="51" text-anchor="middle" font-size="20" fill="#ffffff">Administrativas</text>
+      <text class="svg-bb" x="1085" y="100" text-anchor="middle" font-size="14"
+            letter-spacing="1.3" fill="#3d5e89">SIN DOCTRINA</text>
+
+      <g stroke="#3d5e89" stroke-width="2.6" fill="none">
+        <path d="M1085,112 L1085,142 L590,142 L590,160"/>
+        <path d="M370,160 L810,160"/>
+        <path d="M370,160 L370,186" marker-end="url(#fn2)"/>
+        <path d="M810,160 L810,186" marker-end="url(#fn2)"/>
+      </g>
+
+      <rect x="176" y="194" width="388" height="92" rx="16" fill="#ffffff"/>
+      <text class="svg-h" x="370" y="234" text-anchor="middle" font-size="24" fill="#3d5e89">Cinco elementos</text>
+      <text class="svg-b" x="370" y="263" text-anchor="middle" font-size="15" fill="#3d5e89" opacity=".78">Prever · organizar · dirigir · coordinar · controlar</text>
+
+      <rect x="626" y="194" width="368" height="92" rx="16" fill="#ffffff"/>
+      <text class="svg-h" x="810" y="234" text-anchor="middle" font-size="24" fill="#3d5e89">Catorce principios</text>
+      <text class="svg-b" x="810" y="263" text-anchor="middle" font-size="15" fill="#3d5e89" opacity=".78">El resto de esta exposición</text>
+    </svg>
+  </figure>
+
+  <p style="margin-top:.16in; max-width:10.6in;">
+    Según Fayol, la ausencia de doctrina es la razón de que la función administrativa no se enseñara
+    en ninguna escuela. El libro de 1916 constituye el intento de formularla.
+  </p>
+
+  <div class="folio">04</div>
+</section>
+
+<!-- ============ 5 · taylor y fayol ============ -->
+<section class="slide">
+  <svg class="deco" viewBox="0 0 1280 720">
+    <path d="M0,0 L210,0 C226,66 200,124 150,158 C100,192 86,246 118,290 C54,300 0,254 0,184 Z" fill="#d4e1f6"/>
+    <circle cx="1302" cy="742" r="132" fill="#3d5e89"/>
+  </svg>
+
+  <div class="kicker">Dos entradas al mismo problema</div>
+  <h2>Taylor sube desde el taller,<br>Fayol baja desde la dirección</h2>
+
+  <figure>
+    <svg viewBox="0 0 1180 296" role="img"
+         aria-label="Pirámide de la organización: Taylor la estudia desde el taller hacia arriba y Fayol desde la dirección general hacia abajo">
+      <defs>
+        <marker id="fnA" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 Z" fill="#3d5e89"/>
+        </marker>
+      </defs>
+
+      <path d="M480,18 L700,18 L878,254 L302,254 Z" fill="#d4e1f6"/>
+      <g class="svg-h" text-anchor="middle" fill="#3d5e89">
+        <text x="590" y="66"  font-size="22">Dirección general</text>
+      </g>
+      <g class="svg-b" text-anchor="middle" fill="#3d5e89">
+        <text x="590" y="151" font-size="21">Mandos intermedios</text>
+        <text x="590" y="228" font-size="21">Taller y operarios</text>
+      </g>
+      <g stroke="#3d5e89" stroke-width="1.6" opacity=".45">
+        <line x1="421" y1="97"  x2="759" y2="97"/>
+        <line x1="360" y1="176" x2="820" y2="176"/>
+      </g>
+
+      <path d="M232,248 L232,34" stroke="#3d5e89" stroke-width="3.4" fill="none" marker-end="url(#fnA)"/>
+      <text class="svg-h" x="232" y="18" text-anchor="middle" font-size="19" fill="#3d5e89">TAYLOR</text>
+      <text class="svg-b" x="215" y="280" text-anchor="middle" font-size="16" fill="#3d5e89" opacity=".78">Entra por el taller</text>
+
+      <path d="M948,34 L948,248" stroke="#3d5e89" stroke-width="3.4" fill="none" marker-end="url(#fnA)"/>
+      <text class="svg-h" x="948" y="18" text-anchor="middle" font-size="19" fill="#3d5e89">FAYOL</text>
+      <text class="svg-b" x="966" y="280" text-anchor="middle" font-size="16" fill="#3d5e89" opacity=".78">Entra por la dirección</text>
+    </svg>
+  </figure>
+
+  <div class="cols">
+    <div>
+      <h3>Taylor</h3>
+      <p>Estudia al operario, los tiempos y los movimientos. Optimiza la tarea.</p>
+    </div>
+    <div>
+      <h3>Fayol</h3>
+      <p>Estudia la dirección de la empresa completa. A ambos se les agrupa en la escuela clásica.</p>
+    </div>
+  </div>
+
+  <div class="folio">05</div>
+</section>
+
+<!-- ============ 6 · los catorce ============ -->
+<section class="slide azul">
+  <svg class="deco" viewBox="0 0 1280 720">
+    <path d="M1280,0 L1078,0 C1058,60 1090,116 1134,146 C1178,176 1188,230 1154,268 C1218,278 1280,232 1280,150 Z" fill="#3d5e89"/>
+  </svg>
+
+  <div class="kicker">Los 14 principios</div>
+  <h2>Catorce, uno tras otro</h2>
+
+  <div class="catorce">
+    <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div>
+    <div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div>
+  </div>
+
+  <div class="cita" style="margin-top:.2in;">
+    «En materia administrativa no hay nada rígido ni absoluto: todo es cuestión de medida.»
+    <span class="quien">Henri Fayol</span>
+  </div>
+
+  <p style="margin-top:.24in; max-width:10.6in;">
+    Fayol los enumera sin agruparlos y advierte que son flexibles. Aun así permanecen en uso: el
+    organigrama, la descripción de puestos, la cadena de mando y la rotación de personal como problema
+    proceden de ahí.
+  </p>
+
+  <div class="folio">06</div>
+</section>
+
+<!-- ============ 7 · transicion ============ -->
+<section class="slide">
+  <svg class="deco" viewBox="0 0 1280 720">
+    <circle cx="1200" cy="60" r="200" fill="#d4e1f6"/>
+    <path d="M0,436 C58,396 148,408 186,466 C224,524 196,608 236,666 C266,710 196,720 118,720 L0,720 Z" fill="#3d5e89"/>
+  </svg>
+
+  <div class="kicker">Continúa la exposición</div>
+  <h2>Principios 1 a 3</h2>
+
+  <ul class="lista">
+    <li><span>01</span>División del trabajo</li><br>
+    <li><span>02</span>Autoridad y responsabilidad</li><br>
+    <li><span>03</span>Disciplina</li>
+  </ul>
+
+  <div class="folio">07</div>
+</section>
+
+</body>
+</html>
