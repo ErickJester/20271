@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="xnom">Nombre: </string>
+    <string name="xdato"> ... ingredar datos ...</string>
+    <string name="xaceptar">Aceptar</string>
+</resources>
