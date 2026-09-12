@@ -1,0 +1,1224 @@
+<title>Clase 2 sep · Direccionamiento IPv4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#EDF0EF; --surface:#FFFFFF; --surface-2:#F4F7F6;
+    --text:#121817; --text-muted:#586461; --border:#D6DEDC;
+    --net:#0B7A70; --net-soft:#DCEFEC; --net-ink:#FFFFFF; --net-bright:#0D9488;
+    --host:#AC560E; --host-soft:#FAEDE0; --host-bright:#C4691A;
+    --ok:#3B7A32; --ok-soft:#E5F0E1; --ok-bd:#9AC591;
+    --bad:#AB3626; --bad-soft:#F8E8E5; --bad-bd:#DFA69D;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --fill:#E9EEED;
+    --shadow:0 1px 2px rgba(18,24,23,.05), 0 10px 26px -16px rgba(18,24,23,.28);
+    --f-dis:'Martian Mono','JetBrains Mono',monospace;
+    --f-body:'Newsreader',Georgia,'Times New Roman',serif;
+    --f-code:'JetBrains Mono','Consolas','Courier New',monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0D1211; --surface:#161C1B; --surface-2:#1D2523;
+      --text:#E3EAE8; --text-muted:#93A19D; --border:#2A3331;
+      --net:#5FCEC0; --net-soft:#0F2C28; --net-ink:#0D1211; --net-bright:#2CB4A4;
+      --host:#EDA45E; --host-soft:#2C2013; --host-bright:#D98B3D;
+      --ok:#69C05D; --ok-soft:#152616; --ok-bd:#356037;
+      --bad:#EE9083; --bad-soft:#301A17; --bad-bd:#6A3630;
+      --task:#DEAA52; --task-soft:#2E2412; --task-bd:#57431E;
+      --fill:#1A2120;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -16px rgba(0,0,0,.75);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0D1211; --surface:#161C1B; --surface-2:#1D2523;
+    --text:#E3EAE8; --text-muted:#93A19D; --border:#2A3331;
+    --net:#5FCEC0; --net-soft:#0F2C28; --net-ink:#0D1211; --net-bright:#2CB4A4;
+    --host:#EDA45E; --host-soft:#2C2013; --host-bright:#D98B3D;
+    --ok:#69C05D; --ok-soft:#152616; --ok-bd:#356037;
+    --bad:#EE9083; --bad-soft:#301A17; --bad-bd:#6A3630;
+    --task:#DEAA52; --task-soft:#2E2412; --task-bd:#57431E;
+    --fill:#1A2120;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -16px rgba(0,0,0,.75);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0;}
+  body{background:var(--bg); color:var(--text); font-family:var(--f-body);
+    -webkit-font-smoothing:antialiased; font-size:16px;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--net-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--net); outline-offset:2px; border-radius:3px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none !important; animation:none !important;} }
+
+  /* ---------- cabecera ---------- */
+  header.page{background:var(--surface); border-bottom:1px solid var(--border); padding:30px 18px 26px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:var(--f-dis); font-size:.6rem; font-weight:600; text-transform:uppercase;
+    letter-spacing:.13em; color:var(--net); margin:0 0 14px;}
+  h1{font-family:var(--f-dis); font-size:clamp(1.28rem,3.6vw,1.72rem); font-weight:700;
+    letter-spacing:-.035em; line-height:1.24; margin:0 0 14px;}
+  .lede{font-size:1.02rem; line-height:1.62; color:var(--text-muted); margin:0 0 12px; max-width:62ch;}
+  .lede b{color:var(--text); font-weight:600;}
+  .lede:last-child{margin-bottom:0;}
+
+  /* ---------- la tira de 32 bits: el dispositivo de toda la pagina ---------- */
+  .stripwrap{overflow-x:auto; padding:4px 0 2px; margin:20px 0 6px;}
+  .strip{display:flex; gap:9px; min-width:min-content;}
+  .oct{display:flex; gap:2px;}
+  .b{width:17px; height:26px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--f-code); font-size:.66rem; font-weight:500; border-radius:2px;
+    flex:0 0 auto; user-select:none;}
+  .b.n{background:var(--net-bright); color:#FFFFFF;}
+  .b.h{background:var(--host-bright); color:#FFFFFF;}
+  .b.dim{opacity:.42;}
+  .striplabels{display:flex; gap:9px; min-width:min-content; margin-top:5px;}
+  .ol{width:150px; flex:0 0 auto; font-family:var(--f-code); font-size:.63rem;
+    color:var(--text-muted); text-align:center; font-variant-numeric:tabular-nums;}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;}
+  .lg{display:inline-flex; align-items:center; gap:7px; font-family:var(--f-dis);
+    font-size:.58rem; font-weight:600; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--text-muted);}
+  .lg::before{content:""; width:20px; height:9px; border-radius:2px; background:var(--c);}
+
+  /* ---------- arranque ---------- */
+  main{max-width:900px; margin:0 auto; padding:0 18px 72px;}
+  .arranque{margin-top:26px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:18px 20px; box-shadow:var(--shadow);}
+  .arranque h2{font-family:var(--f-dis); font-size:.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.1em; margin:0 0 13px; color:var(--text);}
+  .arranque ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:11px;}
+  .arranque li{display:flex; gap:12px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:var(--f-code); font-size:.62rem; font-weight:500;
+    color:var(--net); background:var(--net-soft); padding:3px 8px; border-radius:4px;
+    min-width:82px; text-align:center;}
+  .arranque .d{font-size:.94rem; line-height:1.5;}
+  .arranque .d b{font-weight:600;}
+
+  /* ---------- secciones ---------- */
+  section{margin-top:46px;}
+  .sec-head{margin-bottom:16px;}
+  .eyebrow{font-family:var(--f-dis); font-size:.58rem; font-weight:600; text-transform:uppercase;
+    letter-spacing:.12em; color:var(--net); margin:0 0 7px;}
+  h2.sec{font-family:var(--f-dis); font-size:1.04rem; font-weight:600; letter-spacing:-.028em;
+    line-height:1.3; margin:0 0 9px;}
+  .sec-head > p{font-size:.94rem; line-height:1.6; color:var(--text-muted); margin:0; max-width:64ch;}
+  h3.sub{font-family:var(--f-dis); font-size:.8rem; font-weight:600; letter-spacing:-.02em;
+    margin:30px 0 11px;}
+
+  p.body{font-size:1rem; line-height:1.68; margin:0 0 14px; max-width:66ch;}
+  p.body b{font-weight:600;}
+  ul.body,ol.body{font-size:.98rem; line-height:1.6; max-width:66ch; margin:0 0 14px;
+    padding-left:20px; display:flex; flex-direction:column; gap:8px;}
+  ul.body b,ol.body b{font-weight:600;}
+
+  code{font-family:var(--f-code); font-size:.82em; background:var(--fill);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:var(--f-code); font-size:.77rem; line-height:1.7; background:var(--fill);
+    border:1px solid var(--border); border-radius:9px; padding:14px 16px;
+    overflow-x:auto; margin:0 0 14px;}
+  pre code{background:none; border:none; padding:0; font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+  .nt{color:var(--net); font-weight:700;}
+  .ht{color:var(--host); font-weight:700;}
+
+  /* ---------- cita ---------- */
+  .quote{border-left:3px solid var(--net); padding:4px 0 4px 16px; margin:18px 0;
+    font-style:italic; font-size:1rem; line-height:1.6; color:var(--text-muted); max-width:64ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  /* ---------- glosario ---------- */
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 12px; max-width:66ch;}
+  details.dio[open]{border-style:solid; border-color:var(--net-soft);}
+  details.dio summary{cursor:pointer; padding:11px 15px; font-family:var(--f-body);
+    font-size:.93rem; font-weight:500; color:var(--net); list-style:none;
+    display:flex; align-items:center; gap:10px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:19px; height:19px;
+    border-radius:50%; background:var(--net); color:var(--net-ink); font-family:var(--f-code);
+    font-size:.68rem; font-weight:700; display:flex; align-items:center; justify-content:center;
+    line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--net-soft);}
+  details.dio .db{padding:0 16px 14px 44px;}
+  details.dio p{font-size:.94rem; line-height:1.62; margin:0 0 10px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-size:.93rem; line-height:1.56; margin:0 0 10px;
+    padding-left:19px; display:flex; flex-direction:column; gap:7px;}
+  details.dio pre{font-size:.73rem; margin:10px 0;}
+
+  /* ---------- completado (lo que la clase no dio) ---------- */
+  .comp{border-left:3px dashed var(--host); background:var(--host-soft);
+    padding:14px 17px; border-radius:0 9px 9px 0; margin:18px 0; max-width:66ch;}
+  .comp .ct{font-family:var(--f-dis); font-size:.57rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--host); margin:0 0 7px;}
+  .comp p{font-size:.94rem; line-height:1.6; margin:0 0 9px;}
+  .comp p:last-child{margin-bottom:0;}
+  .comp b{font-weight:600;}
+
+  /* ---------- ejercicios ---------- */
+  .ex{margin:26px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--net); border-radius:11px; padding:18px 20px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:var(--f-dis); font-size:.56rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.11em; color:var(--net); margin:0 0 7px;}
+  .ex h3{font-family:var(--f-dis); font-size:.82rem; font-weight:600; letter-spacing:-.02em;
+    margin:0 0 8px;}
+  .ex .ask{font-size:.95rem; line-height:1.55; color:var(--text-muted); margin:0 0 15px; max-width:62ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--net); color:var(--net-ink); border:1px solid var(--net);
+    font-family:var(--f-dis); font-size:.68rem; font-weight:600; letter-spacing:.02em;
+    padding:9px 15px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.12);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--net); color:var(--net); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px;}
+
+  .fb{font-size:.94rem; line-height:1.56; padding:12px 14px; border-radius:8px;
+    display:none; margin-top:12px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:11px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:var(--f-code); font-size:.84rem; line-height:1.5; margin-bottom:10px;
+    word-break:break-word;}
+  .qq em{font-family:var(--f-body); font-style:normal; font-size:.94rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:var(--f-code); font-size:.78rem; background:var(--surface);
+    border:1px solid var(--border); color:var(--text); padding:6px 13px;
+    border-radius:999px; cursor:pointer;}
+  .qopt:hover{border-color:var(--net); background:var(--net-soft);}
+  .qopt.sel{background:var(--net); border-color:var(--net); color:var(--net-ink);}
+  .qwhy{font-size:.9rem; line-height:1.52; color:var(--text-muted); margin-top:9px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  /* ---------- drill de entrada escrita ---------- */
+  .drill .prompt{font-family:var(--f-code); font-size:.86rem; line-height:1.5;
+    background:var(--fill); border:1px solid var(--border); border-radius:8px;
+    padding:12px 14px; margin-bottom:11px;}
+  .drill .prompt .lbl{display:block; font-family:var(--f-dis); font-size:.55rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); margin-bottom:6px;}
+  .drow{display:flex; gap:8px; flex-wrap:wrap;}
+  .din{flex:1; min-width:210px; font-family:var(--f-code); font-size:.86rem;
+    padding:11px 13px; border-radius:8px; border:1px solid var(--border);
+    background:var(--fill); color:var(--text); outline:none;}
+  .din:focus{border-color:var(--net); box-shadow:0 0 0 3px var(--net-soft);}
+  .din.ok{border-color:var(--ok-bd); background:var(--ok-soft);}
+  .din.no{border-color:var(--bad-bd); background:var(--bad-soft);}
+  .dprog{font-family:var(--f-code); font-size:.7rem; color:var(--text-muted);
+    margin-bottom:10px; font-variant-numeric:tabular-nums;}
+
+  /* ---------- explorador de prefijo ---------- */
+  .tool{margin:26px 0; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:20px; box-shadow:var(--shadow);}
+  .tool-tag{font-family:var(--f-dis); font-size:.56rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.11em; color:var(--host); margin:0 0 7px;}
+  .tool h3{font-family:var(--f-dis); font-size:.82rem; font-weight:600; letter-spacing:-.02em;
+    margin:0 0 8px;}
+  .tool .ask{font-size:.95rem; line-height:1.55; color:var(--text-muted); margin:0 0 16px; max-width:62ch;}
+  .slrow{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:6px;}
+  .slrow label{font-family:var(--f-dis); font-size:.6rem; font-weight:600; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--text-muted); white-space:nowrap;}
+  input[type="range"]{flex:1; min-width:190px; accent-color:var(--net-bright); cursor:pointer;}
+  .pfx{font-family:var(--f-code); font-size:1.16rem; font-weight:700; color:var(--net);
+    min-width:52px; text-align:right; font-variant-numeric:tabular-nums;}
+  .readout{display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:1px;
+    background:var(--border); border:1px solid var(--border); border-radius:9px;
+    overflow:hidden; margin-top:16px;}
+  .ro{background:var(--surface-2); padding:11px 13px;}
+  .ro .k{font-family:var(--f-dis); font-size:.53rem; font-weight:600; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--text-muted); margin-bottom:5px;}
+  .ro .v{font-family:var(--f-code); font-size:.92rem; font-weight:500;
+    font-variant-numeric:tabular-nums; word-break:break-all;}
+  .toolnote{font-size:.92rem; line-height:1.55; margin-top:14px; color:var(--text-muted);
+    background:var(--net-soft); border-radius:8px; padding:11px 13px;}
+  .toolnote b{color:var(--text); font-weight:600;}
+
+  /* ---------- tablas ---------- */
+  .tablewrap{overflow-x:auto; margin:16px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:520px; font-size:.88rem;}
+  th{text-align:left; font-family:var(--f-dis); font-size:.55rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--text-muted);
+    padding:11px 14px; border-bottom:1px solid var(--border);
+    background:var(--surface-2); white-space:nowrap;}
+  td{padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:var(--f-code); font-weight:500; white-space:nowrap;
+    font-variant-numeric:tabular-nums;}
+  td.d{color:var(--text-muted); font-size:.92rem;}
+  td.num{font-family:var(--f-code); font-variant-numeric:tabular-nums; white-space:nowrap;}
+
+  .cls{display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px;
+    border-radius:5px; font-family:var(--f-dis); font-size:.66rem; font-weight:700;
+    background:var(--net); color:var(--net-ink);}
+  .cls.off{background:transparent; color:var(--text-muted);
+    border:1px dashed var(--text-muted); font-weight:500;}
+
+  /* ---------- checklist ---------- */
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:12px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:13px 15px;
+    margin-bottom:9px; box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:3px 0 0; width:17px; height:17px; accent-color:var(--net-bright);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-family:var(--f-dis); font-size:.72rem; font-weight:600; line-height:1.45;
+    letter-spacing:-.015em;}
+  .ftask .td2{font-size:.92rem; color:var(--text-muted); line-height:1.5; margin-top:5px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:13px; margin-bottom:15px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:13px 15px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--net-bright); transition:width .3s;}
+  .pcount{font-family:var(--f-code); font-size:.8rem; font-weight:700; white-space:nowrap;
+    font-variant-numeric:tabular-nums;}
+
+  footer.page{margin-top:52px; padding-top:20px; border-top:1px solid var(--border);}
+  footer.page p{font-size:.87rem; line-height:1.55; color:var(--text-muted); margin:0 0 8px; max-width:64ch;}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Servicios en Red · 7CM3 · clase del 2 de septiembre</p>
+    <h1>Direccionamiento IPv4 y clases de red</h1>
+    <p class="lede">Toda la sesión gira alrededor de una sola idea: una dirección IP son <b>32 bits</b> y hay una línea que los parte en dos. Lo que queda a la izquierda dice <b>de qué red vienes</b>; lo que queda a la derecha dice <b>quién eres dentro de ella</b>. Las clases A, B y C no son más que tres lugares fijos donde alguien decidió poner esa línea.</p>
+
+    <div class="stripwrap">
+      <div class="strip" role="img" aria-label="Los 32 bits de 192.168.1.2 con máscara /24: los primeros 24 bits son porción de red y los últimos 8 son porción de host">
+        <div class="oct"><span class="b n">1</span><span class="b n">1</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span></div>
+        <div class="oct"><span class="b n">1</span><span class="b n">0</span><span class="b n">1</span><span class="b n">0</span><span class="b n">1</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span></div>
+        <div class="oct"><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">0</span><span class="b n">1</span></div>
+        <div class="oct"><span class="b h">0</span><span class="b h">0</span><span class="b h">0</span><span class="b h">0</span><span class="b h">0</span><span class="b h">0</span><span class="b h">1</span><span class="b h">0</span></div>
+      </div>
+      <div class="striplabels">
+        <span class="ol">192</span><span class="ol">168</span><span class="ol">1</span><span class="ol">2</span>
+      </div>
+    </div>
+    <div class="legend">
+      <span class="lg" style="--c:var(--net-bright)">porción de red</span>
+      <span class="lg" style="--c:var(--host-bright)">porción de host</span>
+    </div>
+
+    <p class="lede" style="margin-top:20px;">Arriba está <code>192.168.1.2 /24</code>, la dirección que dio un compañero en clase. Esa línea entre el bit 24 y el 25 es literalmente de lo que habló el profesor durante 57 minutos. La página está organizada por los bloques reales de la sesión, con el minuto en que pasó cada cosa.</p>
+    <p class="lede"><b style="color:var(--net);">Los botones con <span style="font-family:var(--f-code);">?</span></b> explican lo que el profesor dio por sabido. Los recuadros con <b style="color:var(--host);">borde naranja punteado</b> son material que <b>no salió en clase</b>: son los huecos que dejó la sesión y que aquí se completan, siempre señalados como tales.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="arranque">
+    <h2>Lo que salió de esta clase</h2>
+    <ul>
+      <li><span class="t">sin tarea</span><span class="d"><b>No se dictó ninguna tarea nueva calificada.</b> La tarea de investigación sobre direccionamiento IP era de la sesión anterior y ya se entregó — es justo la que se estuvo repasando durante los primeros 15 minutos.</span></li>
+      <li><span class="t">15:00</span><span class="d"><b>Repasar los apuntes que subió</b> a la plataforma. Textual: <em>"ya ustedes al ratito en su casa le dan otra repasada más en forma"</em>. No los leyó todos en clase, sólo se detuvo en lo que consideró importante.</span></li>
+      <li><span class="t">~50:00</span><span class="d"><b>Quedó pendiente un ejercicio</b>: la última dirección proyectada no se alcanzaba a ver. <em>"Ah, bueno, esa la dejamos pendiente."</em></span></li>
+      <li><span class="t">56:00</span><span class="d"><b>Lo que viene es subneteo.</b> Lo anunció dos veces y cerró con <em>"poco a poco se va a ir complicando"</em>. Esta clase es el piso de esa siguiente.</span></li>
+    </ul>
+  </div>
+
+  <!-- ============ BLOQUE 1 ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 1 · minuto 00:00 a 05:05</p>
+      <h2 class="sec">El repaso que en realidad era un examen oral</h2>
+      <p>Arrancó preguntando sobre la tarea que la mayoría ya había entregado. No expuso: fue sacando la clase entera a punta de preguntas, y de ahí salió todo el marco.</p>
+    </div>
+
+    <p class="body">Las respuestas del grupo, en el orden en que fueron cayendo, arman la definición completa: una dirección IP sirve para <b>diferenciar cada dispositivo</b>; el espacio de direccionamiento es de <b>32 bits</b>; esos 32 bits se fraccionan en <b>octetos</b>; y una parte identifica a la red mientras la otra identifica al host.</p>
+
+    <p class="quote">"Siempre nosotros vamos a manejar eso: <b>una parte para red y una parte para host</b>, ¿estamos de acuerdo?"</p>
+
+    <details class="dio"><summary>¿Por qué "octetos" y no simplemente "números"?</summary><div class="db">
+      <p>Un <b>octeto</b> son 8 bits. Los 32 bits de una dirección IPv4 se parten en cuatro grupos de 8, y cada grupo se escribe en decimal separado por puntos — eso es la <em>notación decimal punteada</em>.</p>
+      <p>Como 8 bits sólo pueden representar del 0 al 255 (2<sup>8</sup> = 256 combinaciones), <b>ningún número de una dirección IPv4 puede pasar de 255</b>. Si ves un <code>192.168.300.1</code>, no es una dirección válida y no hace falta pensarlo más.</p>
+      <p>La palabra "octeto" se usa en vez de "byte" porque históricamente hubo máquinas donde un byte no eran 8 bits. En redes se dice octeto para no dejar lugar a dudas.</p>
+    </div></details>
+
+    <h3 class="sub">Las cinco clases, y el tache del 127</h3>
+
+    <p class="body">Salieron las cinco clases con sus máscaras: <b>A</b> es <code>/8</code>, <b>B</b> es <code>/16</code>, <b>C</b> es <code>/24</code>, <b>D</b> es de multicast y <b>E</b> está reservada para investigación. Después vinieron los rangos, y ahí puso la primera trampa de la clase. Cuando el grupo contestó que la clase A llega hasta 127:</p>
+
+    <p class="quote">"¿127? <b>¡Tache!</b> ¿Por qué?"</p>
+
+    <p class="body">Un alumno contestó bien de inmediato: porque el <b>127 es para loopback</b>. Por eso la clase A se corta en 126, no en 127. Es de las poquísimas cosas de esta clase que se pregunta directo en examen, porque es un dato que se memoriza mal con mucha facilidad.</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Clase</th><th>Primer octeto</th><th>Máscara nativa</th><th>Para qué</th></tr></thead>
+      <tbody>
+        <tr><td><span class="cls">A</span></td><td class="num">1 – 126</td><td class="sym">/8</td><td class="d">Redes enormes. Pocas redes, muchísimos hosts.</td></tr>
+        <tr><td><span class="cls">B</span></td><td class="num">128 – 191</td><td class="sym">/16</td><td class="d">Redes medianas. Mitad y mitad.</td></tr>
+        <tr><td><span class="cls">C</span></td><td class="num">192 – 223</td><td class="sym">/24</td><td class="d">Redes chicas. Muchas redes, pocos hosts.</td></tr>
+        <tr><td><span class="cls off">D</span></td><td class="num">224 – 239</td><td class="sym">—</td><td class="d">Multicast. No se asigna a hosts.</td></tr>
+        <tr><td><span class="cls off">E</span></td><td class="num">240 – 255</td><td class="sym">—</td><td class="d">Reservada para investigación.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">Las clases D y E aparecen con el recuadro punteado a propósito en toda esta página: existen, entran a examen, pero como él mismo dijo, <em>"la D y la E sí sabemos, pero no las vamos a utilizar, nada más esas tres primeras"</em>. El 127 no aparece en ninguna fila porque no pertenece a ninguna clase utilizable: está apartado.</p>
+
+    <details class="dio"><summary>¿Qué es loopback y por qué se lleva todo un rango?</summary><div class="db">
+      <p><b>Loopback</b> es una dirección que apunta a tu propia máquina. Cuando mandas algo a <code>127.0.0.1</code>, el paquete nunca sale por la tarjeta de red: da la vuelta adentro del sistema operativo y regresa.</p>
+      <p>El profesor lo explicó por su uso: <em>"para ver si nuestra tarjeta de red está funcionando"</em>. Un <code>ping 127.0.0.1</code> que responde te dice que la pila TCP/IP de la máquina está viva, aunque el cable esté desconectado.</p>
+      <p>El detalle que sorprende: no es una dirección, es <b>toda la red 127.0.0.0/8</b> — más de 16 millones de direcciones apartadas para esto. Es un desperdicio histórico, pero así quedó en el estándar y por eso la clase A pierde ese número entero.</p>
+    </div></details>
+
+    <details class="dio"><summary>Un alumno mencionó CIDR. ¿Qué es y por qué el profesor dijo "ya estamos hablando del subneteo"?</summary><div class="db">
+      <p>Una alumna se adelantó con una respuesta muy completa: que en vez de depender de las clases, hoy existe <b>CIDR</b> (<em>Classless Inter-Domain Routing</em>), donde la barra con el número indica directamente cuántos bits forman el prefijo de red, y así ya no dependes de las clases.</p>
+      <p>Tenía razón, y el profesor lo reconoció, pero frenó el tema: <em>"Ahorita antes de llegar al subneteo vamos a explicar esto, pero vamos bien"</em>.</p>
+      <p>La razón de frenarlo: el direccionamiento por clases es el modelo <b>viejo</b>, y CIDR es el que se usa de verdad hoy. Pero para entender por qué CIDR existe primero tienes que ver el problema que resolvió — que las clases desperdiciaban redes enteras. Por eso el orden es clases primero, CIDR y subneteo después.</p>
+    </div></details>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 1</p>
+      <h3>¿De qué clase es cada dirección?</h3>
+      <p class="ask">Es exactamente el ejercicio que hicieron pasando uno por uno al pizarrón. <b>Sólo se mira el primer octeto.</b> Metí dos que no son de ninguna clase utilizable para ver si te acuerdas de por qué.</p>
+      <div class="qrows" id="q1"></div>
+      <div class="btnrow">
+        <button class="btn" id="q1go" type="button">Revisar</button>
+        <button class="btn ghost" id="q1rs" type="button">Reiniciar</button>
+      </div>
+      <div class="fb" id="q1fb"></div>
+    </div>
+  </section>
+
+  <!-- ============ BLOQUE 2 ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 2 · minuto 05:05 a 15:00</p>
+      <h2 class="sec">De la diagonal al decimal</h2>
+      <p>El bloque más importante de la clase. Aquí se conecta el número después de la barra con la máscara escrita en decimal, y con cuántos dispositivos caben.</p>
+    </div>
+
+    <p class="body">La máscara de red es la forma de escribir dónde cae la línea. Se puede escribir de dos maneras y <b>las dos dicen lo mismo</b>:</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Clase</th><th>Prefijo</th><th>Máscara en decimal</th><th>Qué está diciendo</th></tr></thead>
+      <tbody>
+        <tr><td><span class="cls">A</span></td><td class="sym">/8</td><td class="sym">255.0.0.0</td><td class="d">El primer octeto es exclusivo de red.</td></tr>
+        <tr><td><span class="cls">B</span></td><td class="sym">/16</td><td class="sym">255.255.0.0</td><td class="d">Los dos primeros octetos son de red.</td></tr>
+        <tr><td><span class="cls">C</span></td><td class="sym">/24</td><td class="sym">255.255.255.0</td><td class="d">Los tres primeros octetos son de red.</td></tr>
+      </tbody>
+    </table></div>
+
+    <details class="dio"><summary>¿Por qué la máscara está hecha de 255 y de 0, y no de cualquier número?</summary><div class="db">
+      <p>Porque la máscara, vista en binario, es <b>una fila de unos seguida de una fila de ceros, sin mezclarse</b>. Los unos marcan los bits de red; los ceros marcan los de host.</p>
+      <p>Un octeto lleno de unos (<code>11111111</code>) da 255. Un octeto lleno de ceros da 0. Por eso una máscara "nativa" de clase sólo se ve con 255 y con 0 — porque la línea cae justo en la frontera de un octeto.</p>
+      <p>En cuanto la línea cae <em>a media</em> octeto, aparecen los otros números posibles. Un octeto partido sólo puede valer uno de estos ocho:</p>
+      <pre><code>10000000 = 128    11111000 = 248
+11000000 = 192    11111100 = 252
+11100000 = 224    11111110 = 254
+11110000 = 240    11111111 = 255</code></pre>
+      <p>Cualquier máscara que no esté en esa lista está mal. No existe una máscara <code>255.255.100.0</code>, porque 100 en binario es <code>01100100</code> y ahí los unos y los ceros están revueltos.</p>
+    </div></details>
+
+    <h3 class="sub">Los dos ejemplos que dejó en bits</h3>
+
+    <p class="body">Puso <code>/12</code> y <code>/23</code> en el pizarrón y los resolvió <b>contando bits</b>, pero no llegó a convertirlos a decimal. Su razonamiento fue este:</p>
+
+    <p class="quote">"Si es una clase A y me están pidiendo una diagonal 12, entonces estoy diciendo que es 1 2 3 4 5 6 7 8 normales, que <b>esos son inamovibles</b>, esos no los puedo yo mover dependiendo de la clase, pero sí la siguiente porción cuando yo subneteo... puedo agarrar los bits que necesite yo."</p>
+
+    <p class="body">Es decir: en un <code>/12</code> partiendo de clase A, los 8 bits del primer octeto ya eran de red por definición de la clase, y le estás <b>robando 4 bits más</b> al segundo octeto. Quedan 20 bits para host. En un <code>/23</code> partiendo de clase B, los 16 primeros ya eran de red y le robas <b>7 bits</b> al tercer octeto, dejando 9 para host.</p>
+
+    <div class="comp">
+      <p class="ct">Completado — no salió en clase</p>
+      <p>El profesor dejó los dos ejemplos en bits y nunca los escribió en decimal. Aquí está el paso que falta, que es el que se pide en un examen:</p>
+      <p><b>/12</b> → 8 unos + 4 unos = <code>11111111.11110000.00000000.00000000</code> → <b><code>255.240.0.0</code></b><br>
+      <b>/23</b> → 8 + 8 + 7 unos = <code>11111111.11111111.11111110.00000000</code> → <b><code>255.255.254.0</code></b></p>
+      <p>Fíjate en el <code>254</code> del <code>/23</code>: es el error más común de todos. Uno tiende a escribir 255 porque "casi todo el octeto es de red", pero le falta un bit, y a un octeto al que le falta el último bit le corresponde 254, no 255.</p>
+    </div>
+
+    <div class="tool">
+      <p class="tool-tag">Herramienta · muévela</p>
+      <h3>Explorador de prefijo</h3>
+      <p class="ask">Mueve la línea y mira qué cambia. Esto es el pizarrón completo del profesor en un solo control: la tira de 32 bits, la máscara en decimal, y cuántos hosts caben. <b>Prueba /8, /12, /16, /23 y /24</b>, que son los cinco que usó en clase.</p>
+      <div class="slrow">
+        <label for="pfxSlider">Prefijo</label>
+        <input type="range" id="pfxSlider" min="8" max="30" value="24" step="1">
+        <span class="pfx" id="pfxVal">/24</span>
+      </div>
+      <div class="stripwrap"><div class="strip" id="toolStrip"></div>
+        <div class="striplabels"><span class="ol">octeto 1</span><span class="ol">octeto 2</span><span class="ol">octeto 3</span><span class="ol">octeto 4</span></div>
+      </div>
+      <div class="readout">
+        <div class="ro"><div class="k">Máscara decimal</div><div class="v" id="roMask">255.255.255.0</div></div>
+        <div class="ro"><div class="k">Bits de host</div><div class="v" id="roHostBits">8</div></div>
+        <div class="ro"><div class="k">Direcciones totales</div><div class="v" id="roTotal">256</div></div>
+        <div class="ro"><div class="k">Hosts utilizables</div><div class="v" id="roHosts">254</div></div>
+      </div>
+      <p class="toolnote" id="roNote"></p>
+    </div>
+
+    <h3 class="sub">254, y las dos direcciones que nunca se asignan</h3>
+
+    <p class="body">Con <code>192.168.1.2</code> en el pizarrón, preguntó cuántos dispositivos caben en esa red. La respuesta del grupo fue <b>254</b>, y de ahí salió la regla que se usa el resto del semestre: en el último octeto van del 1 al 254, porque <b>el 0 y el 255 están apartados</b>.</p>
+
+    <p class="body">El <b>.0</b> es el identificador de red. Como él lo dijo: <em>"siempre que nosotros veamos un cero al final, es nuestro identificador de red dependiendo de dónde partimos"</em>. Es el nombre de la red completa, no de una máquina.</p>
+
+    <p class="body">El <b>.255</b> es la dirección de broadcast, y para explicarla usó la mejor analogía de la clase:</p>
+
+    <p class="quote">"Es como cuando llego aquí al salón y les digo <b>«Hola, buenos días»</b>. Todos me escuchan, la mayoría me contesta, otros no me contestan, es decir, les estoy enviando un saludo a todos."</p>
+
+    <p class="body">De ahí sale la fórmula que va a aparecer en todos los ejercicios del curso:</p>
+
+<pre><code>hosts utilizables = 2<sup>(bits de host)</sup> - 2
+                            <span class="cm">^ uno por el ID de red, otro por el broadcast</span></code></pre>
+
+    <details class="dio"><summary>Cuidado: "termina en 0" y "es el ID de red" no siempre coinciden</summary><div class="db">
+      <p>La regla que dio —el identificador de red se ve con cero al final— <b>funciona mientras la línea caiga en la frontera de un octeto</b>, que es todo lo que se vio en esta clase. Él mismo puso el matiz al final: <em>"esto partiendo de que todo sea bonito y agradable, porque ya cuando subneteamos cambia"</em>.</p>
+      <p>En cuanto entre el subneteo, vas a ver identificadores de red como <code>192.168.1.64</code> o <code>10.0.32.0</code>, que no terminan en cero y sin embargo son IDs de red. Y al revés: vas a ver direcciones terminadas en <code>.0</code> que sí son hosts válidos.</p>
+      <p>Guárdate la regla como atajo para esta clase, pero sabiendo que tiene fecha de caducidad: la próxima sesión.</p>
+    </div></details>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 2</p>
+      <h3>Escribe la máscara en decimal</h3>
+      <p class="ask">Cinco prefijos, incluidos los dos que el profesor dejó a medias. <b>Escribe la máscara en notación decimal punteada</b> y dale a Revisar. Si te equivocas te digo exactamente en qué.</p>
+      <div class="drill" id="d1"></div>
+    </div>
+  </section>
+
+  <!-- ============ BLOQUE 3 ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3 · minuto 15:00 a 24:00</p>
+      <h2 class="sec">Los apuntes: qué es IPv4 cuando lo ves de frente</h2>
+      <p>Proyectó el documento que había subido a la plataforma. Aclaró que no lo iba a leer completo, sólo detenerse en lo importante — y avisó que la lectura en forma es tarea de casa.</p>
+    </div>
+
+    <p class="body">La ficha técnica que dictó, en orden:</p>
+
+    <ul class="body">
+      <li><b>IPv4</b> es la versión 4 del protocolo de Internet, el principal a nivel de red en el modelo TCP/IP.</li>
+      <li>Está descrito en el <b>RFC 791</b>.</li>
+      <li>Opera en la <b>capa de red</b> del modelo OSI (capa 3).</li>
+      <li>Su unidad de información se llama <b>paquete</b> o <b>datagrama</b>.</li>
+      <li>Es un protocolo <b>no orientado a conexión</b>.</li>
+      <li><b>Fragmenta y reensambla</b> los paquetes cuando hace falta.</li>
+      <li>Direcciones lógicas de <b>32 bits</b>. IPv6 usa 128.</li>
+      <li>Tamaño máximo de paquete: <b>65,535 bytes</b>.</li>
+    </ul>
+
+    <h3 class="sub">"No orientado a conexión", explicado como lo explicó él</h3>
+
+    <p class="body">Preguntó si alguien lo recordaba, nadie contestó, y lo bajó a lenguaje llano: mandas información <b>y no necesitas que te confirmen que llegó</b>. Sigues mandando sin saber si llegó o no.</p>
+
+    <p class="body">Y lo contrastó con TCP, donde lo que mandas tiene que regresar con un acuse: <em>"«¿Sabes qué? Sí llegó», y si no, vuélvelo a mandar"</em>.</p>
+
+    <details class="dio"><summary>Entonces, si IP no garantiza nada, ¿por qué sí llegan las cosas?</summary><div class="db">
+      <p>Porque la garantía no la pone IP, la pone <b>la capa de arriba</b>. IP se encarga nada más de llevar el paquete de una red a otra, y acepta perderlo en el camino. Es un servicio de <em>mejor esfuerzo</em>.</p>
+      <p>Encima de IP corren dos protocolos con filosofías opuestas:</p>
+      <ul>
+        <li><b>TCP</b> — numera, confirma, retransmite lo que se perdió y reordena lo que llegó fuera de orden. Lo usa lo que no tolera errores: una página web, un correo, una descarga.</li>
+        <li><b>UDP</b> — tampoco confirma nada, igual que IP. Lo usa lo que prefiere velocidad sobre exactitud: voz sobre IP, video en vivo, juegos. Un pedacito perdido de audio se oye como un brinco; retransmitirlo llegaría tarde y sería peor.</li>
+      </ul>
+      <p>Ese UDP va a volver en la Unidad IV, cuando se vea Voz sobre IP — que es una de las prácticas del programa.</p>
+    </div></details>
+
+    <details class="dio"><summary>RFC: qué son esos documentos y por qué el 791</summary><div class="db">
+      <p>Un <b>RFC</b> (<em>Request for Comments</em>) es el formato en que se publican los estándares de Internet. Son documentos numerados, de texto plano, publicados por el IETF, y son la fuente original: cuando algo de una red se discute, se cita el RFC, no el libro.</p>
+      <p>El <b>RFC 791</b> es el de IPv4, publicado en <b>1981</b>. Cuando el profesor dice que el direccionamiento se definió ahí, está citando un documento que sigue vigente después de más de cuarenta años.</p>
+      <p>Vale la pena que lo ubiques porque en esta materia van a salir varios más: el RFC 1918 (direcciones privadas), y toda la familia de SNMP que es el corazón de la Unidad III.</p>
+    </div></details>
+
+    <h3 class="sub">Router contra switch: la diferencia que define la materia</h3>
+
+    <p class="body">Aquí conectó con Redes 1 y dejó la distinción que sostiene todo el curso. Preguntó qué dispositivo intermedio usaban para comunicarse dentro de su LAN, el grupo contestó <b>el switch</b>, y de ahí salió:</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th></th><th>Switch</th><th>Router</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Capa OSI</td><td class="d">Capa 2, enlace de datos</td><td class="d">Capa 3, red</td></tr>
+        <tr><td class="sym">Direcciona por</td><td class="d">MAC de la tarjeta de red</td><td class="d">Dirección IP</td></tr>
+        <tr><td class="sym">Alcance</td><td class="d">Dentro de una misma red (LAN)</td><td class="d">Entre redes distintas</td></tr>
+        <tr><td class="sym">¿Necesita IP para operar?</td><td class="d">No. En Redes 1 se comunicaban sin ellas.</td><td class="d">Sí, forzosamente.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="quote">"Aquí sí es importante: nosotros sí, al utilizar un router, necesitamos forzosamente <b>decirle de qué red viene y con qué dispositivo de la otra red se quiere comunicar</b>."</p>
+
+    <p class="body">También mencionó el <b>switch capa 3</b>, que tiene la posibilidad de comportarse como router. Es el equipo que van a configurar en las prácticas de VLANs y enrutamiento de la Unidad II.</p>
+
+    <details class="dio"><summary>MAC contra IP: por qué existen las dos</summary><div class="db">
+      <p>La <b>MAC</b> viene grabada en la tarjeta de red de fábrica. Son 48 bits, se escribe en hexadecimal (<code>00:1B:44:11:3A:B7</code>), y es <em>plana</em>: no dice nada de dónde está el equipo, igual que un número de serie no dice en qué ciudad vives.</p>
+      <p>La <b>IP</b> se asigna, se cambia, y es <em>jerárquica</em>: lleva adentro de qué red vienes. Es lo que permite que un router en otro continente sepa hacia dónde mandar tu paquete sin conocer tu equipo.</p>
+      <p>La analogía que funciona: la MAC es tu nombre, la IP es tu dirección postal. Dentro del salón basta el nombre para llamarte (switch, capa 2). Para mandarte una carta desde otra ciudad hace falta la dirección (router, capa 3).</p>
+      <p>Las dos se usan al mismo tiempo, siempre: tu paquete lleva la IP del destino final y la MAC del siguiente salto. El protocolo que traduce de una a otra dentro de tu red se llama <b>ARP</b>.</p>
+    </div></details>
+
+    <p class="body">Un detalle más que soltó al pasar y que importa: la dirección IP <b>es única y no se puede duplicar</b>. Si dos equipos la tienen, salta un error de inmediato. Su comparación: <em>"es como si fuese un número telefónico"</em>.</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 3</p>
+      <h3>Capa 2, capa 3, y lo demás del bloque</h3>
+      <p class="ask">Cuatro preguntas sobre lo que acaba de salir. <b>Elige una opción en cada una.</b></p>
+      <div class="qrows" id="q3"></div>
+      <div class="btnrow">
+        <button class="btn" id="q3go" type="button">Revisar</button>
+        <button class="btn ghost" id="q3rs" type="button">Reiniciar</button>
+      </div>
+      <div class="fb" id="q3fb"></div>
+    </div>
+  </section>
+
+  <!-- ============ BLOQUE 4 ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 4 · minuto 24:00 a 38:00</p>
+      <h2 class="sec">Quién reparte las direcciones, y el atajo de los primeros bits</h2>
+      <p>Dos cosas en este bloque: de dónde salen las direcciones en el mundo real, y un truco para identificar la clase sin convertir a decimal.</p>
+    </div>
+
+    <h3 class="sub">IANA, LACNIC, NIC México</h3>
+
+    <p class="body">Las direcciones no las inventa nadie: hay una cadena de organizaciones que las reparte. Arriba está la <b>IANA</b>, que es mundial y fue la que empezó a asignar por clases. Debajo hay registros regionales, y a Latinoamérica le toca <b>LACNIC</b>. Y para México, <b>NIC México</b> administra el espacio a nivel de país.</p>
+
+<pre><code>IANA          <span class="cm">mundial, la raíz de todo</span>
+  └── LACNIC       <span class="cm">registro regional de Latinoamérica y el Caribe</span>
+        └── NIC México   <span class="cm">administra el espacio a nivel de país</span></code></pre>
+
+    <details class="dio"><summary>Los cinco registros regionales, por si sale en examen</summary><div class="db">
+      <p>Debajo de la IANA hay <b>cinco</b> registros regionales (RIR), y sólo se mencionó el nuestro en clase:</p>
+      <ul>
+        <li><b>LACNIC</b> — América Latina y el Caribe.</li>
+        <li><b>ARIN</b> — Estados Unidos y Canadá.</li>
+        <li><b>RIPE NCC</b> — Europa, Medio Oriente, Asia Central.</li>
+        <li><b>APNIC</b> — Asia-Pacífico.</li>
+        <li><b>AFRINIC</b> — África.</li>
+      </ul>
+      <p>Ese reparto es también la razón por la que el profesor dijo que "ya nos quitamos todas las direcciones IP": los RIR se quedaron sin bloques nuevos que asignar. APNIC agotó los suyos en 2011 y LACNIC en 2014. De ahí vienen NAT e IPv6.</p>
+    </div></details>
+
+    <h3 class="sub">La cuenta de los hosts</h3>
+
+    <p class="body">Con la clase A en pantalla, hizo la cuenta que hay que saber hacer sola: quedan 24 bits de host, entonces son 2<sup>24</sup> menos 2.</p>
+
+    <p class="quote">"Para nosotros sacar el número de equipos que podemos conectar a cada una de nuestras redes es <b>el número de ceros que queda disponible</b>... ¿Por qué le quitamos dos? El ID de red y el broadcast. <b>Siempre de cajón vamos a utilizar esa fórmula.</b>"</p>
+
+    <div class="comp">
+      <p class="ct">Completado — sólo calculó la clase A</p>
+      <p>En clase se sacó la cuenta de la A (16,777,214) y quedó dicho de paso que una C son 254. La tabla completa, con las tres, es esta:</p>
+      <div class="tablewrap" style="margin:12px 0 0;"><table style="min-width:420px;">
+        <thead><tr><th>Clase</th><th>Bits de host</th><th>Cuenta</th><th>Hosts</th></tr></thead>
+        <tbody>
+          <tr><td><span class="cls">A</span></td><td class="num">24</td><td class="sym">2<sup>24</sup> - 2</td><td class="num">16,777,214</td></tr>
+          <tr><td><span class="cls">B</span></td><td class="num">16</td><td class="sym">2<sup>16</sup> - 2</td><td class="num">65,534</td></tr>
+          <tr><td><span class="cls">C</span></td><td class="num">8</td><td class="sym">2<sup>8</sup> - 2</td><td class="num">254</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <h3 class="sub">El atajo: mira los primeros bits y ya</h3>
+
+    <p class="body">Cerró el bloque con lo que él mismo llamó "otra forma de diferenciar las clases rápidamente". Si te dan la dirección en binario, <b>no hace falta convertir nada</b>: la clase está en los primeros bits.</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Clase</th><th>Empieza con</th><th>Rango que produce</th></tr></thead>
+      <tbody>
+        <tr><td><span class="cls">A</span></td><td class="sym"><span class="nt">0</span>·······</td><td class="num">1 – 126</td></tr>
+        <tr><td><span class="cls">B</span></td><td class="sym"><span class="nt">10</span>······</td><td class="num">128 – 191</td></tr>
+        <tr><td><span class="cls">C</span></td><td class="sym"><span class="nt">110</span>·····</td><td class="num">192 – 223</td></tr>
+        <tr><td><span class="cls off">D</span></td><td class="sym"><span class="ht">1110</span>····</td><td class="num">224 – 239</td></tr>
+        <tr><td><span class="cls off">E</span></td><td class="sym"><span class="ht">1111</span>····</td><td class="num">240 – 255</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="comp">
+      <p class="ct">Completado — se detuvo en la C</p>
+      <p>En clase dio los patrones de A, B y C y ahí paró, coherente con que la D y la E no se van a usar. Las dos últimas filas de la tabla son el complemento: <b>D empieza con 1110</b> y <b>E con 1111</b>.</p>
+      <p>Fíjate en que el patrón tiene lógica y no hay que memorizarlo bruto: <b>cuentas los unos hasta el primer cero</b>. Cero unos es A, un uno es B, dos unos es C, tres unos es D. Y si nunca aparece el cero, es E.</p>
+    </div>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 4</p>
+      <h3>Identifica la clase sólo con los bits</h3>
+      <p class="ask">Cinco octetos en binario, como los que proyectó al final de la clase. <b>No conviertas a decimal</b>: usa el atajo. La última es la que él puso para comprobar.</p>
+      <div class="qrows" id="q4"></div>
+      <div class="btnrow">
+        <button class="btn" id="q4go" type="button">Revisar</button>
+        <button class="btn ghost" id="q4rs" type="button">Reiniciar</button>
+      </div>
+      <div class="fb" id="q4fb"></div>
+    </div>
+  </section>
+
+  <!-- ============ BLOQUE 5 ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 5 · minuto 38:00 a 54:05</p>
+      <h2 class="sec">El pizarrón: broadcast y comprobación</h2>
+      <p>Pasaron uno por uno al frente. <em>"Para que se nos quite un poquito el sueño."</em> Las direcciones proyectadas no quedaron en la grabación, pero sí los tres ejercicios que resolvió en voz alta con todo el grupo.</p>
+    </div>
+
+    <h3 class="sub">De dónde viene una subred: 112.0.0.0</h3>
+
+    <p class="body">Puso <code>112.0.0.0</code> — clase A, porque 112 cae entre 1 y 126 — y mostró que de ahí sale <code>112.1.2.3</code>, ya subneteada. El punto no era la subred, era <b>de dónde partió</b>:</p>
+
+    <p class="quote">"Este 112.0.0.0 es el identificador de... de dónde partió esta subred. ¿Por qué? Porque esos datos nosotros se los vamos a meter <b>al router</b>, para que identifique nuestros dispositivos que están conectados y de dónde provienen."</p>
+
+    <p class="body">Es la primera vez en la clase que aparece el <em>para qué</em> de todo esto: no es aritmética por deporte, es lo que se le configura al router para que sepa enrutar.</p>
+
+    <h3 class="sub">Las tres direcciones de broadcast</h3>
+
+    <p class="body">La regla que aplicó, dicha por él: <em>"los hosts tienen que estar encendidos"</em>, es decir, <b>todos los bits de host en 1</b>. En decimal, cada octeto completamente de host se vuelve 255.</p>
+
+<pre><code><span class="nt">10</span>.<span class="ht">0.0.0</span>       /8    ->  broadcast  <span class="nt">10</span>.<span class="ht">255.255.255</span>
+<span class="nt">140.10</span>.<span class="ht">0.0</span>   /16   ->  broadcast  <span class="nt">140.10</span>.<span class="ht">255.255</span>
+<span class="nt">192.168.1</span>.<span class="ht">0</span> /24   ->  broadcast  <span class="nt">192.168.1</span>.<span class="ht">255</span></code></pre>
+
+    <p class="body">Los octetos en <span class="nt">verde</span> son la porción de red y no se tocan nunca. Los de <span class="ht">naranja</span> son la porción de host: en el identificador de red van todos en 0, en el broadcast van todos en 255.</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 5</p>
+      <h3>Calcula la dirección que te pido</h3>
+      <p class="ask">Los tres broadcast que resolvieron en clase, más las dos que faltaban: la primera y la última IP utilizable. <b>Escribe la dirección completa.</b> Si contestas algo que se parece pero está apartado, te lo digo.</p>
+      <div class="drill" id="d2"></div>
+    </div>
+
+    <h3 class="sub">Comprobar el atajo: 10000111</h3>
+
+    <p class="body">Al final hizo la comprobación que cierra el círculo del bloque anterior. Pidió convertir <code>10000111</code> a decimal con calculadora. El grupo contestó <b>135</b>, que efectivamente cae en el rango de clase B (128 – 191). Y los primeros bits son <code>10</code>, que es el patrón de la B. Coinciden.</p>
+
+    <p class="quote">"Nos ahorramos todo el show de ver los números, <b>simplemente con los bits lo identificamos</b>."</p>
+
+    <details class="dio"><summary>Cómo se convierte un octeto a decimal sin calculadora</summary><div class="db">
+      <p>Cada posición de los 8 bits vale el doble que la de su derecha. De izquierda a derecha:</p>
+      <pre><code>128  64  32  16   8   4   2   1
+  1   0   0   0   0   1   1   1
+128   +   +   +   +   4 + 2 + 1  =  135</code></pre>
+      <p>Sumas nada más las posiciones donde hay un 1. Vale la pena traer esa fila de ocho números memorizada, porque en subneteo se usa constantemente y la calculadora no siempre está a la mano.</p>
+      <p>El mismo truco al revés te da el atajo de las máscaras: 128 es <code>10000000</code>, 192 es <code>11000000</code> (128+64), 224 es <code>11100000</code> (128+64+32), y así.</p>
+    </div></details>
+  </section>
+
+  <!-- ============ BLOQUE 6 ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 6 · minuto 54:05 a 56:53</p>
+      <h2 class="sec">El cierre, y hacia dónde va esto</h2>
+      <p>Corto y con un alumno preguntando ya de salida. Ahí quedó dicho el criterio que va a ordenar todo el subneteo.</p>
+    </div>
+
+    <p class="body">La pregunta de salida fue sobre clases y cantidad de hosts contra redes, y la respuesta apunta directo a la próxima sesión: como administrador te conviene <b>dedicar el número de identificadores que de verdad necesites</b>, y con CIDR puedes subnetear para las redes específicas que quieras.</p>
+
+    <p class="body">Ese es exactamente el problema que mata al direccionamiento por clases: sólo te deja elegir entre tres tamaños, y los tres están mal para casi cualquier caso real.</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Si necesitas…</th><th>Con clases te dan…</th><th>Desperdicio</th></tr></thead>
+      <tbody>
+        <tr><td class="d">300 equipos en una oficina</td><td class="sym">una clase B (/16)</td><td class="d">65,234 direcciones tiradas</td></tr>
+        <tr><td class="d">20 equipos en un laboratorio</td><td class="sym">una clase C (/24)</td><td class="d">234 direcciones tiradas</td></tr>
+        <tr><td class="d">2 equipos en un enlace entre routers</td><td class="sym">una clase C (/24)</td><td class="d">252 direcciones tiradas</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">La alumna que mencionó CIDR al principio de la clase ya había dicho la conclusión sin saberlo: <em>"a veces con ese tipo de clases sobraban redes"</em>. La siguiente clase es justo cómo dejar de desperdiciarlas.</p>
+
+    <p class="quote">"Empezamos así tranquilitos, <b>poco a poco se va a ir complicando</b>."</p>
+  </section>
+
+  <!-- ============ COMPLETADO ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Completado · no salió en clase</p>
+      <h2 class="sec">Los tres huecos que deja la sesión</h2>
+      <p>Nada de esta sección se dijo el 2 de septiembre. Son piezas que la clase deja abiertas y que conviene tener antes de la siguiente, porque el subneteo las da por sabidas.</p>
+    </div>
+
+    <h3 class="sub">1 · Por qué todos sus ejemplos eran 10, 172 y 192.168</h3>
+
+    <p class="body">Vale la pena notar algo que pasó desapercibido: <b>todas</b> las direcciones que usó de ejemplo durante la clase —<code>10.0.0.0</code>, la <code>172.x</code> de las diapositivas, <code>192.168.1.2</code>— salen de los mismos tres bloques. No es casualidad: son las <b>direcciones privadas</b>, definidas en el RFC 1918.</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Bloque privado</th><th>Prefijo</th><th>Clase de origen</th><th>Dónde lo ves</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">10.0.0.0 – 10.255.255.255</td><td class="sym">/8</td><td class="d">una clase A</td><td class="d">Redes corporativas grandes</td></tr>
+        <tr><td class="sym">172.16.0.0 – 172.31.255.255</td><td class="sym">/12</td><td class="d">16 clases B</td><td class="d">Empresas medianas, Docker</td></tr>
+        <tr><td class="sym">192.168.0.0 – 192.168.255.255</td><td class="sym">/16</td><td class="d">256 clases C</td><td class="d">Tu módem de casa</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">Estas direcciones <b>no se enrutan en Internet</b>: cualquier router público las tira. Se pueden repetir en millones de casas al mismo tiempo sin que nada choque, precisamente porque nunca salen. Y ahí encaja la frase que soltó el profesor sin desarrollarla: <em>"ahora tenemos otros mecanismos que nos proporcionan esas direcciones IP para que nosotros podamos salir afuera y navegar"</em>. Ese mecanismo se llama <b>NAT</b>, y es el punto 2.3 del programa oficial — Unidad II, con práctica propia.</p>
+
+    <p class="body">Fíjate también en el <code>/12</code> del bloque de 172: es exactamente el ejemplo que puso en el pizarrón. No lo eligió al azar.</p>
+
+    <h3 class="sub">2 · Las direcciones que no son de nadie</h3>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Dirección</th><th>Qué es</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">0.0.0.0</td><td class="d">"Esta red" o "cualquier dirección". Un equipo la usa antes de tener IP asignada.</td></tr>
+        <tr><td class="sym">127.0.0.0/8</td><td class="d">Loopback. La que le costó el 127 a la clase A.</td></tr>
+        <tr><td class="sym">169.254.0.0/16</td><td class="d">APIPA. Se la autoasigna un equipo cuando pide IP por DHCP y nadie le contesta. Si ves una de estas en tu máquina, el servidor DHCP no respondió.</td></tr>
+        <tr><td class="sym">255.255.255.255</td><td class="d">Broadcast limitado: a toda la red local, sin importar la máscara.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">La de <code>169.254</code> es la más útil en la práctica: es el diagnóstico más rápido que existe. Aparece sola cuando el DHCP falló, y la vas a ver seguido en el laboratorio de la Unidad IV, donde el punto 4.2.1 del programa es justamente asignación dinámica de direcciones IP.</p>
+
+    <h3 class="sub">3 · Cuántas redes hay de cada clase</h3>
+
+    <p class="body">En clase se contaron los hosts pero nunca las redes, que es la otra mitad del intercambio que mencionó al cierre.</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Clase</th><th>Bits de red disponibles</th><th>Redes</th><th>Hosts por red</th></tr></thead>
+      <tbody>
+        <tr><td><span class="cls">A</span></td><td class="d">7 (el primer bit está fijo en 0)</td><td class="num">126</td><td class="num">16,777,214</td></tr>
+        <tr><td><span class="cls">B</span></td><td class="d">14 (los dos primeros fijos en 10)</td><td class="num">16,384</td><td class="num">65,534</td></tr>
+        <tr><td><span class="cls">C</span></td><td class="d">21 (los tres primeros fijos en 110)</td><td class="num">2,097,152</td><td class="num">254</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">La relación se lee de un vistazo: <b>mientras más redes, menos hosts en cada una</b>. Son los mismos 32 bits repartidos de otra forma. Esa es, literalmente, la única decisión que se toma al subnetear.</p>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 6</p>
+      <h3>Trampas y confusiones frecuentes</h3>
+      <p class="ask">Cinco afirmaciones. <b>Decide si cada una es cierta o falsa.</b> Todas son errores que se cometen seguido, y varias salieron implícitas en la clase.</p>
+      <div class="qrows" id="q6"></div>
+      <div class="btnrow">
+        <button class="btn" id="q6go" type="button">Revisar</button>
+        <button class="btn ghost" id="q6rs" type="button">Reiniciar</button>
+      </div>
+      <div class="fb" id="q6fb"></div>
+    </div>
+  </section>
+
+  <!-- ============ CHULETA ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Referencia</p>
+      <h2 class="sec">Todo junto, en una tabla</h2>
+      <p>Lo de la clase más lo completado, en la forma en que conviene tenerlo antes de un examen. Si sólo vas a guardar una cosa de esta página, es esta tabla.</p>
+    </div>
+
+    <div class="tablewrap"><table style="min-width:640px;">
+      <thead><tr><th>Clase</th><th>Primer octeto</th><th>Bits iniciales</th><th>Prefijo</th><th>Máscara</th><th>Redes</th><th>Hosts</th></tr></thead>
+      <tbody>
+        <tr><td><span class="cls">A</span></td><td class="num">1 – 126</td><td class="sym"><span class="nt">0</span>·······</td><td class="sym">/8</td><td class="sym">255.0.0.0</td><td class="num">126</td><td class="num">16,777,214</td></tr>
+        <tr><td><span class="cls">B</span></td><td class="num">128 – 191</td><td class="sym"><span class="nt">10</span>······</td><td class="sym">/16</td><td class="sym">255.255.0.0</td><td class="num">16,384</td><td class="num">65,534</td></tr>
+        <tr><td><span class="cls">C</span></td><td class="num">192 – 223</td><td class="sym"><span class="nt">110</span>·····</td><td class="sym">/24</td><td class="sym">255.255.255.0</td><td class="num">2,097,152</td><td class="num">254</td></tr>
+        <tr><td><span class="cls off">D</span></td><td class="num">224 – 239</td><td class="sym"><span class="ht">1110</span>····</td><td class="sym">—</td><td class="sym">—</td><td class="d" colspan="2">Multicast. No se asigna a hosts.</td></tr>
+        <tr><td><span class="cls off">E</span></td><td class="num">240 – 255</td><td class="sym"><span class="ht">1111</span>····</td><td class="sym">—</td><td class="sym">—</td><td class="d" colspan="2">Reservada para investigación.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body" style="margin-top:18px;"><b>Y las cuatro reglas que hay que traer de memoria:</b></p>
+
+    <ol class="body">
+      <li>El <b>127</b> es loopback y por eso la clase A se corta en 126.</li>
+      <li>Hosts utilizables = <b>2<sup>bits de host</sup> − 2</b>. Los dos que se van son el ID de red y el broadcast.</li>
+      <li>El <b>ID de red</b> lleva todos los bits de host en 0; el <b>broadcast</b> los lleva todos en 1.</li>
+      <li>La clase se ve en los <b>primeros bits</b>: cuenta los unos hasta el primer cero. 0 = A, 1 = B, 2 = C, 3 = D, ninguno = E.</li>
+    </ol>
+  </section>
+
+  <!-- ============ CIERRE ============ -->
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Lo que queda pendiente</h2>
+      <p>Esta sesión no dejó tarea calificada. Lo que hay son estos cuatro pendientes; se guardan en este navegador.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 4</div>
+    </div>
+
+    <div class="final" id="finalTasks"></div>
+
+    <p class="body" style="margin-top:20px;"><b>Cuál urge.</b> Ninguno tiene fecha, pero el orden natural es: repasar los apuntes que subió (es la única instrucción explícita que dio), y llegar a la próxima clase con la tabla de arriba dominada, porque el subneteo la usa como piso y ya no la va a volver a explicar.</p>
+
+    <footer class="page">
+      <p>Reconstruido a partir de la transcripción del 2 de septiembre, que está incompleta: el bloque de ejercicios del pizarrón (38:00 – 54:05) sólo conservó las intervenciones del profesor, así que las direcciones proyectadas que resolvieron los alumnos no se pudieron recuperar. Los ejercicios de esta página que corresponden a ese bloque están armados con los casos que sí quedaron registrados.</p>
+      <p>Todo lo marcado con borde naranja punteado es material de completado, no salió en clase.</p>
+    </footer>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============ motor de quiz (reusado de la serie) ============ */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root = document.getElementById(rootId),
+        fb   = document.getElementById(fbId),
+        sel  = {};
+
+    function build(){
+      root.innerHTML = ""; fb.className = "fb"; sel = {};
+      items.forEach(function(it, i){
+        var row = document.createElement("div"); row.className = "qrow";
+        var q   = document.createElement("div"); q.className = "qq"; q.innerHTML = it.q;
+        var op  = document.createElement("div"); op.className = "qopts";
+        it.opts.forEach(function(o, j){
+          var b = document.createElement("button");
+          b.type = "button"; b.className = "qopt"; b.textContent = o;
+          b.addEventListener("click", function(){
+            sel[i] = j;
+            Array.prototype.forEach.call(op.children, function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why = document.createElement("div"); why.className = "qwhy"; why.innerHTML = it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click", function(){
+      var rows = root.children, right = 0, answered = 0;
+      Array.prototype.forEach.call(rows, function(r, i){
+        r.classList.remove("right", "wrong");
+        var why = r.querySelector(".qwhy");
+        if (sel[i] === undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if (sel[i] === items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if (answered < items.length){
+        fb.className = "fb show bad";
+        fb.innerHTML = "<b>Te faltan respuestas.</b> Contesta las " + items.length + " y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className = "fb show " + (right === items.length ? "good" : "bad");
+      fb.innerHTML = right === items.length
+        ? allGood
+        : "<b>" + right + " de " + items.length + ".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click", build);
+    build();
+  }
+
+  /* ============ motor de drill escrito con pistas por error ============ */
+  function drill(rootId, items, doneMsg){
+    var root = document.getElementById(rootId), i = 0;
+    root.innerHTML =
+      '<div class="dprog"></div>' +
+      '<div class="prompt"><span class="lbl"></span><span class="txt"></span></div>' +
+      '<div class="drow"><input class="din" type="text" spellcheck="false" autocomplete="off" autocapitalize="off"></div>' +
+      '<div class="btnrow">' +
+        '<button class="btn" type="button" data-go>Revisar</button>' +
+        '<button class="btn ghost" type="button" data-rs>Reiniciar</button>' +
+      '</div>' +
+      '<div class="fb"></div>';
+
+    var prog = root.querySelector(".dprog"),
+        lbl  = root.querySelector(".lbl"),
+        txt  = root.querySelector(".txt"),
+        inp  = root.querySelector(".din"),
+        fb   = root.querySelector(".fb"),
+        go   = root.querySelector("[data-go]"),
+        rs   = root.querySelector("[data-rs]");
+
+    function render(){
+      var it = items[i];
+      prog.textContent = (i + 1) + " de " + items.length;
+      lbl.textContent = it.lbl;
+      txt.textContent = it.ask;
+      inp.value = ""; inp.className = "din"; inp.disabled = false;
+      go.disabled = false; go.textContent = "Revisar";
+      fb.className = "fb";
+    }
+
+    function norm(s){ return s.replace(/\s+/g, "").replace(/,/g, "."); }
+
+    function check(){
+      var it = items[i], v = norm(inp.value);
+      if (!v){
+        fb.className = "fb show bad";
+        fb.innerHTML = "<b>Escribe algo primero.</b> " + it.lbl.toLowerCase() + ".";
+        return;
+      }
+      if (v === it.ans){
+        inp.className = "din ok"; inp.disabled = true; go.disabled = true;
+        fb.className = "fb show good";
+        if (i === items.length - 1){
+          fb.innerHTML = "<b>Correcto.</b> " + it.ok + "<br><br>" + doneMsg;
+        } else {
+          fb.innerHTML = "<b>Correcto.</b> " + it.ok;
+          go.disabled = false; go.textContent = "Siguiente";
+          go.onclick = function(){ i++; render(); go.onclick = null; };
+        }
+        return;
+      }
+      inp.className = "din no";
+      var hint = "";
+      (it.hints || []).some(function(h){
+        if (h.test.test(v)){ hint = h.say; return true; }
+        return false;
+      });
+      fb.className = "fb show bad";
+      fb.innerHTML = "<b>Todavía no.</b> " + (hint || it.miss);
+    }
+
+    go.addEventListener("click", function(){ if (go.textContent === "Revisar") check(); });
+    inp.addEventListener("keydown", function(e){
+      if (e.key === "Enter"){ e.preventDefault(); if (go.textContent === "Revisar") check(); else go.click(); }
+    });
+    rs.addEventListener("click", function(){ i = 0; go.onclick = null; render(); });
+    render();
+  }
+
+  /* ============ 1. clase por primer octeto ============ */
+  var CLS5 = ["A", "B", "C", "D o E", "Ninguna"];
+  quiz("q1", [
+    { q: "192.168.1.2", opts: CLS5, ans: 2,
+      why: "<b>Clase C.</b> El 192 abre justamente el rango de la C (192 a 223). Es la dirección que dio un compañero en clase." },
+    { q: "10.0.0.0", opts: CLS5, ans: 0,
+      why: "<b>Clase A.</b> El 10 cae en 1 a 126. Es la que usó para el primer ejercicio de broadcast." },
+    { q: "140.10.0.0", opts: CLS5, ans: 1,
+      why: "<b>Clase B.</b> El 140 cae en 128 a 191. Fue el segundo ejercicio de broadcast." },
+    { q: "112.0.0.0", opts: CLS5, ans: 0,
+      why: "<b>Clase A.</b> 112 está entre 1 y 126. Es la del ejemplo de la subred 112.1.2.3." },
+    { q: "127.0.0.1", opts: CLS5, ans: 4,
+      why: "<b>Ninguna.</b> Aquí está el tache que puso en clase: el 127 <em>parece</em> clase A porque es menor que 128, pero está apartado para loopback. Por eso la A termina en 126." },
+    { q: "224.0.0.5", opts: CLS5, ans: 3,
+      why: "<b>Clase D.</b> El rango 224 a 239 es multicast. No se le asigna a un host: es una dirección de grupo, y esa en particular la usan los routers que hablan OSPF." }
+  ], "q1go", "q1rs", "q1fb",
+  "<b>Las seis.</b> Y la clave está en las dos últimas: sólo hay que mirar el primer octeto, pero acordándote de que el 127 no cuenta y de que arriba del 223 ya no estás en territorio asignable.");
+
+  /* ============ 2. drill de máscaras ============ */
+  drill("d1", [
+    { lbl: "Escribe la máscara de", ask: "/8",
+      ans: "255.0.0.0", ok: "Ocho unos llenan el primer octeto y el resto queda en ceros. Es la nativa de clase A.",
+      miss: "Ocho unos completos son un octeto entero. ¿Cuánto vale un octeto lleno de unos?",
+      hints: [
+        { test: /^8$|^\/8$/, say: "Te estoy pidiendo la conversión, no el prefijo otra vez. Escríbela con puntos." },
+        { test: /^255\.255/, say: "Te pasaste de octeto: ya llevas 16 unos o más. /8 sólo llena el primero." }
+      ] },
+    { lbl: "Escribe la máscara de", ask: "/16",
+      ans: "255.255.0.0", ok: "Dos octetos llenos. Es la nativa de clase B.",
+      miss: "Dieciséis unos son exactamente dos octetos completos.",
+      hints: [
+        { test: /^255\.0\.0\.0$/, say: "Esa es la de /8. Con /16 son dos octetos de red, no uno." },
+        { test: /^255\.255\.255/, say: "Esa es la de /24. Con /16 te detienes en el segundo octeto." }
+      ] },
+    { lbl: "Escribe la máscara de", ask: "/24",
+      ans: "255.255.255.0", ok: "Tres octetos llenos, el último libre para hosts. Es la nativa de clase C.",
+      miss: "Veinticuatro unos son tres octetos completos, y queda uno en ceros.",
+      hints: [
+        { test: /^255\.255\.255\.255$/, say: "Esa sería /32, una sola dirección. Con /24 el último octeto queda en ceros, que es donde viven los 254 hosts." }
+      ] },
+    { lbl: "Escribe la máscara de", ask: "/12  (el que dejó en bits)",
+      ans: "255.240.0.0", ok: "8 unos del primer octeto + 4 robados al segundo. Cuatro unos por la izquierda dan 128+64+32+16 = 240.",
+      miss: "Son 8 unos completos y 4 más en el segundo octeto. Suma 128+64+32+16 para ese segundo octeto.",
+      hints: [
+        { test: /^255\.255\.0\.0$/, say: "Esa es /16. En /12 sólo le robas 4 bits al segundo octeto, no los 8." },
+        { test: /^255\.12\.0\.0$/, say: "La máscara no lleva el número del prefijo adentro: lleva unos. Cuatro unos por la izquierda del segundo octeto valen 240." },
+        { test: /^255\.4\.|^255\.16\./, say: "Ojo con el orden: los unos se cuentan desde la izquierda del octeto, así que valen 128+64+32+16, no 1+2+4+8." }
+      ] },
+    { lbl: "Escribe la máscara de", ask: "/23  (el otro que dejó en bits)",
+      ans: "255.255.254.0", ok: "8 + 8 + 7 unos. Al tercer octeto le falta el último bit, y eso da 254, no 255.",
+      miss: "Dos octetos llenos y 7 unos en el tercero. A ese tercer octeto le falta justo un bit para estar lleno.",
+      hints: [
+        { test: /^255\.255\.255\.0$/, say: "Esa es /24, un bit más. En /23 al tercer octeto le falta el último bit: vale 254." },
+        { test: /^255\.255\.0\.0$/, say: "Esa es /16. En /23 le robas 7 bits al tercer octeto." },
+        { test: /^255\.255\.253\.|^255\.255\.252\./, say: "Cerca, pero cuenta otra vez: 7 unos seguidos desde la izquierda son 128+64+32+16+8+4+2 = 254." }
+      ] }
+  ],
+  "<b>Terminaste el drill.</b> Con esos cinco cubres todo lo que puso en el pizarrón. El de /23 es el que más se falla en examen, por el 254.");
+
+  /* ============ 3. capa 2 vs capa 3 ============ */
+  quiz("q3", [
+    { q: "<em>¿En qué capa del modelo OSI opera IPv4?</em>",
+      opts: ["Capa 2, enlace", "Capa 3, red", "Capa 4, transporte"], ans: 1,
+      why: "<b>Capa 3.</b> Lo dictó tal cual de los apuntes. Por eso al router se le llama dispositivo de capa 3 y al switch de capa 2." },
+    { q: "<em>En Redes 1, comunicándose por switch dentro de la LAN, ¿hacían falta direcciones IP?</em>",
+      opts: ["Sí, siempre", "No, se comunicaban por MAC"], ans: 1,
+      why: "<b>No.</b> Su respuesta fue directa: trabajaban en capa 2, en enlace de datos, y se comunicaban por la MAC de la tarjeta de red. La IP se vuelve obligatoria cuando entra el router." },
+    { q: "<em>\"No orientado a conexión\" significa que…</em>",
+      opts: ["No hace falta confirmación de que el paquete llegó", "No se puede usar sin cable", "Sólo funciona dentro de una LAN"], ans: 0,
+      why: "<b>No hace falta confirmación.</b> Se sigue mandando información sin saber si llegó. Quien sí exige acuse es TCP, que va por encima de IP." },
+    { q: "<em>Un switch capa 3, según lo que dijo en clase…</em>",
+      opts: ["Es lo mismo que un hub", "Puede comportarse como router", "Sólo sirve para VLANs"], ans: 1,
+      why: "<b>Puede comportarse como router.</b> Textual: <em>\"tiene la posibilidad de convertirse en un router\"</em>. Es el equipo con el que van a trabajar en las prácticas de la Unidad II." }
+  ], "q3go", "q3rs", "q3fb",
+  "<b>Las cuatro.</b> La distinción capa 2 / capa 3 es la que sostiene el resto del semestre: todo lo de switches y VLANs vive en capa 2, todo lo de ruteo y NAT en capa 3.");
+
+  /* ============ 4. clase por bits ============ */
+  var CLSB = ["A", "B", "C", "D", "E"];
+  quiz("q4", [
+    { q: "11000000", opts: CLSB, ans: 2,
+      why: "<b>Clase C.</b> Los primeros bits son <code>110</code>, justo el patrón que señaló un alumno en el pizarrón. En decimal es 192, el arranque de la C." },
+    { q: "00001010", opts: CLSB, ans: 0,
+      why: "<b>Clase A.</b> El primer bit es 0 y con eso basta. En decimal es 10." },
+    { q: "10000111", opts: CLSB, ans: 1,
+      why: "<b>Clase B.</b> Es el que puso para comprobar: empieza con <code>10</code>, y al convertirlo da 135, que cae dentro de 128 a 191. Coincide por los dos caminos." },
+    { q: "11101000", opts: CLSB, ans: 3,
+      why: "<b>Clase D.</b> Tres unos antes del cero: <code>1110</code>. En decimal es 232, dentro del rango de multicast (224 a 239). Este patrón no lo dio en clase." },
+    { q: "11110101", opts: CLSB, ans: 4,
+      why: "<b>Clase E.</b> Cuatro unos y ningún cero en las primeras cuatro posiciones: <code>1111</code>. En decimal es 245, el rango reservado. Tampoco lo dio en clase." }
+  ], "q4go", "q4rs", "q4fb",
+  "<b>Las cinco.</b> El atajo completo es contar los unos hasta el primer cero: ninguno es A, uno es B, dos es C, tres es D, y si no aparece el cero es E. Con eso te ahorras la conversión, que fue exactamente el punto que quería dejar.");
+
+  /* ============ 5. drill de broadcast e IPs utilizables ============ */
+  drill("d2", [
+    { lbl: "Dirección de broadcast de", ask: "10.0.0.0 /8",
+      ans: "10.255.255.255", ok: "Los tres octetos de host se van todos a 255. La porción de red, el 10, no se toca.",
+      miss: "Con /8 sólo el primer octeto es de red. Los otros tres son host, y en broadcast van todos en unos.",
+      hints: [
+        { test: /^255\.255\.255\.255$/, say: "Ese es el broadcast limitado, otra cosa. Aquí el 10 es porción de red y se queda tal cual." },
+        { test: /^10\.0\.0\.255$/, say: "Te faltaron octetos: con /8 son tres octetos de host, no uno. Los tres se van a 255." },
+        { test: /^10\.0\.0\.0$/, say: "Ese es el identificador de red, el opuesto. En broadcast los bits de host van todos en 1, no en 0." }
+      ] },
+    { lbl: "Dirección de broadcast de", ask: "140.10.0.0 /16",
+      ans: "140.10.255.255", ok: "Dos octetos de red intactos, dos de host en 255. Es el segundo que resolvieron en clase.",
+      miss: "Con /16 los dos primeros octetos son de red. Los dos últimos son host.",
+      hints: [
+        { test: /^140\.255\.255\.255$/, say: "Tocaste el segundo octeto, y con /16 ese todavía es porción de red. Sólo cambian los dos últimos." },
+        { test: /^140\.10\.0\.255$/, say: "Con /16 son dos octetos de host, no uno. Los dos se van a 255." }
+      ] },
+    { lbl: "Dirección de broadcast de", ask: "192.168.1.0 /24",
+      ans: "192.168.1.255", ok: "Un solo octeto de host, y se va a 255. El tercero que resolvieron.",
+      miss: "Con /24 sólo el último octeto es de host.",
+      hints: [
+        { test: /^192\.168\.255\.255$/, say: "El tercer octeto todavía es de red con /24. Sólo cambia el cuarto." }
+      ] },
+    { lbl: "Primera IP utilizable de", ask: "192.168.1.0 /24",
+      ans: "192.168.1.1", ok: "La .1, inmediatamente después del identificador de red. Es la que él señaló como la típica del router.",
+      miss: "El .0 está apartado como identificador de red, así que la primera que se puede asignar es la siguiente.",
+      hints: [
+        { test: /^192\.168\.1\.0$/, say: "Esa es el identificador de red, no se le asigna a ningún equipo. La primera utilizable es la siguiente." }
+      ] },
+    { lbl: "Última IP utilizable de", ask: "192.168.1.0 /24",
+      ans: "192.168.1.254", ok: "La .254. Van de la 1 a la 254 justamente porque el 0 y el 255 están apartados.",
+      miss: "El rango va de 1 a 254 porque hay dos direcciones que nunca se asignan. ¿Cuál es la de arriba?",
+      hints: [
+        { test: /^192\.168\.1\.255$/, say: "Esa es la de broadcast: es una de las dos que se restan. La última que sí se asigna es la anterior." },
+        { test: /^192\.168\.1\.256$/, say: "Un octeto no pasa de 255, son 8 bits. Y el 255 además está apartado para broadcast." }
+      ] }
+  ],
+  "<b>Los cinco.</b> Esos cinco cálculos son toda la aritmética que pidió esta clase. En la siguiente, con subneteo, el ID de red deja de terminar siempre en .0 y ahí es donde se pone interesante.");
+
+  /* ============ 6. trampas ============ */
+  var VF = ["Cierto", "Falso"];
+  quiz("q6", [
+    { q: "<em>127.0.0.1 es una dirección de clase A.</em>", opts: VF, ans: 1,
+      why: "<b>Falso.</b> Es el tache de la clase. El 127 está apartado para loopback y por eso la clase A se corta en 126." },
+    { q: "<em>Una máscara 255.255.100.0 es válida.</em>", opts: VF, ans: 1,
+      why: "<b>Falso.</b> Una máscara son unos seguidos de ceros, sin mezclarse. 100 en binario es <code>01100100</code>, con unos y ceros revueltos. Los únicos valores posibles en un octeto partido son 128, 192, 224, 240, 248, 252, 254 y 255." },
+    { q: "<em>En una red /24 puedes conectar 256 dispositivos.</em>", opts: VF, ans: 1,
+      why: "<b>Falso.</b> Son 256 direcciones, pero 254 utilizables. Se restan el identificador de red y el broadcast. <em>\"Siempre de cajón vamos a utilizar esa fórmula.\"</em>" },
+    { q: "<em>Una dirección clase A subneteada a /24 sigue siendo clase A.</em>", opts: VF, ans: 0,
+      why: "<b>Cierto.</b> Es exactamente el ejemplo del 10.x.x.x /24 que mostró. La clase la define el primer octeto y no cambia; lo que cambia es dónde pusiste la línea. Por eso dijo <em>\"partimos de una clase tipo A subneteada a una clase C\"</em>: se comporta como C, pero es A." },
+    { q: "<em>Dos casas distintas pueden tener las dos un equipo en 192.168.1.5 al mismo tiempo.</em>", opts: VF, ans: 0,
+      why: "<b>Cierto</b>, y no contradice que la IP sea única. 192.168.0.0/16 es un bloque privado: esas direcciones no se enrutan en Internet, así que la unicidad sólo se exige dentro de cada red. Esto no se vio en clase, está en la sección de completado." }
+  ], "q6go", "q6rs", "q6fb",
+  "<b>Las cinco.</b> Las dos últimas son las que separan a quien memorizó la tabla de quien entendió qué significa la línea entre red y host.");
+
+  /* ============ explorador de prefijo ============ */
+  var slider = document.getElementById("pfxSlider"),
+      pfxVal = document.getElementById("pfxVal"),
+      tStrip = document.getElementById("toolStrip"),
+      roMask = document.getElementById("roMask"),
+      roHB   = document.getElementById("roHostBits"),
+      roTot  = document.getElementById("roTotal"),
+      roHost = document.getElementById("roHosts"),
+      roNote = document.getElementById("roNote");
+
+  function maskFrom(p){
+    var o = [], i;
+    for (i = 0; i < 4; i++){
+      var bits = Math.min(8, Math.max(0, p - i * 8));
+      o.push(bits === 0 ? 0 : 256 - Math.pow(2, 8 - bits));
+    }
+    return o.join(".");
+  }
+
+  function note(p){
+    if (p === 8)  return "<b>/8 es la nativa de clase A.</b> El primer octeto completo es de red y no se toca: son los que el profesor llamó inamovibles.";
+    if (p === 16) return "<b>/16 es la nativa de clase B.</b> Mitad y mitad, como lo resumió en el pizarrón.";
+    if (p === 24) return "<b>/24 es la nativa de clase C.</b> Tres octetos de red, uno de host, y ya no queda octeto que robar para subnetear.";
+    if (p === 12) return "<b>Este es su ejemplo del /12.</b> Partiendo de clase A, los 8 primeros bits ya eran de red y le robaste 4 al segundo octeto. Fíjate en el 240 de la máscara.";
+    if (p === 23) return "<b>Este es su ejemplo del /23.</b> Partiendo de clase B, le robaste 7 bits al tercer octeto. La máscara da 254, no 255, porque falta justo un bit.";
+    if (p < 16)   return "Estás entre la frontera de clase A y la de clase B: le estás robando " + (p - 8) + " bit(s) al segundo octeto para hacer subredes de una clase A.";
+    if (p < 24)   return "Estás entre la frontera de clase B y la de clase C: le estás robando " + (p - 16) + " bit(s) al tercer octeto.";
+    return "Pasaste la frontera de la clase C: le estás robando " + (p - 24) + " bit(s) al último octeto, el que estaba destinado a puros hosts. Aquí ya es subneteo puro, que es la clase siguiente.";
+  }
+
+  function renderTool(){
+    var p = parseInt(slider.value, 10), i, j, html = "";
+    for (i = 0; i < 4; i++){
+      html += '<div class="oct">';
+      for (j = 0; j < 8; j++){
+        var idx = i * 8 + j;
+        html += idx < p ? '<span class="b n">1</span>' : '<span class="b h">0</span>';
+      }
+      html += "</div>";
+    }
+    tStrip.innerHTML = html;
+    tStrip.setAttribute("aria-label", "Máscara /" + p + ": " + p + " bits de red y " + (32 - p) + " bits de host");
+
+    var hb = 32 - p, total = Math.pow(2, hb);
+    pfxVal.textContent = "/" + p;
+    roMask.textContent = maskFrom(p);
+    roHB.textContent = hb;
+    roTot.textContent = total.toLocaleString("es-MX");
+    roHost.textContent = (total - 2).toLocaleString("es-MX");
+    roNote.innerHTML = note(p);
+  }
+
+  slider.addEventListener("input", renderTool);
+  renderTool();
+
+  /* ============ checklist ============ */
+  var FINAL = [
+    { id: "c2sep-apuntes", t: "Repasar los apuntes que subió a la plataforma",
+      d: "La única instrucción explícita de la sesión: \"ya ustedes al ratito en su casa le dan otra repasada más en forma\". En clase sólo se detuvo en lo que consideró importante." },
+    { id: "c2sep-tabla", t: "Dominar la tabla de clases antes de la próxima clase",
+      d: "Rangos, máscaras, bits iniciales y la fórmula 2^n - 2. El subneteo la da por sabida y no la vuelve a explicar." },
+    { id: "c2sep-pendiente", t: "Preguntar por el ejercicio que quedó pendiente",
+      d: "La última dirección proyectada no se veía y la dejó para después: \"esa la dejamos pendiente\". Vale la pena recordárselo." },
+    { id: "c2sep-cidr", t: "Leer por encima qué es CIDR",
+      d: "No es tarea. Pero una compañera ya lo trajo a colación y él frenó el tema para después: llegar con la idea general hace que la clase de subneteo cueste la mitad." }
+  ];
+
+  var KEY = "clase-2sep-tareas", st = {};
+  try { st = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { st = {}; }
+
+  var fh  = document.getElementById("finalTasks"),
+      bar = document.getElementById("bar"),
+      pc  = document.getElementById("pcount");
+
+  FINAL.forEach(function(it){
+    var l  = document.createElement("label"); l.className = "ftask";
+    var cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!st[it.id];
+    var b  = document.createElement("div");
+    b.innerHTML = '<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent  = it.t;
+    b.querySelector(".td2").textContent = it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if (cb.checked) l.classList.add("done");
+    cb.addEventListener("change", function(){
+      st[it.id] = cb.checked;
+      l.classList.toggle("done", cb.checked);
+      try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+
+  function refresh(){
+    var done = 0, boxes = fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes, function(c){ if (c.checked) done++; });
+    pc.textContent = done + " / " + FINAL.length;
+    bar.style.width = Math.round(done / FINAL.length * 100) + "%";
+  }
+  refresh();
+})();
+</script>
