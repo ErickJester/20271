@@ -2,7 +2,7 @@
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="${OUT:-$(cd "$HERE/.." && pwd)}"
-NAME="${NAME:-Infografia - Concepto de Liderazgo}"
+NAME="${NAME:-Organizador - Liderazgo Personal}"
 
 # navegador: el primero que exista (o CHROME=... por fuera)
 if [ -z "$CHROME" ]; then
@@ -19,7 +19,7 @@ fi
 
 # inlinar fuentes base64 en un HTML autocontenido
 awk 'BEGIN{while((getline line < "'"$HERE"'/fonts.css")>0) css=css line "\n"}
-     /\/\*FONTS\*\//{printf "%s", css; next} {print}' "$HERE/infografia.html" > "$HERE/build.html"
+     /\/\*FONTS\*\//{printf "%s", css; next} {print}' "$HERE/organizador.html" > "$HERE/build.html"
 
 WINHTML=$(cygpath -w "$HERE/build.html")
 WINPDF=$(cygpath -w "$OUT/$NAME.pdf")
