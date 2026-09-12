@@ -1,0 +1,896 @@
+<title>Clase 6 · Apache y Nginx en Docker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDF0F1; --surface:#FFFFFF; --surface-2:#F4F7F8;
+    --text:#12181B; --text-muted:#57666B; --border:#D7DEE1;
+    --accent:#1D6E8C; --accent-soft:#DDF0F6; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --run:#B4551F; --run-soft:#FBEADD;
+    --file:#186156; --file-soft:#DEEEEA;
+    --apache:#C1442A; --apache-soft:#F8E3DD;
+    --nginx:#1E7A4C; --nginx-soft:#DFF0E6;
+    --code-bg:#EFF3F3;
+    --shadow:0 1px 2px rgba(18,24,27,.06), 0 10px 26px -14px rgba(18,24,27,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1416; --surface:#161D20; --surface-2:#1C2427;
+      --text:#E7EDEE; --text-muted:#94A6AB; --border:#2A3438;
+      --accent:#7FC6E4; --accent-soft:#132A34; --accent-ink:#0E1416;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --run:#E29A5C; --run-soft:#332212;
+      --file:#5FC2AE; --file-soft:#12332C;
+      --apache:#EE8F76; --apache-soft:#332018;
+      --nginx:#67CB94; --nginx-soft:#12301F;
+      --code-bg:#141B1D;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1416; --surface:#161D20; --surface-2:#1C2427;
+    --text:#E7EDEE; --text-muted:#94A6AB; --border:#2A3438;
+    --accent:#7FC6E4; --accent-soft:#132A34; --accent-ink:#0E1416;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --run:#E29A5C; --run-soft:#332212;
+    --file:#5FC2AE; --file-soft:#12332C;
+    --apache:#EE8F76; --apache-soft:#332018;
+    --nginx:#67CB94; --nginx-soft:#12301F;
+    --code-bg:#141B1D;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+
+  /* --- las dos rutas de Docker: el dispositivo estructural de esta clase --- */
+  .ruta{border-left:3px solid var(--c); padding-left:16px;}
+  .ruta.dash{border-left-style:dashed;}
+  .ruta h2.sec{color:var(--c);}
+  .rutabar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .rutachip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .rutachip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--c);}
+  .rutachip.dash::before{background:none; border:2px dashed var(--c); height:10px;}
+
+  /* --- chips de servidor: Apache / Nginx --- */
+  .srv{display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace;
+    font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    padding:3px 9px; border-radius:5px;}
+  .srv.apache{background:var(--apache-soft); color:var(--apache);}
+  .srv.nginx{background:var(--nginx-soft); color:var(--nginx);}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  /* --- nota editorial (no es cita del profesor) --- */
+  .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; margin:16px 0; max-width:68ch; display:flex; gap:11px;}
+  .note .ic{flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--border);
+    color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;}
+  .note p{font-family:'Source Serif 4',Georgia,serif; font-size:.86rem; line-height:1.55;
+    color:var(--text-muted); margin:0;}
+  .note b{color:var(--text); font-weight:600;}
+
+  /* --- resumen de arranque --- */
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.76rem; padding:7px 12px;
+    border-radius:8px; cursor:pointer; text-align:left;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+  .task pre{font-size:.74rem; background:var(--surface); margin:9px 0;}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:460px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:460px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+
+  /* --- inventario del laboratorio --- */
+  .lab{display:flex; flex-direction:column; gap:8px; margin:14px 0 8px; max-width:68ch;}
+  .lab-item{display:flex; align-items:center; gap:11px; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:9px 13px; box-shadow:var(--shadow);}
+  .lab-item .dot{flex:0 0 auto; width:9px; height:9px; border-radius:50%; background:var(--accent);}
+  .lab-item .lt{font-size:.87rem; font-weight:600;}
+  .lab-item .ld{font-family:'Source Serif 4',Georgia,serif; font-size:.82rem; color:var(--text-muted);}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Web Client · Clase 6 · práctica de laboratorio · miércoles 9 de septiembre</p>
+    <h1>Apache y Nginx en Docker</h1>
+    <p class="lede">Clase de <b>pura práctica</b>: primero cerró los entregables del avance de proyecto, y luego se sentó a construir con el grupo dos formas de publicar el minisitio de nuevo ingreso en un contenedor — un <code>docker run</code> con todos sus flags, y la ruta que sí queda en el repo: un <code>Dockerfile</code>. El resto de la clase fue laboratorio: montar el mismo sitio en Apache y en Nginx, cada uno en su puerto.</p>
+    <p class="lede" style="margin-top:10px;">La página sigue las <b style="color:var(--run)">dos rutas de Docker</b> con un riel de color: <b style="color:var(--run)">ámbar punteado el <code>docker run</code></b> — rápido, pero no queda guardado en ningún lado — y <b style="color:var(--file)">verde sólido el <code>Dockerfile</code></b>, la que sí se versiona. Los servidores de la práctica llevan su propio color: <span class="srv apache">Apache</span> <span class="srv nginx">Nginx</span>.</p>
+    <p class="lede" style="margin-top:10px;"><b style="color:var(--accent);">Los botones con <span style="font-family:'IBM Plex Mono',monospace;">?</span></b> explican los términos que dio por sabidos. Hay seis ejercicios intercalados.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="arranque">
+    <h2>Lo que salió de esta clase</h2>
+    <ol>
+      <li><span class="t">00:00</span><span class="d"><b>Avance de proyecto:</b> diccionario de datos, modelo E-R, script SQL y su representación relacional. Al menos <b>5 tablas</b> sin contar gestión de usuarios, y la base en al menos <b>3FN</b>.</span></li>
+      <li><span class="t">17:00</span><span class="d"><b>Práctica:</b> publicar el minisitio en un <span class="srv apache">Apache</span> (puerto <b>8080</b>) y en un <span class="srv nginx">Nginx</span> (puerto <b>8081</b>). Es el trabajo del resto de la clase.</span></li>
+      <li><span class="t">31:45</span><span class="d"><b>Pendiente administrativo:</b> "asuman que todo se entrega el 11 de septiembre" — ~15 actividades subidas a la plataforma, varias son solo lecturas.</span></li>
+      <li><span class="t">confirmado</span><span class="d">La <b>réplica del minisitio de nuevo ingreso</b> (tarea de la clase 2) ya quedó entregada por el grupo — con ella se trabajó toda la sesión.</span></li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <span class="ic">i</span>
+    <p><b>Nota sobre la fecha de esta clase:</b> se infiere miércoles 9 de septiembre por el patrón lunes/miércoles del curso (la clase 5 fue el lunes 7). El propio profesor dice en esta sesión "todavía tenemos como una semanita" hablando del 11 de septiembre, lo cual encajaría mejor con una fecha unos días antes del 9. Vale la pena confirmarla contra tu propio calendario antes de fiarte de ella para otra cosa.</p>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 0 · minuto 00:00 a 05:30</p>
+      <h2 class="sec">Lo que ya se debe entregar del proyecto</h2>
+      <p>Antes de tocar Docker, cerró la lista de entregables del avance del primer parcial. El proyecto sigue siendo libre — equipos de hasta cuatro, problema a elección — pero estos cuatro documentos ya no son opcionales.</p>
+    </div>
+
+    <p class="quote">"Es libre, hasta ahí. ¿Vamos bien o nos regresamos? Entonces, ¿qué vamos a entregar hasta ahorita?"</p>
+
+    <p class="body">Cuatro piezas, en el orden en que las nombró — aunque él mismo aclaró que <b>no es el orden en que se construyen</b>: el script SQL y la base ya debieron existir antes de poder sacar el diagrama entidad-relación con una herramienta.</p>
+
+    <ol class="body">
+      <li><b>Portada.</b></li>
+      <li><b>Diccionario de datos:</b> la tabla con atributo, tipo, restricciones (numérico, autogenerado, llave primaria, no nulo…) y una descripción en prosa de qué representa cada campo.</li>
+      <li><b>Modelo entidad-relación (E-R).</b></li>
+      <li><b>Script de creación de la base de datos</b> (el archivo <code>.sql</code>), del cual —con ingeniería inversa en el IDE que uses— sale el E-R y la representación relacional casi solos.</li>
+    </ol>
+
+    <details class="dio"><summary>¿Qué hace exactamente la "reingeniería" que mencionó?</summary><div class="db">
+      <p>Es <b>ingeniería inversa</b>: en vez de dibujar el diagrama y de ahí generar el script SQL (el camino "de adelante hacia atrás"), le das a la herramienta una base de datos ya creada y ella dibuja el diagrama entidad-relación leyendo las tablas, columnas y llaves foráneas que encuentra. MySQL Workbench, DBeaver y Navicat lo hacen todos con un asistente de "Reverse Engineer" o similar.</p>
+    </div></details>
+
+    <p class="body">Dos reglas de diseño, ambas ya vistas en Bases de Datos pero que insistió en repetir:</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Regla</th><th>Detalle</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">≥ 5 tablas</td><td class="d">Sin contar el módulo de gestión de usuarios. Ese módulo "va de cajón" — usuarios, roles y la tabla de unión entre ambos son <b>tres tablas más</b>, aparte.</td></tr>
+        <tr><td class="sym">3FN</td><td class="d">Tercera Forma Normal, como mínimo. "Ya pasaron por bases de datos" — no lo explicó de nuevo, lo dio por hecho.</td></tr>
+      </tbody>
+    </table></div>
+
+    <details class="dio"><summary>¿Qué exige la Tercera Forma Normal (3FN), en corto?</summary><div class="db">
+      <p>Que cada columna dependa <b>solo</b> de la llave primaria de su tabla, y de nada más. Si una columna en realidad describe a otra columna que no es la llave (por ejemplo, guardar el nombre de una carrera dentro de la tabla de alumnos en vez de solo su <code>id_carrera</code>), esa columna se va a su propia tabla. Es la regla que evita que un mismo dato se repita en muchas filas y se desincronice.</p>
+    </div></details>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 1 · cuenta las tablas</p>
+    <h3>¿Cuántas tablas, según qué incluyas?</h3>
+    <p class="ask">Tres preguntas sobre las reglas que acaba de poner. Contesta las tres y dale a <b>Revisar</b>.</p>
+    <div class="qrows" id="q1"></div>
+    <div class="btnrow">
+      <button class="btn" id="q1go" type="button">Revisar</button>
+      <button class="btn ghost" id="q1rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q1fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 1 · minuto 05:30 a ~11:00</p>
+      <h2 class="sec">Ruta 1 — <code>docker run</code>, flag por flag</h2>
+      <p>Retomó la presentación de contenedores donde se había quedado, y armó en el pizarrón el comando completo para publicar el minisitio sin escribir un solo archivo de configuración.</p>
+    </div>
+
+    <div class="ruta dash" style="--c:var(--run);">
+      <div class="rutabar"><span class="rutachip dash">docker run · no queda guardado en ningún lado</span></div>
+
+      <p class="body">Partió de una estructura de carpetas concreta —la suya, en su propia máquina— para que quedara claro de dónde sale cada pieza del comando: <code>Documentos\escom\2027-1\escom\back-front\contenedores\minisitio\nuevoingreso_27-1</code>. Ahí adentro, con la terminal parada en esa carpeta, el comando fue:</p>
+
+      <pre><code>docker run --name escom_ni -d -it -p 3000:80 httpd:latest -v ${PWD}:/usr/local/apache2/htdocs</code></pre>
+
+      <p class="quote">"El <b>ni</b> es de 'nuevo ingreso'. Queremos que esta cosa, si en dado caso llega a funcionar —esperemos que sí—, escuche peticiones para mí en el <b>puerto 3000</b>. Que internamente esta cosa va a estar trabajando en el <b>puerto 80</b>, eso es otra cosa."</p>
+
+      <figure>
+        <svg viewBox="0 0 640 210" role="img" aria-label="Diagrama del volumen -v: la carpeta nuevoingreso_27-1 en el host se monta sobre /usr/local/apache2/htdocs dentro del contenedor de Apache">
+          <rect x="14" y="46" width="252" height="118" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+          <text x="140" y="34" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--text-muted)">TU MÁQUINA (HOST)</text>
+          <text x="140" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">…\minisitio\</text>
+          <text x="140" y="96" text-anchor="middle" font-family="IBM Plex Mono" font-size="11.5" font-weight="600" style="fill:var(--text)">nuevoingreso_27-1</text>
+          <rect x="60" y="110" width="160" height="38" rx="7" fill="var(--run-soft)" stroke="var(--run)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+          <text x="140" y="133" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--run)">${PWD}</text>
+
+          <path d="M270,105 H366" fill="none" style="stroke:var(--run)" stroke-width="2" marker-end="url(#arrRun)"></path>
+          <text x="318" y="90" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--run)">-v ${PWD}:…</text>
+
+          <rect x="374" y="46" width="252" height="118" rx="10" fill="var(--surface)" stroke="var(--apache)" stroke-width="1.5"></rect>
+          <text x="500" y="34" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--apache)">CONTENEDOR (APACHE)</text>
+          <text x="500" y="72" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">/usr/local/apache2/</text>
+          <rect x="420" y="98" width="160" height="38" rx="7" fill="var(--apache-soft)" stroke="var(--apache)" stroke-width="1.5"></rect>
+          <text x="500" y="121" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="600" style="fill:var(--apache)">htdocs</text>
+          <defs><marker id="arrRun" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" style="fill:var(--run)"></path></marker></defs>
+        </svg>
+        <figcaption>De los dos puntos hacia la izquierda: dónde está lo tuyo en el host. De los dos puntos hacia la derecha: dónde lo espera Apache — <code>htdocs</code> es, por convención en la familia Debian/Ubuntu, el directorio de trabajo del servidor.</figcaption>
+      </figure>
+
+      <p class="body">La pregunta clave de este bloque fue de dónde sale <code>${PWD}</code>:</p>
+
+      <p class="quote"><b>Alumno:</b> "Mostrar el directorio donde te encuentras." <b>Profesor:</b> "Mostrar el directorio actual. Funciona igual: o sea, estoy trabajando aquí. Entonces esto funciona para sistemas Unix, específicamente para Unix: <code>${PWD}</code>."</p>
+
+      <details class="dio"><summary>¿Qué hace <code>pwd</code> y por qué aparece entre llaves como <code>${PWD}</code>?</summary><div class="db">
+        <p><code>pwd</code> ("print working directory") es el comando de Unix/Linux que imprime la ruta de la carpeta donde está parada tu terminal ahora mismo. <code>${PWD}</code> es la variable de entorno equivalente: en vez de escribir la ruta completa a mano dentro del comando <code>docker run</code>, dejas que el shell la sustituya sola por donde sea que estés parado. Así el mismo comando le sirve a cualquiera, sin importar dónde tenga clonada la carpeta.</p>
+        <p>El profesor mismo se trabó buscando el nombre de <code>{ }</code> —dijo "llavecitas", "barritas", "corchetes" antes de que un alumno lo corrigiera a "llaves"— y no llegó a aclarar del todo el equivalente exacto en PowerShell. Lo seguro: en Windows <b>no</b> se usa <code>${PWD}</code> tal cual como en Bash; conviene probarlo en tu propia terminal antes de copiar el comando literal.</p>
+      </details>
+
+      <p class="body">Resultado esperado: abrir <code>localhost:3000</code> en el navegador y ver el minisitio, servido por el Apache que vive dentro del contenedor.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 2 · decodificador de flags</p>
+    <h3>¿Qué hace cada parte del <code>docker run</code>?</h3>
+    <p class="ask">Sobre este mismo comando: <code>docker run --name escom_ni -d -it -p 3000:80 httpd:latest -v ${PWD}:/usr/local/apache2/htdocs</code>. Empareja cada pieza con lo que hace.</p>
+    <div class="qrows" id="q2"></div>
+    <div class="btnrow">
+      <button class="btn" id="q2go" type="button">Revisar</button>
+      <button class="btn ghost" id="q2rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q2fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 2 · minuto ~11:00 a 17:00</p>
+      <h2 class="sec">Ruta 2 — el <code>Dockerfile</code>, la que sí se guarda</h2>
+      <p>El mismo resultado, pero esta vez como archivo de configuración dentro del proyecto — reproducible, versionable, y sin tener que reescribir el comando cada vez.</p>
+    </div>
+
+    <div class="ruta" style="--c:var(--file);">
+      <div class="rutabar"><span class="rutachip">Dockerfile · vive en el repo</span></div>
+
+      <p class="quote">"¿No lo quiero echar a andar así? Está bien. Vamos con un Dockerfile."</p>
+
+      <p class="body">La regla del nombre del archivo, tal cual la dijo: <b>sin extensión y con «D» mayúscula</b> — <code>Dockerfile</code>, no <code>dockerfile.txt</code> ni <code>Dockerfile.txt</code>.</p>
+
+      <pre><code>FROM httpd
+
+COPY . /usr/local/apache2/htdocs/
+
+EXPOSE 80</code></pre>
+
+      <details class="dio"><summary>¿Qué hace cada línea del Dockerfile?</summary><div class="db">
+        <ul>
+          <li><code>FROM httpd</code> — parte de la imagen base <code>httpd</code>. Sin poner una versión después de los dos puntos, Docker toma la <b>última estable</b> disponible en el Docker Hub.</li>
+          <li><code>COPY . /usr/local/apache2/htdocs/</code> — copia el contenido de la carpeta donde está el Dockerfile (el punto, "el directorio actual") hacia adentro del contenedor, al directorio de trabajo de Apache.</li>
+          <li><code>EXPOSE 80</code> — documenta que el contenedor va a escuchar peticiones por el puerto 80 por dentro. No abre el puerto hacia el host por sí solo; eso lo hace el <code>-p</code> del <code>docker run</code>.</li>
+        </ul>
+      </details>
+
+      <details class="dio"><summary>¿Qué es el Docker Hub?</summary><div class="db">
+        <p>Es el repositorio público de imágenes de Docker — el equivalente a lo que es GitHub para el código, pero para imágenes ya armadas. <code>httpd</code> y <code>nginx</code> son imágenes oficiales que cualquiera puede descargar desde ahí con un <code>FROM</code> o un <code>docker pull</code>.</p>
+      </details>
+
+      <p class="body">Con el Dockerfile ya dentro de la carpeta del proyecto (junto al <code>index.html</code>, la carpeta <code>media</code>, <code>css</code>, etc.), toca construir la imagen:</p>
+
+      <pre><code>docker build -t mi_imagen .</code></pre>
+
+      <p class="body"><code>-t</code> (o <code>--tag</code>) es el nombre que le pones a la imagen — puede llevar tu usuario delante, como <code>davis/mi_imagen:latest</code>. El punto al final <b>no es decorativo</b>: es el directorio donde Docker debe buscar el Dockerfile, o sea, el directorio actual.</p>
+
+      <p class="body">Un <code>docker image ls</code> confirma que la imagen ya existe. Y para echarla a andar:</p>
+
+      <pre><code>docker run --name escom_ni -d -it -p 3500:80 mi_imagen</code></pre>
+
+      <p class="body">Mismo resultado que con la ruta 1, solo que ahora por <code>localhost:3500</code>, y con la ventaja de que el Dockerfile queda en el repo — cualquiera puede reconstruir la imagen sin que tú le dictes el comando.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 3 · arma la ruta 2 en orden</p>
+    <h3>Del Dockerfile al contenedor corriendo</h3>
+    <p class="ask">Cinco piezas: tres líneas del Dockerfile y dos comandos de terminal, revueltas. Ve armando la secuencia completa — construir la imagen y correrla no sirve si el Dockerfile está mal.</p>
+    <div class="built" id="built"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow">
+      <button class="btn ghost" id="bldRs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="bldFb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3 · minuto 17:00 a 31:40</p>
+      <h2 class="sec">La práctica: el mismo sitio, dos servidores</h2>
+      <p>Con las dos rutas ya explicadas, soltó al grupo a trabajar. El resto de la clase la pasó circulando entre las máquinas resolviendo dudas puntuales.</p>
+    </div>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Práctica de la clase</span><span class="task-when">minuto 17:00</span></div>
+      <h3>Publica el minisitio en <span class="srv apache">Apache</span> y en <span class="srv nginx">Nginx</span></h3>
+      <p class="said">"Tienen lo que resta de la clase: móntenlo en un Apache Web Server. Entreténganse. Es más: móntenlo en los dos, en un Apache y en una cosa rara que se llama Nginx. Lo divertido es: este pónganlo en el puerto 8080 y este pónganlo en el puerto 8081."</p>
+      <p>Es el mismo minisitio de nuevo ingreso de la clase 2, con Dockerfile ya hecho para el puerto 3500 (tarea 2). Ahora toca duplicarlo: una imagen basada en <code>httpd</code> expuesta en <b>8080</b>, y otra basada en <code>nginx</code> expuesta en <b>8081</b>.</p>
+      <pre><code>docker run --name escom_apache -d -it -p 8080:80 mi_imagen_apache
+docker run --name escom_nginx  -d -it -p 8081:80 mi_imagen_nginx</code></pre>
+    </div>
+
+    <p class="body">La única pieza nueva es el Dockerfile de Nginx, porque su carpeta de trabajo por defecto <b>no es <code>htdocs</code></b> como en Apache:</p>
+
+    <pre><code>FROM nginx
+
+COPY . /usr/share/nginx/html/
+
+EXPOSE 80</code></pre>
+
+    <details class="dio"><summary>¿Qué es Nginx, y en qué se distingue de Apache aquí?</summary><div class="db">
+      <p><b>Nginx</b> (se pronuncia "engine-x") es otro servidor web, como Apache — recibe peticiones HTTP y devuelve archivos o respuestas. Para este ejercicio la diferencia práctica que importa es una sola: la carpeta donde cada uno espera encontrar tus archivos estáticos. En Apache es <code>/usr/local/apache2/htdocs/</code>; en la imagen oficial de Nginx es <code>/usr/share/nginx/html/</code>. Cambiar solo esa ruta en el <code>COPY</code> es, para este ejercicio, la única diferencia real entre los dos Dockerfiles.</p>
+    </details>
+
+    <figure>
+      <svg viewBox="0 0 640 230" role="img" aria-label="Cuatro contenedores con distinto puerto de host, todos escuchando internamente por el puerto 80: 3000 y 3500 de los ejemplos del pizarrón, 8080 para Apache y 8081 para Nginx">
+        <text x="320" y="24" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--text-muted)">UN PUERTO INTERNO, CUATRO PUERTAS DE ENTRADA</text>
+
+        <g font-family="IBM Plex Mono" font-size="10.5">
+          <!-- 3000 -->
+          <rect x="14" y="52" width="138" height="140" rx="10" fill="var(--surface)" stroke="var(--run)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+          <text x="83" y="72" text-anchor="middle" font-weight="600" style="fill:var(--run)">:3000</text>
+          <rect x="34" y="90" width="98" height="70" rx="7" fill="var(--run-soft)" stroke="var(--run)" stroke-width="1.2"></rect>
+          <text x="83" y="129" text-anchor="middle" font-weight="600" style="fill:var(--run)">80</text>
+          <text x="83" y="176" text-anchor="middle" font-size="8.5" style="fill:var(--text-muted)">docker run</text>
+
+          <!-- 3500 -->
+          <rect x="168" y="52" width="138" height="140" rx="10" fill="var(--surface)" stroke="var(--file)" stroke-width="1.5"></rect>
+          <text x="237" y="72" text-anchor="middle" font-weight="600" style="fill:var(--file)">:3500</text>
+          <rect x="188" y="90" width="98" height="70" rx="7" fill="var(--file-soft)" stroke="var(--file)" stroke-width="1.2"></rect>
+          <text x="237" y="129" text-anchor="middle" font-weight="600" style="fill:var(--file)">80</text>
+          <text x="237" y="176" text-anchor="middle" font-size="8.5" style="fill:var(--text-muted)">Dockerfile</text>
+
+          <!-- 8080 apache -->
+          <rect x="322" y="52" width="138" height="140" rx="10" fill="var(--surface)" stroke="var(--apache)" stroke-width="1.5"></rect>
+          <text x="391" y="72" text-anchor="middle" font-weight="600" style="fill:var(--apache)">:8080</text>
+          <rect x="342" y="90" width="98" height="70" rx="7" fill="var(--apache-soft)" stroke="var(--apache)" stroke-width="1.2"></rect>
+          <text x="391" y="129" text-anchor="middle" font-weight="600" style="fill:var(--apache)">80</text>
+          <text x="391" y="176" text-anchor="middle" font-size="8.5" style="fill:var(--text-muted)">Apache</text>
+
+          <!-- 8081 nginx -->
+          <rect x="476" y="52" width="138" height="140" rx="10" fill="var(--surface)" stroke="var(--nginx)" stroke-width="1.5"></rect>
+          <text x="545" y="72" text-anchor="middle" font-weight="600" style="fill:var(--nginx)">:8081</text>
+          <rect x="496" y="90" width="98" height="70" rx="7" fill="var(--nginx-soft)" stroke="var(--nginx)" stroke-width="1.2"></rect>
+          <text x="545" y="129" text-anchor="middle" font-weight="600" style="fill:var(--nginx)">80</text>
+          <text x="545" y="176" text-anchor="middle" font-size="8.5" style="fill:var(--text-muted)">Nginx</text>
+        </g>
+      </svg>
+      <figcaption>Los cuatro contenedores de la clase trabajan por dentro en el puerto 80 — es el puerto por defecto de cualquier servidor web. Lo único que cambia entre uno y otro es el puerto del <b>host</b>, el de la izquierda de los dos puntos en <code>-p</code>.</figcaption>
+    </figure>
+
+    <h3 class="sub">Antes de arrancar: el inventario del laboratorio</h3>
+    <p class="body">Mientras el grupo se instalaba, aprovechó para pasar lista de lo que cada máquina del laboratorio "se supone" que ya trae — y pidió confirmarlo, no darlo por hecho:</p>
+
+    <div class="lab">
+      <div class="lab-item"><span class="dot"></span><span class="lt">Docker</span><span class="ld"> — indispensable para todo lo de hoy.</span></div>
+      <div class="lab-item"><span class="dot"></span><span class="lt">Java</span><span class="ld"> — "en algún momento vamos a jugar con esto", averiguar qué versión.</span></div>
+      <div class="lab-item"><span class="dot"></span><span class="lt">Visual Studio Code</span></div>
+      <div class="lab-item"><span class="dot"></span><span class="lt">DBeaver o MySQL</span></div>
+      <div class="lab-item"><span class="dot"></span><span class="lt">IntelliJ</span></div>
+      <div class="lab-item"><span class="dot"></span><span class="lt">Insomnia (o Postman)</span></div>
+    </div>
+
+    <p class="body" style="margin-top:4px;">Si tu máquina del laboratorio no trae algo de esta lista, la alternativa que dio fue simple: trae tu propio equipo.</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Digresión · minuto 31:45 a 36:00</p>
+      <h2 class="sec">"Asuman que todo se entrega el 11 de septiembre"</h2>
+    </div>
+
+    <p class="quote">"De las 20,000 actividades que su compañero me imagino ya les compartió... asuman que todo se entrega el 11 de septiembre. [...] Ya si para el 11 de septiembre, digamos que ya estamos como por el 9 y les dejo una actividad, no va a ser para el 11, va a ser para una semana después."</p>
+
+    <p class="body">Un alumno contó ~18 actividades subidas a la plataforma, otro corrigió a ~15. El profesor cerró el conteo sin pelear el número exacto: "es un montón", pero aclaró que <b>no todas son entregables calificados</b> — varias son solo lecturas que espera que se hagan por cuenta propia, sin revisión.</p>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p>Este "11 de septiembre" es una <b>fecha general</b>, dicha de pasada para el conjunto de actividades de la plataforma — no quedó claro si aplica tal cual al avance de proyecto del Bloque 0, que en la lista oficial del curso seguía sin fecha propia hasta esta clase. Se registra con esa reserva en la agenda del semestre.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 4 · minuto 36:00 a 45:10</p>
+      <h2 class="sec">Varios servicios a la vez: Docker Compose</h2>
+      <p>Cuando el proyecto necesita más de un contenedor —Apache más Tomcat, o Apache más Nginx— ya no conviene escribir un <code>docker run</code> por cada uno a mano.</p>
+    </div>
+
+    <p class="quote">"Si quieren montar varios servicios, móntenlos en un archivito de este estilo: <code>docker-compose.yml</code>."</p>
+
+    <p class="body">La idea es reciclar exactamente la misma estructura que ya tienen: un Dockerfile por servicio, cada uno en su propia carpeta, y el archivo <code>docker-compose.yml</code> apuntando a cada una.</p>
+
+    <pre><code>services:
+  apache:
+    build: ./apache
+    ports:
+      - "8080:80"
+  nginx:
+    build: ./nginx
+    ports:
+      - "8081:80"</code></pre>
+
+    <details class="dio"><summary>¿Qué es Docker Compose y en qué se distingue de un docker run suelto?</summary><div class="db">
+      <p><b>Docker Compose</b> es una herramienta que lee un archivo YAML (<code>docker-compose.yml</code>) donde describes uno o varios servicios —cada uno con su imagen o Dockerfile, sus puertos, sus volúmenes— y los levanta o los apaga todos juntos con un solo comando. Es la forma ordenada de reemplazar una fila de comandos <code>docker run</code> escritos a mano, uno por contenedor.</p>
+    </details>
+
+    <pre><code>docker compose up
+docker compose down</code></pre>
+
+    <p class="body"><code>docker compose up</code> construye (si hace falta) y levanta todos los servicios del archivo. <code>docker compose down</code> los apaga y los quita.</p>
+
+    <p class="quote">"Y san se acabó. [...] Y vámonos."</p>
+
+    <details class="dio"><summary>¿Por qué la indentación de YAML importa tanto?</summary><div class="db">
+      <p>YAML usa la sangría (espacios, nunca tabulaciones) para representar de qué depende cada línea — no llaves ni corchetes como JSON. Dos espacios de más o de menos cambian a qué servicio pertenece una clave, o la rompen directamente. Es justo el tipo de error que no truena con un mensaje claro: el archivo "se ve bien" pero Compose lo interpreta distinto a como lo pensaste.</p>
+    </details>
+
+    <p class="body">Una alumna preguntó por la sintaxis en Windows. La respuesta se quedó a medias —el profesor dudó entre "llavecitas", "barritas" y "corchetes" antes de que el grupo lo corrigiera a "llaves"— pero el punto de fondo sí quedó claro: en PowerShell el comando casi se copia y pega igual, con Docker instalado, y el resultado esperado es el mismo: se conecta al Docker Hub, descarga la imagen, toma tu carpeta actual, crea el contenedor con el nombre que le diste, y expone el puerto que pediste.</p>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 4 · Docker Compose</p>
+    <h3>De varios <code>docker run</code> a un solo archivo</h3>
+    <p class="ask">Tres preguntas sobre cómo se comporta Compose frente a levantar cada contenedor a mano.</p>
+    <div class="qrows" id="q4"></div>
+    <div class="btnrow">
+      <button class="btn" id="q4go" type="button">Revisar</button>
+      <button class="btn ghost" id="q4rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q4fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 5 · minuto 45:15 a 49:08</p>
+      <h2 class="sec">¿Esto ya son microservicios?</h2>
+      <p>Cerró la clase respondiendo una pregunta que alguien lanzó mientras trabajaba: si estamos jugando con servidores dentro de contenedores, ¿ya estamos haciendo microservicios?</p>
+    </div>
+
+    <p class="quote">"El cuestionamiento del compañero se me hizo interesante: '¿Estamos jugando con servidores?' La respuesta es sí. [...] Solo que en ese contenedor, que es ese espacio grandote, esa cajota que ven en los trenes y en los barcos así bien bonito —no sé, allá por Azcapotzalco hay un montón de contenedores—, ahí están empaquetando el servidor web, que es el Apache."</p>
+
+    <p class="body">Estirando la misma metáfora: en otra "cajota" va un Nginx; en otra, un proyecto en Node; en otra, un proyecto en Spring —que además trae su propio servidor adentro, uno minimalista llamado <b>Tomcat embebido</b>—; en otra, un Angular. Y esas cajas, tarde o temprano, <b>tienen que platicar entre sí</b>.</p>
+
+    <details class="dio"><summary>¿Qué es un PaaS, y por qué Render puede correr Java sin "tener soporte para Java"?</summary><div class="db">
+      <p><b>PaaS</b> (Platform as a Service) es una nube que te da un lugar donde correr tu aplicación sin que tú administres el servidor físico ni el sistema operativo por debajo — solo subes tu código o tu imagen y la nube se encarga del resto. Algunas PaaS dan soporte nativo a ciertos lenguajes (subes tu <code>.jar</code> y ya). Render, según el profesor, no tiene ese soporte nativo para Java — pero si tu proyecto ya vive dentro de una imagen Docker, a Render no le importa qué hay adentro: solo corre el contenedor. Empaquetar en Docker es, en ese sentido, un pasaporte universal.</p>
+    </details>
+
+    <p class="body">Y sobre la duda de un compañero al final de la clase, mientras levantaba su propia landing page en otro puerto: si dos contenedores usan la misma imagen de servidor web y ambos escuchan por dentro en el 80, lo que se <b>enmascara</b> —lo único que cambia entre uno y otro— es el puerto del host. Es exactamente lo que pasó con Apache en 8080 y Nginx en 8081 en esta misma clase.</p>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 5 · el cierre de la clase</p>
+    <h3>Contenedores, Tomcat embebido y PaaS</h3>
+    <p class="ask">Cuatro preguntas sobre la reflexión final. La última es la misma duda que resolvió el profesor en vivo con un alumno.</p>
+    <div class="qrows" id="q5"></div>
+    <div class="btnrow">
+      <button class="btn" id="q5go" type="button">Revisar</button>
+      <button class="btn ghost" id="q5rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q5fb"></div>
+  </div>
+
+  <section class="final">
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Checklist de la clase 6</h2>
+      <p>Se guarda en tu navegador. Nada se sube a ningún lado ni se comparte con nadie más.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 0</div>
+    </div>
+
+    <div id="finalTasks"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- motor de quiz ---------- */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt";
+          b.textContent=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click",function(){
+      var rows=root.children, right=0, answered=0;
+      Array.prototype.forEach.call(rows,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length
+        ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  /* ---------- 1. cuenta las tablas ---------- */
+  quiz("q1",[
+    {q:"¿Cuántas tablas como mínimo debe de tener tu diseño, <em>sin</em> contar gestión de usuarios?",
+     opts:["3","5","10"], ans:1,
+     why:"<b>Cinco.</b> Lo dijo tal cual: \"deben de ser al menos cinco tablas sin esta cosa\", refiriéndose al módulo de usuarios."},
+    {q:"Si SÍ incluyes gestión de usuarios (con roles), ¿cuántas tablas se suman a esas cinco?",
+     opts:["Una","Dos","Tres"], ans:2,
+     why:"<b>Tres.</b> Usuarios, roles, y la tabla de unión entre ambas — \"esas van de cajón\", es decir, aparte de las cinco propias del proyecto. En total, con gestión de usuarios completa, son al menos ocho."},
+    {q:"¿En qué forma normal debe estar, como mínimo, tu base de datos?",
+     opts:["1FN","2FN","3FN"], ans:2,
+     why:"<b>Tercera Forma Normal.</b> \"Su base de datos al menos que esté en eso... al menos en Tercera Forma Normal. Ya pasaron por bases de datos\" — no lo volvió a explicar."}
+  ],"q1go","q1rs","q1fb",
+  "<b>Las tres.</b> Ocho tablas mínimo si cuentas usuarios y roles, 3FN de piso. Son las dos reglas que un modelador te va a revisar antes que cualquier otra cosa.");
+
+  /* ---------- 2. flags del docker run ---------- */
+  quiz("q2",[
+    {q:"<code>--name escom_ni</code>",
+     opts:["Nombre del contenedor","Nombre de la imagen","Puerto por el que escucha"], ans:0,
+     why:"<b>Nombre del contenedor.</b> Así lo identificas después con <code>docker ps</code>, <code>docker stop</code>, etc. \"El ni es de 'nuevo ingreso'.\""},
+    {q:"<code>-d</code>",
+     opts:["Modo interactivo","Modo desatendido (segundo plano)","Copia el directorio actual"], ans:1,
+     why:"<b>Desatendido.</b> \"Detached\": el contenedor corre en segundo plano y te devuelve la terminal de inmediato, en vez de quedarse pegado a la salida del proceso."},
+    {q:"<code>-it</code>",
+     opts:["Permite conectarte por terminal a un contenedor en ejecución","Instala herramientas dentro del contenedor","Indica el tag (versión) de la imagen"], ans:0,
+     why:"<b>Terminal interactiva.</b> Combinada con <code>docker exec</code> más adelante, es lo que te deja entrar a una shell dentro del contenedor ya corriendo."},
+    {q:"<code>-p 3000:80</code>",
+     opts:["El contenedor escucha en 3000, por dentro trabaja en 80","El contenedor escucha en 80, por dentro trabaja en 3000","Son el mismo puerto, solo cambia el nombre"], ans:0,
+     why:"<b>Host:contenedor.</b> El número de la izquierda es el puerto de tu máquina; el de la derecha es el puerto interno donde Apache realmente escucha. \"Que escuche peticiones para mí en el puerto 3000. Que internamente esta cosa va a estar trabajando en el puerto 80.\""},
+    {q:"<code>-v ${PWD}:/usr/local/apache2/htdocs</code>",
+     opts:["Copia el contenido una sola vez, al crear el contenedor","Monta (asocia en vivo) tu carpeta actual con la carpeta htdocs","Cambia el puerto por el que responde Apache"], ans:1,
+     why:"<b>Monta, no copia.</b> Es un volumen: la carpeta del host y la del contenedor quedan ligadas en vivo. Cualquier cambio que hagas en tu <code>index.html</code> se refleja sin reconstruir nada — esa es la \"persistencia\" que mencionó."}
+  ],"q2go","q2rs","q2fb",
+  "<b>Las cinco.</b> Con esto puedes leer cualquier <code>docker run</code> parecido a este sin tener que memorizarlo: cada flag responde una pregunta distinta (¿cómo se llama?, ¿en segundo plano?, ¿puedo entrar?, ¿por dónde entra?, ¿qué carpeta comparte?).");
+
+  /* ---------- 3. arma la ruta 2 en orden ---------- */
+  var STEPS=[
+    "FROM httpd",
+    "COPY . /usr/local/apache2/htdocs/",
+    "EXPOSE 80",
+    "docker build -t mi_imagen .",
+    "docker run --name escom_ni -d -it -p 3500:80 mi_imagen"
+  ];
+  var STEPWHY=[
+    "Primero la imagen base. Sin versión después de los dos puntos, Docker va por la última estable de <code>httpd</code>.",
+    "Copia tu carpeta actual hacia el directorio de trabajo de Apache dentro del contenedor.",
+    "Documenta el puerto interno por el que va a escuchar el servidor.",
+    "Con el Dockerfile ya completo, se construye la imagen. El punto final es el directorio donde buscar el Dockerfile.",
+    "Y por último se corre: nombre, segundo plano, terminal interactiva, y el mapeo de puerto host:contenedor."
+  ];
+  var placed=[], bank=document.getElementById("bank"),
+      built=document.getElementById("built"), bldFb=document.getElementById("bldFb");
+
+  function shuffled(){
+    var idx=STEPS.map(function(_,i){return i;});
+    for(var i=idx.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), t=idx[i]; idx[i]=idx[j]; idx[j]=t;
+    }
+    return idx;
+  }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled().forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS[i]; b.dataset.i=i;
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          if(placed.length===STEPS.length){
+            bldFb.className="fb show good";
+            bldFb.innerHTML="<b>Esa es la ruta 2 completa.</b> Para Nginx cambia solo la primera línea a <code>FROM nginx</code> y la ruta del COPY a <code>/usr/share/nginx/html/</code> — lo demás se repite igual, con <code>-p 8081:80</code> al final.";
+          } else {
+            bldFb.className="fb show good";
+            bldFb.innerHTML="<b>Va.</b> "+STEPWHY[i];
+          }
+        } else {
+          bldFb.className="fb show bad";
+          bldFb.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed.length===0
+              ? "Empieza por la imagen base del Dockerfile."
+              : "Antes va otra. Pista: "+STEPWHY[placed.length].replace(/<[^>]+>/g,""));
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando la ruta…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){
+        placed=placed.slice(0,n); renderBuilt(); renderBank(); bldFb.className="fb";
+      });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){
+    placed=[]; renderBuilt(); renderBank(); bldFb.className="fb";
+  });
+  renderBuilt(); renderBank();
+
+  /* ---------- 4. docker compose ---------- */
+  quiz("q4",[
+    {q:"En <code>docker-compose.yml</code>, cada servicio (apache, tomcat, nginx…) apunta a…",
+     opts:["Su propio Dockerfile, con build: ./carpeta","Un docker run escrito a mano por servicio","Un volumen compartido obligatorio entre todos"], ans:0,
+     why:"<b>Su propio Dockerfile.</b> \"Puedes reciclar tu misma estructura: un Dockerfile para tu Apache, un Dockerfile para tu Tomcat.\" Compose solo orquesta lo que ya armaste con la ruta 2."},
+    {q:"Para levantar todos los servicios del archivo de una sola vez:",
+     opts:["docker compose up","docker run --all","docker build --compose"], ans:0,
+     why:"<code>docker compose up</code>. \"Y san se acabó.\""},
+    {q:"Para apagarlos y quitarlos:",
+     opts:["docker compose stop, nada más","docker compose down","docker kill *"], ans:1,
+     why:"<code>docker compose down</code>. \"Para matarlo: docker compose down. Y vámonos.\""}
+  ],"q4go","q4rs","q4fb",
+  "<b>Las tres.</b> Compose no reemplaza el Dockerfile de cada servicio — lo asume ya hecho, y solo evita que levantes cada contenedor con un comando distinto a mano.");
+
+  /* ---------- 5. cierre ---------- */
+  quiz("q5",[
+    {q:"¿Qué corre, en el fondo, dentro del contenedor de Apache de la práctica de hoy?",
+     opts:["Un servidor web completo, aislado del resto del sistema","Solo el archivo index.html, sin servidor detrás","Una máquina virtual completa, con su propio kernel"], ans:0,
+     why:"<b>Un servidor web completo.</b> El contenedor empaqueta a Apache entero, no solo tus archivos — por eso responde a peticiones HTTP igual que un servidor de verdad."},
+    {q:"Un proyecto en Spring, ¿trae su propio servidor por dentro?",
+     opts:["No, siempre hay que instalar un Tomcat aparte","Sí: un Tomcat minimalista llamado 'Tomcat embebido'","No, Spring no usa Tomcat para nada"], ans:1,
+     why:"<b>Tomcat embebido.</b> Es una versión reducida de Tomcat que viaja dentro del propio proyecto Spring, sin instalación aparte."},
+    {q:"Render no tiene soporte nativo para Java. ¿Por qué de todos modos puedes desplegar ahí un proyecto Java?",
+     opts:["Porque sí tiene soporte para Docker, y adentro puedes meter lo que quieras","Porque Render traduce Java a JavaScript solo","No se puede: hay que usar otro proveedor"], ans:0,
+     why:"<b>Soporte para Docker.</b> \"¿Tiene soporte para Java? No, pero tiene soporte para Docker. Y si lo pueden meter en un Docker, pueden meter lo que quieran.\""},
+    {q:"Quieres correr dos sitios con la misma imagen de Apache al mismo tiempo, sin que truenen entre sí. ¿Qué cambias de un <code>docker run</code> a otro?",
+     opts:["El puerto del host (-p), dejando el interno en 80 los dos","El puerto interno del contenedor, dejando el host en 80 los dos","Nada — Docker los acomoda solo"], ans:0,
+     why:"<b>El puerto del host.</b> Es \"enmascarar\" el puerto: mismo servidor, mismo 80 interno, pero cada contenedor entra por una puerta distinta en tu máquina — exactamente 8080 y 8081 en la práctica de hoy."}
+  ],"q5go","q5rs","q5fb",
+  "<b>Las cuatro.</b> El hilo que las conecta: un contenedor es una caja completa (no un archivo suelto), y lo único que de verdad se negocia entre dos contenedores del mismo tipo es la puerta del host por la que se entra.");
+
+  /* ---------- checklist ---------- */
+  var FINAL=[
+    {id:"c6-apache", t:"Práctica · publicar el minisitio en Apache (puerto 8080)",
+     d:"Dockerfile con FROM httpd, COPY hacia /usr/local/apache2/htdocs/, EXPOSE 80, y docker run con -p 8080:80."},
+    {id:"c6-nginx", t:"Práctica · publicar el mismo minisitio en Nginx (puerto 8081)",
+     d:"Mismo Dockerfile, dos cambios: FROM nginx y COPY hacia /usr/share/nginx/html/. docker run con -p 8081:80."},
+    {id:"c6-avance", t:"Avance de proyecto · diccionario, E-R, script SQL y relacional",
+     d:"Al menos 5 tablas sin gestión de usuarios (8 si la incluyes), base en 3FN. Fecha tentativa: 11 de septiembre — sin confirmar del todo para esta entrega en particular."},
+    {id:"c6-plataforma", t:"Pendiente administrativo · revisar tus actividades en la plataforma",
+     d:"~15 actividades subidas, varias son solo lecturas sin entrega. El profesor las dio todas por vencidas el 11 de septiembre."}
+  ];
+  var KEY="clase6-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var fh=document.getElementById("finalTasks"), bar=document.getElementById("bar"),
+      pc=document.getElementById("pcount");
+  FINAL.forEach(function(it){
+    var l=document.createElement("label"); l.className="ftask";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!st[it.id];
+    var b=document.createElement("div");
+    b.innerHTML='<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent=it.t;
+    b.querySelector(".td2").textContent=it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if(cb.checked) l.classList.add("done");
+    cb.addEventListener("change",function(){
+      st[it.id]=cb.checked; l.classList.toggle("done",cb.checked);
+      try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+  function refresh(){
+    var done=0, boxes=fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes,function(c){ if(c.checked) done++; });
+    pc.textContent=done+" / "+FINAL.length;
+    bar.style.width=Math.round(done/FINAL.length*100)+"%";
+  }
+  refresh();
+})();
+</script>
