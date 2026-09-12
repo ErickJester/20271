@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ecuación de segundo grado: ax^2 + bx + c = 0" />
+
+    <EditText
+        android:id="@+id/editTextA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Coeficiente a"
+        android:inputType="numberSigned|numberDecimal" />
+
+    <EditText
+        android:id="@+id/editTextB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Coeficiente b"
+        android:inputType="numberSigned|numberDecimal" />
+
+    <EditText
+        android:id="@+id/editTextC"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Coeficiente c"
+        android:inputType="numberSigned|numberDecimal" />
+
+    <Button
+        android:id="@+id/buttonCalculate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Calcular raíces" />
+
+</LinearLayout>

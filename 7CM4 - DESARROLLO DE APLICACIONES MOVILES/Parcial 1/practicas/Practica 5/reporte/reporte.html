@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Practica 5 - Plantillas de layout</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  pre {
+    background: #f4f4f4; border: 1px solid #ddd; border-radius: 5px;
+    padding: 10px 12px; font-size: 10.5px; line-height: 1.4;
+    white-space: pre-wrap; word-break: break-word; margin: 6px 0 12px;
+    page-break-inside: avoid;
+  }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .plantilla { page-break-inside: avoid; margin-bottom: 26px; }
+  .plantilla-fig { display: flex; gap: 14px; align-items: flex-start; }
+  .plantilla-fig .texto { flex: 1; min-width: 0; }
+  .plantilla-fig figure { margin: 0; flex: none; width: 200px; text-align: center; }
+  .plantilla-fig img { width: 100%; border: 1px solid #999; border-radius: 6px; display: block; }
+  .plantilla-fig figcaption { font-size: 10px; color: #444; margin-top: 5px; }
+
+  table.pasos { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 11px; }
+  table.pasos th, table.pasos td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  table.pasos th { background: #eee; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Plantillas de layout en Android</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 5: Plantillas de layout</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>12 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta práctica pide comparar los ocho tipos de layout de Android que trae el documento del profesor:
+    ConstraintLayout, LinearLayout, FrameLayout, RelativeLayout, CoordinatorLayout, TableLayout, GridLayout
+    y AbsoluteLayout. Cada uno organiza a sus elementos hijos de una forma distinta, y entender esas
+    diferencias es lo que permite elegir el layout correcto según la pantalla que se necesite construir.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Implementar cada uno de los ocho layouts con el ejemplo de código proporcionado.</li>
+    <li>Incluir el nombre del alumno en un TextView dentro de cada pantalla.</li>
+    <li>Ejecutar la aplicación en un emulador y capturar cada plantilla para compararlas.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>1. Entorno de trabajo</h3>
+  <p>
+    El proyecto se creó con la plantilla Empty Views Activity en Java. La aplicación tiene una pantalla
+    principal (<code class="inline">MainActivity</code>) con un botón por cada layout, y cada botón abre
+    una actividad distinta que muestra ese layout en particular. Todas las actividades extienden
+    <code class="inline">android.app.Activity</code> directamente. Seis de los ocho layouts son parte del
+    SDK clásico de Android (LinearLayout, FrameLayout, RelativeLayout, TableLayout, GridLayout,
+    AbsoluteLayout); los otros dos, ConstraintLayout y CoordinatorLayout, son parte de AndroidX y se
+    agregaron como dependencias del proyecto porque son justamente el tema de esta práctica.
+  </p>
+
+  <div class="plantilla">
+    <h3>2. ConstraintLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Es el estándar moderno para pantallas complejas: en lugar de anidar layouts unos dentro de otros,
+          cada elemento se ancla a otros elementos o a los bordes del contenedor mediante restricciones
+          (<code class="inline">app:layout_constraintTop_toTopOf</code>, etc.).
+        </p>
+        <pre>&lt;androidx.constraintlayout.widget.ConstraintLayout ...&gt;
+    &lt;TextView android:id="@+id/text_titulo"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+    &lt;Button
+        app:layout_constraintTop_toBottomOf="@id/text_titulo" /&gt;
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/01_constraint.png" alt="ConstraintLayout">
+        <figcaption>Figura 1. ConstraintLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plantilla">
+    <h3>3. LinearLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Alinea a sus hijos uno detrás de otro, en fila o en columna según
+          <code class="inline">android:orientation</code>. Es el layout más simple y el más usado para
+          formularios sencillos, como el de inicio de sesión de este ejemplo.
+        </p>
+        <pre>&lt;LinearLayout android:orientation="vertical" ...&gt;
+    &lt;EditText android:hint="Correo electrónico" /&gt;
+    &lt;EditText android:hint="Contraseña" android:inputType="textPassword" /&gt;
+    &lt;Button android:text="Iniciar Sesión" /&gt;
+&lt;/LinearLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/02_linear.png" alt="LinearLayout">
+        <figcaption>Figura 2. LinearLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plantilla">
+    <h3>4. FrameLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Apila a sus hijos unos sobre otros, en el orden en que aparecen en el XML. Sirve para superponer
+          contenido, como un indicador de carga sobre una imagen de fondo; en esta pantalla se ve el fondo
+          de color, el nombre del alumno al centro y una barra de progreso hasta abajo, los tres al mismo
+          tiempo.
+        </p>
+        <pre>&lt;FrameLayout ...&gt;
+    &lt;View android:background="#3949AB" /&gt;
+    &lt;TextView android:layout_gravity="center" android:text="@string/xautor" /&gt;
+    &lt;ProgressBar android:layout_gravity="bottom|center_horizontal" /&gt;
+&lt;/FrameLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/03_frame.png" alt="FrameLayout">
+        <figcaption>Figura 3. FrameLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plantilla">
+    <h3>5. RelativeLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Ubica a cada hijo en relación con otro hijo o con los bordes del contenedor, usando atributos como
+          <code class="inline">layout_below</code> o <code class="inline">layout_alignParentBottom</code>.
+          Hoy en día ConstraintLayout cubre los mismos casos con más control, así que RelativeLayout ya casi
+          no se usa en proyectos nuevos.
+        </p>
+        <pre>&lt;RelativeLayout ...&gt;
+    &lt;TextView android:id="@+id/etiqueta" android:text="Nombre de usuario:" /&gt;
+    &lt;EditText android:layout_below="@id/etiqueta" /&gt;
+    &lt;Button android:layout_alignParentBottom="true" android:text="Guardar" /&gt;
+&lt;/RelativeLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/04_relative.png" alt="RelativeLayout">
+        <figcaption>Figura 4. RelativeLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plantilla">
+    <h3>6. CoordinatorLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Es un contenedor pensado para coordinar el movimiento de varias vistas a la vez, como cuando una
+          barra superior se colapsa al hacer scroll. Aquí se usa para colocar una
+          <code class="inline">MaterialToolbar</code> arriba y un botón flotante abajo a la derecha.
+        </p>
+        <p>
+          Al probar esta pantalla, el nombre del alumno apareció encimado con el título de la barra superior:
+          CoordinatorLayout no acomoda a sus hijos en orden como LinearLayout, así que un TextView sin más
+          se queda en la esquina superior izquierda, debajo de la barra. Se resolvió con
+          <code class="inline">app:layout_anchor</code>, que ancla el TextView a la parte de abajo de la
+          barra en vez de calcularle un margen fijo.
+        </p>
+        <pre>&lt;androidx.coordinatorlayout.widget.CoordinatorLayout ...&gt;
+    &lt;com.google.android.material.appbar.AppBarLayout android:id="@+id/xappbar"&gt;
+        &lt;com.google.android.material.appbar.MaterialToolbar app:title="CoordinatorLayout" /&gt;
+    &lt;/com.google.android.material.appbar.AppBarLayout&gt;
+    &lt;TextView android:text="@string/xautor"
+        app:layout_anchor="@id/xappbar"
+        app:layout_anchorGravity="bottom|start" /&gt;
+    &lt;com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_gravity="bottom|end" /&gt;
+&lt;/androidx.coordinatorlayout.widget.CoordinatorLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/05_coordinator.png" alt="CoordinatorLayout">
+        <figcaption>Figura 5. CoordinatorLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plantilla">
+    <h3>7. TableLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Organiza el contenido en filas (<code class="inline">TableRow</code>) y columnas, como una hoja de
+          cálculo. El atributo <code class="inline">stretchColumns</code> hace que las columnas indicadas se
+          repartan el espacio disponible.
+        </p>
+        <pre>&lt;TableLayout android:stretchColumns="0,1"&gt;
+    &lt;TableRow&gt;
+        &lt;TextView android:text="Producto" /&gt;
+        &lt;TextView android:text="Precio" /&gt;
+    &lt;/TableRow&gt;
+    &lt;TableRow&gt;
+        &lt;TextView android:text="Café Americano" /&gt;
+        &lt;TextView android:text="$2.50" /&gt;
+    &lt;/TableRow&gt;
+&lt;/TableLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/06_table.png" alt="TableLayout">
+        <figcaption>Figura 6. TableLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plantilla">
+    <h3>8. GridLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Distribuye a sus hijos en una cuadrícula de columnas y filas fijas
+          (<code class="inline">columnCount</code>, <code class="inline">rowCount</code>). A diferencia de
+          TableLayout, aquí cualquier vista puede ocupar más de una columna con
+          <code class="inline">layout_columnSpan</code>, que es lo que se usó para que el título y el nombre
+          del alumno cruzaran las dos columnas de botones.
+        </p>
+        <pre>&lt;GridLayout android:columnCount="2" android:rowCount="3"&gt;
+    &lt;TextView android:layout_columnSpan="2" android:text="@string/xautor" /&gt;
+    &lt;Button android:text="Botón 1" /&gt;
+    &lt;Button android:text="Botón 2" /&gt;
+&lt;/GridLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/07_grid.png" alt="GridLayout">
+        <figcaption>Figura 7. GridLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="plantilla">
+    <h3>9. AbsoluteLayout</h3>
+    <div class="plantilla-fig">
+      <div class="texto">
+        <p>
+          Coloca a sus hijos en coordenadas x, y exactas, en píxeles independientes de densidad. Está
+          descontinuado desde hace más de diez años porque una posición fija se rompe en cuanto la pantalla
+          cambia de tamaño u orientación, pero el propio framework de Android lo sigue incluyendo.
+        </p>
+        <pre>&lt;AbsoluteLayout ...&gt;
+    &lt;TextView android:text="@string/xautor" android:layout_x="16dp" android:layout_y="48dp" /&gt;
+    &lt;Button android:text="No usar este Layout" android:layout_x="50dp" android:layout_y="120dp" /&gt;
+&lt;/AbsoluteLayout&gt;</pre>
+      </div>
+      <figure>
+        <img src="../screenshots/08_absolute.png" alt="AbsoluteLayout">
+        <figcaption>Figura 8. AbsoluteLayout.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>
+    Ver los ocho layouts uno junto al otro deja más claro por qué ConstraintLayout terminó reemplazando a
+    RelativeLayout: hace lo mismo (posicionar elementos unos respecto a otros) pero sin el anidamiento extra
+    que LinearLayout necesitaría para el mismo resultado, y sin depender de una jerarquía tan rígida como la
+    de TableLayout o GridLayout. El caso que más tiempo me tomó entender fue CoordinatorLayout, porque a
+    diferencia de los demás no acomoda a sus hijos automáticamente: si no se ancla un elemento a otro con
+    <code class="inline">layout_anchor</code>, simplemente se queda flotando en la esquina y se puede
+    encimar con la barra superior, que es justo lo que pasó la primera vez que probé esta pantalla.
+    AbsoluteLayout, en cambio, deja ver por qué está descontinuado con solo mirarlo: basta con que el
+    androide de la pantalla sea un poco más chico o más grande para que el botón quede fuera de lugar.
+  </p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>DAMN Plantillas (documento de la materia, Desarrollo de Aplicaciones Móviles Nativas).</li>
+    <li>Android Developers. <em>Layouts</em>. <code class="inline">https://developer.android.com/develop/ui/views/layout/declaring-layout</code></li>
+    <li>Android Developers. <em>ConstraintLayout</em>. <code class="inline">https://developer.android.com/develop/ui/views/layout/constraint-layout</code></li>
+    <li>Material Design. <em>CoordinatorLayout behaviors</em>. <code class="inline">https://developer.android.com/reference/androidx/coordinatorlayout/widget/CoordinatorLayout</code></li>
+  </ul>
+</section>
+
+</body>
+</html>

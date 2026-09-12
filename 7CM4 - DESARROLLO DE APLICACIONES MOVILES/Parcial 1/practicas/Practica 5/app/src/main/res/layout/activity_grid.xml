@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:columnCount="2"
+    android:rowCount="3">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_columnSpan="2"
+        android:text="GridLayout"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_columnSpan="2"
+        android:layout_marginBottom="8dp"
+        android:text="@string/xautor" />
+
+    <Button android:text="Botón 1" />
+    <Button android:text="Botón 2" />
+    <Button android:text="Botón 3" />
+    <Button android:text="Botón 4" />
+
+</GridLayout>

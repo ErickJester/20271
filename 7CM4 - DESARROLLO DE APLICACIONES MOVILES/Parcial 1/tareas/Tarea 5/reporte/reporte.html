@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tarea 5 - Numero maravilloso</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  pre {
+    background: #f4f4f4; border: 1px solid #ddd; border-radius: 5px;
+    padding: 10px 12px; font-size: 10.5px; line-height: 1.4;
+    white-space: pre-wrap; word-break: break-word; margin: 6px 0 12px;
+    page-break-inside: avoid;
+  }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figuras { display: flex; gap: 10px; justify-content: space-between; margin: 10px 0; }
+  .figuras figure { margin: 0; flex: 1; text-align: center; page-break-inside: avoid; }
+  .figuras img {
+    width: 100%; border: 1px solid #999; border-radius: 6px; display: block;
+  }
+  .figuras figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola img { width: 46%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  table.pasos { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 11px; }
+  table.pasos th, table.pasos td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  table.pasos th { background: #eee; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Número maravilloso<br>(conjetura de Collatz)</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Tarea:</td><td>Tarea 5: Número maravilloso</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>12 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta tarea pide construir una aplicación Android que reciba un número natural y determine si es un
+    "número maravilloso", es decir, si al aplicarle repetidamente la regla de la conjetura de Collatz
+    (dividir entre 2 si es par, multiplicar por 3 y sumar 1 si es impar) la secuencia siempre termina en 1.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Implementar la regla de Collatz con una estructura de control simple en Java.</li>
+    <li>Mostrar al usuario la secuencia completa de pasos hasta llegar a 1, no solo el resultado final.</li>
+    <li>Probar la aplicación con números de distinto tamaño para observar cómo varía la cantidad de pasos.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>1. Entorno de trabajo</h3>
+  <p>
+    El proyecto se hizo en Java con el SDK clásico de Android: <code class="inline">MainActivity</code>
+    extiende directamente <code class="inline">android.app.Activity</code>, sin usar
+    <code class="inline">AppCompatActivity</code> ni otras clases de AndroidX. La interfaz usa vistas
+    nativas del framework (<code class="inline">EditText</code>, <code class="inline">Button</code>,
+    <code class="inline">TextView</code>), sin <code class="inline">ConstraintLayout</code>.
+  </p>
+
+  <h3>2. Interfaz (activity_main.xml)</h3>
+  <p>
+    Un <code class="inline">ScrollView</code> con un <code class="inline">LinearLayout</code> vertical
+    adentro contiene el título, el campo para escribir el número, el botón "Verificar" y el
+    <code class="inline">TextView</code> donde se muestra la secuencia completa. El
+    <code class="inline">ScrollView</code> es necesario porque números como 27 generan una secuencia de
+    más de cien pasos.
+  </p>
+  <pre>&lt;ScrollView ...&gt;
+  &lt;LinearLayout android:orientation="vertical" ...&gt;
+    &lt;TextView android:text="@string/xtitulo" /&gt;
+    &lt;EditText android:id="@+id/xnumero" android:inputType="number"
+        android:hint="@string/xdato" /&gt;
+    &lt;Button android:id="@+id/xboton" android:text="@string/xaceptar" /&gt;
+    &lt;TextView android:id="@+id/xresultado" android:fontFamily="monospace" /&gt;
+  &lt;/LinearLayout&gt;
+&lt;/ScrollView&gt;</pre>
+
+  <h3>3. Lógica (MainActivity.java)</h3>
+  <p>
+    Al presionar el botón, se valida que el campo no esté vacío y que el texto se pueda convertir a
+    número. Si el número es válido, se construye la secuencia de Collatz en un ciclo
+    <code class="inline">while</code> hasta llegar a 1, contando los pasos y guardando cada valor en un
+    <code class="inline">StringBuilder</code> para mostrarlo completo al final:
+  </p>
+  <pre>StringBuilder secuencia = new StringBuilder();
+secuencia.append(numero);
+long n = numero;
+int pasos = 0;
+while (n != 1 &amp;&amp; pasos &lt; 1000) {
+    if (n % 2 == 0) {
+        n = n / 2;
+    } else {
+        n = 3 * n + 1;
+    }
+    secuencia.append(" -&gt; ").append(n);
+    pasos++;
+}
+boolean esMaravilloso = (n == 1);</pre>
+  <p>
+    El límite de 1000 pasos es solo una protección: la conjetura de Collatz nunca se ha demostrado para
+    todos los números naturales, así que en teoría no hay garantía de que algún número extremo tarde más
+    de eso en llegar a 1, aunque para los números que caben en un <code class="inline">long</code> nunca se
+    ha encontrado uno así.
+  </p>
+
+  <h3>4. Pruebas en el emulador Android</h3>
+  <p>Se probaron tres números para cubrir un caso corto, uno largo y el número que da nombre a esta tarea:</p>
+  <table class="pasos">
+    <tr><th>Número</th><th>Resultado</th><th>Pasos</th></tr>
+    <tr><td>6</td><td>Maravilloso</td><td>8</td></tr>
+    <tr><td>27</td><td>Maravilloso</td><td>111</td></tr>
+  </table>
+
+  <div class="figura-sola">
+    <figure>
+      <img src="../screenshots/00_inicial.png" alt="Pantalla inicial">
+      <figcaption>Figura 1. Pantalla inicial de la aplicación.</figcaption>
+    </figure>
+  </div>
+
+  <div class="figuras">
+    <figure>
+      <img src="../screenshots/02_numero6.png" alt="Resultado para 6">
+      <figcaption>Figura 2. Número 6: secuencia corta, 8 pasos.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/01_numero27.png" alt="Resultado para 27">
+      <figcaption>Figura 3. Número 27: 111 pasos, uno de los ejemplos clásicos de la conjetura.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>
+    Lo que más me llamó la atención de esta tarea es la diferencia de tamaño entre la lógica y el
+    resultado. La regla en sí son dos líneas: dividir entre 2 o multiplicar por 3 y sumar 1. Pero el número
+    27, que no tiene nada de especial a simple vista, tarda 111 pasos en llegar a 1, subiendo hasta más de
+    9000 en el camino antes de bajar. Ver la secuencia completa en pantalla, en lugar de solo un "sí" o un
+    "no", ayuda a entender por qué a este problema se le sigue llamando conjetura y no teorema: nadie ha
+    probado que funcione para todos los números, solo que no se ha encontrado ningún contraejemplo.
+  </p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro. <em>DAMN Kotlin Practica4</em> (documento de la materia donde se planteó por primera vez el número maravilloso).</li>
+    <li>Android Developers. <em>Activity, Views and Layouts</em>. <code class="inline">https://developer.android.com/guide</code></li>
+    <li>Wikipedia. <em>Collatz conjecture</em>. <code class="inline">https://en.wikipedia.org/wiki/Collatz_conjecture</code></li>
+  </ul>
+</section>
+
+</body>
+</html>

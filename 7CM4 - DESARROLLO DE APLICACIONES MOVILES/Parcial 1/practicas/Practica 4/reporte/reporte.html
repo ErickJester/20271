@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Practica 4 - Numeros especiales en Kotlin</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  pre {
+    background: #f4f4f4; border: 1px solid #ddd; border-radius: 5px;
+    padding: 10px 12px; font-size: 10.5px; line-height: 1.4;
+    white-space: pre-wrap; word-break: break-word; margin: 6px 0 12px;
+    page-break-inside: avoid;
+  }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figuras { display: flex; gap: 10px; justify-content: space-between; margin: 10px 0; }
+  .figuras figure { margin: 0; flex: 1; text-align: center; page-break-inside: avoid; }
+  .figuras img {
+    width: 100%; border: 1px solid #999; border-radius: 6px; display: block;
+  }
+  .figuras figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola img { width: 46%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  table.pasos { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 11px; }
+  table.pasos th, table.pasos td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  table.pasos th { background: #eee; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- ===================== CARATULA ===================== -->
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Números especiales en Kotlin:<br>primo, Fibonacci, número maravilloso<br>(conjetura de Collatz) y constante de Kaprekar</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 4: Operadores y estructuras de control de Kotlin</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>12 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<!-- ===================== INTRODUCCION ===================== -->
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta práctica corresponde al tema "Operadores y estructuras de control de Kotlin" de la Unidad II del programa
+    de la materia. Parte del ejemplo del profesor que verifica si un número natural es primo, y lo extiende con
+    dos ejercicios: comprobar si el número es de Fibonacci y si es un "número maravilloso" (la conjetura de
+    Collatz), y comprobar si un número de 3 o 4 dígitos corresponde a la constante de Kaprekar.
+  </p>
+  <p><strong>Objetivos:</strong></p>
+  <ul>
+    <li>Aplicar operadores de rango, comparación y el operador Elvis (<code class="inline">?:</code>) de Kotlin en un caso real.</li>
+    <li>Practicar estructuras de control (<code class="inline">for</code>, <code class="inline">while</code>, <code class="inline">when</code>) para resolver los cuatro criterios.</li>
+    <li>Construir una interfaz Android simple (EditText, Button, TextView) que reciba un número y muestre el resultado de los cuatro análisis.</li>
+    <li>Verificar el funcionamiento de la aplicación en un emulador Android con distintos casos de prueba.</li>
+  </ul>
+</section>
+
+<!-- ===================== DESARROLLO ===================== -->
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>1. Entorno de trabajo</h3>
+  <p>
+    Se creó un proyecto en Android Studio con la plantilla <em>Empty Views Activity</em> y lenguaje Kotlin.
+    El proyecto usa Android Gradle Plugin 9.3.2 (soporte de Kotlin integrado, sin plugin adicional de
+    <code class="inline">org.jetbrains.kotlin.android</code>), <code class="inline">compileSdk</code>/<code class="inline">targetSdk</code> 37 y
+    <code class="inline">minSdk</code> 24. La actividad principal es <code class="inline">MainActivity</code>, que extiende
+    <code class="inline">AppCompatActivity</code>.
+  </p>
+
+  <h3>2. Interfaz (activity_main.xml)</h3>
+  <p>
+    La interfaz se armó con un <code class="inline">ScrollView</code> que contiene un <code class="inline">LinearLayout</code>
+    vertical con tres elementos: un <code class="inline">EditText</code> para capturar el número natural, un
+    <code class="inline">Button</code> ("Verificar") y un <code class="inline">TextView</code> donde se muestra el
+    resultado de los cuatro análisis. Se usó <code class="inline">ScrollView</code> porque la secuencia de Collatz de
+    algunos números puede ocupar varias líneas de texto.
+  </p>
+  <pre>&lt;ScrollView ...&gt;
+  &lt;LinearLayout android:orientation="vertical" ...&gt;
+    &lt;EditText android:id="@+id/xnatural" android:inputType="number"
+        android:hint="@string/hint_numero" /&gt;
+    &lt;Button android:id="@+id/xboton" android:text="@string/accion_verificar" /&gt;
+    &lt;TextView android:id="@+id/xcalcular" android:fontFamily="monospace" /&gt;
+  &lt;/LinearLayout&gt;
+&lt;/ScrollView&gt;</pre>
+
+  <h3>3. Lógica de los cuatro análisis (MainActivity.kt)</h3>
+  <p>La función <code class="inline">esPrimo</code> descarta los números menores o iguales a 1 y busca divisores hasta la raíz cuadrada del número:</p>
+  <pre>private fun esPrimo(num: Int): Boolean {
+    if (num &lt;= 1) return false
+    for (i in 2..sqrt(num.toDouble()).toInt()) {
+        if (num % i == 0) return false
+    }
+    return true
+}</pre>
+
+  <p>Para el Ejercicio 1, <code class="inline">esFibonacci</code> genera la sucesión 0, 1, 1, 2, 3, 5... hasta alcanzar o pasar el número; es de Fibonacci si la sucesión cae exactamente en él:</p>
+  <pre>private fun esFibonacci(num: Int): Boolean {
+    var a = 0
+    var b = 1
+    while (a &lt; num) {
+        val siguiente = a + b
+        a = b
+        b = siguiente
+    }
+    return a == num
+}</pre>
+
+  <p>El número maravilloso, también del Ejercicio 1, sigue la conjetura de Collatz: si el número es par se divide
+    entre 2, si es impar se multiplica por 3 y se suma 1, y se repite hasta llegar a 1.
+    <code class="inline">secuenciaMaravilloso</code> usa <code class="inline">Long</code>
+    porque <code class="inline">3n+1</code> puede exceder el rango de <code class="inline">Int</code>:</p>
+  <pre>private fun secuenciaMaravilloso(num: Int): List&lt;Long&gt; {
+    val secuencia = mutableListOf(num.toLong())
+    var n = num.toLong()
+    while (n != 1L &amp;&amp; secuencia.size &lt; 1000) {
+        n = if (n % 2 == 0L) n / 2 else 3 * n + 1
+        secuencia.add(n)
+    }
+    return secuencia
+}</pre>
+
+  <p>El Ejercicio 2 pide la constante de Kaprekar, que solo aplica a números de 3 o 4 dígitos. En cada paso,
+    <code class="inline">pasosKaprekar</code> ordena los dígitos de forma ascendente y descendente y resta el
+    menor del mayor; la rutina converge a 495 (3 dígitos) o 6174 (4 dígitos), salvo que los dígitos sean todos
+    iguales:</p>
+  <pre>private fun pasosKaprekar(num: Int): List&lt;Int&gt;? {
+    val digitos = num.toString().length
+    if (digitos !in 3..4) return null
+    val objetivo = if (digitos == 3) 495 else 6174
+    val pasos = mutableListOf(num)
+    var n = num
+    while (n != objetivo &amp;&amp; n != 0 &amp;&amp; pasos.size &lt; 20) {
+        val ascendente = n.toString().padStart(digitos, '0').toList().sorted().joinToString("")
+        val descendente = ascendente.reversed()
+        n = descendente.toInt() - ascendente.toInt()
+        pasos.add(n)
+    }
+    return pasos
+}</pre>
+
+  <p>
+    Al presionar el botón "Verificar", se valida la entrada con <code class="inline">toIntOrNull() ?: -1</code>
+    (operador Elvis) y, si es válida, se arma el resultado con <code class="inline">buildString</code>,
+    evaluando los cuatro criterios y usando un bloque <code class="inline">when</code> para el caso de Kaprekar.
+  </p>
+
+  <h3>4. Pruebas en el emulador Android</h3>
+  <p>
+    La aplicación se instaló y ejecutó en un emulador Android (Medium Phone, API 36) con <code class="inline">adb</code>.
+    Se probaron los siguientes casos, que en conjunto cubren los cuatro análisis:
+  </p>
+  <table class="pasos">
+    <tr><th>Número</th><th>Primo</th><th>Fibonacci</th><th>Maravilloso</th><th>Kaprekar</th></tr>
+    <tr><td>13</td><td>Sí</td><td>Sí</td><td>Sí (9 pasos)</td><td>No aplica (2 dígitos)</td></tr>
+    <tr><td>495</td><td>No</td><td>No</td><td>Sí (97 pasos)</td><td>Sí, ya es la constante (495, 0 pasos)</td></tr>
+    <tr><td>2025</td><td>No</td><td>No</td><td>Sí (156 pasos)</td><td>Sí, llega a 6174 en 6 pasos</td></tr>
+  </table>
+
+  <div class="figura-sola">
+    <figure>
+      <img src="../screenshots/00_inicial.png" alt="Pantalla inicial">
+      <figcaption>Figura 1. Pantalla inicial de la aplicación.</figcaption>
+    </figure>
+  </div>
+
+  <div class="figuras">
+    <figure>
+      <img src="../screenshots/01_numero13.png" alt="Resultado para 13">
+      <figcaption>Figura 2. Número 13: primo, Fibonacci y maravilloso.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/02_numero495.png" alt="Resultado para 495">
+      <figcaption>Figura 3. Número 495: constante de Kaprekar (3 dígitos, 0 pasos).</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/03_numero2025.png" alt="Resultado para 2025">
+      <figcaption>Figura 4. Número 2025: constante de Kaprekar (4 dígitos, 6 pasos).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===================== CONCLUSIONES ===================== -->
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>
+    Esta práctica me sirvió para reforzar cómo se combinan las estructuras de control de Kotlin
+    (<code class="inline">for</code>, <code class="inline">while</code>, <code class="inline">when</code>) con
+    operadores propios del lenguaje, como el Elvis (<code class="inline">?:</code>) para manejar entradas inválidas
+    sin necesidad de bloques <code class="inline">if</code> adicionales. El ejercicio del número maravilloso me
+    pareció el más interesante: la lógica es muy corta, una condición de paridad y dos operaciones, pero la
+    secuencia resultante para números como 495 o 2025 puede tardar decenas de pasos en llegar a 1. Es la
+    conjetura de Collatz: nadie ha demostrado que funcione para todos los números naturales, aunque se ha
+    comprobado con computadoras para cifras enormes.
+  </p>
+  <p>
+    La rutina de Kaprekar también deja una idea clara de por qué a veces conviene expresar un cálculo como una
+    secuencia de pasos (una lista) en lugar de solo un resultado final: mostrar los pasos intermedios ayuda a
+    verificar que el algoritmo hace lo que se espera, y en este caso corrobora visualmente que la rutina siempre
+    converge a 495 o 6174 salvo en el caso especial de dígitos repetidos.
+  </p>
+</section>
+
+<!-- ===================== BIBLIOGRAFIA ===================== -->
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro. <em>DAMN Kotlin Practica4</em> (documento de la materia, Desarrollo de Aplicaciones Móviles Nativas).</li>
+    <li>Kotlin Foundation. <em>Kotlin documentation: Control flow, Operator overloading, Null safety</em>. <code class="inline">https://kotlinlang.org/docs/</code></li>
+    <li>Android Developers. <em>Build your first app / App architecture guides</em>. <code class="inline">https://developer.android.com/guide</code></li>
+    <li>Wikipedia. <em>Collatz conjecture</em>. <code class="inline">https://en.wikipedia.org/wiki/Collatz_conjecture</code></li>
+    <li>Wikipedia. <em>Kaprekar's constant</em>. <code class="inline">https://en.wikipedia.org/wiki/6174_(number)</code></li>
+  </ul>
+</section>
+
+</body>
+</html>

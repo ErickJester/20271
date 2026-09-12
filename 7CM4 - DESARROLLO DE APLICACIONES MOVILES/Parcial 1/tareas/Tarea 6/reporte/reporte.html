@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tarea 6 - Constante de Kaprekar</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  pre {
+    background: #f4f4f4; border: 1px solid #ddd; border-radius: 5px;
+    padding: 10px 12px; font-size: 10.5px; line-height: 1.4;
+    white-space: pre-wrap; word-break: break-word; margin: 6px 0 12px;
+    page-break-inside: avoid;
+  }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figuras { display: flex; gap: 10px; justify-content: space-between; margin: 10px 0; }
+  .figuras figure { margin: 0; flex: 1; text-align: center; page-break-inside: avoid; }
+  .figuras img {
+    width: 100%; border: 1px solid #999; border-radius: 6px; display: block;
+  }
+  .figuras figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola img { width: 46%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  table.pasos { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 11px; }
+  table.pasos th, table.pasos td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  table.pasos th { background: #eee; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Constante de Kaprekar</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Tarea:</td><td>Tarea 6: Constante de Kaprekar</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>12 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta tarea pide construir una aplicación Android que reciba un número de 3 o 4 dígitos y verifique si,
+    al aplicarle repetidamente la rutina de Kaprekar, llega a la constante correspondiente: 495 para números
+    de 3 dígitos o 6174 para números de 4 dígitos.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Implementar la rutina de Kaprekar (ordenar dígitos, restar el menor del mayor) en Java.</li>
+    <li>Detectar el caso especial de los números con todos sus dígitos iguales, donde la rutina llega a 0
+      en lugar de a la constante.</li>
+    <li>Mostrar los pasos intermedios, no solo si el número llega o no a la constante.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>1. Entorno de trabajo</h3>
+  <p>
+    Igual que en la Tarea 5, el proyecto se hizo en Java con el SDK clásico de Android:
+    <code class="inline">MainActivity</code> extiende <code class="inline">android.app.Activity</code> y la
+    interfaz usa vistas nativas (<code class="inline">EditText</code>, <code class="inline">Button</code>,
+    <code class="inline">TextView</code>), sin AndroidX ni <code class="inline">ConstraintLayout</code>.
+  </p>
+
+  <h3>2. Interfaz (activity_main.xml)</h3>
+  <p>
+    El diseño es el mismo patrón que la Tarea 5: título, campo de texto, botón "Verificar" y un
+    <code class="inline">TextView</code> con los pasos de la rutina, todo dentro de un
+    <code class="inline">ScrollView</code>.
+  </p>
+  <pre>&lt;ScrollView ...&gt;
+  &lt;LinearLayout android:orientation="vertical" ...&gt;
+    &lt;TextView android:text="@string/xtitulo" /&gt;
+    &lt;EditText android:id="@+id/xnumero" android:inputType="number"
+        android:hint="@string/xdato" /&gt;
+    &lt;Button android:id="@+id/xboton" android:text="@string/xaceptar" /&gt;
+    &lt;TextView android:id="@+id/xresultado" android:fontFamily="monospace" /&gt;
+  &lt;/LinearLayout&gt;
+&lt;/ScrollView&gt;</pre>
+
+  <h3>3. Lógica (MainActivity.java)</h3>
+  <p>
+    Primero se valida que el número tenga exactamente 3 o 4 dígitos y se fija el objetivo correspondiente
+    (495 o 6174). Cada paso de la rutina ordena los dígitos de forma ascendente y descendente con
+    <code class="inline">Arrays.sort</code> y resta el menor del mayor:
+  </p>
+  <pre>private int pasoKaprekar(int numero, int digitos) {
+    char[] cifras = String.format("%0" + digitos + "d", numero).toCharArray();
+
+    char[] ascendente = cifras.clone();
+    Arrays.sort(ascendente);
+
+    char[] descendente = cifras.clone();
+    Arrays.sort(descendente);
+    invertir(descendente);
+
+    int menor = Integer.parseInt(new String(ascendente));
+    int mayor = Integer.parseInt(new String(descendente));
+    return mayor - menor;
+}</pre>
+  <p>
+    El ciclo principal repite este paso hasta que el número llega al objetivo o hasta que llega a 0, que es
+    lo que pasa cuando los cuatro (o tres) dígitos son iguales: al restar el mismo número ordenado de las
+    dos formas, el resultado siempre es 0, y ahí se queda para siempre porque 0 no es ni 495 ni 6174.
+  </p>
+
+  <h3>4. Pruebas en el emulador Android</h3>
+  <p>Se probaron tres casos: uno de 4 dígitos, uno de 3 dígitos y el caso especial de dígitos repetidos:</p>
+  <table class="pasos">
+    <tr><th>Número</th><th>Dígitos</th><th>Resultado</th><th>Pasos</th></tr>
+    <tr><td>3529</td><td>4</td><td>Llega a 6174</td><td>5</td></tr>
+    <tr><td>753</td><td>3</td><td>Llega a 495</td><td>3</td></tr>
+    <tr><td>111</td><td>3</td><td>No llega (dígitos repetidos)</td><td>Llega a 0 en 1 paso</td></tr>
+  </table>
+
+  <div class="figura-sola">
+    <figure>
+      <img src="../screenshots/00_inicial.png" alt="Pantalla inicial">
+      <figcaption>Figura 1. Pantalla inicial de la aplicación.</figcaption>
+    </figure>
+  </div>
+
+  <div class="figuras">
+    <figure>
+      <img src="../screenshots/01_numero3529.png" alt="Resultado para 3529">
+      <figcaption>Figura 2. Número 3529: llega a 6174 en 5 pasos.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/02_numero753.png" alt="Resultado para 753">
+      <figcaption>Figura 3. Número 753: llega a 495 en 3 pasos.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/03_numero111.png" alt="Resultado para 111">
+      <figcaption>Figura 4. Número 111: dígitos repetidos, la rutina llega a 0.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>
+    Lo que más se me quedó de esta tarea es que la constante de Kaprekar no depende del número que uno
+    elija: cualquier número de 4 dígitos que no tenga sus cuatro dígitos iguales termina en 6174, y con
+    números de 3 dígitos pasa lo mismo con 495. Probarlo con 3529 y 753 y ver que ambos convergen en pocos
+    pasos ayuda a confiar en la rutina, pero el caso de 111 fue el que más me sirvió para entender por qué
+    hace falta ese caso especial en el código: sin él, el ciclo se quedaría comparando 0 contra el objetivo
+    para siempre.
+  </p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro. <em>DAMN Kotlin Practica4</em> (documento de la materia donde se planteó por primera vez la constante de Kaprekar).</li>
+    <li>Android Developers. <em>Activity, Views and Layouts</em>. <code class="inline">https://developer.android.com/guide</code></li>
+    <li>Wikipedia. <em>Kaprekar's constant</em>. <code class="inline">https://en.wikipedia.org/wiki/6174_(number)</code></li>
+  </ul>
+</section>
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/xlabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RelativeLayout"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/xautor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/xlabel"
+        android:layout_marginTop="8dp"
+        android:text="@string/xautor" />
+
+    <TextView
+        android:id="@+id/etiqueta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/xautor"
+        android:layout_marginTop="16dp"
+        android:text="Nombre de usuario:" />
+
+    <EditText
+        android:id="@+id/campo_texto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etiqueta" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Guardar" />
+
+</RelativeLayout>

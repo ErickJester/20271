@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Plantillas</string>
+    <string name="xmenutitulo">Plantillas de layout en Android</string>
+    <string name="xautor">Angel Frausto Robles</string>
+    <string name="xbtn_constraint">ConstraintLayout</string>
+    <string name="xbtn_linear">LinearLayout</string>
+    <string name="xbtn_frame">FrameLayout</string>
+    <string name="xbtn_relative">RelativeLayout</string>
+    <string name="xbtn_coordinator">CoordinatorLayout</string>
+    <string name="xbtn_table">TableLayout</string>
+    <string name="xbtn_grid">GridLayout</string>
+    <string name="xbtn_absolute">AbsoluteLayout</string>
+</resources>

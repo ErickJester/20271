@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Practica 6 - Intentos en Java</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  pre {
+    background: #f4f4f4; border: 1px solid #ddd; border-radius: 5px;
+    padding: 10px 12px; font-size: 10.5px; line-height: 1.4;
+    white-space: pre-wrap; word-break: break-word; margin: 6px 0 12px;
+    page-break-inside: avoid;
+  }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figuras { display: flex; gap: 10px; justify-content: space-between; margin: 10px 0; }
+  .figuras figure { margin: 0; flex: 1; text-align: center; page-break-inside: avoid; }
+  .figuras img { width: 100%; border: 1px solid #999; border-radius: 6px; display: block; }
+  .figuras figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola img { width: 46%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  table.pasos { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 11px; }
+  table.pasos th, table.pasos td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  table.pasos th { background: #eee; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Intentos (Intent) en Java</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 6: Intentos en Java</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>12 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Un Intent es el objeto que usa Android para pedirle a otro componente que haga algo: abrir una
+    pantalla nueva, mandar datos de una actividad a otra o invocar una acción del sistema. Esta práctica
+    parte de un ejemplo que resuelve una ecuación de segundo grado en una pantalla y muestra las raíces en
+    otra, y lo extiende con dos ejercicios: mostrar las raíces complejas con notación algebraica, y una
+    segunda aplicación que envía datos personales de una pantalla a otra con un Intent.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Usar <code class="inline">Intent</code> y <code class="inline">putExtra</code> para pasar datos entre dos actividades.</li>
+    <li>Calcular el discriminante de una ecuación cuadrática y manejar sus tres casos: raíces reales, raíz doble y raíces complejas.</li>
+    <li>Diseñar una segunda pantalla que reciba y muestre varios datos de texto enviados por Intent.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>1. Entorno de trabajo</h3>
+  <p>
+    El proyecto tiene cinco actividades: una pantalla de menú (<code class="inline">MainActivity</code>) y
+    dos flujos independientes, cada uno con dos pantallas. Todas extienden
+    <code class="inline">android.app.Activity</code> directamente, sin AppCompat, y todas las interfaces
+    usan <code class="inline">LinearLayout</code>.
+  </p>
+
+  <h3>2. Ecuación de segundo grado: EcuacionActivity → ResultActivity</h3>
+  <p>
+    <code class="inline">EcuacionActivity</code> pide los tres coeficientes en <code class="inline">EditText</code>
+    y, al presionar el botón, arma un Intent explícito hacia <code class="inline">ResultActivity</code> con
+    los tres valores como datos adicionales:
+  </p>
+  <pre>Intent intent = new Intent(EcuacionActivity.this, ResultActivity.class);
+intent.putExtra("a", a);
+intent.putExtra("b", b);
+intent.putExtra("c", c);
+startActivity(intent);</pre>
+  <p>
+    <code class="inline">ResultActivity</code> los recupera con <code class="inline">getDoubleExtra</code> y
+    calcula el discriminante para decidir entre los tres casos clásicos de la fórmula general.
+  </p>
+
+  <h3>3. Ejercicio 1: raíces complejas con notación a + jb</h3>
+  <p>
+    Cuando el discriminante es negativo, la raíz cuadrada no existe en los números reales. En vez de dejar
+    que la aplicación truene con <code class="inline">Math.sqrt</code> de un número negativo (que en Java
+    da <code class="inline">NaN</code>, no un error, pero tampoco un resultado útil), se calcula la parte
+    real y la magnitud de la parte imaginaria por separado y se arma el texto a mano con la notación que
+    pide el ejercicio:
+  </p>
+  <pre>double parteReal = -b / (2 * a);
+double parteImaginaria = Math.abs(Math.sqrt(-discriminante) / (2 * a));
+resultado = "Raíces complejas:\nx1 = " + parteReal + " + " + parteImaginaria + "j"
+        + "\nx2 = " + parteReal + " - " + parteImaginaria + "j";</pre>
+  <p>
+    Se usa <code class="inline">Math.abs</code> sobre la parte imaginaria para que siempre se lea
+    "+ jb" y "- jb"; sin eso, si <code class="inline">a</code> fuera negativo el signo se podría invertir y
+    el texto quedaría con un doble signo negativo, como "+ -0.86j".
+  </p>
+
+  <h3>4. Ejercicio 2: datos personales (DatosActivity → MostrarDatosActivity)</h3>
+  <p>
+    Este ejercicio pide una aplicación aparte: una pantalla con cuatro campos (nombre, apellido, correo y
+    teléfono) que, al presionar "Enviar", los manda por Intent a una segunda pantalla que solo los muestra.
+    A diferencia del ejemplo de la ecuación, aquí los datos son texto, así que se usa
+    <code class="inline">getStringExtra</code> en vez de <code class="inline">getDoubleExtra</code>:
+  </p>
+  <pre>Intent intent = new Intent(DatosActivity.this, MostrarDatosActivity.class);
+intent.putExtra("nombre", editNombre.getText().toString());
+intent.putExtra("apellido", editApellido.getText().toString());
+intent.putExtra("correo", editCorreo.getText().toString());
+intent.putExtra("telefono", editTelefono.getText().toString());
+startActivity(intent);</pre>
+
+  <h3>5. Pruebas en el emulador Android</h3>
+  <p>Se probaron los tres casos de la ecuación y el flujo completo de datos personales:</p>
+  <table class="pasos">
+    <tr><th>Caso</th><th>Entrada</th><th>Resultado</th></tr>
+    <tr><td>Raíces reales</td><td>a=1, b=4, c=2</td><td>x1 = -0.586, x2 = -3.414</td></tr>
+    <tr><td>Raíces complejas</td><td>a=1, b=1, c=1</td><td>x1 = -0.5 + 0.866j, x2 = -0.5 - 0.866j</td></tr>
+    <tr><td>Datos personales</td><td>Angel, Frausto Robles, angel@example.com, 5512345678</td><td>Los cuatro datos se muestran en la segunda pantalla</td></tr>
+  </table>
+
+  <div class="figura-sola">
+    <figure>
+      <img src="../screenshots/00_menu.png" alt="Menú principal">
+      <figcaption>Figura 1. Menú principal de la aplicación.</figcaption>
+    </figure>
+  </div>
+
+  <div class="figuras">
+    <figure>
+      <img src="../screenshots/01_ecuacion.png" alt="Pantalla de coeficientes">
+      <figcaption>Figura 2. Captura de los coeficientes a, b y c.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/02_reales.png" alt="Raíces reales">
+      <figcaption>Figura 3. Raíces reales, a=1, b=4, c=2.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/03_complejas.png" alt="Raíces complejas">
+      <figcaption>Figura 4. Raíces complejas, a=1, b=1, c=1.</figcaption>
+    </figure>
+  </div>
+
+  <div class="figuras">
+    <figure>
+      <img src="../screenshots/04_datos.png" alt="Formulario de datos personales">
+      <figcaption>Figura 5. Formulario del Ejercicio 2.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/05_mostrar_datos.png" alt="Datos recibidos por Intent">
+      <figcaption>Figura 6. Datos recibidos en la segunda pantalla.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>
+    Comparar el ejemplo de la ecuación con el del Ejercicio 2 deja claro que un Intent no distingue si los
+    datos que carga son números o texto: el mecanismo (crear el Intent, poner los extras, llamar a
+    <code class="inline">startActivity</code>, leerlos con el <code class="inline">get*Extra</code>
+    correspondiente) es siempre el mismo, solo cambia el método usado para cada tipo. Lo que más trabajo me
+    costó fue el caso de las raíces complejas, no por el Intent en sí, sino por evitar el signo doble en el
+    texto final; fue un buen recordatorio de que "que compile" y "que el resultado se lea bien" son cosas
+    distintas.
+  </p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>DAMN Java Intentos (documento de la materia, Desarrollo de Aplicaciones Móviles Nativas).</li>
+    <li>Android Developers. <em>Intents and intent filters</em>. <code class="inline">https://developer.android.com/guide/components/intents-filters</code></li>
+    <li>Android Developers. <em>Activity</em>. <code class="inline">https://developer.android.com/reference/android/app/Activity</code></li>
+  </ul>
+</section>
+
+</body>
+</html>

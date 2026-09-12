@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Kaprekar</string>
+    <string name="xtitulo">Constante de Kaprekar</string>
+    <string name="xdato">Ingresa un numero de 3 o 4 digitos</string>
+    <string name="xaceptar">Verificar</string>
+</resources>

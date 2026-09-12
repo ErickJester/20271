@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:stretchColumns="0,1">
+
+    <TableRow>
+        <TextView
+            android:text="TableLayout"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+    </TableRow>
+
+    <TableRow>
+        <TextView
+            android:text="@string/xautor"
+            android:paddingBottom="16dp" />
+    </TableRow>
+
+    <TableRow>
+        <TextView android:text="Producto" android:textStyle="bold" />
+        <TextView android:text="Precio" android:textStyle="bold" />
+    </TableRow>
+
+    <TableRow>
+        <TextView android:text="Café Americano" />
+        <TextView android:text="$2.50" />
+    </TableRow>
+
+</TableLayout>

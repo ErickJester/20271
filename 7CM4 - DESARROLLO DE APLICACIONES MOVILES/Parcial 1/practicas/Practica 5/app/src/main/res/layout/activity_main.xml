@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/xmenutitulo"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/xbtnConstraint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_constraint" />
+
+        <Button
+            android:id="@+id/xbtnLinear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_linear" />
+
+        <Button
+            android:id="@+id/xbtnFrame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_frame" />
+
+        <Button
+            android:id="@+id/xbtnRelative"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_relative" />
+
+        <Button
+            android:id="@+id/xbtnCoordinator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_coordinator" />
+
+        <Button
+            android:id="@+id/xbtnTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_table" />
+
+        <Button
+            android:id="@+id/xbtnGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_grid" />
+
+        <Button
+            android:id="@+id/xbtnAbsolute"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/xbtn_absolute" />
+
+    </LinearLayout>
+
+</ScrollView>
