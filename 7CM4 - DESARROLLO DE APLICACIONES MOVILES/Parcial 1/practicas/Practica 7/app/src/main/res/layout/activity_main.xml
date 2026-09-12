@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ecuación de Segundo Grado\nax^2+bx+c=0"
+        android:textSize="18sp" />
+
+    <EditText
+        android:id="@+id/coefA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberSigned|numberDecimal"
+        android:hint="Coeficiente a" />
+
+    <EditText
+        android:id="@+id/coefB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberSigned|numberDecimal"
+        android:hint="Coeficiente b" />
+
+    <EditText
+        android:id="@+id/coefC"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberSigned|numberDecimal"
+        android:hint="Coeficiente c" />
+
+    <Button
+        android:id="@+id/solveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Resolver" />
+
+</LinearLayout>

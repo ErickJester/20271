@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Practica 7 - Intentos en Kotlin</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  pre {
+    background: #f4f4f4; border: 1px solid #ddd; border-radius: 5px;
+    padding: 10px 12px; font-size: 10.5px; line-height: 1.4;
+    white-space: pre-wrap; word-break: break-word; margin: 6px 0 12px;
+    page-break-inside: avoid;
+  }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figuras { display: flex; gap: 10px; justify-content: space-between; margin: 10px 0; }
+  .figuras figure { margin: 0; flex: 1; text-align: center; page-break-inside: avoid; }
+  .figuras img { width: 100%; border: 1px solid #999; border-radius: 6px; display: block; }
+  .figuras figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola img { width: 46%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  table.pasos { border-collapse: collapse; width: 100%; margin: 6px 0 12px; font-size: 11px; }
+  table.pasos th, table.pasos td { border: 1px solid #ccc; padding: 5px 8px; text-align: left; }
+  table.pasos th { background: #eee; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Intentos (Intent) en Kotlin</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 7: Intentos en Kotlin</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>12 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta práctica retoma el mismo problema que la Práctica 6, resolver una ecuación de segundo grado
+    pasando los coeficientes de una pantalla a otra, pero ahora en Kotlin. El material de la materia
+    presenta tres formas de usar un Intent: el explícito, para moverse entre pantallas de la misma
+    aplicación; el implícito, para pedirle al sistema una acción general sin decir qué aplicación la
+    debe atender; y <code class="inline">registerForActivityResult</code>, la forma moderna de recibir
+    de vuelta un resultado de otra actividad en lugar del antiguo
+    <code class="inline">startActivityForResult</code>.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Distinguir cuándo un Intent es explícito y cuándo es implícito.</li>
+    <li>Pasar los tres coeficientes de una ecuación cuadrática de <code class="inline">MainActivity</code>
+      a <code class="inline">ResultActivity</code> con <code class="inline">putExtra</code>.</li>
+    <li>Mostrar las raíces con tres decimales y, cuando sean complejas, con la notación a + jb.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>1. Entorno de trabajo</h3>
+  <p>
+    Igual que en las prácticas anteriores de esta materia, ambas actividades extienden
+    <code class="inline">android.app.Activity</code> directamente en vez de
+    <code class="inline">AppCompatActivity</code>, y la interfaz usa
+    <code class="inline">LinearLayout</code> con vistas nativas.
+  </p>
+
+  <h3>2. Intent explícito y Intent implícito</h3>
+  <p>
+    Un Intent explícito nombra la clase de destino, como el que conecta
+    <code class="inline">MainActivity</code> con <code class="inline">ResultActivity</code> en esta
+    práctica. Un Intent implícito, en cambio, solo describe una acción y deja que el sistema decida
+    qué aplicación la resuelve, por ejemplo <code class="inline">Intent(Intent.ACTION_VIEW,
+    Uri.parse("https://developer.android.com"))</code> para abrir una URL en el navegador que el
+    usuario tenga configurado. Esta práctica solo necesita el explícito, porque las dos pantallas son
+    de la propia aplicación.
+  </p>
+
+  <h3>3. MainActivity: pedir los coeficientes</h3>
+  <p>
+    Al presionar el botón se arma el Intent explícito con los tres coeficientes como datos
+    adicionales y se navega a <code class="inline">ResultActivity</code>:
+  </p>
+  <pre>val intent = Intent(this, ResultActivity::class.java).apply {
+    putExtra("coefA", a)
+    putExtra("coefB", b)
+    putExtra("coefC", c)
+}
+startActivity(intent)</pre>
+
+  <h3>4. Un error real en el material de la materia</h3>
+  <p>
+    El documento de la práctica trae un error entre su propio XML y su propio Kotlin. El
+    <code class="inline">activity_main.xml</code> del ejemplo declara los campos como
+    <code class="inline">coefA</code>, <code class="inline">coefB</code> y
+    <code class="inline">coefC</code>, pero el <code class="inline">MainActivity.kt</code> que se
+    supone debe leerlos los busca con <code class="inline">findViewById(R.id.xa)</code>,
+    <code class="inline">R.id.xb</code> y <code class="inline">R.id.xc</code>, unos ids que no existen
+    en ese layout. Copiado tal cual, el proyecto no compila porque <code class="inline">R.id.xa</code>
+    es una referencia que Kotlin no puede resolver. En este proyecto los tres
+    <code class="inline">findViewById</code> usan los ids reales del XML
+    (<code class="inline">coefA</code>, <code class="inline">coefB</code>, <code class="inline">coefC</code>),
+    que es, de hecho, lo único que hace falta corregir para que el ejemplo funcione.
+  </p>
+
+  <h3>5. Ejercicio: tres decimales y notación a + jb</h3>
+  <p>
+    El ejercicio pide dos cambios sobre el ejemplo: mostrar las raíces con tres decimales solamente, y
+    si son complejas, con la notación a + jb. Para los tres decimales se usa el formateador de cadenas
+    de Kotlin, y para las raíces complejas se separa la parte real de la magnitud de la parte
+    imaginaria, aplicando valor absoluto a esta última por la misma razón que en la Práctica 6: sin
+    eso, un coeficiente <code class="inline">a</code> negativo puede duplicar el signo en el texto.
+  </p>
+  <pre>val parteReal = -coefB / (2 * coefA)
+val parteImaginaria = abs(sqrt(-discriminante) / (2 * coefA))
+"Raíces complejas:\nx1 = ${"%.3f".format(parteReal)} + ${"%.3f".format(parteImaginaria)}j" +
+    "\nx2 = ${"%.3f".format(parteReal)} - ${"%.3f".format(parteImaginaria)}j"</pre>
+
+  <h3>6. Pruebas en el emulador Android</h3>
+  <p>Se probaron los tres casos del discriminante, incluyendo el ejemplo propio del documento de la materia:</p>
+  <table class="pasos">
+    <tr><th>Caso</th><th>Entrada</th><th>Resultado esperado</th></tr>
+    <tr><td>Raíces reales (ejemplo del documento)</td><td>a=1, b=4, c=2</td><td>x1 = -0.586, x2 = -3.414</td></tr>
+    <tr><td>Raíz doble</td><td>a=1, b=2, c=1</td><td>x = -1.000</td></tr>
+    <tr><td>Raíces complejas</td><td>a=1, b=1, c=1</td><td>x1 = -0.500 + 0.866j, x2 = -0.500 - 0.866j</td></tr>
+  </table>
+
+  <div class="figura-sola">
+    <figure>
+      <img src="../screenshots/00_inicial.png" alt="Pantalla inicial">
+      <figcaption>Figura 1. Pantalla inicial de la aplicación.</figcaption>
+    </figure>
+  </div>
+
+  <div class="figuras">
+    <figure>
+      <img src="../screenshots/01_coeficientes.png" alt="Coeficientes del ejemplo">
+      <figcaption>Figura 2. Coeficientes del ejemplo del documento, a=1, b=4, c=2.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/02_reales.png" alt="Raíces reales">
+      <figcaption>Figura 3. Raíces reales con tres decimales.</figcaption>
+    </figure>
+  </div>
+
+  <div class="figuras">
+    <figure>
+      <img src="../screenshots/03_doble.png" alt="Raíz doble">
+      <figcaption>Figura 4. Raíz doble, a=1, b=2, c=1.</figcaption>
+    </figure>
+    <figure>
+      <img src="../screenshots/04_complejas.png" alt="Raíces complejas">
+      <figcaption>Figura 5. Raíces complejas con notación a + jb, a=1, b=1, c=1.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>
+    Volver a escribir el mismo ejercicio de la ecuación cuadrática que ya había hecho en Java, ahora en
+    Kotlin, sirvió más para notar las diferencias de sintaxis que para entender el Intent en sí, que ya
+    conocía de la práctica anterior: el <code class="inline">apply {}</code> para armar el Intent y los
+    <code class="inline">putExtra</code> en una sola expresión, y las plantillas de cadena con
+    <code class="inline">$</code> en vez de concatenar con signos de más. Lo que sí fue nuevo fue
+    encontrarme un error real en el propio documento de la práctica, entre el layout y el código de
+    ejemplo; corregirlo fue un buen ejercicio para no copiar el código de un PDF sin revisar que
+    encaje con el resto del proyecto. Sobre <code class="inline">registerForActivityResult</code>, que
+    el documento explica antes del ejemplo, no lo usé en esta práctica porque
+    <code class="inline">ResultActivity</code> solo muestra un resultado y nunca necesita devolver
+    nada a <code class="inline">MainActivity</code>; lo dejo entendido para cuando haga falta.
+  </p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>DAMN Kotlin Intentos (documento de la materia, Desarrollo de Aplicaciones Móviles Nativas).</li>
+    <li>Android Developers. <em>Intents and intent filters</em>. <code class="inline">https://developer.android.com/guide/components/intents-filters</code></li>
+    <li>Android Developers. <em>Getting a result from an activity</em>. <code class="inline">https://developer.android.com/training/basics/intents/result</code></li>
+  </ul>
+</section>
+
+</body>
+</html>

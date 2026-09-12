@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">IntentosKotlin</string>
+    <string name="hint_numero">Ingresa un número natural</string>
+    <string name="accion_verificar">Verificar</string>
+</resources>
