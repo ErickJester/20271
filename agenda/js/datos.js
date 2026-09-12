@@ -61,7 +61,7 @@ const CURSOS = [
     nombreOficial: "Desarrollo de aplicaciones móviles nativas",
     semestre: "VII",
     color: "#d97706",
-    carpeta: "7CM4 - DESARROLLO DE APLICACIONES MÓVILES",
+    carpeta: "7CM4 - DESARROLLO DE APLICACIONES MOVILES",
     unidades: [
       "I. Aspectos básicos en el desarrollo de aplicaciones móviles",
       "II. Estructura y componentes de la interfaz de usuario",
