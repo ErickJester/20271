@@ -13,7 +13,7 @@ CREATE DATABASE inventario_equipo_escom
 -- \c inventario_equipo_escom
 
 -- ============================================================
--- 1. Tablas catalogo (sin dependencias)
+-- 1. Tablas catalogo (experto_soporte depende de departamento, creada justo antes)
 -- ============================================================
 
 CREATE TABLE edificio_campus (
@@ -29,18 +29,23 @@ CREATE TABLE edificio_campus (
     CONSTRAINT ck_edificio_niveles CHECK (numero_niveles IS NULL OR numero_niveles > 0)
 );
 
+-- Campos tal como los da el ejercicio E-7 del libro (Distribuidor/Vendor). monto_total_compra
+-- y numero_total_pedidos son, a propósito, una redundancia controlada: el libro los guarda como
+-- columnas ya calculadas en vez de obligarlos a calcularse con SUM()/COUNT() sobre computadora
+-- cada vez que se consultan.
 CREATE TABLE distribuidor (
-    id_distribuidor SERIAL PRIMARY KEY,
-    razon_social    VARCHAR(120) NOT NULL,
-    rfc             VARCHAR(13) NOT NULL,
-    nombre_contacto VARCHAR(100),
-    telefono        VARCHAR(15),
-    correo          VARCHAR(100),
-    direccion       VARCHAR(150),
-    fecha_alta      DATE NOT NULL DEFAULT CURRENT_DATE,
-    CONSTRAINT uq_distribuidor_rfc UNIQUE (rfc),
-    CONSTRAINT ck_distribuidor_rfc CHECK (LENGTH(rfc) BETWEEN 12 AND 13),
-    CONSTRAINT ck_distribuidor_correo CHECK (correo IS NULL OR correo LIKE '%_@_%._%')
+    id_distribuidor       SERIAL PRIMARY KEY,
+    nombre                VARCHAR(120) NOT NULL,
+    calle                 VARCHAR(100),
+    ciudad                VARCHAR(60) NOT NULL,
+    estado                VARCHAR(60) NOT NULL,
+    codigo_postal         VARCHAR(10),
+    telefono              VARCHAR(15) NOT NULL,
+    fecha_ultimo_pedido   DATE,
+    monto_total_compra    NUMERIC(12,2) NOT NULL DEFAULT 0,
+    numero_total_pedidos  INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT ck_distribuidor_monto CHECK (monto_total_compra >= 0),
+    CONSTRAINT ck_distribuidor_pedidos CHECK (numero_total_pedidos >= 0)
 );
 
 CREATE TABLE categoria_software (
@@ -50,19 +55,28 @@ CREATE TABLE categoria_software (
     CONSTRAINT uq_categoria_nombre UNIQUE (nombre)
 );
 
+-- Departamento (Department Codes en el libro): al que pertenece cada experto de soporte.
+CREATE TABLE departamento (
+    id_departamento SERIAL PRIMARY KEY,
+    nombre          VARCHAR(80) NOT NULL,
+    CONSTRAINT uq_departamento_nombre UNIQUE (nombre)
+);
+
+-- Campos tal como los da el caso base del libro (Experto de software), con Codigo departamento
+-- como clave foranea hacia departamento en vez de texto libre.
 CREATE TABLE experto_soporte (
     id_experto        SERIAL PRIMARY KEY,
     num_empleado      VARCHAR(15) NOT NULL,
-    nombre            VARCHAR(60) NOT NULL,
+    primer_nombre     VARCHAR(60) NOT NULL,
     apellido_paterno  VARCHAR(60) NOT NULL,
-    apellido_materno  VARCHAR(60),
-    correo            VARCHAR(100) NOT NULL,
-    telefono          VARCHAR(15),
-    especialidad      VARCHAR(80),
-    activo            BOOLEAN NOT NULL DEFAULT TRUE,
+    telefono_oficina  VARCHAR(15),
+    direccion_email   VARCHAR(100) NOT NULL,
+    id_departamento   INTEGER NOT NULL,
     CONSTRAINT uq_experto_num_empleado UNIQUE (num_empleado),
-    CONSTRAINT uq_experto_correo UNIQUE (correo),
-    CONSTRAINT ck_experto_correo CHECK (correo LIKE '%_@_%._%')
+    CONSTRAINT uq_experto_email UNIQUE (direccion_email),
+    CONSTRAINT ck_experto_email CHECK (direccion_email LIKE '%_@_%._%'),
+    CONSTRAINT fk_experto_departamento FOREIGN KEY (id_departamento)
+        REFERENCES departamento (id_departamento) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE sistema_operativo (
@@ -77,21 +91,32 @@ CREATE TABLE sistema_operativo (
 );
 
 -- ============================================================
--- 2. Tabla maestra software (depende de categoria_software y experto_soporte)
+-- 2. Tabla maestra software (depende de categoria_software, experto_soporte y sistema_operativo)
 -- ============================================================
 
+-- Campos tal como quedan en la version final del caso (figura E13.4 del libro): Operating System
+-- Code, Computer Type, Memory Required, Site License, Number Of Copies y Software Cost.
 CREATE TABLE software (
-    id_software    SERIAL PRIMARY KEY,
-    titulo         VARCHAR(100) NOT NULL,
-    version        VARCHAR(30) NOT NULL,
-    editorial      VARCHAR(80) NOT NULL,
-    tipo_licencia  VARCHAR(20) NOT NULL,
-    id_categoria   INTEGER NOT NULL,
-    id_experto     INTEGER NOT NULL,
+    id_software                  SERIAL PRIMARY KEY,
+    titulo                       VARCHAR(100) NOT NULL,
+    version                      VARCHAR(30) NOT NULL,
+    editorial                    VARCHAR(80) NOT NULL,
+    id_categoria                 INTEGER NOT NULL,
+    id_sistema_operativo         INTEGER NOT NULL,
+    tipo_computadora_requerida   VARCHAR(30),
+    memoria_requerida_gb         SMALLINT,
+    licencia_sitio               BOOLEAN NOT NULL DEFAULT FALSE,
+    numero_copias                SMALLINT,
+    costo                        NUMERIC(10,2) NOT NULL DEFAULT 0,
+    id_experto                   INTEGER NOT NULL,
     CONSTRAINT uq_software_titulo_version UNIQUE (titulo, version),
-    CONSTRAINT ck_software_tipo_licencia CHECK (tipo_licencia IN ('Libre','Propietaria','Suscripcion','Educativa','Prueba')),
+    CONSTRAINT ck_software_memoria CHECK (memoria_requerida_gb IS NULL OR memoria_requerida_gb > 0),
+    CONSTRAINT ck_software_copias CHECK (numero_copias IS NULL OR numero_copias > 0),
+    CONSTRAINT ck_software_costo CHECK (costo >= 0),
     CONSTRAINT fk_software_categoria FOREIGN KEY (id_categoria)
         REFERENCES categoria_software (id_categoria) ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT fk_software_so FOREIGN KEY (id_sistema_operativo)
+        REFERENCES sistema_operativo (id_sistema_operativo) ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_software_experto FOREIGN KEY (id_experto)
         REFERENCES experto_soporte (id_experto) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -101,29 +126,36 @@ CREATE TABLE software (
 -- ============================================================
 
 CREATE TABLE computadora (
-    id_computadora       SERIAL PRIMARY KEY,
-    num_inventario       VARCHAR(20) NOT NULL,
-    numero_serie         VARCHAR(50) NOT NULL,
-    marca                VARCHAR(50) NOT NULL,
-    modelo               VARCHAR(60) NOT NULL,
-    tipo_equipo          VARCHAR(20) NOT NULL,
-    procesador           VARCHAR(80),
-    memoria_ram_gb       SMALLINT,
-    almacenamiento_gb    INTEGER,
-    fecha_compra         DATE NOT NULL,
-    costo_adquisicion    NUMERIC(10,2) NOT NULL,
-    fecha_fin_garantia   DATE,
-    estado               VARCHAR(20) NOT NULL DEFAULT 'Activo',
-    ubicacion_especifica VARCHAR(60),
-    id_edificio          INTEGER NOT NULL,
-    id_distribuidor      INTEGER NOT NULL,
+    id_computadora                    SERIAL PRIMARY KEY,
+    num_inventario                    VARCHAR(20) NOT NULL,
+    numero_serie                      VARCHAR(50) NOT NULL,
+    marca                             VARCHAR(50) NOT NULL,
+    modelo                            VARCHAR(60) NOT NULL,
+    tipo_equipo                       VARCHAR(20) NOT NULL,
+    procesador                        VARCHAR(80),
+    memoria_ram_gb                    SMALLINT,
+    capacidad_disco_duro_gb           INTEGER,
+    capacidad_segundo_disco_duro_gb   INTEGER,
+    unidad_optica                     VARCHAR(30),
+    fecha_compra                      DATE NOT NULL,
+    costo_adquisicion                 NUMERIC(10,2) NOT NULL,
+    costo_reemplazo                   NUMERIC(10,2),
+    intervalo_actualizacion_meses     SMALLINT,
+    fecha_fin_garantia                DATE,
+    estado                            VARCHAR(20) NOT NULL DEFAULT 'Activo',
+    ubicacion_especifica              VARCHAR(60),
+    id_edificio                       INTEGER NOT NULL,
+    id_distribuidor                   INTEGER NOT NULL,
     CONSTRAINT uq_computadora_num_inventario UNIQUE (num_inventario),
     CONSTRAINT uq_computadora_numero_serie UNIQUE (numero_serie),
     CONSTRAINT ck_computadora_tipo CHECK (tipo_equipo IN ('Escritorio','Portatil','All-in-One','Servidor')),
     CONSTRAINT ck_computadora_estado CHECK (estado IN ('Activo','En reparacion','Resguardo','Baja')),
     CONSTRAINT ck_computadora_costo CHECK (costo_adquisicion >= 0),
+    CONSTRAINT ck_computadora_costo_reemplazo CHECK (costo_reemplazo IS NULL OR costo_reemplazo >= 0),
     CONSTRAINT ck_computadora_ram CHECK (memoria_ram_gb IS NULL OR memoria_ram_gb > 0),
-    CONSTRAINT ck_computadora_almacenamiento CHECK (almacenamiento_gb IS NULL OR almacenamiento_gb > 0),
+    CONSTRAINT ck_computadora_disco CHECK (capacidad_disco_duro_gb IS NULL OR capacidad_disco_duro_gb > 0),
+    CONSTRAINT ck_computadora_disco2 CHECK (capacidad_segundo_disco_duro_gb IS NULL OR capacidad_segundo_disco_duro_gb > 0),
+    CONSTRAINT ck_computadora_intervalo CHECK (intervalo_actualizacion_meses IS NULL OR intervalo_actualizacion_meses > 0),
     CONSTRAINT ck_computadora_garantia CHECK (fecha_fin_garantia IS NULL OR fecha_fin_garantia >= fecha_compra),
     CONSTRAINT fk_computadora_edificio FOREIGN KEY (id_edificio)
         REFERENCES edificio_campus (id_edificio) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -196,10 +228,10 @@ INSERT INTO edificio_campus (clave, nombre, tipo_espacio, direccion, numero_nive
 ('LAB-C2', 'Laboratorio de Computo 2', 'Laboratorio', 'Edificio C, primer piso', 1, TRUE),
 ('CUB-D3', 'Cubiculos Docentes Edificio D', 'Cubiculo', 'Edificio D, segundo piso', 1, TRUE);
 
-INSERT INTO distribuidor (razon_social, rfc, nombre_contacto, telefono, correo, direccion, fecha_alta) VALUES
-('Compuequipos del Centro SA de CV', 'CCE010203AB1', 'Laura Jimenez', '4921234567', 'ventas@compuequipos.mx', 'Av. Tecnologico 100, Zacatecas', '2022-01-15'),
-('Distribuidora TecnoZac SA de CV', 'DTZ150607XY2', 'Marco Reyes', '4929876543', 'contacto@tecnozac.mx', 'Blvd. Adolfo Lopez Mateos 45, Zacatecas', '2021-08-03'),
-('Importadora de Sistemas del Norte SA', 'ISN980512QW3', 'Diana Soto', '4925551234', 'diana.soto@isn.com.mx', 'Carretera Panamericana Km 12, Zacatecas', '2023-03-20');
+INSERT INTO distribuidor (nombre, calle, ciudad, estado, codigo_postal, telefono, fecha_ultimo_pedido, monto_total_compra, numero_total_pedidos) VALUES
+('Compuequipos del Centro SA de CV', 'Av. Instituto Politecnico Nacional 2508', 'Ciudad de Mexico', 'Ciudad de Mexico', '07738', '5551234567', '2024-02-10', 37300.00, 2),
+('Distribuidora TecnoMex SA de CV', 'Blvd. Miguel de Cervantes Saavedra 301', 'Ciudad de Mexico', 'Ciudad de Mexico', '07300', '5559876543', '2023-06-01', 24900.00, 1),
+('Importadora de Sistemas del Norte SA', 'Eje Central Lazaro Cardenas 100', 'Ciudad de Mexico', 'Ciudad de Mexico', '11000', '5555551234', NULL, 0.00, 0);
 
 INSERT INTO categoria_software (nombre, descripcion) VALUES
 ('Ofimatica', 'Procesadores de texto, hojas de calculo y presentaciones'),
@@ -207,26 +239,31 @@ INSERT INTO categoria_software (nombre, descripcion) VALUES
 ('Diseno', 'Software de edicion grafica, CAD y multimedia'),
 ('Seguridad', 'Antivirus y herramientas de proteccion del equipo');
 
-INSERT INTO experto_soporte (num_empleado, nombre, apellido_paterno, apellido_materno, correo, telefono, especialidad, activo) VALUES
-('EMP-0001', 'Ricardo', 'Alvarez', 'Gomez', 'ricardo.alvarez@escom.ipn.mx', '4921110001', 'Redes y hardware', TRUE),
-('EMP-0002', 'Paola', 'Martinez', 'Luna', 'paola.martinez@escom.ipn.mx', '4921110002', 'Software y licenciamiento', TRUE),
-('EMP-0003', 'Ivan', 'Delgado', 'Rios', 'ivan.delgado@escom.ipn.mx', '4921110003', 'Sistemas operativos', TRUE);
+INSERT INTO departamento (nombre) VALUES
+('Soporte Tecnico'),
+('Redes y Telecomunicaciones'),
+('Sistemas y Licenciamiento');
+
+INSERT INTO experto_soporte (num_empleado, primer_nombre, apellido_paterno, telefono_oficina, direccion_email, id_departamento) VALUES
+('EMP-0001', 'Ricardo', 'Alvarez', '4921110001', 'ricardo.alvarez@escom.ipn.mx', 2),
+('EMP-0002', 'Paola', 'Martinez', '4921110002', 'paola.martinez@escom.ipn.mx', 3),
+('EMP-0003', 'Ivan', 'Delgado', '4921110003', 'ivan.delgado@escom.ipn.mx', 1);
 
 INSERT INTO sistema_operativo (nombre, version, arquitectura, fabricante, fecha_fin_soporte) VALUES
 ('Windows', '11 Pro 23H2', '64 bits', 'Microsoft Corporation', '2028-10-10'),
 ('Ubuntu', '22.04 LTS', '64 bits', 'Canonical Ltd.', '2027-04-01'),
 ('Windows', '10 Pro 22H2', '64 bits', 'Microsoft Corporation', '2026-10-14');
 
-INSERT INTO software (titulo, version, editorial, tipo_licencia, id_categoria, id_experto) VALUES
-('Microsoft Office', '2021', 'Microsoft Corporation', 'Propietaria', 1, 2),
-('Visual Studio Code', '1.89', 'Microsoft Corporation', 'Libre', 2, 2),
-('AutoCAD', '2024', 'Autodesk Inc.', 'Suscripcion', 3, 2),
-('Windows Defender', '4.18', 'Microsoft Corporation', 'Libre', 4, 3);
+INSERT INTO software (titulo, version, editorial, id_categoria, id_sistema_operativo, tipo_computadora_requerida, memoria_requerida_gb, licencia_sitio, numero_copias, costo, id_experto) VALUES
+('Microsoft Office', '2021', 'Microsoft Corporation', 1, 1, 'Escritorio o Portatil', 4, FALSE, 25, 3200.00, 2),
+('Visual Studio Code', '1.89', 'Microsoft Corporation', 2, 2, 'Cualquiera', 2, TRUE, NULL, 0.00, 2),
+('AutoCAD', '2024', 'Autodesk Inc.', 3, 1, 'Escritorio', 16, FALSE, 5, 45000.00, 2),
+('Windows Defender', '4.18', 'Microsoft Corporation', 4, 1, 'Cualquiera', 1, TRUE, NULL, 0.00, 3);
 
-INSERT INTO computadora (num_inventario, numero_serie, marca, modelo, tipo_equipo, procesador, memoria_ram_gb, almacenamiento_gb, fecha_compra, costo_adquisicion, fecha_fin_garantia, estado, ubicacion_especifica, id_edificio, id_distribuidor) VALUES
-('ESCOM-00123', 'SN-DL-7420-001', 'Dell', 'OptiPlex 7420', 'Escritorio', 'Intel Core i5-13500', 16, 512, '2024-02-10', 15800.00, '2027-02-10', 'Activo', 'Mesa 1, lugar 3', 1, 1),
-('ESCOM-00124', 'SN-HP-EL800-002', 'HP', 'EliteDesk 800 G9', 'Escritorio', 'Intel Core i7-13700', 32, 1024, '2024-02-10', 21500.00, '2027-02-10', 'Activo', 'Mesa 2, lugar 1', 1, 1),
-('ESCOM-00087', 'SN-LN-T14-003', 'Lenovo', 'ThinkPad T14', 'Portatil', 'AMD Ryzen 7 7840U', 16, 512, '2023-06-01', 24900.00, '2025-06-01', 'Activo', 'Resguardo docente', 3, 2);
+INSERT INTO computadora (num_inventario, numero_serie, marca, modelo, tipo_equipo, procesador, memoria_ram_gb, capacidad_disco_duro_gb, capacidad_segundo_disco_duro_gb, unidad_optica, fecha_compra, costo_adquisicion, costo_reemplazo, intervalo_actualizacion_meses, fecha_fin_garantia, estado, ubicacion_especifica, id_edificio, id_distribuidor) VALUES
+('ESCOM-00123', 'SN-DL-7420-001', 'Dell', 'OptiPlex 7420', 'Escritorio', 'Intel Core i5-13500', 16, 512, NULL, 'DVD-RW', '2024-02-10', 15800.00, 16500.00, 48, '2027-02-10', 'Activo', 'Mesa 1, lugar 3', 1, 1),
+('ESCOM-00124', 'SN-HP-EL800-002', 'HP', 'EliteDesk 800 G9', 'Escritorio', 'Intel Core i7-13700', 32, 512, 1024, NULL, '2024-02-10', 21500.00, 22500.00, 48, '2027-02-10', 'Activo', 'Mesa 2, lugar 1', 1, 1),
+('ESCOM-00087', 'SN-LN-T14-003', 'Lenovo', 'ThinkPad T14', 'Portatil', 'AMD Ryzen 7 7840U', 16, 512, NULL, NULL, '2023-06-01', 24900.00, 26000.00, 36, '2025-06-01', 'Activo', 'Resguardo docente', 3, 2);
 
 INSERT INTO mantenimiento (id_computadora, id_experto, fecha_mantenimiento, tipo, descripcion, costo, cubierto_garantia) VALUES
 (1, 1, '2025-03-14', 'Preventivo', 'Limpieza interna y verificacion de disipadores', 0.00, TRUE),
