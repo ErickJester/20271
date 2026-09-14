@@ -1,0 +1,94 @@
+$ psql -h localhost -p 5433 -U postgres -d postgres -c "CREATE DATABASE inventario_equipo_escom WITH ENCODING = 'UTF8' TEMPLATE template0;"
+CREATE DATABASE
+
+$ psql -h localhost -p 5433 -U postgres -d inventario_equipo_escom -f script.sql
+psql:script.sql:10: ERROR:  la nueva "collation" (es_MX.UTF-8) es incompatible con la "collation"
+de la base de datos patron (Spanish_Mexico.1252)
+SUGERENCIA:  Use la misma "collation" que en la base de datos patron, o bien use template0 como patron.
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+INSERT 0 3
+INSERT 0 3
+INSERT 0 4
+INSERT 0 3
+INSERT 0 3
+INSERT 0 4
+INSERT 0 3
+INSERT 0 3
+INSERT 0 4
+INSERT 0 4
+
+$ psql -h localhost -p 5433 -U postgres -d inventario_equipo_escom -c "\dt"
+               Listado de relaciones
+ Esquema |        Nombre        | Tipo  |   Dueno
+---------+----------------------+-------+----------
+ public  | categoria_software   | tabla | postgres
+ public  | computadora          | tabla | postgres
+ public  | distribuidor         | tabla | postgres
+ public  | edificio_campus      | tabla | postgres
+ public  | experto_soporte      | tabla | postgres
+ public  | instalacion_so       | tabla | postgres
+ public  | instalacion_software | tabla | postgres
+ public  | mantenimiento        | tabla | postgres
+ public  | sistema_operativo    | tabla | postgres
+ public  | software             | tabla | postgres
+(10 filas)
+
+$ -- Conteo de registros por tabla (minimo 3 por tabla, cumplido en las 10)
+        tabla         | count
+----------------------+-------
+ edificio_campus      |     3
+ distribuidor         |     3
+ categoria_software   |     4
+ experto_soporte      |     3
+ sistema_operativo    |     3
+ software             |     4
+ computadora          |     3
+ mantenimiento        |     3
+ instalacion_software |     4
+ instalacion_so       |     4
+(10 filas)
+
+$ -- Consulta 1: equipos con software cuya licencia ya vencio
+SELECT c.num_inventario, s.titulo, i.fecha_vencimiento_licencia
+FROM instalacion_software i
+JOIN computadora c ON c.id_computadora = i.id_computadora
+JOIN software s ON s.id_software = i.id_software
+WHERE i.activa = TRUE AND i.fecha_vencimiento_licencia < CURRENT_DATE;
+
+ num_inventario | titulo  | fecha_vencimiento_licencia
+----------------+---------+----------------------------
+ ESCOM-00124    | AutoCAD | 2025-02-15
+(1 fila)
+
+$ -- Consulta 2: gasto en mantenimiento de equipos fuera de garantia
+SELECT c.num_inventario, SUM(m.costo) AS gasto_total
+FROM mantenimiento m
+JOIN computadora c ON c.id_computadora = m.id_computadora
+WHERE m.cubierto_garantia = FALSE
+GROUP BY c.num_inventario;
+
+ num_inventario | gasto_total
+----------------+-------------
+ ESCOM-00087    |     1450.00
+(1 fila)
+
+$ -- Consulta 3: equipos con arranque dual (mas de un sistema operativo instalado)
+SELECT id_computadora, COUNT(*) AS num_sistemas
+FROM instalacion_so
+GROUP BY id_computadora
+HAVING COUNT(*) > 1;
+
+ id_computadora | num_sistemas
+----------------+--------------
+              3 |            2
+(1 fila)
