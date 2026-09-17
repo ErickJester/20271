@@ -1,12 +1,9 @@
 # Diccionario de Datos — Sistema de Inventario y Gestión de Equipo de Cómputo (ESCOM)
 
-Documento correspondiente al **Avance 1** del proyecto de C704. El profesor autorizó tomar el
-proyecto directamente de un libro de la bibliografía del curso; este diseño adapta el caso continuo
-de la CPU (*Central Pacific University*) del capítulo 13 de Kendall & Kendall, sustituyendo la
-institución por la ESCOM y resolviendo, además del caso base, las extensiones que el propio capítulo
-deja como ejercicio (ver [`planteamiento.md`](planteamiento.md)). El resultado son **9 entidades de
-negocio** más **2 entidades asociativas** que resuelven las relaciones muchos-a-muchos, con un total
-de **11 tablas**.
+Documento correspondiente al **Avance 1** del proyecto de C704: el diseño de la base de datos para
+el inventario de equipo de cómputo de la ESCOM (ver [`planteamiento.md`](planteamiento.md)). El
+modelo tiene **9 entidades de negocio** más **2 entidades asociativas** que resuelven las relaciones
+muchos-a-muchos, con un total de **11 tablas**.
 
 Este diccionario es la fuente de verdad del avance: el modelo E-R, la representación relacional y el
 script SQL deben coincidir atributo por atributo con lo aquí definido.
@@ -18,7 +15,7 @@ script SQL deben coincidir atributo por atributo con lo aquí definido.
 | **SGBD objetivo** | PostgreSQL 16 (tipos `SERIAL`, `VARCHAR`, `NUMERIC`, `BOOLEAN`, `DATE`) |
 | **Nomenclatura de tablas** | `snake_case`, en singular (`computadora`, no `computadoras`) |
 | **Nomenclatura de atributos** | `snake_case`, sin acentos ni caracteres especiales en los identificadores |
-| **Claves primarias** | Sustitutas (surrogate), enteras autoincrementales, con prefijo `id_` (equivalente a los códigos/números de inventario que el libro usa como identificador de cada entidad) |
+| **Claves primarias** | Sustitutas (surrogate), enteras autoincrementales, con prefijo `id_` |
 | **Claves primarias compuestas** | Solo en las entidades asociativas, formadas por sus dos claves foráneas |
 | **Codificación** | `UTF8`, intercalación `es_MX.UTF-8` |
 | **Fechas** | Tipo `DATE` (sin hora); el formato de captura es `AAAA-MM-DD` |
@@ -32,19 +29,19 @@ script SQL deben coincidir atributo por atributo con lo aquí definido.
 
 ## Resumen de tablas
 
-| # | Tabla | Tipo | Clave primaria | Descripción | Origen en el libro |
-|---|---|---|---|---|---|
-| 1 | `edificio_campus` | Catálogo | `id_edificio` | Espacios físicos de la ESCOM donde se ubican los equipos | Caso base (`Campus Location`) |
-| 2 | `distribuidor` | Catálogo | `id_distribuidor` | Proveedores a quienes se adquiere el equipo de cómputo | Ejercicios E-3 / E-7 (`Vendor`) |
-| 3 | `categoria_software` | Catálogo | `id_categoria` | Clasificación temática de los paquetes de software | Caso base (`Software Category`) |
-| 4 | `departamento` | Catálogo | `id_departamento` | Departamento institucional al que pertenece cada experto | Caso base (`Department Codes`) |
-| 5 | `experto_soporte` | Catálogo | `id_experto` | Personal de soporte técnico de la institución | Caso base (`Employee`) |
-| 6 | `sistema_operativo` | Catálogo | `id_sistema_operativo` | Sistemas operativos instalables en los equipos | Caso base (`Operating System`) |
-| 7 | `software` | Maestra | `id_software` | Paquetes de software del inventario institucional | Caso base (`Software Master`) |
-| 8 | `computadora` | Maestra | `id_computadora` | Equipos de cómputo que conforman el inventario | Caso base (`Hardware Master`) |
-| 9 | `mantenimiento` | Transaccional | `id_mantenimiento` | Historial de servicios realizados a cada equipo | Ejercicios E-4 / E-6 (`Maintenance`) |
-| 10 | `instalacion_software` | Asociativa | `id_computadora` + `id_software` | Qué software está instalado en qué equipo y con qué licencia | Caso base (`Hardware-Software`) |
-| 11 | `instalacion_so` | Asociativa | `id_computadora` + `id_sistema_operativo` | Qué sistemas operativos están instalados en qué equipo | Ejercicio E-8 |
+| # | Tabla | Tipo | Clave primaria | Descripción |
+|---|---|---|---|---|
+| 1 | `edificio_campus` | Catálogo | `id_edificio` | Espacios físicos de la ESCOM donde se ubican los equipos |
+| 2 | `distribuidor` | Catálogo | `id_distribuidor` | Proveedores a quienes se adquiere el equipo de cómputo |
+| 3 | `categoria_software` | Catálogo | `id_categoria` | Clasificación temática de los paquetes de software |
+| 4 | `departamento` | Catálogo | `id_departamento` | Departamento institucional al que pertenece cada experto |
+| 5 | `experto_soporte` | Catálogo | `id_experto` | Personal de soporte técnico de la institución |
+| 6 | `sistema_operativo` | Catálogo | `id_sistema_operativo` | Sistemas operativos instalables en los equipos |
+| 7 | `software` | Maestra | `id_software` | Paquetes de software del inventario institucional |
+| 8 | `computadora` | Maestra | `id_computadora` | Equipos de cómputo que conforman el inventario |
+| 9 | `mantenimiento` | Transaccional | `id_mantenimiento` | Historial de servicios realizados a cada equipo |
+| 10 | `instalacion_software` | Asociativa | `id_computadora` + `id_software` | Qué software está instalado en qué equipo y con qué licencia |
+| 11 | `instalacion_so` | Asociativa | `id_computadora` + `id_sistema_operativo` | Qué sistemas operativos están instalados en qué equipo |
 
 ---
 
@@ -52,9 +49,7 @@ script SQL deben coincidir atributo por atributo con lo aquí definido.
 
 **Descripción**: catálogo de los edificios, laboratorios y espacios físicos de la ESCOM donde se
 localiza el equipo de cómputo. Permite responder consultas de distribución del parque informático por
-ubicación. En el libro es la entidad `Campus Location`, que el caso base deja como catálogo mínimo
-(código + descripción); aquí se conserva ampliada porque la problemática pide distinguir laboratorios,
-cubículos y aulas.
+ubicación, distinguiendo laboratorios, cubículos y aulas.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
@@ -80,24 +75,23 @@ cubículos y aulas.
 
 ## 2. `distribuidor`
 
-**Descripción**: proveedores externos a quienes la institución adquiere el equipo de cómputo. Es la
-entidad `Vendor` que los ejercicios E-3 y E-7 del capítulo piden agregar al caso base; los atributos
-siguen tal cual la lista que da el ejercicio E-7. `monto_total_compra` y `numero_total_pedidos` son,
-a propósito, una **redundancia controlada**: el libro los guarda como columnas ya calculadas en vez de
-obligar a recalcular `SUM()`/`COUNT()` sobre `computadora` cada vez que se consultan.
+**Descripción**: proveedores externos a quienes la institución adquiere el equipo de cómputo.
+`monto_total_compra` y `numero_total_pedidos` son, a propósito, una **redundancia controlada**: se
+guardan como columnas ya calculadas en vez de obligar a recalcular `SUM()`/`COUNT()` sobre
+`computadora` cada vez que se consultan.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_distribuidor` | SERIAL | — | No | **PK** | Identificador único del distribuidor (`Numero distribuidor`) |
-| 2 | `nombre` | VARCHAR | 120 | No | — | Nombre del distribuidor (`Nombre distribuidor`) |
-| 3 | `calle` | VARCHAR | 100 | Sí | — | Calle del domicilio (`Calle`) |
-| 4 | `ciudad` | VARCHAR | 60 | No | — | Ciudad del domicilio (`Ciudad`) |
-| 5 | `estado` | VARCHAR | 60 | No | — | Estado/entidad federativa del domicilio (`Estado`; no confundir con `computadora.estado`, que es la situación operativa de un equipo) |
-| 6 | `codigo_postal` | VARCHAR | 10 | Sí | — | Código postal (`Codigo postal`) |
-| 7 | `telefono` | VARCHAR | 15 | No | — | Número telefónico (`Numero telefonico`) |
-| 8 | `fecha_ultimo_pedido` | DATE | — | Sí | — | Fecha de envío del último pedido (`Fecha envio ultimo pedido`) |
-| 9 | `monto_total_compra` | NUMERIC | 12,2 | No | — | Monto total comprado a este distribuidor, en MXN (`Monto total compra distribuidor`) |
-| 10 | `numero_total_pedidos` | INTEGER | — | No | — | Número total de pedidos enviados al distribuidor (`Numero total de pedidos enviados al distribuidor`) |
+| 1 | `id_distribuidor` | SERIAL | — | No | **PK** | Identificador único del distribuidor |
+| 2 | `nombre` | VARCHAR | 120 | No | — | Nombre del distribuidor |
+| 3 | `calle` | VARCHAR | 100 | Sí | — | Calle del domicilio |
+| 4 | `ciudad` | VARCHAR | 60 | No | — | Ciudad del domicilio |
+| 5 | `estado` | VARCHAR | 60 | No | — | Estado/entidad federativa del domicilio (no confundir con `computadora.estado`, que es la situación operativa de un equipo) |
+| 6 | `codigo_postal` | VARCHAR | 10 | Sí | — | Código postal |
+| 7 | `telefono` | VARCHAR | 15 | No | — | Número telefónico |
+| 8 | `fecha_ultimo_pedido` | DATE | — | Sí | — | Fecha de envío del último pedido |
+| 9 | `monto_total_compra` | NUMERIC | 12,2 | No | — | Monto total comprado a este distribuidor, en MXN |
+| 10 | `numero_total_pedidos` | INTEGER | — | No | — | Número total de pedidos enviados al distribuidor |
 
 **Claves foráneas**: ninguna.
 
@@ -113,9 +107,8 @@ obligar a recalcular `SUM()`/`COUNT()` sobre `computadora` cada vez que se consu
 ## 3. `categoria_software`
 
 **Descripción**: clasificación temática de los paquetes de software (ofimática, desarrollo, diseño,
-etc.). Es la entidad `Software Category` del caso base: Chip la separa en su propio catálogo
-"para ahorrar espacio en los archivos maestros" y para poder cambiar la categoría de un paquete sin
-tocar todos sus registros.
+etc.). Se separa en su propio catálogo para evitar texto libre repetido en `software` y para poder
+cambiar la categoría de un paquete sin tocar todos sus registros.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
@@ -135,9 +128,8 @@ tocar todos sus registros.
 ## 4. `departamento`
 
 **Descripción**: catálogo de los departamentos institucionales a los que pertenece cada experto de
-soporte. Es la entidad `Department Codes` que aparece en el diagrama final del caso base (figura
-E13.3) y que las primeras versiones de este diseño habían omitido, dejando el departamento como texto
-libre dentro de `experto_soporte`.
+soporte. Se separa en su propio catálogo, en vez de dejarlo como texto libre dentro de
+`experto_soporte`, para evitar inconsistencias en el nombre del departamento entre registros.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
@@ -155,21 +147,19 @@ libre dentro de `experto_soporte`.
 
 ## 5. `experto_soporte`
 
-**Descripción**: personal de soporte técnico de la institución (`Employee` en el libro). Cumple dos
-funciones en el modelo: es responsable del seguimiento de un paquete de software y es quien ejecuta
-los servicios de mantenimiento sobre los equipos. Los atributos siguen la lista del caso base, con
-`id_departamento` como clave foránea hacia `departamento` en vez del texto libre que tenía una
-versión anterior de este diseño.
+**Descripción**: personal de soporte técnico de la institución. Cumple dos funciones en el modelo: es
+responsable del seguimiento de un paquete de software y es quien ejecuta los servicios de
+mantenimiento sobre los equipos. Incluye `id_departamento` como clave foránea hacia `departamento`.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_experto` | SERIAL | — | No | **PK** | Identificador único del experto de soporte (`Numero empleado`) |
-| 2 | `num_empleado` | VARCHAR | 15 | No | UQ | Número de empleado institucional (`Numero empleado`) |
-| 3 | `primer_nombre` | VARCHAR | 60 | No | — | Primer nombre del experto (`Primer nombre experto`) |
-| 4 | `apellido_paterno` | VARCHAR | 60 | No | — | Apellido paterno (`Apellido paterno experto`) |
-| 5 | `telefono_oficina` | VARCHAR | 15 | Sí | — | Teléfono de oficina (`Telefono oficina`) |
-| 6 | `direccion_email` | VARCHAR | 100 | No | UQ | Correo institucional del experto (`Direccion email`) |
-| 7 | `id_departamento` | INTEGER | — | No | **FK** | Departamento al que pertenece (`Codigo departamento`) |
+| 1 | `id_experto` | SERIAL | — | No | **PK** | Identificador único del experto de soporte |
+| 2 | `num_empleado` | VARCHAR | 15 | No | UQ | Número de empleado institucional |
+| 3 | `primer_nombre` | VARCHAR | 60 | No | — | Primer nombre del experto |
+| 4 | `apellido_paterno` | VARCHAR | 60 | No | — | Apellido paterno |
+| 5 | `telefono_oficina` | VARCHAR | 15 | Sí | — | Teléfono de oficina |
+| 6 | `direccion_email` | VARCHAR | 100 | No | UQ | Correo institucional del experto |
+| 7 | `id_departamento` | INTEGER | — | No | **FK** | Departamento al que pertenece |
 
 **Claves foráneas**
 
@@ -189,10 +179,9 @@ versión anterior de este diseño.
 
 ## 6. `sistema_operativo`
 
-**Descripción**: catálogo de sistemas operativos que pueden instalarse en los equipos (`Operating
-System` en el libro). Se separa de `computadora` porque un mismo equipo puede alojar más de un
-sistema operativo (arranque dual, ejercicio E-8) y porque el mismo sistema operativo se repite en
-cientos de equipos y de paquetes de software.
+**Descripción**: catálogo de sistemas operativos que pueden instalarse en los equipos. Se separa de
+`computadora` porque un mismo equipo puede alojar más de uno (arranque dual) y porque el mismo
+sistema operativo se repite en cientos de equipos y de paquetes de software.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
@@ -218,27 +207,26 @@ cientos de equipos y de paquetes de software.
 
 ## 7. `software`
 
-**Descripción**: catálogo de paquetes de software institucional (`Software Master` en el libro). Los
-atributos siguen la versión final del caso (figura E13.4): además de los datos propios del paquete,
-`software` referencia el sistema operativo que requiere y describe el tipo de computadora, la memoria
-necesaria, si la licencia es de sitio, el número de copias y el costo del paquete. Los datos de **una
-instalación concreta** (clave y vigencia de licencia) no viven aquí, sino en `instalacion_software`,
-porque la licencia se adquiere por equipo y no por producto.
+**Descripción**: catálogo de paquetes de software institucional. Además de los datos propios del
+paquete, `software` referencia el sistema operativo que requiere y describe el tipo de computadora,
+la memoria necesaria, si la licencia es de sitio, el número de copias y el costo del paquete. Los
+datos de **una instalación concreta** (clave y vigencia de licencia) no viven aquí, sino en
+`instalacion_software`, porque la licencia se adquiere por equipo y no por producto.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_software` | SERIAL | — | No | **PK** | Identificador único del paquete (`Numero inventario software`) |
-| 2 | `titulo` | VARCHAR | 100 | No | UQ¹ | Nombre comercial del paquete (`Titulo`) |
-| 3 | `version` | VARCHAR | 30 | No | UQ¹ | Versión del paquete (`Numero version`) |
-| 4 | `editorial` | VARCHAR | 80 | No | — | Empresa desarrolladora o editora (`Publisher`) |
-| 5 | `id_categoria` | INTEGER | — | No | **FK** | Categoría a la que pertenece (`Software Category Code`) |
-| 6 | `id_sistema_operativo` | INTEGER | — | No | **FK** | Sistema operativo que requiere (`Operating System Code`) |
-| 7 | `tipo_computadora_requerida` | VARCHAR | 30 | Sí | — | Tipo de equipo compatible (`Computer Type`) |
-| 8 | `memoria_requerida_gb` | SMALLINT | — | Sí | — | Memoria mínima requerida, en GB (`Memory Required`) |
-| 9 | `licencia_sitio` | BOOLEAN | — | No | — | Si la licencia cubre todo el sitio (`Site License`) |
-| 10 | `numero_copias` | SMALLINT | — | Sí | — | Copias con licencia (nulo si `licencia_sitio = TRUE`) (`Number Of Copies`) |
-| 11 | `costo` | NUMERIC | 10,2 | No | — | Costo del paquete, en MXN (`Software Cost`) |
-| 12 | `id_experto` | INTEGER | — | No | **FK** | Experto responsable del paquete (`Employee Number`) |
+| 1 | `id_software` | SERIAL | — | No | **PK** | Identificador único del paquete |
+| 2 | `titulo` | VARCHAR | 100 | No | UQ¹ | Nombre comercial del paquete |
+| 3 | `version` | VARCHAR | 30 | No | UQ¹ | Versión del paquete |
+| 4 | `editorial` | VARCHAR | 80 | No | — | Empresa desarrolladora o editora |
+| 5 | `id_categoria` | INTEGER | — | No | **FK** | Categoría a la que pertenece |
+| 6 | `id_sistema_operativo` | INTEGER | — | No | **FK** | Sistema operativo que requiere |
+| 7 | `tipo_computadora_requerida` | VARCHAR | 30 | Sí | — | Tipo de equipo compatible |
+| 8 | `memoria_requerida_gb` | SMALLINT | — | Sí | — | Memoria mínima requerida, en GB |
+| 9 | `licencia_sitio` | BOOLEAN | — | No | — | Si la licencia cubre todo el sitio |
+| 10 | `numero_copias` | SMALLINT | — | Sí | — | Copias con licencia (nulo si `licencia_sitio = TRUE`) |
+| 11 | `costo` | NUMERIC | 10,2 | No | — | Costo del paquete, en MXN |
+| 12 | `id_experto` | INTEGER | — | No | **FK** | Experto responsable del paquete |
 
 ¹ `titulo` y `version` forman una clave única compuesta.
 
@@ -264,10 +252,8 @@ porque la licencia se adquiere por equipo y no por producto.
 
 ## 8. `computadora`
 
-**Descripción**: entidad central del inventario, equivalente a `Hardware Master` en el caso de la
-CPU. Registra cada equipo con sus características técnicas, su ubicación física, el proveedor que lo
-vendió y la vigencia de su garantía. Los atributos marcados con¹ vienen directamente de la figura
-E13.1 del libro.
+**Descripción**: entidad central del inventario. Registra cada equipo con sus características
+técnicas, su ubicación física, el proveedor que lo vendió y la vigencia de su garantía.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
@@ -280,12 +266,12 @@ E13.1 del libro.
 | 7 | `procesador` | VARCHAR | 80 | Sí | — | Descripción del procesador instalado |
 | 8 | `memoria_ram_gb` | SMALLINT | — | Sí | — | Memoria RAM instalada, en gigabytes |
 | 9 | `capacidad_disco_duro_gb` | INTEGER | — | Sí | — | Capacidad del disco duro principal, en gigabytes |
-| 10 | `capacidad_segundo_disco_duro_gb`¹ | INTEGER | — | Sí | — | Capacidad de un segundo disco duro, si lo tiene |
-| 11 | `unidad_optica`¹ | VARCHAR | 30 | Sí | — | Unidad óptica instalada (ej. `DVD-RW`; nulo si no tiene) |
+| 10 | `capacidad_segundo_disco_duro_gb` | INTEGER | — | Sí | — | Capacidad de un segundo disco duro, si lo tiene |
+| 11 | `unidad_optica` | VARCHAR | 30 | Sí | — | Unidad óptica instalada (ej. `DVD-RW`; nulo si no tiene) |
 | 12 | `fecha_compra` | DATE | — | No | — | Fecha de adquisición del equipo |
 | 13 | `costo_adquisicion` | NUMERIC | 10,2 | No | — | Costo de compra del equipo en MXN |
-| 14 | `costo_reemplazo`¹ | NUMERIC | 10,2 | Sí | — | Costo estimado de reemplazar el equipo hoy, en MXN |
-| 15 | `intervalo_actualizacion_meses`¹ | SMALLINT | — | Sí | — | Cada cuántos meses se planea renovar el equipo |
+| 14 | `costo_reemplazo` | NUMERIC | 10,2 | Sí | — | Costo estimado de reemplazar el equipo hoy, en MXN |
+| 15 | `intervalo_actualizacion_meses` | SMALLINT | — | Sí | — | Cada cuántos meses se planea renovar el equipo |
 | 16 | `fecha_fin_garantia` | DATE | — | Sí | — | Fecha de término de la garantía del fabricante |
 | 17 | `estado` | VARCHAR | 20 | No | — | Situación operativa actual del equipo |
 | 18 | `ubicacion_especifica` | VARCHAR | 60 | Sí | — | Posición dentro del espacio (ej. `Mesa 12, lugar 4`) |
@@ -320,22 +306,21 @@ E13.1 del libro.
 
 ## 9. `mantenimiento`
 
-**Descripción**: bitácora de los servicios de mantenimiento aplicados a cada equipo (`Maintenance` en
-el libro, ejercicios E-4 y E-6). Es la única entidad transaccional del modelo: crece con el tiempo y
-permite calcular el gasto histórico por equipo y distinguir lo cubierto por garantía de lo pagado por
-la institución. Conserva dos atributos que el ejercicio E-6 no pide (`id_experto`, `descripcion`)
-porque la problemática exige saber quién dio el servicio, no solo que se dio.
+**Descripción**: bitácora de los servicios de mantenimiento aplicados a cada equipo. Es la única
+entidad transaccional del modelo: crece con el tiempo y permite calcular el gasto histórico por
+equipo y distinguir lo cubierto por garantía de lo pagado por la institución. Incluye `id_experto` y
+`descripcion` porque la problemática exige saber quién dio el servicio, no solo que se dio.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_mantenimiento` | SERIAL | — | No | **PK** | Identificador único del servicio (`Numero orden mantenimiento`) |
-| 2 | `id_computadora` | INTEGER | — | No | **FK** | Equipo al que se le aplicó el mantenimiento (`Numero inventario hardware`) |
+| 1 | `id_mantenimiento` | SERIAL | — | No | **PK** | Identificador único del servicio |
+| 2 | `id_computadora` | INTEGER | — | No | **FK** | Equipo al que se le aplicó el mantenimiento |
 | 3 | `id_experto` | INTEGER | — | Sí | **FK** | Experto que realizó el servicio (nulo si fue externo) |
-| 4 | `fecha_mantenimiento` | DATE | — | No | — | Fecha en que se realizó el servicio (`Fecha mantenimiento`) |
-| 5 | `tipo` | VARCHAR | 20 | No | — | Naturaleza del servicio realizado (`Tipo de mantenimiento`) |
+| 4 | `fecha_mantenimiento` | DATE | — | No | — | Fecha en que se realizó el servicio |
+| 5 | `tipo` | VARCHAR | 20 | No | — | Naturaleza del servicio realizado |
 | 6 | `descripcion` | VARCHAR | 250 | No | — | Detalle de las acciones ejecutadas |
-| 7 | `costo` | NUMERIC | 10,2 | No | — | Costo del servicio en MXN (`Costo de mantenimiento`) |
-| 8 | `cubierto_garantia` | BOOLEAN | — | No | — | Si el servicio lo cubrió la garantía (`Mantenimiento cubierto por garantia`) |
+| 7 | `costo` | NUMERIC | 10,2 | No | — | Costo del servicio en MXN |
+| 8 | `cubierto_garantia` | BOOLEAN | — | No | — | Si el servicio lo cubrió la garantía |
 
 **Claves foráneas**
 
@@ -361,10 +346,10 @@ porque la problemática exige saber quién dio el servicio, no solo que se dio.
 
 ## 10. `instalacion_software` *(entidad asociativa)*
 
-**Descripción**: resuelve la relación muchos-a-muchos entre `computadora` y `software` (`Hardware-
-Software` en el libro). Un equipo tiene instalados varios paquetes y un paquete está instalado en
-varios equipos. Los atributos de licencia por instalación (clave y vigencia) viven aquí, no en
-`software`, y son un añadido de este diseño sobre el caso base: son lo que permite responder
+**Descripción**: resuelve la relación muchos-a-muchos entre `computadora` y `software`. Un equipo
+tiene instalados varios paquetes y un paquete está instalado en varios equipos. Los atributos de
+licencia por instalación (clave y vigencia) viven aquí, no en `software`, porque la licencia se
+adquiere por equipo y no por producto: son lo que permite responder
 *"¿qué computadoras tienen software con licencia vencida?"*.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
@@ -399,10 +384,9 @@ varios equipos. Los atributos de licencia por instalación (clave y vigencia) vi
 
 ## 11. `instalacion_so` *(entidad asociativa)*
 
-**Descripción**: resuelve la relación muchos-a-muchos entre `computadora` y `sistema_operativo`, la
-entidad `Computer Operating System` que pide agregar el ejercicio E-8, necesaria porque un equipo
-puede tener configurado arranque dual. Registra en qué partición vive cada sistema y cuál es el que
-arranca por omisión.
+**Descripción**: resuelve la relación muchos-a-muchos entre `computadora` y `sistema_operativo`,
+necesaria porque un equipo puede tener configurado arranque dual. Registra en qué partición vive
+cada sistema y cuál es el que arranca por omisión.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|

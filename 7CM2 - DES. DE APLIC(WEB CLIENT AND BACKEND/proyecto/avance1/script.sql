@@ -1,6 +1,6 @@
 -- ============================================================
 -- Avance 1 -- Sistema de Inventario y Gestion de Equipo de Computo (ESCOM)
--- C704 -- Desarrollo de aplicaciones web cliente y backend (7CM2)
+-- Web client and backend development frameworks (7CM2)
 -- Motor objetivo: PostgreSQL 16
 -- ============================================================
 
@@ -29,10 +29,9 @@ CREATE TABLE edificio_campus (
     CONSTRAINT ck_edificio_niveles CHECK (numero_niveles IS NULL OR numero_niveles > 0)
 );
 
--- Campos tal como los da el ejercicio E-7 del libro (Distribuidor/Vendor). monto_total_compra
--- y numero_total_pedidos son, a propósito, una redundancia controlada: el libro los guarda como
--- columnas ya calculadas en vez de obligarlos a calcularse con SUM()/COUNT() sobre computadora
--- cada vez que se consultan.
+-- monto_total_compra y numero_total_pedidos son, a proposito, una redundancia controlada:
+-- se guardan como columnas ya calculadas en vez de obligarlos a calcularse con SUM()/COUNT()
+-- sobre computadora cada vez que se consultan.
 CREATE TABLE distribuidor (
     id_distribuidor       SERIAL PRIMARY KEY,
     nombre                VARCHAR(120) NOT NULL,
@@ -55,15 +54,14 @@ CREATE TABLE categoria_software (
     CONSTRAINT uq_categoria_nombre UNIQUE (nombre)
 );
 
--- Departamento (Department Codes en el libro): al que pertenece cada experto de soporte.
+-- Departamento al que pertenece cada experto de soporte.
 CREATE TABLE departamento (
     id_departamento SERIAL PRIMARY KEY,
     nombre          VARCHAR(80) NOT NULL,
     CONSTRAINT uq_departamento_nombre UNIQUE (nombre)
 );
 
--- Campos tal como los da el caso base del libro (Experto de software), con Codigo departamento
--- como clave foranea hacia departamento en vez de texto libre.
+-- id_departamento es clave foranea hacia departamento, en vez de texto libre.
 CREATE TABLE experto_soporte (
     id_experto        SERIAL PRIMARY KEY,
     num_empleado      VARCHAR(15) NOT NULL,
@@ -94,8 +92,8 @@ CREATE TABLE sistema_operativo (
 -- 2. Tabla maestra software (depende de categoria_software, experto_soporte y sistema_operativo)
 -- ============================================================
 
--- Campos tal como quedan en la version final del caso (figura E13.4 del libro): Operating System
--- Code, Computer Type, Memory Required, Site License, Number Of Copies y Software Cost.
+-- Referencia el sistema operativo requerido y describe el tipo de computadora, la memoria
+-- necesaria, si la licencia es de sitio, el numero de copias y el costo del paquete.
 CREATE TABLE software (
     id_software                  SERIAL PRIMARY KEY,
     titulo                       VARCHAR(100) NOT NULL,

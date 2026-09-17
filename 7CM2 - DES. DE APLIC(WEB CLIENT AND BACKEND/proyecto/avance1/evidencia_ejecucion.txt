@@ -62,7 +62,7 @@ $ -- Conteo de registros por tabla (minimo 3 por tabla, cumplido en las 11)
  instalacion_so       |     4
 (11 filas)
 
-$ -- Verificacion: experto_soporte referenciando departamento (Codigo departamento del libro)
+$ -- Verificacion: experto_soporte referenciando departamento
 SELECT e.primer_nombre, e.apellido_paterno, d.nombre AS departamento
 FROM experto_soporte e JOIN departamento d ON d.id_departamento = e.id_departamento;
 
@@ -73,7 +73,7 @@ FROM experto_soporte e JOIN departamento d ON d.id_departamento = e.id_departame
  Paola          | Martinez         | Sistemas y Licenciamiento
 (3 filas)
 
-$ -- Verificacion: software referenciando sistema_operativo (Operating System Code del libro)
+$ -- Verificacion: software referenciando sistema_operativo
 SELECT s.titulo, so.nombre, so.version, s.licencia_sitio, s.numero_copias, s.costo
 FROM software s JOIN sistema_operativo so ON so.id_sistema_operativo = s.id_sistema_operativo;
 
@@ -85,8 +85,8 @@ FROM software s JOIN sistema_operativo so ON so.id_sistema_operativo = s.id_sist
  Windows Defender   | Windows | 11 Pro 23H2 | t              |                |     0.00
 (4 filas)
 
-$ -- Verificacion: distribuidor con los campos exactos del ejercicio E-7 (incluye la
-$ -- redundancia controlada monto_total_compra / numero_total_pedidos)
+$ -- Verificacion: distribuidor (incluye la redundancia controlada
+$ -- monto_total_compra / numero_total_pedidos)
 SELECT nombre, ciudad, monto_total_compra, numero_total_pedidos FROM distribuidor;
 
                 nombre                |      ciudad      | monto_total_compra | numero_total_pedidos

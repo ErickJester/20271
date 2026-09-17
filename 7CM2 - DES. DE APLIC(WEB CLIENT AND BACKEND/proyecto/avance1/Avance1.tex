@@ -17,6 +17,7 @@
 \usepackage{float}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
+\usepackage{rotating}
 \usepackage{csquotes}
 \usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
 \addbibresource{referencias.bib}
@@ -32,7 +33,7 @@
 	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
 	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
 	\vspace{1cm}
-	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	{\huge\Large \color{colorIPN}{Web client and backend development frameworks}.\par}
 	\vspace{1.5cm}
 	{\huge\Large  \color{colorESCOM}{Avance 1: Diseño e Implementación de Base de Datos}\par}
 	\vspace{0.6cm}
@@ -89,24 +90,22 @@
 %################################################
 \section{\color{colorIPN}{Introducción}}
 
-El profesor autorizó tomar el proyecto de semestre directamente de un libro de la bibliografía del curso, y este proyecto adapta el caso continuo de la CPU (\textit{Central Pacific University}) del capítulo 13, \enquote{Diseño de bases de datos}, de Kendall \& Kendall \cite{kendall2011}. El episodio 13 (p.\ 437) sigue a los analistas Chip Puller y Anna Liszt construyendo, paso a paso, el modelo de un sistema de inventario de equipo de cómputo universitario: exactamente el dominio de este avance. La adaptación sustituye \textit{Central Pacific University} por la ESCOM y resuelve, además del caso base, las tres extensiones que el propio capítulo deja como ejercicio al lector (p.\ 440): agregar \texttt{Distribuidor} (ejercicios E-3 y E-7), agregar \texttt{Mantenimiento} (ejercicios E-4 y E-6), y agregar la entidad asociativa \texttt{Computadora}--\texttt{SistemaOperativo} para el caso de arranque dual (ejercicio E-8).
-
-Los laboratorios de cómputo y los cubículos docentes de la ESCOM acumulan, semestre tras semestre, un parque de equipo cada vez más grande y heterogéneo: computadoras de distintas marcas y modelos, adquiridas en fechas distintas y con distintos proveedores, cada una con su propio sistema operativo y su propio conjunto de paquetes de software instalados. Es, punto por punto, la misma problemática que plantea el caso de la CPU. Actualmente no existe un sistema centralizado que permita saber, en un momento dado, qué software está instalado en cada equipo y si su licencia sigue vigente, qué equipos ya superaron su periodo de garantía, cuál es el historial de mantenimientos realizados a cada computadora, a qué proveedor se le compró cada equipo, o quién es la persona de soporte responsable de cada paquete de software instalado.
+Los laboratorios de cómputo y los cubículos docentes de la ESCOM acumulan, semestre tras semestre, un parque de equipo cada vez más grande y heterogéneo: computadoras de distintas marcas y modelos, adquiridas en fechas distintas y con distintos proveedores, cada una con su propio sistema operativo y su propio conjunto de paquetes de software instalados. Actualmente no existe un sistema centralizado que permita saber, en un momento dado, qué software está instalado en cada equipo y si su licencia sigue vigente, qué equipos ya superaron su periodo de garantía, cuál es el historial de mantenimientos realizados a cada computadora, a qué proveedor se le compró cada equipo, o quién es la persona de soporte responsable de cada paquete de software instalado.
 
 Esta información hoy se encuentra dispersa en hojas de cálculo, notas del personal de soporte y facturas físicas, lo que dificulta las auditorías de cumplimiento de licenciamiento, la planeación de reemplazos de equipo y el seguimiento de mantenimientos. Preguntas tan simples como \enquote{¿qué computadoras tienen instalado software cuya licencia ya venció?} o \enquote{¿cuánto se ha gastado en mantenimiento de equipos fuera de garantía este año?} son, en la práctica, imposibles de responder a mano con la información dispersa de esta manera.
 
 Una base de datos relacional resuelve exactamente ese problema: centraliza el inventario de hardware y software, las relaciones de instalación entre ambos, el historial de mantenimiento y los proveedores, eliminando la duplicidad de información y habilitando consultas que hoy no se pueden hacer. Ese es el propósito de este primer avance del proyecto: identificar el dominio del problema y traducirlo en un diseño de base de datos completo, desde las entidades hasta el script que la crea y la puebla.
 
-Este documento cubre, en ese orden, la problemática y las entidades del dominio, el diccionario de datos completo de las once tablas del modelo, el modelo Entidad-Relación con sus cardinalidades, la representación relacional derivada de él, y el script SQL de creación y poblado de la base de datos. Queda fuera de este avance el desarrollo del backend, del frontend y del módulo de autenticación y autorización, que se abordan en etapas posteriores del curso y que, conforme a la rúbrica de esta actividad, no se contabilizan dentro de las entidades de negocio del modelo.
+Este documento cubre, en ese orden, la problemática y las entidades del dominio, el diccionario de datos completo de las once tablas del modelo, el modelo Entidad-Relación con sus cardinalidades, la representación relacional derivada de él, y el script SQL de creación y poblado de la base de datos.
 
 %################################################
 \section{\color{colorIPN}{Desarrollo}}
 
 \subsection{ \color{colorESCOM}{Problemática y solución propuesta}}
 
-El dominio elegido es el inventario de equipo de cómputo de la ESCOM, tomado del caso de la CPU de Kendall \& Kendall \cite{kendall2011}. La problemática, descrita en la introducción, tiene una causa común a los cinco síntomas que presenta: no existe un modelo de datos que relacione el equipo físico con su ubicación, su proveedor, el software que tiene instalado, los sistemas operativos que ejecuta y el historial de servicio que ha recibido. Cada uno de esos aspectos se registra hoy por separado y sin relación explícita entre ellos.
+El dominio elegido es el inventario de equipo de cómputo de la ESCOM. La problemática, descrita en la introducción, tiene una causa común a los cinco síntomas que presenta: no existe un modelo de datos que relacione el equipo físico con su ubicación, su proveedor, el software que tiene instalado, los sistemas operativos que ejecuta y el historial de servicio que ha recibido. Cada uno de esos aspectos se registra hoy por separado y sin relación explícita entre ellos.
 
-La solución sigue el modelo que Chip y Anna construyen en el episodio 13 del libro: parte de dos entidades simples (\texttt{Computadora} y \texttt{Software}) relacionadas de muchos a muchos, y normaliza hacia afuera todo lo que no depende únicamente de cada una (\texttt{SistemaOperativo}, \texttt{EdificioCampus}, \texttt{CategoriaSoftware}, \texttt{ExpertoSoporte} y \texttt{Departamento}), exactamente como se explica en la sección \ref{sec:diccionario}. Sobre ese modelo base se resuelven las tres extensiones que el propio capítulo deja como ejercicio (p.\ 440 del libro): \texttt{Distribuidor} (E-3, E-7), \texttt{Mantenimiento} (E-4, E-6) y la entidad asociativa \texttt{Computadora}--\texttt{SistemaOperativo} para el arranque dual (E-8). El resultado son once tablas relacionales: seis catálogos de apoyo (edificios, distribuidores, categorías de software, departamentos, expertos de soporte y sistemas operativos), dos tablas maestras (software y computadora), una tabla transaccional (mantenimiento) y dos tablas asociativas que resuelven las relaciones muchos a muchos del modelo. El resto de esta sección desarrolla ese modelo con el nivel de detalle que pide la rúbrica de la actividad.
+La solución parte de dos entidades simples (\texttt{Computadora} y \texttt{Software}) relacionadas de muchos a muchos, y normaliza hacia afuera todo lo que no depende únicamente de cada una (\texttt{SistemaOperativo}, \texttt{EdificioCampus}, \texttt{CategoriaSoftware}, \texttt{ExpertoSoporte} y \texttt{Departamento}), exactamente como se explica en la sección \ref{sec:diccionario}. Sobre ese modelo base se agregan tres extensiones adicionales: \texttt{Distribuidor}, \texttt{Mantenimiento} y la entidad asociativa \texttt{Computadora}--\texttt{SistemaOperativo} para el arranque dual. El resultado son once tablas relacionales: seis catálogos de apoyo (edificios, distribuidores, categorías de software, departamentos, expertos de soporte y sistemas operativos), dos tablas maestras (software y computadora), una tabla transaccional (mantenimiento) y dos tablas asociativas que resuelven las relaciones muchos a muchos del modelo. El resto de esta sección desarrolla ese modelo con el nivel de detalle que pide la rúbrica de la actividad.
 
 \subsection{ \color{colorESCOM}{Entidades identificadas}}
 
@@ -189,14 +188,14 @@ Catálogo de los edificios, laboratorios y espacios físicos de la ESCOM donde s
 %------------------------------------------------
 \subsubsection{\texttt{distribuidor}}
 
-Proveedores externos a quienes la institución adquiere el equipo de cómputo, entidad \texttt{Vendor} que los ejercicios E-3 y E-7 del capítulo piden agregar al caso base. Los atributos siguen tal cual la lista que da el ejercicio E-7. \texttt{monto\_total\_compra} y \texttt{numero\_total\_pedidos} son, a propósito, una \textbf{redundancia controlada}: el libro los guarda ya calculados en vez de obligar a recalcular \texttt{SUM()}/\texttt{COUNT()} sobre \texttt{computadora} cada vez que se consultan.
+Proveedores externos a quienes la institución adquiere el equipo de cómputo. \texttt{monto\_\allowbreak total\_\allowbreak compra} y \texttt{numero\_\allowbreak total\_\allowbreak pedidos} son, a propósito, una \textbf{redundancia controlada}: se guardan ya calculados en vez de obligar a recalcular \texttt{SUM()}/\texttt{COUNT()} sobre \texttt{computadora} cada vez que se consultan.
 
 \begin{table}[H]
 	\centering
 	\footnotesize
 	\begin{tabular}{p{2.9cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.2cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_distribuidor} & SERIAL & --- & No & PK & Identificador único (\texttt{Numero distribuidor}) \\ \hline
+		\texttt{id\_distribuidor} & SERIAL & --- & No & PK & Identificador único \\ \hline
 		\texttt{nombre} & VARCHAR & 120 & No & --- & Nombre del distribuidor \\ \hline
 		\texttt{calle} & VARCHAR & 100 & Sí & --- & Calle del domicilio \\ \hline
 		\texttt{ciudad} & VARCHAR & 60 & No & --- & Ciudad del domicilio \\ \hline
@@ -236,7 +235,7 @@ Clasificación temática de los paquetes de software, separada en su propio cat�
 %------------------------------------------------
 \subsubsection{\texttt{departamento}}
 
-Departamentos institucionales a los que pertenece cada experto de soporte: la entidad \texttt{Department Codes} del diagrama final del caso base (figura E13.3), que una primera versión de este diseño había omitido dejando el departamento como texto libre en \texttt{experto\_soporte}.
+Departamentos institucionales a los que pertenece cada experto de soporte. Se separa en su propio catálogo, en vez de dejarlo como texto libre en \texttt{experto\_soporte}, para evitar inconsistencias en el nombre del departamento entre distintos registros.
 
 \begin{table}[H]
 	\centering
@@ -255,14 +254,14 @@ Departamentos institucionales a los que pertenece cada experto de soporte: la en
 %------------------------------------------------
 \subsubsection{\texttt{experto\_soporte}}
 
-Personal de soporte técnico (\texttt{Employee} en el libro). Cumple dos funciones en el modelo: da seguimiento a un paquete de software y ejecuta los servicios de mantenimiento sobre los equipos. Los atributos siguen la lista del caso base, con \texttt{id\_departamento} como clave foránea.
+Personal de soporte técnico. Cumple dos funciones en el modelo: da seguimiento a un paquete de software y ejecuta los servicios de mantenimiento sobre los equipos. Incluye \texttt{id\_departamento} como clave foránea hacia su departamento de adscripción.
 
 \begin{table}[H]
 	\centering
 	\footnotesize
 	\begin{tabular}{p{2.9cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.2cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_experto} & SERIAL & --- & No & PK & Identificador único (\texttt{Numero empleado}) \\ \hline
+		\texttt{id\_experto} & SERIAL & --- & No & PK & Identificador único \\ \hline
 		\texttt{num\_empleado} & VARCHAR & 15 & No & UQ & Número de empleado institucional \\ \hline
 		\texttt{primer\_nombre} & VARCHAR & 60 & No & --- & Primer nombre del experto \\ \hline
 		\texttt{apellido\_paterno} & VARCHAR & 60 & No & --- & Apellido paterno \\ \hline
@@ -313,24 +312,24 @@ Sistemas operativos que pueden instalarse en los equipos, separados de \texttt{c
 %------------------------------------------------
 \subsubsection{\texttt{software}}
 
-Paquetes de software institucional (\texttt{Software Master} en el libro). Los atributos siguen la versión final del caso (figura E13.4): además de los datos propios del paquete, referencia el sistema operativo que requiere y describe el tipo de computadora, la memoria necesaria, si la licencia es de sitio, el número de copias y el costo. Los datos de \textbf{una instalación concreta}, como la clave y la vigencia de licencia, van en \texttt{instalacion\_software}, porque la licencia se adquiere por equipo y no por producto.
+Paquetes de software institucional. Además de los datos propios del paquete, referencia el sistema operativo que requiere y describe el tipo de computadora, la memoria necesaria, si la licencia es de sitio, el número de copias y el costo. Los datos de \textbf{una instalación concreta}, como la clave y la vigencia de licencia, van en \texttt{instalacion\_software}, porque la licencia se adquiere por equipo y no por producto.
 
 \begin{table}[H]
 	\centering
 	\footnotesize
-	\begin{tabular}{p{3cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.3cm}}\hline \hline
+	\begin{tabular}{p{4cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{6.3cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_software} & SERIAL & --- & No & PK & Identificador único (\texttt{Numero inventario software}) \\ \hline
+		\texttt{id\_software} & SERIAL & --- & No & PK & Identificador único \\ \hline
 		\texttt{titulo} & VARCHAR & 100 & No & UQ\textsuperscript{1} & Nombre comercial del paquete \\ \hline
 		\texttt{version} & VARCHAR & 30 & No & UQ\textsuperscript{1} & Versión del paquete \\ \hline
-		\texttt{editorial} & VARCHAR & 80 & No & --- & Empresa desarrolladora o editora (\texttt{Publisher}) \\ \hline
+		\texttt{editorial} & VARCHAR & 80 & No & --- & Empresa desarrolladora o editora \\ \hline
 		\texttt{id\_categoria} & INTEGER & --- & No & FK & Categoría a la que pertenece \\ \hline
-		\texttt{id\_sistema\_operativo} & INTEGER & --- & No & FK & Sistema operativo que requiere (\texttt{Operating System Code}) \\ \hline
-		\texttt{tipo\_computadora\_requerida} & VARCHAR & 30 & Sí & --- & Tipo de equipo compatible (\texttt{Computer Type}) \\ \hline
+		\texttt{id\_sistema\_operativo} & INTEGER & --- & No & FK & Sistema operativo que requiere \\ \hline
+		\texttt{tipo\_computadora\_requerida} & VARCHAR & 30 & Sí & --- & Tipo de equipo compatible \\ \hline
 		\texttt{memoria\_requerida\_gb} & SMALLINT & --- & Sí & --- & Memoria mínima requerida, en GB \\ \hline
-		\texttt{licencia\_sitio} & BOOLEAN & --- & No & --- & Si la licencia cubre todo el sitio (\texttt{Site License}) \\ \hline
+		\texttt{licencia\_sitio} & BOOLEAN & --- & No & --- & Si la licencia cubre todo el sitio \\ \hline
 		\texttt{numero\_copias} & SMALLINT & --- & Sí & --- & Copias con licencia (nulo si \texttt{licencia\_sitio}) \\ \hline
-		\texttt{costo} & NUMERIC & 10,2 & No & --- & Costo del paquete, en MXN (\texttt{Software Cost}) \\ \hline
+		\texttt{costo} & NUMERIC & 10,2 & No & --- & Costo del paquete, en MXN \\ \hline
 		\texttt{id\_experto} & INTEGER & --- & No & FK & Experto responsable del paquete \\ \hline \hline
 	\end{tabular}
 	\caption{Diccionario de datos de \texttt{software}. \textsuperscript{1} clave única compuesta}
@@ -350,17 +349,17 @@ Paquetes de software institucional (\texttt{Software Master} en el libro). Los a
 	\label{tabla:fk-software}
 \end{table}
 
-\textbf{Restricciones adicionales}: \texttt{UNIQUE(titulo, version)}; \texttt{CHECK} de que \texttt{memoria\_requerida\_gb}, \texttt{numero\_copias} y \texttt{costo} sean válidos cuando no son nulos. \texttt{RESTRICT} en las tres FK: no se puede borrar una categoría, un sistema operativo ni un experto mientras existan paquetes que dependan de ellos.
+\textbf{Restricciones adicionales}: \texttt{UNIQUE(titulo, version)}; \texttt{CHECK} de que \texttt{memoria\_\allowbreak requerida\_gb}, \texttt{numero\_\allowbreak copias} y \texttt{costo} sean válidos cuando no son nulos. \texttt{RESTRICT} en las tres FK: no se puede borrar una categoría, un sistema operativo ni un experto mientras existan paquetes que dependan de ellos.
 
 %------------------------------------------------
 \subsubsection{\texttt{computadora}}
 
-Entidad central del inventario, equivalente a \texttt{COMPUTADORA}/\texttt{HARDWARE} en el caso de la CPU: cada equipo de cómputo con sus características técnicas, ubicación física, proveedor y vigencia de garantía. Los atributos marcados con \textsuperscript{1} vienen directamente de la figura E13.1 del libro (\texttt{Costo reemplazo}, \texttt{Capacidad segundo disco duro}, \texttt{Unidad optica}, \texttt{Intervalo actualizacion}).
+Entidad central del inventario: cada equipo de cómputo con sus características técnicas, ubicación física, proveedor y vigencia de garantía.
 
 \begin{table}[H]
 	\centering
 	\footnotesize
-	\begin{tabular}{p{4.4cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{5.7cm}}\hline \hline
+	\begin{tabular}{p{4.7cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{5.4cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
 		\texttt{id\_computadora} & SERIAL & --- & No & PK & Identificador único del equipo \\ \hline
 		\texttt{num\_inventario} & VARCHAR & 20 & No & UQ & Número de inventario de la etiqueta institucional \\ \hline
@@ -371,12 +370,12 @@ Entidad central del inventario, equivalente a \texttt{COMPUTADORA}/\texttt{HARDW
 		\texttt{procesador} & VARCHAR & 80 & Sí & --- & Descripción del procesador instalado \\ \hline
 		\texttt{memoria\_ram\_gb} & SMALLINT & --- & Sí & --- & Memoria RAM instalada, en GB \\ \hline
 		\texttt{capacidad\_disco\_duro\_gb} & INTEGER & --- & Sí & --- & Capacidad del disco duro principal, en GB \\ \hline
-		\texttt{capacidad\_segundo\_disco\_duro\_gb}\textsuperscript{1} & INTEGER & --- & Sí & --- & Capacidad de un segundo disco duro, si lo tiene \\ \hline
-		\texttt{unidad\_optica}\textsuperscript{1} & VARCHAR & 30 & Sí & --- & Unidad óptica instalada (nulo si no tiene) \\ \hline
+		\texttt{capacidad\_segundo\_disco\_duro\_gb} & INTEGER & --- & Sí & --- & Capacidad de un segundo disco duro, si lo tiene \\ \hline
+		\texttt{unidad\_optica} & VARCHAR & 30 & Sí & --- & Unidad óptica instalada (nulo si no tiene) \\ \hline
 		\texttt{fecha\_compra} & DATE & --- & No & --- & Fecha de adquisición del equipo \\ \hline
 		\texttt{costo\_adquisicion} & NUMERIC & 10,2 & No & --- & Costo de compra, en MXN \\ \hline
-		\texttt{costo\_reemplazo}\textsuperscript{1} & NUMERIC & 10,2 & Sí & --- & Costo estimado de reemplazo hoy, en MXN \\ \hline
-		\texttt{intervalo\_actualizacion\_meses}\textsuperscript{1} & SMALLINT & --- & Sí & --- & Cada cuántos meses se planea renovar el equipo \\ \hline
+		\texttt{costo\_reemplazo} & NUMERIC & 10,2 & Sí & --- & Costo estimado de reemplazo hoy, en MXN \\ \hline
+		\texttt{intervalo\_actualizacion\_meses} & SMALLINT & --- & Sí & --- & Cada cuántos meses se planea renovar el equipo \\ \hline
 		\texttt{fecha\_fin\_garantia} & DATE & --- & Sí & --- & Fecha de término de la garantía \\ \hline
 		\texttt{estado} & VARCHAR & 20 & No & --- & Situación operativa actual del equipo \\ \hline
 		\texttt{ubicacion\_especifica} & VARCHAR & 60 & Sí & --- & Posición dentro del espacio físico \\ \hline
@@ -404,7 +403,7 @@ Entidad central del inventario, equivalente a \texttt{COMPUTADORA}/\texttt{HARDW
 %------------------------------------------------
 \subsubsection{\texttt{mantenimiento}}
 
-Bitácora de los servicios de mantenimiento aplicados a cada equipo (\texttt{Maintenance} en el libro, ejercicios E-4 y E-6). Es la única entidad transaccional del modelo: crece con el tiempo y permite calcular el gasto histórico por equipo. Conserva dos atributos que el ejercicio E-6 no pide (\texttt{id\_experto}, \texttt{descripcion}) porque la problemática exige saber quién dio el servicio, no solo que se dio.
+Bitácora de los servicios de mantenimiento aplicados a cada equipo. Es la única entidad transaccional del modelo: crece con el tiempo y permite calcular el gasto histórico por equipo. Incluye \texttt{id\_experto} y \texttt{descripcion} porque la problemática exige saber quién dio el servicio, no solo que se dio.
 
 \begin{table}[H]
 	\centering
@@ -446,7 +445,7 @@ Resuelve la relación muchos a muchos entre \texttt{computadora} y \texttt{softw
 \begin{table}[H]
 	\centering
 	\footnotesize
-	\begin{tabular}{p{3.4cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1.3cm} | p{6.4cm}}\hline \hline
+	\begin{tabular}{p{3.9cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1.3cm} | p{5.9cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
 		\texttt{id\_computadora} & INTEGER & --- & No & PK, FK & Equipo donde se instaló el paquete \\ \hline
 		\texttt{id\_software} & INTEGER & --- & No & PK, FK & Paquete de software instalado \\ \hline
@@ -535,21 +534,22 @@ Las relaciones R8 y R9 son muchos a muchos y se resuelven, respectivamente, con 
 %################################################
 \subsection{ \color{colorESCOM}{Modelo Entidad-Relación}}
 
-La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Visio/Information Engineering que usa el caso continuo de la CPU (\textit{Central Pacific University}) del capítulo 13 de Kendall \& Kendall \cite{kendall2011} en vez de la notación de Chen. Ese caso resuelve un sistema de inventario de equipo de cómputo universitario prácticamente idéntico en dominio al de este proyecto. Cada recuadro es una entidad con su lista completa de atributos y, en la columna izquierda, la marca \texttt{PK} para la clave primaria y \texttt{FK} para las claves foráneas (\texttt{PK, FK} cuando un atributo es ambas cosas, en las dos entidades asociativas). Los recuadros con relleno son las entidades asociativas. Sobre cada línea se indica la cardinalidad en cada extremo y el verbo que nombra la relación (ver tabla \ref{tabla:relaciones}). La figura es, por construcción, exactamente el mismo contenido que el diccionario de datos de la sección \ref{sec:diccionario}: cada atributo, cada clave primaria y cada clave foránea del diccionario aparece aquí y viceversa.
+La figura \ref{img:modelo-er} muestra el modelo completo, con notación de Visio/Information Engineering \cite{kendall2011} en vez de la notación de Chen. Cada recuadro es una entidad con su lista completa de atributos y, en la columna izquierda, la marca \texttt{PK} para la clave primaria y \texttt{FK} para las claves foráneas (\texttt{PK, FK} cuando un atributo es ambas cosas, en las dos entidades asociativas). Los recuadros con relleno son las entidades asociativas. Sobre cada línea se indica la cardinalidad en cada extremo y el verbo que nombra la relación (ver tabla \ref{tabla:relaciones}). La figura es, por construcción, exactamente el mismo contenido que el diccionario de datos de la sección \ref{sec:diccionario}: cada atributo, cada clave primaria y cada clave foránea del diccionario aparece aquí y viceversa.
 
-\begin{figure}[H]
+\begin{sidewaysfigure}
 	\centering
-	\resizebox{\linewidth}{!}{%
+	\resizebox{\textheight}{!}{%
 	\begin{tikzpicture}[
-		tbl/.style={draw, colorIPN, thin, rounded corners=1pt, font=\tiny, inner sep=3pt, fill=white},
-		assoc/.style={draw, colorESCOM, thin, rounded corners=1pt, font=\tiny, inner sep=3pt, fill=colorESCOM!8},
+		x=0.65cm, y=0.65cm,
+		tbl/.style={draw, colorIPN, thin, rounded corners=1pt, font=\small, inner sep=5pt, fill=white},
+		assoc/.style={draw, colorESCOM, thin, rounded corners=1pt, font=\small, inner sep=5pt, fill=colorESCOM!8},
 		rel/.style={colorIPN, thick},
-		card/.style={font=\scriptsize, color=colorIPN},
-		etq/.style={font=\scriptsize, color=colorESCOM}
+		card/.style={font=\small, color=colorIPN},
+		etq/.style={font=\small, color=colorESCOM}
 	]
 		\node[tbl] (edificio) at (0,20) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{edificio\_campus}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{edificio\_campus}}\\ \hline
 				PK & \texttt{id\_edificio}\\
 				 & \texttt{clave}\\
 				 & \texttt{nombre}\\
@@ -560,7 +560,7 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[tbl] (distribuidor) at (0,2) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{distribuidor}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{distribuidor}}\\ \hline
 				PK & \texttt{id\_distribuidor}\\
 				 & \texttt{nombre}\\
 				 & \texttt{calle}\\
@@ -574,7 +574,7 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[tbl] (computadora) at (12,11) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{computadora}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{computadora}}\\ \hline
 				PK & \texttt{id\_computadora}\\
 				 & \texttt{num\_inventario}\\
 				 & \texttt{numero\_serie}\\
@@ -598,7 +598,7 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[assoc] (instsw) at (26,20) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{instalacion\_software}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{instalacion\_software}}\\ \hline
 				PK, FK & \texttt{id\_computadora}\\
 				PK, FK & \texttt{id\_software}\\
 				 & \texttt{fecha\_instalacion}\\
@@ -608,7 +608,7 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[tbl] (mantenimiento) at (26,6) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{mantenimiento}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{mantenimiento}}\\ \hline
 				PK & \texttt{id\_mantenimiento}\\
 				FK & \texttt{id\_computadora}\\
 				FK & \texttt{id\_experto}\\
@@ -620,7 +620,7 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[assoc] (instso) at (12,-10) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{instalacion\_so}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{instalacion\_so}}\\ \hline
 				PK, FK & \texttt{id\_computadora}\\
 				PK, FK & \texttt{id\_sistema\_operativo}\\
 				 & \texttt{fecha\_instalacion}\\
@@ -629,14 +629,14 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[tbl] (categoria) at (40,31) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{categoria\_software}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{categoria\_software}}\\ \hline
 				PK & \texttt{id\_categoria}\\
 				 & \texttt{nombre}\\
 				 & \texttt{descripcion}\\
 			\end{tabular}};
 		\node[tbl] (software) at (40,20) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{software}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{software}}\\ \hline
 				PK & \texttt{id\_software}\\
 				 & \texttt{titulo}\\
 				 & \texttt{version}\\
@@ -650,9 +650,9 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 				 & \texttt{costo}\\
 				FK & \texttt{id\_experto}\\
 			\end{tabular}};
-		\node[tbl] (so) at (40,6) {%
+		\node[tbl] (so) at (40,-2) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{sistema\_operativo}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{sistema\_operativo}}\\ \hline
 				PK & \texttt{id\_sistema\_operativo}\\
 				 & \texttt{nombre}\\
 				 & \texttt{version}\\
@@ -662,7 +662,7 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[tbl] (experto) at (54,13) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{experto\_soporte}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{experto\_soporte}}\\ \hline
 				PK & \texttt{id\_experto}\\
 				 & \texttt{num\_empleado}\\
 				 & \texttt{primer\_nombre}\\
@@ -673,7 +673,7 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			\end{tabular}};
 		\node[tbl] (departamento) at (54,24) {%
 			\begin{tabular}{@{}ll@{}}
-				\multicolumn{2}{c}{\scriptsize\textbf{departamento}}\\ \hline
+				\multicolumn{2}{c}{\normalsize\textbf{departamento}}\\ \hline
 				PK & \texttt{id\_departamento}\\
 				 & \texttt{nombre}\\
 			\end{tabular}};
@@ -730,31 +730,40 @@ La figura \ref{img:modelo-er} muestra el modelo completo, con la notación de Vi
 			node[pos=0.1, left, card] {1}
 			node[pos=0.9, left, card] {N};
 	\end{tikzpicture}}
-	\caption{Modelo Entidad-Relación del Sistema de Inventario y Gestión de Equipo de Cómputo (ESCOM), en notación de Visio/IE siguiendo el caso de la CPU de Kendall \& Kendall \cite{kendall2011}. Los recuadros rellenos son entidades asociativas}
+	\caption{Modelo Entidad-Relación del Sistema de Inventario y Gestión de Equipo de Cómputo (ESCOM), en notación de Visio/IE. Los recuadros rellenos son entidades asociativas}
 	\label{img:modelo-er}
-\end{figure}
+\end{sidewaysfigure}
 
 %################################################
 \subsection{ \color{colorESCOM}{Representación relacional}}
 
 La transformación del modelo E-R a esquema relacional sigue las reglas estándar \cite{cardona2014}: toda entidad se convierte en tabla, toda relación N:1 aporta una clave foránea en el lado N, y toda relación M:N se resuelve con una tabla intermedia cuya clave primaria combina las claves foráneas de las dos tablas que conecta. Es exactamente lo que ya se detalló en el diccionario de datos. La notación siguiente resume el esquema completo: la clave primaria va subrayada y las claves foráneas en cursiva.
 
-\begin{quote}
-	\ttfamily\footnotesize\raggedright
-	edificio\_campus(\underline{id\_edificio}, clave, nombre, tipo\_espacio, direccion, numero\_niveles, activo) \\[4pt]
-	distribuidor(\underline{id\_distribuidor}, nombre, calle, ciudad, estado, codigo\_postal, telefono, fecha\_ultimo\_pedido, monto\_total\_compra, numero\_total\_pedidos) \\[4pt]
-	categoria\_software(\underline{id\_categoria}, nombre, descripcion) \\[4pt]
-	departamento(\underline{id\_departamento}, nombre) \\[4pt]
-	experto\_soporte(\underline{id\_experto}, num\_empleado, primer\_nombre, apellido\_paterno, telefono\_oficina, direccion\_email, \textit{id\_departamento}) \\[4pt]
-	sistema\_operativo(\underline{id\_sistema\_operativo}, nombre, version, arquitectura, fabricante, fecha\_fin\_soporte) \\[4pt]
-	software(\underline{id\_software}, titulo, version, editorial, \textit{id\_categoria}, \textit{id\_sistema\_operativo}, tipo\_computadora\_requerida, memoria\_requerida\_gb, licencia\_sitio, numero\_copias, costo, \textit{id\_experto}) \\[4pt]
-	computadora(\underline{id\_computadora}, num\_inventario, numero\_serie, marca, modelo, tipo\_equipo, procesador, memoria\_ram\_gb, capacidad\_disco\_duro\_gb, capacidad\_segundo\_disco\_duro\_gb, unidad\_optica, fecha\_compra, costo\_adquisicion, costo\_reemplazo, intervalo\_actualizacion\_meses, fecha\_fin\_garantia, estado, ubicacion\_especifica, \textit{id\_edificio}, \textit{id\_distribuidor}) \\[4pt]
-	mantenimiento(\underline{id\_mantenimiento}, \textit{id\_computadora}, \textit{id\_experto}, fecha\_mantenimiento, tipo, descripcion, costo, cubierto\_garantia) \\[4pt]
-	instalacion\_software(\underline{\textit{id\_computadora}}, \underline{\textit{id\_software}}, fecha\_instalacion, clave\_licencia, fecha\_vencimiento\_licencia, activa) \\[4pt]
-	instalacion\_so(\underline{\textit{id\_computadora}}, \underline{\textit{id\_sistema\_operativo}}, fecha\_instalacion, particion, es\_principal)
-\end{quote}
+\begin{table}[H]
+	\centering
+	\small
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{p{4.3cm} | p{10.3cm}}
+		\hline\hline
+		\textbf{Tabla} & \textbf{Atributos (\underline{clave primaria} subrayada, \textit{clave foránea} en cursiva)} \\ \hline\hline
+		\ttfamily edificio\_campus & \ttfamily\underline{id\_edificio}, clave, nombre, tipo\_espacio, direccion, numero\_niveles, activo \\ \hline
+		\ttfamily distribuidor & \ttfamily\underline{id\_distribuidor}, nombre, calle, ciudad, estado, codigo\_postal, telefono, fecha\_ultimo\_pedido, monto\_total\_compra, numero\_total\_pedidos \\ \hline
+		\ttfamily categoria\_software & \ttfamily\underline{id\_categoria}, nombre, descripcion \\ \hline
+		\ttfamily departamento & \ttfamily\underline{id\_departamento}, nombre \\ \hline
+		\ttfamily experto\_soporte & \ttfamily\underline{id\_experto}, num\_empleado, primer\_nombre, apellido\_paterno, telefono\_oficina, direccion\_email, \textit{id\_departamento} \\ \hline
+		\ttfamily sistema\_operativo & \ttfamily\underline{id\_sistema\_operativo}, nombre, version, arquitectura, fabricante, fecha\_fin\_soporte \\ \hline
+		\ttfamily software & \ttfamily\underline{id\_software}, titulo, version, editorial, \textit{id\_categoria}, \textit{id\_sistema\_operativo}, tipo\_computadora\_requerida, memoria\_requerida\_gb, licencia\_sitio, numero\_copias, costo, \textit{id\_experto} \\ \hline
+		\ttfamily computadora & \ttfamily\underline{id\_computadora}, num\_inventario, numero\_serie, marca, modelo, tipo\_equipo, procesador, memoria\_ram\_gb, capacidad\_disco\_duro\_gb, capacidad\_segundo\_disco\_duro\_gb, unidad\_optica, fecha\_compra, costo\_adquisicion, costo\_reemplazo, intervalo\_actualizacion\_meses, fecha\_fin\_garantia, estado, ubicacion\_especifica, \textit{id\_edificio}, \textit{id\_distribuidor} \\ \hline
+		\ttfamily mantenimiento & \ttfamily\underline{id\_mantenimiento}, \textit{id\_computadora}, \textit{id\_experto}, fecha\_mantenimiento, tipo, descripcion, costo, cubierto\_garantia \\ \hline
+		\ttfamily instalacion\_software & \ttfamily\underline{\textit{id\_computadora}}, \underline{\textit{id\_software}}, fecha\_instalacion, clave\_licencia, fecha\_vencimiento\_licencia, activa \\ \hline
+		\ttfamily instalacion\_so & \ttfamily\underline{\textit{id\_computadora}}, \underline{\textit{id\_sistema\_operativo}}, fecha\_instalacion, particion, es\_principal \\ \hline\hline
+	\end{tabular}
+	\renewcommand{\arraystretch}{1}
+	\caption{Representación relacional del modelo: esquema de cada tabla en notación \texttt{tabla(atributos)}}
+	\label{tabla:relacional}
+\end{table}
 
-El esquema está en tercera forma normal: cada atributo no llave depende únicamente de la clave primaria completa de su tabla y no hay dependencias transitivas entre atributos no llave. En particular, separar \texttt{categoria\_software}, \texttt{sistema\_operativo} y \texttt{departamento} en catálogos propios evita que su nombre se repita (y se desincronice) en cada fila de \texttt{software}, \texttt{computadora} o \texttt{experto\_soporte} que los use. La única excepción deliberada son \texttt{monto\_total\_compra} y \texttt{numero\_total\_pedidos} de \texttt{distribuidor}: son una redundancia controlada que el propio caso de la CPU introduce, en vez de recalcularlos con \texttt{SUM()}/\texttt{COUNT()} sobre \texttt{computadora} cada vez que se consultan.
+El esquema está en tercera forma normal: cada atributo no llave depende únicamente de la clave primaria completa de su tabla y no hay dependencias transitivas entre atributos no llave. En particular, separar \texttt{categoria\_software}, \texttt{sistema\_operativo} y \texttt{departamento} en catálogos propios evita que su nombre se repita (y se desincronice) en cada fila de \texttt{software}, \texttt{computadora} o \texttt{experto\_soporte} que los use. La única excepción deliberada son \texttt{monto\_total\_compra} y \texttt{numero\_total\_pedidos} de \texttt{distribuidor}: son una redundancia controlada, en vez de recalcularlos con \texttt{SUM()}/\texttt{COUNT()} sobre \texttt{computadora} cada vez que se consultan.
 
 %################################################
 \subsection{ \color{colorESCOM}{Script SQL}}
@@ -778,9 +787,39 @@ Con el servidor arriba, se creó la base de datos y se ejecutó el script comple
 %################################################
 \subsection{ \color{colorESCOM}{Evidencias de ejecución}}
 
-A continuación se muestra la salida completa de la ejecución, capturada directamente de la sesión de \texttt{psql}: la creación de las once tablas, el índice, el poblado con \texttt{INSERT}, el listado de tablas con \texttt{\textbackslash dt}, el conteo de registros por tabla, la verificación de \texttt{experto\_soporte} contra \texttt{departamento} y de \texttt{software} contra \texttt{sistema\_operativo} (las dos claves foráneas nuevas de esta iteración), los valores cargados en \texttt{distribuidor} con los campos exactos del ejercicio E-7, y las tres consultas de validación planteadas en el diseño (licencias vencidas, gasto de mantenimiento fuera de garantía y equipos con arranque dual):
+A continuación se muestran las capturas de pantalla de la ejecución real: la creación de las once tablas, el índice, el poblado con \texttt{INSERT}, el listado de tablas con \texttt{\textbackslash dt}, el conteo de registros por tabla, la verificación de \texttt{experto\_soporte} contra \texttt{departamento} y de \texttt{software} contra \texttt{sistema\_operativo} (las dos claves foráneas nuevas de esta iteración), los valores cargados en \texttt{distribuidor}, y las tres consultas de validación planteadas en el diseño (licencias vencidas, gasto de mantenimiento fuera de garantía y equipos con arranque dual).
 
-\lstinputlisting[basicstyle=\scriptsize\ttfamily, caption={Salida real de la ejecución de \texttt{script.sql} y de las consultas de validación, sobre PostgreSQL 16.15}, label={cod:evidencia}]{evidencia_ejecucion.txt}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{evidencia_01_creacion.png}
+	\caption{Creación de las once tablas, el índice y el poblado de \texttt{script.sql} sobre PostgreSQL 16.15}
+	\label{img:evidencia-1}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{evidencia_02_verificacion_tablas.png}
+	\caption{Listado de tablas (\texttt{\textbackslash dt}) y conteo de registros por tabla}
+	\label{img:evidencia-2}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{evidencia_03_verificacion_joins.png}
+	\caption{Verificación de las claves foráneas \texttt{experto\_soporte}--\texttt{departamento} y \texttt{software}--\texttt{sistema\_operativo}, y de los valores cargados en \texttt{distribuidor}}
+	\label{img:evidencia-3}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\linewidth]{evidencia_04_consultas.png}
+	\caption{Las tres consultas de validación (licencia vencida, gasto fuera de garantía, arranque dual)}
+	\label{img:evidencia-4}
+\end{figure}
+
+La transcripción completa en texto plano, tal como se copió de la sesión de \texttt{psql}, se conserva en el archivo \texttt{evidencia\_ejecucion.txt} entregado junto con este reporte:
+
+\lstinputlisting[basicstyle=\scriptsize\ttfamily, caption={Transcripción completa de la ejecución de \texttt{script.sql} y de las consultas de validación, sobre PostgreSQL 16.15}, label={cod:evidencia}]{evidencia_ejecucion.txt}
 
 Los tres resultados de las consultas de validación son consistentes con los datos de prueba insertados: el equipo \texttt{ESCOM-00124} aparece con \texttt{AutoCAD} vencido el 2025-02-15 porque esa es la fecha de vencimiento que se le cargó en \texttt{instalacion\_software}; el equipo \texttt{ESCOM-00087} aparece con \$1{,}450.00 de gasto fuera de garantía porque es el único mantenimiento con \texttt{cubierto\_garantia = FALSE}; y el equipo con \texttt{id\_computadora = 3} es el único con dos filas en \texttt{instalacion\_so}, que es exactamente el equipo al que se le cargó Windows y Ubuntu en arranque dual. El motor no solo aceptó el esquema: los datos de prueba y las consultas que motivaron el proyecto coinciden.
 
