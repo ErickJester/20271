@@ -1,100 +1,79 @@
-$ psql -h localhost -p 5433 -U postgres -d postgres -c "CREATE DATABASE inventario_equipo_escom WITH ENCODING = 'UTF8' TEMPLATE template0;"
-CREATE DATABASE
+$ mysql -h 127.0.0.1 -P 3308 -u root -e "DROP DATABASE IF EXISTS inventario_equipo_escom;"
+$ mysql -h 127.0.0.1 -P 3308 -u root < script.sql
+(el cliente de MySQL no confirma cada sentencia como psql; la ausencia de
+salida o de mensajes de error indica que las 11 tablas, el indice y los
+44 registros del poblado se crearon sin errores)
 
-$ psql -h localhost -p 5433 -U postgres -d inventario_equipo_escom -f script.sql
-psql:script.sql:10: ERROR:  la nueva "collation" (es_MX.UTF-8) es incompatible con la "collation"
-de la base de datos patron (Spanish_Mexico.1252)
-SUGERENCIA:  Use la misma "collation" que en la base de datos patron, o bien use template0 como patron.
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE INDEX
-INSERT 0 3
-INSERT 0 3
-INSERT 0 4
-INSERT 0 3
-INSERT 0 3
-INSERT 0 3
-INSERT 0 4
-INSERT 0 3
-INSERT 0 3
-INSERT 0 4
-INSERT 0 4
-
-$ psql -h localhost -p 5433 -U postgres -d inventario_equipo_escom -c "\dt"
-               Listado de relaciones
- Esquema |        Nombre        | Tipo  |   Dueno
----------+----------------------+-------+----------
- public  | categoria_software   | tabla | postgres
- public  | computadora          | tabla | postgres
- public  | departamento         | tabla | postgres
- public  | distribuidor         | tabla | postgres
- public  | edificio_campus      | tabla | postgres
- public  | experto_soporte      | tabla | postgres
- public  | instalacion_so       | tabla | postgres
- public  | instalacion_software | tabla | postgres
- public  | mantenimiento        | tabla | postgres
- public  | sistema_operativo    | tabla | postgres
- public  | software             | tabla | postgres
-(11 filas)
+$ mysql -h 127.0.0.1 -P 3308 -u root --table inventario_equipo_escom -e "SHOW TABLES;"
++-------------------------------------+
+| Tables_in_inventario_equipo_escom   |
++-------------------------------------+
+| categoria_software                  |
+| computadora                         |
+| departamento                        |
+| distribuidor                        |
+| edificio_campus                     |
+| experto_soporte                     |
+| instalacion_so                      |
+| instalacion_software                |
+| mantenimiento                       |
+| sistema_operativo                   |
+| software                            |
++-------------------------------------+
 
 $ -- Conteo de registros por tabla (minimo 3 por tabla, cumplido en las 11)
-        tabla         | count
-----------------------+-------
- edificio_campus      |     3
- distribuidor         |     3
- categoria_software   |     4
- departamento         |     3
- experto_soporte      |     3
- sistema_operativo    |     3
- software             |     4
- computadora          |     3
- mantenimiento        |     3
- instalacion_software |     4
- instalacion_so       |     4
-(11 filas)
++----------------------+----------+
+| tabla                | count(*) |
++----------------------+----------+
+| edificio_campus      |        3 |
+| distribuidor         |        3 |
+| categoria_software   |        4 |
+| departamento         |        3 |
+| experto_soporte      |        3 |
+| sistema_operativo    |        3 |
+| software             |        4 |
+| computadora          |        3 |
+| mantenimiento        |        3 |
+| instalacion_software |        4 |
+| instalacion_so       |        4 |
++----------------------+----------+
 
 $ -- Verificacion: experto_soporte referenciando departamento
 SELECT e.primer_nombre, e.apellido_paterno, d.nombre AS departamento
 FROM experto_soporte e JOIN departamento d ON d.id_departamento = e.id_departamento;
 
- primer_nombre | apellido_paterno |        departamento
-----------------+------------------+----------------------------
- Ivan           | Delgado          | Soporte Tecnico
- Ricardo        | Alvarez          | Redes y Telecomunicaciones
- Paola          | Martinez         | Sistemas y Licenciamiento
-(3 filas)
++---------------+------------------+-----------------------------+
+| primer_nombre | apellido_paterno | departamento                |
++---------------+------------------+-----------------------------+
+| Ricardo       | Alvarez          | Redes y Telecomunicaciones  |
+| Paola         | Martinez         | Sistemas y Licenciamiento   |
+| Ivan          | Delgado          | Soporte Tecnico             |
++---------------+------------------+-----------------------------+
 
 $ -- Verificacion: software referenciando sistema_operativo
 SELECT s.titulo, so.nombre, so.version, s.licencia_sitio, s.numero_copias, s.costo
 FROM software s JOIN sistema_operativo so ON so.id_sistema_operativo = s.id_sistema_operativo;
 
-       titulo       | nombre  |   version   | licencia_sitio | numero_copias |  costo
---------------------+---------+-------------+----------------+----------------+----------
- Microsoft Office   | Windows | 11 Pro 23H2 | f              |             25 |  3200.00
- Visual Studio Code | Ubuntu  | 22.04 LTS   | t              |                |     0.00
- AutoCAD            | Windows | 11 Pro 23H2 | f              |              5 | 45000.00
- Windows Defender   | Windows | 11 Pro 23H2 | t              |                |     0.00
-(4 filas)
++--------------------+---------+-------------+----------------+---------------+----------+
+| titulo             | nombre  | version     | licencia_sitio | numero_copias | costo    |
++--------------------+---------+-------------+----------------+---------------+----------+
+| Microsoft Office   | Windows | 11 Pro 23H2 |              0 |            25 |  3200.00 |
+| Visual Studio Code | Ubuntu  | 22.04 LTS   |              1 |          NULL |     0.00 |
+| AutoCAD            | Windows | 11 Pro 23H2 |              0 |             5 | 45000.00 |
+| Windows Defender   | Windows | 11 Pro 23H2 |              1 |          NULL |     0.00 |
++--------------------+---------+-------------+----------------+---------------+----------+
 
 $ -- Verificacion: distribuidor (incluye la redundancia controlada
 $ -- monto_total_compra / numero_total_pedidos)
 SELECT nombre, ciudad, monto_total_compra, numero_total_pedidos FROM distribuidor;
 
-                nombre                |      ciudad      | monto_total_compra | numero_total_pedidos
----------------------------------------+------------------+---------------------+-----------------------
- Compuequipos del Centro SA de CV     | Ciudad de Mexico |           37300.00 |                     2
- Distribuidora TecnoMex SA de CV      | Ciudad de Mexico |           24900.00 |                     1
- Importadora de Sistemas del Norte SA | Ciudad de Mexico |               0.00 |                     0
-(3 filas)
++---------------------------------------+------------------+---------------------+-----------------------+
+| nombre                                | ciudad           | monto_total_compra  | numero_total_pedidos  |
++---------------------------------------+------------------+---------------------+-----------------------+
+| Compuequipos del Centro SA de CV      | Ciudad de Mexico |            37300.00 |                     2 |
+| Distribuidora TecnoMex SA de CV       | Ciudad de Mexico |            24900.00 |                     1 |
+| Importadora de Sistemas del Norte SA  | Ciudad de Mexico |                0.00 |                     0 |
++---------------------------------------+------------------+---------------------+-----------------------+
 
 $ -- Consulta 1: equipos con software cuya licencia ya vencio
 SELECT c.num_inventario, s.titulo, i.fecha_vencimiento_licencia
@@ -103,10 +82,11 @@ JOIN computadora c ON c.id_computadora = i.id_computadora
 JOIN software s ON s.id_software = i.id_software
 WHERE i.activa = TRUE AND i.fecha_vencimiento_licencia < CURRENT_DATE;
 
- num_inventario | titulo  | fecha_vencimiento_licencia
-----------------+---------+----------------------------
- ESCOM-00124    | AutoCAD | 2025-02-15
-(1 fila)
++----------------+---------+----------------------------+
+| num_inventario | titulo  | fecha_vencimiento_licencia |
++----------------+---------+----------------------------+
+| ESCOM-00124    | AutoCAD | 2025-02-15                 |
++----------------+---------+----------------------------+
 
 $ -- Consulta 2: gasto en mantenimiento de equipos fuera de garantia
 SELECT c.num_inventario, SUM(m.costo) AS gasto_total
@@ -115,10 +95,11 @@ JOIN computadora c ON c.id_computadora = m.id_computadora
 WHERE m.cubierto_garantia = FALSE
 GROUP BY c.num_inventario;
 
- num_inventario | gasto_total
-----------------+-------------
- ESCOM-00087    |     1450.00
-(1 fila)
++----------------+-------------+
+| num_inventario | gasto_total |
++----------------+-------------+
+| ESCOM-00087    |     1450.00 |
++----------------+-------------+
 
 $ -- Consulta 3: equipos con arranque dual (mas de un sistema operativo instalado)
 SELECT id_computadora, COUNT(*) AS num_sistemas
@@ -126,7 +107,8 @@ FROM instalacion_so
 GROUP BY id_computadora
 HAVING COUNT(*) > 1;
 
- id_computadora | num_sistemas
-----------------+--------------
-              3 |            2
-(1 fila)
++----------------+--------------+
+| id_computadora | num_sistemas |
++----------------+--------------+
+|              3 |            2 |
++----------------+--------------+

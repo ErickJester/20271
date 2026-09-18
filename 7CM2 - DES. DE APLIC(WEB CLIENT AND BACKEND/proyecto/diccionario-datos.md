@@ -12,18 +12,18 @@ script SQL deben coincidir atributo por atributo con lo aquí definido.
 
 | Aspecto | Decisión |
 |---|---|
-| **SGBD objetivo** | PostgreSQL 16 (tipos `SERIAL`, `VARCHAR`, `NUMERIC`, `BOOLEAN`, `DATE`) |
+| **SGBD objetivo** | MySQL 8 (tipos `INT AUTO_INCREMENT`, `VARCHAR`, `NUMERIC`, `BOOLEAN`, `DATE`) |
 | **Nomenclatura de tablas** | `snake_case`, en singular (`computadora`, no `computadoras`) |
 | **Nomenclatura de atributos** | `snake_case`, sin acentos ni caracteres especiales en los identificadores |
 | **Claves primarias** | Sustitutas (surrogate), enteras autoincrementales, con prefijo `id_` |
 | **Claves primarias compuestas** | Solo en las entidades asociativas, formadas por sus dos claves foráneas |
-| **Codificación** | `UTF8`, intercalación `es_MX.UTF-8` |
+| **Codificación** | `utf8mb4`, intercalación `utf8mb4_spanish_ci` |
 | **Fechas** | Tipo `DATE` (sin hora); el formato de captura es `AAAA-MM-DD` |
 | **Montos** | `NUMERIC(10,2)` en pesos mexicanos (MXN) |
 
-> **Nota sobre PostgreSQL**: el tipo `SERIAL` es azúcar sintáctica de PostgreSQL que crea un
-> `INTEGER NOT NULL` asociado a una secuencia. En el diccionario se documenta como `SERIAL` y en el
-> script DDL se declara como tal.
+> **Nota sobre MySQL**: las claves primarias sustitutas se documentan en este diccionario como
+> `INT (AI)` — entero con autoincremento — y en el script DDL se declaran como
+> `INT AUTO_INCREMENT PRIMARY KEY`.
 
 ---
 
@@ -53,7 +53,7 @@ ubicación, distinguiendo laboratorios, cubículos y aulas.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_edificio` | SERIAL | — | No | **PK** | Identificador único del edificio o espacio |
+| 1 | `id_edificio` | INT (AI) | — | No | **PK** | Identificador único del edificio o espacio |
 | 2 | `clave` | VARCHAR | 10 | No | UQ | Clave corta institucional del espacio (ej. `LAB-C1`) |
 | 3 | `nombre` | VARCHAR | 80 | No | — | Nombre completo del edificio o laboratorio |
 | 4 | `tipo_espacio` | VARCHAR | 20 | No | — | Naturaleza del espacio: laboratorio, cubículo, aula, oficina |
@@ -82,7 +82,7 @@ guardan como columnas ya calculadas en vez de obligar a recalcular `SUM()`/`COUN
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_distribuidor` | SERIAL | — | No | **PK** | Identificador único del distribuidor |
+| 1 | `id_distribuidor` | INT (AI) | — | No | **PK** | Identificador único del distribuidor |
 | 2 | `nombre` | VARCHAR | 120 | No | — | Nombre del distribuidor |
 | 3 | `calle` | VARCHAR | 100 | Sí | — | Calle del domicilio |
 | 4 | `ciudad` | VARCHAR | 60 | No | — | Ciudad del domicilio |
@@ -112,7 +112,7 @@ cambiar la categoría de un paquete sin tocar todos sus registros.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_categoria` | SERIAL | — | No | **PK** | Identificador único de la categoría |
+| 1 | `id_categoria` | INT (AI) | — | No | **PK** | Identificador único de la categoría |
 | 2 | `nombre` | VARCHAR | 60 | No | UQ | Nombre de la categoría (ej. Ofimática, Desarrollo) |
 | 3 | `descripcion` | VARCHAR | 200 | Sí | — | Explicación del tipo de software que agrupa |
 
@@ -133,7 +133,7 @@ soporte. Se separa en su propio catálogo, en vez de dejarlo como texto libre de
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_departamento` | SERIAL | — | No | **PK** | Identificador único del departamento |
+| 1 | `id_departamento` | INT (AI) | — | No | **PK** | Identificador único del departamento |
 | 2 | `nombre` | VARCHAR | 80 | No | UQ | Nombre del departamento (ej. Soporte Técnico) |
 
 **Claves foráneas**: ninguna.
@@ -153,7 +153,7 @@ mantenimiento sobre los equipos. Incluye `id_departamento` como clave foránea h
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_experto` | SERIAL | — | No | **PK** | Identificador único del experto de soporte |
+| 1 | `id_experto` | INT (AI) | — | No | **PK** | Identificador único del experto de soporte |
 | 2 | `num_empleado` | VARCHAR | 15 | No | UQ | Número de empleado institucional |
 | 3 | `primer_nombre` | VARCHAR | 60 | No | — | Primer nombre del experto |
 | 4 | `apellido_paterno` | VARCHAR | 60 | No | — | Apellido paterno |
@@ -185,7 +185,7 @@ sistema operativo se repite en cientos de equipos y de paquetes de software.
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_sistema_operativo` | SERIAL | — | No | **PK** | Identificador único del sistema operativo |
+| 1 | `id_sistema_operativo` | INT (AI) | — | No | **PK** | Identificador único del sistema operativo |
 | 2 | `nombre` | VARCHAR | 60 | No | UQ¹ | Nombre del sistema operativo (ej. Windows, Ubuntu) |
 | 3 | `version` | VARCHAR | 30 | No | UQ¹ | Versión o edición (ej. `11 Pro 23H2`, `22.04 LTS`) |
 | 4 | `arquitectura` | VARCHAR | 10 | No | UQ¹ | Arquitectura soportada del binario instalado |
@@ -215,7 +215,7 @@ datos de **una instalación concreta** (clave y vigencia de licencia) no viven a
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_software` | SERIAL | — | No | **PK** | Identificador único del paquete |
+| 1 | `id_software` | INT (AI) | — | No | **PK** | Identificador único del paquete |
 | 2 | `titulo` | VARCHAR | 100 | No | UQ¹ | Nombre comercial del paquete |
 | 3 | `version` | VARCHAR | 30 | No | UQ¹ | Versión del paquete |
 | 4 | `editorial` | VARCHAR | 80 | No | — | Empresa desarrolladora o editora |
@@ -257,7 +257,7 @@ técnicas, su ubicación física, el proveedor que lo vendió y la vigencia de s
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_computadora` | SERIAL | — | No | **PK** | Identificador único del equipo |
+| 1 | `id_computadora` | INT (AI) | — | No | **PK** | Identificador único del equipo |
 | 2 | `num_inventario` | VARCHAR | 20 | No | UQ | Número de inventario de la etiqueta institucional |
 | 3 | `numero_serie` | VARCHAR | 50 | No | UQ | Número de serie asignado por el fabricante |
 | 4 | `marca` | VARCHAR | 50 | No | — | Marca del equipo (ej. Dell, HP, Lenovo) |
@@ -313,7 +313,7 @@ equipo y distinguir lo cubierto por garantía de lo pagado por la institución. 
 
 | # | Atributo | Tipo de dato | Long. | Nulo | Clave | Descripción |
 |---|---|---|---|---|---|---|
-| 1 | `id_mantenimiento` | SERIAL | — | No | **PK** | Identificador único del servicio |
+| 1 | `id_mantenimiento` | INT (AI) | — | No | **PK** | Identificador único del servicio |
 | 2 | `id_computadora` | INTEGER | — | No | **FK** | Equipo al que se le aplicó el mantenimiento |
 | 3 | `id_experto` | INTEGER | — | Sí | **FK** | Experto que realizó el servicio (nulo si fue externo) |
 | 4 | `fecha_mantenimiento` | DATE | — | No | — | Fecha en que se realizó el servicio |
@@ -409,9 +409,11 @@ cada sistema y cuál es el que arranca por omisión.
 
 - `PK_instalacion_so`: la clave compuesta impide registrar dos veces el mismo sistema operativo en el
   mismo equipo.
-- `UQ_instalacion_so_principal`: índice único parcial
-  `CREATE UNIQUE INDEX uq_instalacion_so_principal ON instalacion_so (id_computadora) WHERE es_principal;`
-  — garantiza que cada equipo tenga como máximo **un** sistema operativo marcado como principal.
+- `UQ_instalacion_so_principal`: columna generada `principal_uk` (vale 1 cuando `es_principal` es
+  verdadero y `NULL` en cualquier otro caso) más una restricción
+  `UNIQUE (id_computadora, principal_uk)` — como MySQL trata cada `NULL` como distinto, la unicidad
+  solo se evalúa entre las filas donde `es_principal = TRUE`, garantizando que cada equipo tenga
+  como máximo **un** sistema operativo marcado como principal.
 - `DEFAULT` de `es_principal` = `TRUE`.
 
 ---

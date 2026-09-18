@@ -142,12 +142,12 @@ La autenticación y autorización de usuarios del sistema es obligatoria más ad
 	\centering
 	\begin{tabular}{p{4.5cm} | p{10cm}}\hline \hline
 		\textbf{Aspecto} & \textbf{Decisión} \\ \hline \hline
-		Motor de base de datos & PostgreSQL 16 \cite{postgresql16} \\ \hline
+		Motor de base de datos & MySQL 8 \cite{mysql8} \\ \hline
 		Nomenclatura de tablas & \texttt{snake\_case}, singular \\ \hline
 		Nomenclatura de atributos & \texttt{snake\_case}, sin acentos \\ \hline
-		Claves primarias & Sustitutas (\texttt{SERIAL}), con prefijo \texttt{id\_}, salvo en las entidades asociativas \\ \hline
+		Claves primarias & Sustitutas (\texttt{INT AUTO\_INCREMENT}), con prefijo \texttt{id\_}, salvo en las entidades asociativas \\ \hline
 		Claves primarias compuestas & Solo en las dos entidades asociativas, formadas por sus dos claves foráneas \\ \hline
-		Codificación & \texttt{UTF8}, intercalación \texttt{es\_MX.UTF-8} \\ \hline
+		Codificación & \texttt{utf8mb4}, intercalación \texttt{utf8mb4\_spanish\_ci} \\ \hline
 		Fechas & Tipo \texttt{DATE}, formato \texttt{AAAA-MM-DD} \\ \hline
 		Montos & \texttt{NUMERIC(10,2)} en pesos mexicanos \\ \hline \hline
 	\end{tabular}
@@ -171,7 +171,7 @@ Catálogo de los edificios, laboratorios y espacios físicos de la ESCOM donde s
 	\footnotesize
 	\begin{tabular}{p{2.6cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.7cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_edificio} & SERIAL & --- & No & PK & Identificador único del edificio o espacio \\ \hline
+		\texttt{id\_edificio} & INT (AI) & --- & No & PK & Identificador único del edificio o espacio \\ \hline
 		\texttt{clave} & VARCHAR & 10 & No & UQ & Clave corta institucional del espacio (ej. \texttt{LAB-C1}) \\ \hline
 		\texttt{nombre} & VARCHAR & 80 & No & --- & Nombre completo del edificio o laboratorio \\ \hline
 		\texttt{tipo\_espacio} & VARCHAR & 20 & No & --- & Naturaleza del espacio: laboratorio, cubículo, aula, oficina \\ \hline
@@ -195,7 +195,7 @@ Proveedores externos a quienes la institución adquiere el equipo de cómputo. \
 	\footnotesize
 	\begin{tabular}{p{2.9cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.2cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_distribuidor} & SERIAL & --- & No & PK & Identificador único \\ \hline
+		\texttt{id\_distribuidor} & INT (AI) & --- & No & PK & Identificador único \\ \hline
 		\texttt{nombre} & VARCHAR & 120 & No & --- & Nombre del distribuidor \\ \hline
 		\texttt{calle} & VARCHAR & 100 & Sí & --- & Calle del domicilio \\ \hline
 		\texttt{ciudad} & VARCHAR & 60 & No & --- & Ciudad del domicilio \\ \hline
@@ -222,7 +222,7 @@ Clasificación temática de los paquetes de software, separada en su propio cat�
 	\footnotesize
 	\begin{tabular}{p{2.9cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.2cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_categoria} & SERIAL & --- & No & PK & Identificador único de la categoría \\ \hline
+		\texttt{id\_categoria} & INT (AI) & --- & No & PK & Identificador único de la categoría \\ \hline
 		\texttt{nombre} & VARCHAR & 60 & No & UQ & Nombre de la categoría (ej. Ofimática, Desarrollo) \\ \hline
 		\texttt{descripcion} & VARCHAR & 200 & Sí & --- & Explicación del tipo de software que agrupa \\ \hline \hline
 	\end{tabular}
@@ -242,7 +242,7 @@ Departamentos institucionales a los que pertenece cada experto de soporte. Se se
 	\footnotesize
 	\begin{tabular}{p{2.9cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.2cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_departamento} & SERIAL & --- & No & PK & Identificador único del departamento \\ \hline
+		\texttt{id\_departamento} & INT (AI) & --- & No & PK & Identificador único del departamento \\ \hline
 		\texttt{nombre} & VARCHAR & 80 & No & UQ & Nombre del departamento (ej. Soporte Técnico) \\ \hline \hline
 	\end{tabular}
 	\caption{Diccionario de datos de \texttt{departamento}}
@@ -261,7 +261,7 @@ Personal de soporte técnico. Cumple dos funciones en el modelo: da seguimiento 
 	\footnotesize
 	\begin{tabular}{p{2.9cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7.2cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_experto} & SERIAL & --- & No & PK & Identificador único \\ \hline
+		\texttt{id\_experto} & INT (AI) & --- & No & PK & Identificador único \\ \hline
 		\texttt{num\_empleado} & VARCHAR & 15 & No & UQ & Número de empleado institucional \\ \hline
 		\texttt{primer\_nombre} & VARCHAR & 60 & No & --- & Primer nombre del experto \\ \hline
 		\texttt{apellido\_paterno} & VARCHAR & 60 & No & --- & Apellido paterno \\ \hline
@@ -296,7 +296,7 @@ Sistemas operativos que pueden instalarse en los equipos, separados de \texttt{c
 	\footnotesize
 	\begin{tabular}{p{3.1cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_sistema\_operativo} & SERIAL & --- & No & PK & Identificador único del sistema operativo \\ \hline
+		\texttt{id\_sistema\_operativo} & INT (AI) & --- & No & PK & Identificador único del sistema operativo \\ \hline
 		\texttt{nombre} & VARCHAR & 60 & No & UQ\textsuperscript{1} & Nombre del sistema operativo (ej. Windows, Ubuntu) \\ \hline
 		\texttt{version} & VARCHAR & 30 & No & UQ\textsuperscript{1} & Versión o edición (ej. \texttt{11 Pro 23H2}, \texttt{22.04 LTS}) \\ \hline
 		\texttt{arquitectura} & VARCHAR & 10 & No & UQ\textsuperscript{1} & Arquitectura soportada del binario instalado \\ \hline
@@ -319,7 +319,7 @@ Paquetes de software institucional. Además de los datos propios del paquete, re
 	\footnotesize
 	\begin{tabular}{p{4cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{6.3cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_software} & SERIAL & --- & No & PK & Identificador único \\ \hline
+		\texttt{id\_software} & INT (AI) & --- & No & PK & Identificador único \\ \hline
 		\texttt{titulo} & VARCHAR & 100 & No & UQ\textsuperscript{1} & Nombre comercial del paquete \\ \hline
 		\texttt{version} & VARCHAR & 30 & No & UQ\textsuperscript{1} & Versión del paquete \\ \hline
 		\texttt{editorial} & VARCHAR & 80 & No & --- & Empresa desarrolladora o editora \\ \hline
@@ -361,7 +361,7 @@ Entidad central del inventario: cada equipo de cómputo con sus características
 	\footnotesize
 	\begin{tabular}{p{4.7cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{5.4cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_computadora} & SERIAL & --- & No & PK & Identificador único del equipo \\ \hline
+		\texttt{id\_computadora} & INT (AI) & --- & No & PK & Identificador único del equipo \\ \hline
 		\texttt{num\_inventario} & VARCHAR & 20 & No & UQ & Número de inventario de la etiqueta institucional \\ \hline
 		\texttt{numero\_serie} & VARCHAR & 50 & No & UQ & Número de serie del fabricante \\ \hline
 		\texttt{marca} & VARCHAR & 50 & No & --- & Marca del equipo \\ \hline
@@ -410,7 +410,7 @@ Bitácora de los servicios de mantenimiento aplicados a cada equipo. Es la únic
 	\footnotesize
 	\begin{tabular}{p{3.1cm} | p{1.6cm} | p{0.8cm} | p{0.7cm} | p{1cm} | p{7cm}}\hline \hline
 		\textbf{Atributo} & \textbf{Tipo} & \textbf{Long.} & \textbf{Nulo} & \textbf{Clave} & \textbf{Descripción} \\ \hline \hline
-		\texttt{id\_mantenimiento} & SERIAL & --- & No & PK & Identificador único del servicio \\ \hline
+		\texttt{id\_mantenimiento} & INT (AI) & --- & No & PK & Identificador único del servicio \\ \hline
 		\texttt{id\_computadora} & INTEGER & --- & No & FK & Equipo al que se aplicó el servicio \\ \hline
 		\texttt{id\_experto} & INTEGER & --- & Sí & FK & Experto que lo realizó (nulo si fue externo) \\ \hline
 		\texttt{fecha\_mantenimiento} & DATE & --- & No & --- & Fecha del servicio \\ \hline
@@ -504,7 +504,7 @@ Resuelve la relación muchos a muchos entre \texttt{computadora} y \texttt{siste
 	\label{tabla:fk-instso}
 \end{table}
 
-\textbf{Clave primaria compuesta} \texttt{(id\_computadora, id\_sistema\_operativo)}. \textbf{Restricción adicional}: un índice único parcial garantiza que cada equipo tenga como máximo un sistema operativo marcado como principal (\texttt{es\_principal = TRUE}).
+\textbf{Clave primaria compuesta} \texttt{(id\_computadora, id\_sistema\_operativo)}. \textbf{Restricción adicional}: una columna generada \texttt{principal\_uk}, que solo vale 1 cuando \texttt{es\_principal = TRUE} (y \texttt{NULL} en caso contrario), combinada con una restricción \texttt{UNIQUE(id\_computadora, principal\_uk)}, garantiza que cada equipo tenga como máximo un sistema operativo marcado como principal.
 
 %################################################
 \subsection{ \color{colorESCOM}{Relaciones y cardinalidades}}
@@ -775,31 +775,31 @@ El script completo de creación y poblado se entrega también como archivo indep
 %################################################
 \subsection{ \color{colorESCOM}{Instalación y ejecución del entorno de prueba}}
 
-Para validar \texttt{script.sql} se instaló PostgreSQL 16.15 en Windows a partir de los binarios portables que distribuye EnterpriseDB (\texttt{postgresql-16.15-1-windows-x64-binaries.zip}), sin usar el instalador \texttt{.exe} estándar: la máquina de trabajo no tenía privilegios de administrador disponibles, y ese instalador registra un servicio de Windows, lo que requiere elevación. Los binarios portables no necesitan esa elevación porque no se registran como servicio; se descomprimieron en una carpeta local y el clúster se inicializó y se levantó a mano:
+Para validar \texttt{script.sql} se instaló MySQL Community Server 8.4.9 en Windows mediante el gestor de paquetes \texttt{winget}, y se inicializó un directorio de datos independiente del que usaría un servicio instalado en el sistema, para poder levantar y detener el servidor a mano durante las pruebas sin afectar ninguna instalación existente:
 
-\begin{lstlisting}[language=bash, caption={Inicialización y arranque del servidor PostgreSQL portable}]
-initdb -D data -U postgres -E UTF8 --locale=Spanish_Mexico
-pg_ctl -D data -l pg.log -o "-p 5433" start
+\begin{lstlisting}[language=bash, caption={Inicialización y arranque del servidor MySQL de prueba}]
+mysqld --initialize-insecure --datadir=data
+mysqld --datadir=data --port=3308 --standalone
 \end{lstlisting}
 
-Con el servidor arriba, se creó la base de datos y se ejecutó el script completo. Aquí apareció la única dificultad real del proceso: el \texttt{CREATE DATABASE} de \texttt{script.sql} pide el \textit{collation} \texttt{es\_MX.UTF-8}, que es el identificador de locale usado por los sistemas Linux (el destino real del proyecto, pensando en un despliegue en un PaaS o contenedor). PostgreSQL en Windows nombra ese mismo locale \texttt{Spanish\_Mexico.1252}, así que la sentencia falla con un error de \textit{collation} incompatible. La base se creó entonces de forma equivalente con el locale de Windows, y el resto del script (las once sentencias \texttt{CREATE TABLE}, el índice único parcial y las once sentencias \texttt{INSERT}) se ejecutó sin ningún otro error. Esto no es un defecto del diseño: en un servidor Linux con el paquete de locales \texttt{es\_MX.UTF-8} instalado (la situación normal en producción), la sentencia original del script se ejecuta tal cual está escrita.
+Con el servidor arriba, se creó la base de datos y se ejecutó el script completo, sin ningún error. Aquí apareció la única dificultad real del proceso, y no fue en la ejecución sino en el diseño de una restricción: \texttt{instalacion\_so} necesita garantizar que cada equipo tenga a lo más un sistema operativo marcado como principal, algo que en otros motores se resuelve con un índice único parcial (que solo evalúa la unicidad sobre las filas que cumplen una condición). MySQL no admite una cláusula \texttt{WHERE} en \texttt{CREATE INDEX}, así que la restricción se rediseñó con una columna generada (\texttt{principal\_uk}), que vale 1 solo cuando \texttt{es\_principal} es verdadero y \texttt{NULL} en cualquier otro caso; una restricción \texttt{UNIQUE} normal sobre \texttt{(id\_computadora, principal\_uk)} logra el mismo efecto, porque MySQL trata cada valor \texttt{NULL} como distinto de los demás para efectos de unicidad. Esto no es un defecto del diseño original: es la manera estándar de expresar un índice único condicional en un motor que no ofrece esa cláusula directamente, y se verificó insertando a propósito un segundo sistema operativo principal para el mismo equipo, lo que el motor rechazó correctamente.
 
 %################################################
 \subsection{ \color{colorESCOM}{Evidencias de ejecución}}
 
-A continuación se muestran las capturas de pantalla de la ejecución real: la creación de las once tablas, el índice, el poblado con \texttt{INSERT}, el listado de tablas con \texttt{\textbackslash dt}, el conteo de registros por tabla, la verificación de \texttt{experto\_soporte} contra \texttt{departamento} y de \texttt{software} contra \texttt{sistema\_operativo} (las dos claves foráneas nuevas de esta iteración), los valores cargados en \texttt{distribuidor}, y las tres consultas de validación planteadas en el diseño (licencias vencidas, gasto de mantenimiento fuera de garantía y equipos con arranque dual).
+A continuación se muestran las capturas de pantalla de la ejecución real: la creación de las once tablas, el índice y el poblado con \texttt{INSERT}, el listado de tablas (\texttt{SHOW TABLES}) y el conteo de registros por tabla, la verificación de \texttt{experto\_soporte} contra \texttt{departamento} y de \texttt{software} contra \texttt{sistema\_operativo} (las dos claves foráneas nuevas de esta iteración), los valores cargados en \texttt{distribuidor}, y las tres consultas de validación planteadas en el diseño (licencias vencidas, gasto de mantenimiento fuera de garantía y equipos con arranque dual).
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.95\linewidth]{evidencia_01_creacion.png}
-	\caption{Creación de las once tablas, el índice y el poblado de \texttt{script.sql} sobre PostgreSQL 16.15}
+	\caption{Ejecución de \texttt{script.sql} sobre MySQL 8.4 y listado de las once tablas creadas}
 	\label{img:evidencia-1}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.95\linewidth]{evidencia_02_verificacion_tablas.png}
-	\caption{Listado de tablas (\texttt{\textbackslash dt}) y conteo de registros por tabla}
+	\caption{Listado de tablas (\texttt{SHOW TABLES}) y conteo de registros por tabla}
 	\label{img:evidencia-2}
 \end{figure}
 
@@ -817,9 +817,9 @@ A continuación se muestran las capturas de pantalla de la ejecución real: la c
 	\label{img:evidencia-4}
 \end{figure}
 
-La transcripción completa en texto plano, tal como se copió de la sesión de \texttt{psql}, se conserva en el archivo \texttt{evidencia\_ejecucion.txt} entregado junto con este reporte:
+La transcripción completa en texto plano, tal como se copió de la sesión del cliente \texttt{mysql}, se conserva en el archivo \texttt{evidencia\_ejecucion.txt} entregado junto con este reporte:
 
-\lstinputlisting[basicstyle=\scriptsize\ttfamily, caption={Transcripción completa de la ejecución de \texttt{script.sql} y de las consultas de validación, sobre PostgreSQL 16.15}, label={cod:evidencia}]{evidencia_ejecucion.txt}
+\lstinputlisting[basicstyle=\scriptsize\ttfamily, caption={Transcripción completa de la ejecución de \texttt{script.sql} y de las consultas de validación, sobre MySQL 8.4}, label={cod:evidencia}]{evidencia_ejecucion.txt}
 
 Los tres resultados de las consultas de validación son consistentes con los datos de prueba insertados: el equipo \texttt{ESCOM-00124} aparece con \texttt{AutoCAD} vencido el 2025-02-15 porque esa es la fecha de vencimiento que se le cargó en \texttt{instalacion\_software}; el equipo \texttt{ESCOM-00087} aparece con \$1{,}450.00 de gasto fuera de garantía porque es el único mantenimiento con \texttt{cubierto\_garantia = FALSE}; y el equipo con \texttt{id\_computadora = 3} es el único con dos filas en \texttt{instalacion\_so}, que es exactamente el equipo al que se le cargó Windows y Ubuntu en arranque dual. El motor no solo aceptó el esquema: los datos de prueba y las consultas que motivaron el proyecto coinciden.
 
@@ -830,7 +830,7 @@ El diseño de este primer avance deja resuelto el problema de fondo que motivó 
 
 La dificultad principal del diseño fue decidir dónde vive cada atributo, no identificar las entidades. El caso más claro es la vigencia de la licencia: ponerla en \texttt{software} habría sido más simple, pero incorrecto, porque la licencia se compra por equipo y no por producto; solo separándola en \texttt{instalacion\_software} el modelo puede responder la pregunta que justificó el proyecto. Algo parecido ocurrió con \texttt{categoria\_software} y \texttt{sistema\_operativo}: convertirlos en catálogos propios, en vez de dejarlos como texto libre dentro de \texttt{software} y \texttt{computadora}, fue la decisión que mantiene el esquema en tercera forma normal.
 
-La segunda dificultad fue más pequeña y vino del entorno, no del diseño: sin privilegios de administrador en la máquina de prueba, instalar PostgreSQL con el instalador estándar (que registra un servicio de Windows) no era viable, así que la solución fue usar los binarios portables oficiales e inicializar el clúster a mano. Sobre eso apareció el único error real de todo el proceso: el locale \texttt{es\_MX.UTF-8} que pide \texttt{script.sql}, pensado para el servidor Linux donde el proyecto se va a desplegar más adelante, no existe con ese nombre en Windows. Ninguna de las dos dificultades tocó el modelo: una vez creada la base con el locale equivalente, las once tablas, las restricciones y el poblado se ejecutaron sin un solo error adicional, y las tres consultas que motivaron el proyecto desde la introducción devolvieron exactamente los resultados esperados contra los datos de prueba.
+La segunda dificultad fue más pequeña y vino del motor, no del modelo: MySQL no admite índices únicos con condición (\texttt{WHERE}), a diferencia de otros motores, así que la restricción que garantiza un único sistema operativo principal por equipo se resolvió con la columna generada \texttt{principal\_uk} descrita en la sección anterior. Ninguna de las dos dificultades tocó el modelo conceptual: una vez creada la base, las once tablas, las restricciones y el poblado se ejecutaron sin un solo error, y las tres consultas que motivaron el proyecto desde la introducción devolvieron exactamente los resultados esperados contra los datos de prueba.
 
 Con eso, el Avance 1 queda completo en sus cuatro partes (diccionario de datos, modelo E-R, representación relacional y script DDL/DML validado contra un motor real) y consistente entre ellas, que era el objetivo de esta entrega.
 

@@ -1,23 +1,21 @@
 -- ============================================================
 -- Avance 1 -- Sistema de Inventario y Gestion de Equipo de Computo (ESCOM)
 -- Web client and backend development frameworks (7CM2)
--- Motor objetivo: PostgreSQL 16
+-- Motor objetivo: MySQL 8
 -- ============================================================
 
 CREATE DATABASE inventario_equipo_escom
-    WITH ENCODING = 'UTF8'
-    LC_COLLATE = 'es_MX.UTF-8'
-    LC_CTYPE = 'es_MX.UTF-8';
+    CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_spanish_ci;
 
--- Conectarse a la base recien creada antes de continuar (psql):
--- \c inventario_equipo_escom
+USE inventario_equipo_escom;
 
 -- ============================================================
 -- 1. Tablas catalogo (experto_soporte depende de departamento, creada justo antes)
 -- ============================================================
 
 CREATE TABLE edificio_campus (
-    id_edificio     SERIAL PRIMARY KEY,
+    id_edificio     INT AUTO_INCREMENT PRIMARY KEY,
     clave           VARCHAR(10) NOT NULL,
     nombre          VARCHAR(80) NOT NULL,
     tipo_espacio    VARCHAR(20) NOT NULL,
@@ -33,7 +31,7 @@ CREATE TABLE edificio_campus (
 -- se guardan como columnas ya calculadas en vez de obligarlos a calcularse con SUM()/COUNT()
 -- sobre computadora cada vez que se consultan.
 CREATE TABLE distribuidor (
-    id_distribuidor       SERIAL PRIMARY KEY,
+    id_distribuidor       INT AUTO_INCREMENT PRIMARY KEY,
     nombre                VARCHAR(120) NOT NULL,
     calle                 VARCHAR(100),
     ciudad                VARCHAR(60) NOT NULL,
@@ -48,7 +46,7 @@ CREATE TABLE distribuidor (
 );
 
 CREATE TABLE categoria_software (
-    id_categoria SERIAL PRIMARY KEY,
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nombre       VARCHAR(60) NOT NULL,
     descripcion  VARCHAR(200),
     CONSTRAINT uq_categoria_nombre UNIQUE (nombre)
@@ -56,14 +54,14 @@ CREATE TABLE categoria_software (
 
 -- Departamento al que pertenece cada experto de soporte.
 CREATE TABLE departamento (
-    id_departamento SERIAL PRIMARY KEY,
+    id_departamento INT AUTO_INCREMENT PRIMARY KEY,
     nombre          VARCHAR(80) NOT NULL,
     CONSTRAINT uq_departamento_nombre UNIQUE (nombre)
 );
 
 -- id_departamento es clave foranea hacia departamento, en vez de texto libre.
 CREATE TABLE experto_soporte (
-    id_experto        SERIAL PRIMARY KEY,
+    id_experto        INT AUTO_INCREMENT PRIMARY KEY,
     num_empleado      VARCHAR(15) NOT NULL,
     primer_nombre     VARCHAR(60) NOT NULL,
     apellido_paterno  VARCHAR(60) NOT NULL,
@@ -78,7 +76,7 @@ CREATE TABLE experto_soporte (
 );
 
 CREATE TABLE sistema_operativo (
-    id_sistema_operativo SERIAL PRIMARY KEY,
+    id_sistema_operativo INT AUTO_INCREMENT PRIMARY KEY,
     nombre               VARCHAR(60) NOT NULL,
     version              VARCHAR(30) NOT NULL,
     arquitectura         VARCHAR(10) NOT NULL,
@@ -95,7 +93,7 @@ CREATE TABLE sistema_operativo (
 -- Referencia el sistema operativo requerido y describe el tipo de computadora, la memoria
 -- necesaria, si la licencia es de sitio, el numero de copias y el costo del paquete.
 CREATE TABLE software (
-    id_software                  SERIAL PRIMARY KEY,
+    id_software                  INT AUTO_INCREMENT PRIMARY KEY,
     titulo                       VARCHAR(100) NOT NULL,
     version                      VARCHAR(30) NOT NULL,
     editorial                    VARCHAR(80) NOT NULL,
@@ -124,7 +122,7 @@ CREATE TABLE software (
 -- ============================================================
 
 CREATE TABLE computadora (
-    id_computadora                    SERIAL PRIMARY KEY,
+    id_computadora                    INT AUTO_INCREMENT PRIMARY KEY,
     num_inventario                    VARCHAR(20) NOT NULL,
     numero_serie                      VARCHAR(50) NOT NULL,
     marca                             VARCHAR(50) NOT NULL,
@@ -166,7 +164,7 @@ CREATE TABLE computadora (
 -- ============================================================
 
 CREATE TABLE mantenimiento (
-    id_mantenimiento     SERIAL PRIMARY KEY,
+    id_mantenimiento     INT AUTO_INCREMENT PRIMARY KEY,
     id_computadora       INTEGER NOT NULL,
     id_experto           INTEGER,
     fecha_mantenimiento  DATE NOT NULL,
@@ -198,24 +196,24 @@ CREATE TABLE instalacion_software (
         REFERENCES software (id_software) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- principal_uk es una columna generada que solo vale 1 cuando es_principal = TRUE
+-- (y NULL en caso contrario); junto con la restriccion UNIQUE de abajo, emula un
+-- indice unico parcial: MySQL trata cada NULL como distinto, asi que la unicidad
+-- solo se evalua entre las filas donde es_principal es verdadero.
 CREATE TABLE instalacion_so (
     id_computadora         INTEGER NOT NULL,
     id_sistema_operativo   INTEGER NOT NULL,
     fecha_instalacion      DATE NOT NULL,
     particion              VARCHAR(30),
     es_principal           BOOLEAN NOT NULL DEFAULT TRUE,
+    principal_uk           TINYINT GENERATED ALWAYS AS (CASE WHEN es_principal THEN 1 ELSE NULL END) VIRTUAL,
     PRIMARY KEY (id_computadora, id_sistema_operativo),
+    CONSTRAINT uq_instalacion_so_principal UNIQUE (id_computadora, principal_uk),
     CONSTRAINT fk_instalacion_so_computadora FOREIGN KEY (id_computadora)
         REFERENCES computadora (id_computadora) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT fk_instalacion_so_sistema FOREIGN KEY (id_sistema_operativo)
         REFERENCES sistema_operativo (id_sistema_operativo) ON DELETE RESTRICT ON UPDATE CASCADE
 );
-
--- Garantiza que cada computadora tenga a lo sumo un sistema operativo "principal"
--- (indice unico parcial: solo evalua unicidad entre las filas donde es_principal = TRUE)
-CREATE UNIQUE INDEX uq_instalacion_so_principal
-    ON instalacion_so (id_computadora)
-    WHERE es_principal;
 
 -- ============================================================
 -- 5. Poblado (DML) -- minimo 3 registros por tabla
