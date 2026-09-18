@@ -1,0 +1,20 @@
+# Sirve el minisitio de Nuevo Ingreso ESCOM (https://www.escom.ipn.mx/nuevoingreso27_1/)
+# con el servidor web Nginx. Mismo sitio que Dockerfile.apache; solo cambia el servidor
+# y por tanto la carpeta destino del COPY.
+
+FROM nginx:alpine
+
+# DocumentRoot por defecto de la imagen oficial de nginx.
+COPY sitio/ /usr/share/nginx/html/
+
+# nginx dentro del contenedor siempre escucha en el 80; el puerto externo (8081)
+# se define al correr el contenedor con -p, no aqui dentro.
+EXPOSE 80
+
+# Build  (contexto = esta carpeta, para que COPY sitio/ encuentre el sitio):
+#   docker build -f Dockerfile.nginx -t nuevoingreso-nginx .
+#
+# Run  (mapea el 80 interno de nginx al 8081 de la maquina host):
+#   docker run --name nuevoingreso-nginx -d -p 8081:80 nuevoingreso-nginx
+#
+# Verificar:  http://localhost:8081

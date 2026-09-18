@@ -324,17 +324,17 @@ const TAREAS = [
   {
     id: "wad-docker-apache-nginx",
     curso: "7CM2",
-    titulo: "Ejercicio — Publicar el minisitio en Apache (:8080) y Nginx (:8081)",
+    titulo: "Descarga, creación y ejecución de imagen Docker del minisitio de nuevo ingreso de ESCOM",
     tipo: "practica",
     entrega: null,
     fechaPorConfirmar: false,
     parcial: 1,
-    estado: "pendiente",
-    descripcion: "Reusar el minisitio de nuevo ingreso (tarea 2, ya con Dockerfile para :3500) y duplicarlo en dos servidores distintos: uno basado en httpd expuesto en el puerto 8080, y otro basado en nginx expuesto en el puerto 8081. El único cambio real entre los dos Dockerfiles es la carpeta de destino del COPY: /usr/local/apache2/htdocs/ en Apache, /usr/share/nginx/html/ en Nginx. Se hizo en vivo durante la clase 6, sin fecha de entrega explícita — confirmar si es solo un ejercicio de práctica o si también se sube a algún lado.",
-    entregable: "Dos imágenes/contenedores corriendo (Apache :8080, Nginx :8081) o sus dos Dockerfiles",
-    pasos: ["Dockerfile de Apache (ya existe, tarea 2)", "Dockerfile de Nginx (FROM nginx, COPY a /usr/share/nginx/html/)", "docker build de ambas imágenes", "docker run -p 8080:80 (Apache)", "docker run -p 8081:80 (Nginx)"],
-    origen: "Clase 6 · práctica de laboratorio",
-    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/docker apache nginx"
+    estado: "en-curso",
+    descripcion: "CONFIRMADO: es entrega formal con rúbrica oficial de 100 puntos (portada 5, introducción 10, conceptos teóricos 10, evidencia de descarga 10, Dockerfile 15, docker build 10, docker run 10, sitio en navegador 15, conclusiones 10, referencias 5) y reporte en LaTeX con la plantilla del aula virtual — deja de ser solo el ejercicio informal de la clase 6. Reusa el minisitio ya descargado en tarea 2. Carpeta ya armada: sitio/ (contenido), Dockerfile.apache (httpd, :8080), Dockerfile.nginx (nginx, :8081), README.md con los comandos exactos, y reporte/Practica-Docker-Apache-Nginx.tex ya redactado siguiendo la rúbrica punto por punto, con imágenes placeholder en reporte/imagenes/ listas para sustituir por capturas reales. Docker no está instalado en la máquina de trabajo (verificado: ni en PATH, ni Docker Desktop, ni en WSL Ubuntu) — falta que el alumno instale Docker, corra los build/run de README.md, tome las 6 capturas reales (mismo nombre de archivo que las placeholder) y compile el .tex. Sin fecha de entrega confirmada por el profesor todavía.",
+    entregable: "Dos Dockerfiles + dos contenedores corriendo (Apache :8080, Nginx :8081) + reporte en LaTeX con capturas reales",
+    pasos: ["Instalar Docker Desktop (pendiente en esta máquina)", "docker build -f Dockerfile.apache (ya escrito)", "docker build -f Dockerfile.nginx (ya escrito)", "docker run de ambos con -p 8080:80 y -p 8081:80", "Tomar las 6 capturas que pide README.md y reemplazar los placeholder en reporte/imagenes/", "Compilar Practica-Docker-Apache-Nginx.tex a PDF"],
+    origen: "Clase 6 · confirmado con rúbrica oficial el 18 sept",
+    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/SegundaOpcion"
   },
   {
     id: "wad-api-temperaturas",

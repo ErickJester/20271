@@ -1,0 +1,19 @@
+# Sirve el minisitio de Nuevo Ingreso ESCOM (https://www.escom.ipn.mx/nuevoingreso27_1/)
+# con el servidor web Apache (httpd). Sitio 100% estatico: basta el servidor + los archivos.
+
+FROM httpd:2.4-alpine
+
+# DocumentRoot por defecto de la imagen oficial de httpd.
+COPY sitio/ /usr/local/apache2/htdocs/
+
+# httpd dentro del contenedor siempre escucha en el 80; el puerto externo (8080)
+# se define al correr el contenedor con -p, no aqui dentro.
+EXPOSE 80
+
+# Build  (contexto = esta carpeta, para que COPY sitio/ encuentre el sitio):
+#   docker build -f Dockerfile.apache -t nuevoingreso-apache .
+#
+# Run  (mapea el 80 interno de httpd al 8080 de la maquina host):
+#   docker run --name nuevoingreso-apache -d -p 8080:80 nuevoingreso-apache
+#
+# Verificar:  http://localhost:8080
