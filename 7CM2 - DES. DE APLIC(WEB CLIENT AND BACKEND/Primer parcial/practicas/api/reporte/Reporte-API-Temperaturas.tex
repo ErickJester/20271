@@ -1,0 +1,481 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\newcommand{\gC}{\ensuremath{^{\circ}}C}
+\newcommand{\gF}{\ensuremath{^{\circ}}F}
+
+% Captura de terminal: archivo, etiqueta, pie de figura
+\newcommand{\capturaCurl}[3]{%
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.95\linewidth]{#1}
+		\caption{#3}
+		\label{#2}
+	\end{figure}}
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Práctica: API REST para conversión de temperaturas con Spring Boot}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{Boleta: 2019630177}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Código}
+
+\lstset{
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	breaklines=true,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+		{°}{{\textdegree}}1
+}
+
+% Comandos y respuestas de terminal: sin numeración, sin colores de sintaxis
+\lstdefinestyle{consola}{
+	numbers=none,
+	frame=single,
+	basicstyle=\footnotesize\ttfamily,
+	keywordstyle=\color{black},
+	stringstyle=\color{black},
+	commentstyle=\color{black}
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+Esta práctica construye una API REST que convierte temperaturas entre las escalas Celsius, Fahrenheit y Kelvin. Está hecha con Spring Boot y expone seis endpoints \texttt{GET}, uno por cada par de escalas. Cada endpoint recibe el valor por query string, valida que sea un número físicamente posible y devuelve una respuesta JSON estructurada; cuando el dato no es válido, devuelve un error JSON con el código HTTP que corresponde. Los endpoints se probaron con \texttt{curl} contra la API en ejecución.
+
+%################################################
+\section{\color{colorIPN}{Desarrollo de la API}}
+
+\subsection{Descripción de la API}
+
+La URL base es \texttt{http://localhost:8082/api/temperatura}. El puerto 8082 se fija en \texttt{application.properties} con \texttt{server.port=8082}; sin esa línea, el Tomcat embebido usaría el 8080. Todos los endpoints usan el verbo \texttt{GET}, porque solo consultan un resultado y no crean ni modifican nada, y reciben un único parámetro obligatorio, \texttt{valor}, con la temperatura que se quiere convertir. La tabla \ref{tab:endpoints} lista los seis endpoints y la fórmula que aplica cada uno.
+
+\begin{table}[H]
+	\centering
+	\small
+	\begin{tabular}{>{\ttfamily\footnotesize}p{6.4cm} l l}
+		\toprule
+		\textrm{\textbf{Endpoint}} & \textbf{Conversión} & \textbf{Fórmula} \\
+		\midrule
+		/convertir-celsius-a-fahrenheit & \gC{} $\rightarrow$ \gF{} & $F = C \times \frac{9}{5} + 32$ \\
+		/convertir-celsius-a-kelvin & \gC{} $\rightarrow$ K & $K = C + 273.15$ \\
+		/convertir-fahrenheit-a-celsius & \gF{} $\rightarrow$ \gC{} & $C = (F - 32) \times \frac{5}{9}$ \\
+		/convertir-fahrenheit-a-kelvin & \gF{} $\rightarrow$ K & $K = (F - 32) \times \frac{5}{9} + 273.15$ \\
+		/convertir-kelvin-a-celsius & K $\rightarrow$ \gC{} & $C = K - 273.15$ \\
+		/convertir-kelvin-a-fahrenheit & K $\rightarrow$ \gF{} & $F = (K - 273.15) \times \frac{9}{5} + 32$ \\
+		\bottomrule
+	\end{tabular}
+	\caption{Endpoints disponibles (todos \texttt{GET} con el parámetro \texttt{?valor=})}
+	\label{tab:endpoints}
+\end{table}
+
+Los resultados se redondean a dos decimales. La respuesta correcta es un objeto JSON con cuatro campos: el valor recibido, su unidad, el valor convertido y la unidad de destino.
+
+\begin{lstlisting}[style=consola]
+{
+  "valorOriginal": 10.0,
+  "unidadOriginal": "°C",
+  "valorRespuesta": 50.0,
+  "unidadRespuesta": "°F"
+}
+\end{lstlisting}
+
+Cuando la petición no es válida, la API devuelve otro objeto JSON con el código HTTP, su nombre, un mensaje legible y la ruta que se pidió. La tabla \ref{tab:estados} resume los códigos que usa \cite{rfc9110}.
+
+\begin{table}[H]
+	\centering
+	\small
+	\begin{tabular}{l l p{9.2cm}}
+		\toprule
+		\textbf{Código} & \textbf{Nombre} & \textbf{Cuándo se devuelve} \\
+		\midrule
+		200 & OK & La conversión se calculó correctamente. \\
+		400 & Bad Request & Falta \texttt{valor}, o no es un número (por ejemplo \texttt{abc} o \texttt{20,5}). \\
+		422 & Unprocessable Content & El valor es un número, pero está por debajo del cero absoluto, o es \texttt{NaN} o infinito. \\
+		\bottomrule
+	\end{tabular}
+	\caption{Códigos de respuesta que devuelve la API}
+	\label{tab:estados}
+\end{table}
+
+El límite de cada escala es el cero absoluto \cite{bipm_si}: $-273.15$\,\gC{}, $-459.67$\,\gF{} y $0$\,K. Un valor exactamente igual al límite se acepta; uno menor se rechaza.
+
+\subsection{Tecnologías utilizadas}
+
+\begin{table}[H]
+	\centering
+	\small
+	\begin{tabular}{l l}
+		\toprule
+		\textbf{Tecnología} & \textbf{Uso} \\
+		\midrule
+		Java 21 (Eclipse Temurin 21.0.12) & Lenguaje. Se usa \texttt{record} para los DTO \cite{jep395}. \\
+		Spring Boot 4.1.1 & Framework; configura el servidor y la aplicación \cite{spring_boot_ref}. \\
+		Spring Web MVC (\texttt{spring-boot-starter-webmvc}) & \texttt{@RestController}, \texttt{@GetMapping}, \texttt{@RequestParam}. \\
+		Tomcat 11 embebido & Servidor; por eso el empaquetado es un JAR ejecutable. \\
+		Spring Boot DevTools & Reinicio automático durante el desarrollo. \\
+		Maven (\texttt{mvnw}) & Construcción y ejecución de pruebas. \\
+		JUnit 5 & Pruebas unitarias del servicio de conversión. \\
+		\texttt{curl} & Cliente para probar los endpoints desde la terminal. \\
+		\bottomrule
+	\end{tabular}
+	\caption{Tecnologías del proyecto}
+	\label{tab:tecnologias}
+\end{table}
+
+El proyecto se generó con Spring Initializr (Maven, Java, Group \texttt{com.ipn.mx}, Artifact \texttt{apisimple}, empaquetado JAR) con las dependencias Spring Web y DevTools. No usa base de datos ni librerías externas: la conversión es aritmética pura.
+
+\subsection{Estructura del proyecto y ejecución}
+
+\begin{lstlisting}[style=consola]
+ApiSimple/
+  pom.xml
+  src/main/java/com/ipn/mx/
+    ApiSimpleApplication.java
+    controller/TemperaturaController.java
+    service/TemperaturaService.java
+    dto/ConversionResponse.java
+    dto/ErrorResponse.java
+    exception/ValorFueraDeRangoException.java
+    exception/GlobalExceptionHandler.java
+  src/main/resources/application.properties
+  src/test/java/com/ipn/mx/service/TemperaturaServiceTest.java
+\end{lstlisting}
+
+El controlador solo recibe la petición y arma la respuesta; el servicio hace la aritmética y valida el rango; el manejador global convierte las excepciones en respuestas de error. Para compilar, probar y arrancar:
+
+\begin{lstlisting}[style=consola]
+./mvnw package
+java -jar target/apisimple-0.0.1-SNAPSHOT.jar
+\end{lstlisting}
+
+\subsection{Implementación}
+
+El DTO de respuesta es un \texttt{record}: sus valores se fijan al construirlo y no cambian, y como solo viaja de vuelta al cliente no necesita setters.
+
+\begin{lstlisting}[language=Java,caption={DTO de respuesta}]
+public record ConversionResponse(
+    Double valorOriginal,
+    String unidadOriginal,
+    Double valorRespuesta,
+    String unidadRespuesta
+) {}
+\end{lstlisting}
+
+Cada endpoint sigue el mismo patrón: recibe \texttt{valor} con \texttt{@RequestParam}, llama al servicio y devuelve un \texttt{ResponseEntity.ok()} con el DTO \cite{spring_requestparam}.
+
+\begin{lstlisting}[language=Java,caption={Endpoint de Celsius a Fahrenheit}]
+@GetMapping("/convertir-celsius-a-fahrenheit")
+public ResponseEntity<ConversionResponse> celsiusAFahrenheit(
+    @RequestParam(name = "valor") Double celsius
+) {
+    Double fahrenheit = servicio.celsiusAFahrenheit(celsius);
+    return ResponseEntity.ok(new ConversionResponse(celsius, CELSIUS, fahrenheit, FAHRENHEIT));
+}
+\end{lstlisting}
+
+La validación del rango vive en el servicio, en un solo método que usan las seis conversiones, y el redondeo a dos decimales en otro.
+
+\begin{lstlisting}[language=Java,caption={Validación del rango y redondeo en TemperaturaService}]
+private void validar(double valor, double minimo, String unidad) {
+    if (Double.isNaN(valor) || Double.isInfinite(valor)) {
+        throw new ValorFueraDeRangoException("El valor debe ser un número finito.");
+    }
+    if (valor < minimo) {
+        throw new ValorFueraDeRangoException(
+            "%s %s está por debajo del cero absoluto (mínimo permitido: %s %s)."
+                .formatted(valor, unidad, minimo, unidad));
+    }
+}
+
+private double redondear(double valor) {
+    return Math.round(valor * 100.0) / 100.0 + 0.0;
+}
+\end{lstlisting}
+
+Los errores se convierten en JSON con una clase \texttt{@RestControllerAdvice}, que captura la excepción antes de que llegue al cliente como una página de error de Spring \cite{spring_exceptionhandler}.
+
+\begin{lstlisting}[language=Java,caption={Dos de los tres manejadores de GlobalExceptionHandler}]
+@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+public ResponseEntity<ErrorResponse> valorNoNumerico(
+    MethodArgumentTypeMismatchException ex, HttpServletRequest request
+) {
+    String mensaje = "El parámetro '%s' debe ser un número (con punto decimal); se recibió '%s'."
+        .formatted(ex.getName(), ex.getValue());
+    return responder(HttpStatus.BAD_REQUEST, mensaje, request);
+}
+
+@ExceptionHandler(ValorFueraDeRangoException.class)
+public ResponseEntity<ErrorResponse> fueraDeRango(
+    ValorFueraDeRangoException ex, HttpServletRequest request
+) {
+    return responder(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), request);
+}
+\end{lstlisting}
+
+El tercer manejador, para \texttt{MissingServletRequestParameterException}, responde 400 cuando falta \texttt{valor}.
+
+Además del arranque del contexto, hay cuatro pruebas unitarias de JUnit sobre el servicio: las seis fórmulas con valores conocidos, el cero absoluto exacto de cada escala (que debe aceptarse), un valor apenas por debajo de él (que debe rechazarse) y \texttt{NaN} e infinito. Las cinco pasan con \texttt{./mvnw package}.
+
+\subsection{Pruebas con curl}
+
+Todos los comandos se ejecutaron en una terminal de Windows contra el JAR corriendo en el puerto 8082. Se usan dos opciones de \texttt{curl} \cite{curl_manpage}: \texttt{-s} (\textit{silent}) oculta la barra de progreso y \texttt{-w "\textbackslash nHTTP \%\{http\_code\}\textbackslash n"} imprime el código HTTP de la respuesta después del cuerpo. La URL va entre comillas porque contiene \texttt{?}, un carácter que algunos intérpretes de comandos interpretan por su cuenta. Para cada endpoint se muestra el comando, la captura de la terminal, la respuesta en JSON (con sangría para leerla mejor; la captura muestra el cuerpo tal cual llega) y la misma respuesta en texto plano.
+
+\subsubsection{Celsius a Fahrenheit}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-celsius-a-fahrenheit?valor=10"
+\end{lstlisting}
+
+\capturaCurl{01_celsius_a_fahrenheit.png}{img:c2f}{Celsius a Fahrenheit con \texttt{valor=10}}
+
+\begin{lstlisting}[style=consola]
+{ "valorOriginal": 10.0, "unidadOriginal": "°C", "valorRespuesta": 50.0, "unidadRespuesta": "°F" }
+\end{lstlisting}
+
+\textbf{Texto plano:} 10\,\gC{} equivalen a 50\,\gF{} (HTTP 200).
+
+\subsubsection{Celsius a Kelvin}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-celsius-a-kelvin?valor=20"
+\end{lstlisting}
+
+\capturaCurl{02_celsius_a_kelvin.png}{img:c2k}{Celsius a Kelvin con \texttt{valor=20}}
+
+\begin{lstlisting}[style=consola]
+{ "valorOriginal": 20.0, "unidadOriginal": "°C", "valorRespuesta": 293.15, "unidadRespuesta": "K" }
+\end{lstlisting}
+
+\textbf{Texto plano:} 20\,\gC{} equivalen a 293.15\,K (HTTP 200).
+
+\subsubsection{Fahrenheit a Celsius}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-fahrenheit-a-celsius?valor=212"
+\end{lstlisting}
+
+\capturaCurl{03_fahrenheit_a_celsius.png}{img:f2c}{Fahrenheit a Celsius con \texttt{valor=212}}
+
+\begin{lstlisting}[style=consola]
+{ "valorOriginal": 212.0, "unidadOriginal": "°F", "valorRespuesta": 100.0, "unidadRespuesta": "°C" }
+\end{lstlisting}
+
+\textbf{Texto plano:} 212\,\gF{} equivalen a 100\,\gC{}, el punto de ebullición del agua (HTTP 200).
+
+\subsubsection{Fahrenheit a Kelvin}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-fahrenheit-a-kelvin?valor=32"
+\end{lstlisting}
+
+\capturaCurl{04_fahrenheit_a_kelvin.png}{img:f2k}{Fahrenheit a Kelvin con \texttt{valor=32}}
+
+\begin{lstlisting}[style=consola]
+{ "valorOriginal": 32.0, "unidadOriginal": "°F", "valorRespuesta": 273.15, "unidadRespuesta": "K" }
+\end{lstlisting}
+
+\textbf{Texto plano:} 32\,\gF{} equivalen a 273.15\,K, el punto de congelación del agua (HTTP 200).
+
+\subsubsection{Kelvin a Celsius}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-kelvin-a-celsius?valor=300"
+\end{lstlisting}
+
+\capturaCurl{05_kelvin_a_celsius.png}{img:k2c}{Kelvin a Celsius con \texttt{valor=300}}
+
+\begin{lstlisting}[style=consola]
+{ "valorOriginal": 300.0, "unidadOriginal": "K", "valorRespuesta": 26.85, "unidadRespuesta": "°C" }
+\end{lstlisting}
+
+\textbf{Texto plano:} 300\,K equivalen a 26.85\,\gC{} (HTTP 200).
+
+\subsubsection{Kelvin a Fahrenheit}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-kelvin-a-fahrenheit?valor=300"
+\end{lstlisting}
+
+\capturaCurl{06_kelvin_a_fahrenheit.png}{img:k2f}{Kelvin a Fahrenheit con \texttt{valor=300}}
+
+\begin{lstlisting}[style=consola]
+{ "valorOriginal": 300.0, "unidadOriginal": "K", "valorRespuesta": 80.33, "unidadRespuesta": "°F" }
+\end{lstlisting}
+
+\textbf{Texto plano:} 300\,K equivalen a 80.33\,\gF{} (HTTP 200).
+
+\subsection{Validación de datos}
+
+Se probaron cinco entradas inválidas. En todos los casos la API responde con un JSON de error (el objeto de cuatro campos descrito en la tabla \ref{tab:estados}) y no con una traza de Java.
+
+\subsubsection{Valor no numérico}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-celsius-a-fahrenheit?valor=abc"
+\end{lstlisting}
+
+\capturaCurl{07_error_no_numerico.png}{img:noNumerico}{Valor no numérico: \texttt{valor=abc}}
+
+\begin{lstlisting}[style=consola]
+{ "estado": 400, "error": "Bad Request",
+  "mensaje": "El parámetro 'valor' debe ser un número (con punto decimal); se recibió 'abc'.",
+  "ruta": "/api/temperatura/convertir-celsius-a-fahrenheit" }
+\end{lstlisting}
+
+\textbf{Texto plano:} error 400: el parámetro \texttt{valor} debe ser un número; se recibió \texttt{abc}. Spring no puede convertir la cadena a \texttt{Double} y lanza \texttt{MethodArgumentTypeMismatchException}, que el manejador global convierte en este JSON. Lo mismo ocurre con una coma decimal (\texttt{20,5}).
+
+\subsubsection{Parámetro faltante}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-celsius-a-kelvin"
+\end{lstlisting}
+
+\capturaCurl{08_error_falta_parametro.png}{img:falta}{Petición sin el parámetro \texttt{valor}}
+
+\begin{lstlisting}[style=consola]
+{ "estado": 400, "error": "Bad Request", "mensaje": "Falta el parámetro obligatorio 'valor'.",
+  "ruta": "/api/temperatura/convertir-celsius-a-kelvin" }
+\end{lstlisting}
+
+\textbf{Texto plano:} error 400: falta el parámetro obligatorio \texttt{valor}.
+
+\subsubsection{Valor fuera de rango: por debajo del cero absoluto en Celsius}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-celsius-a-kelvin?valor=-300"
+\end{lstlisting}
+
+\capturaCurl{09_error_bajo_cero_celsius.png}{img:cero1}{Valor por debajo del cero absoluto en Celsius}
+
+\begin{lstlisting}[style=consola]
+{ "estado": 422, "error": "Unprocessable Content",
+  "mensaje": "-300.0 °C está por debajo del cero absoluto (mínimo permitido: -273.15 °C).",
+  "ruta": "/api/temperatura/convertir-celsius-a-kelvin" }
+\end{lstlisting}
+
+\textbf{Texto plano:} error 422: $-300$\,\gC{} está por debajo del cero absoluto; el mínimo permitido es $-273.15$\,\gC{}. El valor sí es un número, pero no existe físicamente, por eso se devuelve 422 y no 400.
+
+\subsubsection{Valor fuera de rango: Kelvin negativo}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-kelvin-a-celsius?valor=-5"
+\end{lstlisting}
+
+\capturaCurl{10_error_bajo_cero_kelvin.png}{img:cero2}{Kelvin negativo, por debajo de su mínimo}
+
+\begin{lstlisting}[style=consola]
+{ "estado": 422, "error": "Unprocessable Content",
+  "mensaje": "-5.0 K está por debajo del cero absoluto (mínimo permitido: 0.0 K).",
+  "ruta": "/api/temperatura/convertir-kelvin-a-celsius" }
+\end{lstlisting}
+
+\textbf{Texto plano:} error 422: $-5$\,K está por debajo del cero absoluto; el mínimo permitido es 0\,K.
+
+\subsubsection{Valor no finito: NaN}
+
+\begin{lstlisting}[style=consola]
+curl -s -w "\nHTTP %{http_code}\n" "http://localhost:8082/api/temperatura/convertir-fahrenheit-a-celsius?valor=NaN"
+\end{lstlisting}
+
+\capturaCurl{11_error_nan.png}{img:nan}{Valor \texttt{NaN}}
+
+\begin{lstlisting}[style=consola]
+{ "estado": 422, "error": "Unprocessable Content",
+  "mensaje": "El valor debe ser un número finito.",
+  "ruta": "/api/temperatura/convertir-fahrenheit-a-celsius" }
+\end{lstlisting}
+
+\textbf{Texto plano:} error 422: el valor debe ser un número finito. \texttt{NaN} e \texttt{Infinity} sí se convierten a \texttt{Double} sin error \cite{java_double}, así que llegan hasta el servicio y ahí se rechazan.
+
+%################################################
+\section{\color{colorIPN}{Conclusiones}}
+
+Los errores más típicos de esta práctica tienen que ver con los tipos de dato. Todo lo que llega por la URL es texto, y Spring lo convierte a \texttt{Double} antes de entrar al método. Si la conversión falla (\texttt{abc}, o \texttt{20,5} con coma decimal, que Java no acepta) el método nunca se ejecuta y el error se produce fuera de él, en \texttt{MethodArgumentTypeMismatchException}; por eso hay que capturarlo en un \texttt{@RestControllerAdvice} y no dentro del controlador. En sentido contrario, \texttt{NaN} e \texttt{Infinity} sí convierten sin problema a \texttt{Double}, de modo que un número ``válido'' para Java puede no serlo para el problema, y hay que rechazarlo a mano.
+
+La diferencia entre \texttt{Double} y \texttt{double} también importa. El parámetro del controlador es el objeto \texttt{Double}, que puede ser \texttt{null}, y el servicio recibe el primitivo \texttt{double}. Eso solo es seguro porque el parámetro es obligatorio: si faltara, Spring responde 400 antes de llamar al método, y no se produce un \texttt{NullPointerException} al desempaquetar.
+
+En la aritmética, dos errores son clásicos. El primero es la división entera: en Java \texttt{9 / 5} con enteros vale 1, no 1.8. En este proyecto la operación \texttt{celsius * 9 / 5} se evalúa de izquierda a derecha con un \texttt{double}, así que no ocurre, pero escribir \texttt{9 / 5 * celsius} con literales enteros sí lo produciría. El segundo es la precisión de la coma flotante: 0.1 + 0.2 da 0.30000000000000004, y en esta API la conversión de 300\,K a Fahrenheit da 80.33000000000004 antes de redondear. Por eso el servicio redondea a dos decimales, y además suma 0.0 al resultado para que un $-0.0$ salga como 0.0.
+
+En cuanto a HTTP, la API separa el 400 del 422: 400 significa que la petición no se entiende (falta el parámetro o no es un número), y 422 significa que se entiende pero el valor no tiene sentido (por debajo del cero absoluto) \cite{rfc9110}. Si el servicio lanzara su excepción y nadie la capturara, Spring respondería 500, y un error del cliente se reportaría como un fallo del servidor. Otros errores frecuentes al probar con \texttt{curl} son usar el puerto 8080 en vez del 8082 (la conexión se rechaza si nada escucha ahí), olvidar las comillas alrededor de la URL, escribir \texttt{curl} en PowerShell (donde es un alias de \texttt{Invoke-WebRequest} y hay que usar \texttt{curl.exe}) y una consola sin UTF-8, donde el símbolo de grados sale corrupto. Poner el valor en la ruta (\texttt{/valor/10}) en vez de en la query también da un 404, porque \texttt{@RequestParam} lee el query string y no un segmento de ruta.
+
+Las seis conversiones y los cinco casos de error se comprobaron con \texttt{curl} sobre la aplicación en ejecución (figuras \ref{img:c2f} a \ref{img:nan}).
+
+%################################################
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\nocite{*}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}
