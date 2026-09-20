@@ -178,7 +178,46 @@ Los códigos van del 100 al 599 y se agrupan por su primer dígito. La tabla \re
 
 La frontera entre 4xx y 5xx es la más importante de las cuatro, porque reparte la culpa. Un 4xx dice que reintentar la misma petición tal cual va a fallar otra vez. Un 5xx dice que la petición estaba bien y que reintentarla más tarde tiene sentido. Confundirlas hace que los clientes reintenten lo que nunca va a funcionar o que se rindan ante algo que se habría resuelto solo.
 
-Los códigos que aparecen en la práctica son pocos. Vale la pena conocer estos:
+Los códigos que aparecen en la práctica son pocos. Las tablas \ref{tabla:codigos-1xx-3xx} y \ref{tabla:codigos-4xx-5xx} los reúnen uno por uno; después de cada tabla se explica el detalle que no cabe en una descripción de una línea.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{1.8cm} | p{4cm} | p{9.3cm}}\hline \hline
+		\textbf{Código} & \textbf{Nombre} & \textbf{Descripción} \\ \hline \hline
+		100 & Continue & Indica al cliente que puede enviar el cuerpo que anunció. \\ \hline
+		101 & Switching Protocols & Confirma el cambio de protocolo, como al abrir un WebSocket. \\ \hline
+		200 & OK & Respuesta de éxito genérica. \\ \hline
+		201 & Created & Indica que se creó un recurso nuevo; suele venir con el encabezado \texttt{Location}. \\ \hline
+		202 & Accepted & El trabajo se encoló y todavía no termina. \\ \hline
+		204 & No Content & La operación salió bien y a propósito no hay cuerpo que devolver. \\ \hline
+		301 & Moved Permanently & El recurso cambió de dirección para siempre. \\ \hline
+		302 & Found & Desvío temporal; a diferencia de 307, el cliente puede cambiar el método al seguirlo. \\ \hline
+		307 & Temporary Redirect & Desvío temporal que obliga a conservar el método original. \\ \hline
+		304 & Not Modified & Respuesta a una petición condicional cuando el recurso no cambió; viaja sin cuerpo. \\ \hline \hline
+	\end{tabular}
+	\caption{Códigos informativos, de éxito y de redirección}
+	\label{tabla:codigos-1xx-3xx}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{1.8cm} | p{4cm} | p{9.3cm}}\hline \hline
+		\textbf{Código} & \textbf{Nombre} & \textbf{Descripción} \\ \hline \hline
+		400 & Bad Request & Error de cliente genérico; se usa para datos que no pasan validación. \\ \hline
+		401 & Unauthorized & Falta de credenciales; debe venir con el encabezado \texttt{WWW-Authenticate}. \\ \hline
+		403 & Forbidden & Credenciales válidas pero sin permiso suficiente para la operación. \\ \hline
+		404 & Not Found & El servidor no pudo encontrar el contenido solicitado. \\ \hline
+		405 & Method Not Allowed & La ruta existe pero no acepta el método usado. \\ \hline
+		409 & Conflict & Choque con el estado actual, como una clave que ya está ocupada. \\ \hline
+		429 & Too Many Requests & Se excedió un límite de peticiones permitidas. \\ \hline
+		500 & Internal Server Error & Error de servidor genérico; suele ser una excepción sin atender. \\ \hline
+		502 & Bad Gateway & Un intermediario recibió una respuesta inválida del servicio de atrás. \\ \hline
+		503 & Service Unavailable & El servicio está temporalmente fuera de servicio. \\ \hline
+		504 & Gateway Timeout & Un intermediario no recibió respuesta a tiempo del servicio de atrás. \\ \hline \hline
+	\end{tabular}
+	\caption{Códigos de error del cliente y del servidor}
+	\label{tabla:codigos-4xx-5xx}
+\end{table}
 
 \textbf{100 Continue} le dice al cliente que puede mandar el cuerpo que anunció. \textbf{101 Switching Protocols} es la respuesta a un cambio de protocolo, y es la que se ve al abrir un WebSocket. En una interfaz REST común no se escriben a mano.
 
