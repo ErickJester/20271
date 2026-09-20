@@ -114,17 +114,17 @@ const TAREAS = [
   {
     id: "wad-inv-dao",
     curso: "7CM2",
-    titulo: "Investigación — Patrón DAO",
+    titulo: "Investigación — el patrón de diseño DAO (Data Access Object)",
     tipo: "investigacion",
     entrega: "2026-09-11T23:00",
     fechaPorConfirmar: true,
     parcial: 1,
-    estado: "pendiente",
-    descripcion: "Mismo formato de cuatro preguntas. Conecta con el CarreraDAO que empezó en el pizarrón.",
-    entregable: "Documento en la plantilla LaTeX del curso",
-    pasos: ["Qué es", "Para qué sirve", "Con qué se come", "Cómo se adereza", "Compilar PDF", "Subir"],
-    origen: "Clase 3 · lista oficial de tareas (tentativa 11 sept)",
-    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/tareas"
+    estado: "en-curso",
+    descripcion: "Rúbrica confirmada de 10 puntos: portada (1), introducción (2), desarrollo con definición/estructura/componentes/ejemplo/ventajas-desventajas (4), conclusiones con reflexión personal (2) y referencias (1). Ya está armado y compilado en investigacion patron dao/InvestigacionDAO.pdf, usando como ejemplo real el Carrera.java y CarreraDAO.java de la práctica de la GUI (interfaz y fábrica se agregaron como código ilustrativo, ya que el proyecto de clase no las tiene). Falta solo confirmar la fecha real y subir.",
+    entregable: "Reporte en LaTeX (PDF) con diagrama de estructura, ejemplo en Java y bibliografía",
+    pasos: ["Qué es y origen (Core J2EE Patterns)", "Definición formal", "Estructura y componentes (interfaz, implementación, DTO, fábrica)", "Ejemplo en Java", "Ventajas y desventajas", "Conclusión con reflexión personal", "Compilar PDF", "Subir"],
+    origen: "Clase 3 · rúbrica oficial confirmada el 19 sept",
+    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/tareas/investigacion patron dao"
   },
   {
     id: "wad-inv-soft-delete",

@@ -1,0 +1,275 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[fleqn]{mathtools}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{nccmath}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{tasks}
+\usepackage{color}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+
+\definecolor{colorIPN}{rgb}{0.5, 0.0,0.13}
+\definecolor{colorESCOM}{rgb}{0.0, 0.5,1.0}
+\graphicspath{ {imagenes/} }
+
+\begin{document}
+%#########################################################
+\begin{titlepage}
+	\centering
+	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
+	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
+	\vspace{1cm}
+	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
+	\vspace{1.5cm}
+	{\huge\Large  \color{colorESCOM}{Investigación: el patrón de diseño DAO (Data Access Object)}\par}
+		\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+	\vspace{2cm}
+	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{Boleta: 2019630177}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
+	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\vfill
+	{\large \color{colorIPN}{\today}\par}
+	\vfill
+\end{titlepage}
+
+\renewcommand\lstlistingname{Código}
+
+\lstset{
+	basicstyle=\small\sffamily,
+	numbers=left,
+	numberstyle=\tiny,
+	frame=tb,
+	tabsize=4,
+	columns=fixed,
+	showstringspaces=false,
+	showtabs=false,
+	keepspaces,
+	commentstyle=\color{Violet},
+	keywordstyle=\color{colorIPN} \bfseries,
+	stringstyle=\color{colorESCOM},
+	extendedchars=true,
+	inputencoding=utf8,
+	literate=
+		{á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+		{Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+		{ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
+}
+
+\settasks{
+	counter-format=(tsk[r]),
+	label-width=4ex
+}
+\tableofcontents
+\pagebreak
+\listoffigures
+\pagebreak
+\listoftables
+\pagenumbering {arabic}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Introducción}}
+
+El patrón DAO (Data Access Object) aparece en el catálogo Core J2EE Patterns, publicado por Sun Microsystems a partir del trabajo de Alur, Crupi y Malks \cite{alur2003corej2ee}. Ataca un problema concreto de las aplicaciones empresariales en Java: la lógica de negocio termina mezclada con el código que habla directamente con la base de datos, y cualquier cambio de motor o de esquema obliga a tocar clases que no debieran saber nada de SQL.
+
+El patrón separa esas dos responsabilidades. La lógica de negocio pide datos a través de una interfaz fija; quien implementa esa interfaz decide cómo conseguirlos, ya sea con JDBC contra MySQL, con un archivo o con una llamada a otro servicio. Ese acomodo explica por qué el patrón sigue vigente mucho después de J2EE: aparece bajo el mismo nombre en Spring, en Hibernate y en cualquier proyecto que necesite aislar la persistencia del resto de la aplicación \cite{oracle_dao}.
+
+El ejemplo que recorre este documento es un recurso llamado \texttt{Carrera}: primero se define la clase que representa el dato y después la clase que lo guarda y lo recupera de MySQL.
+
+%################################################
+\section{\color{colorIPN}{Definición formal}}
+
+Core J2EE Patterns define al Data Access Object como el objeto responsable de abstraer y encapsular todo el acceso a una fuente de datos \cite{alur2003corej2ee}. El objeto de negocio que necesita esos datos nunca llama directamente al manejador de base de datos: llama al DAO, y el DAO es el único que conoce el detalle de cómo se guarda y se recupera la información.
+
+Esa frontera es la misma que separa una interfaz de su implementación. Mientras el contrato del DAO no cambie, la aplicación puede migrar de MySQL a otro motor, o incluso a una fuente de datos que no sea una base de datos relacional, sin que el resto del código note la diferencia \cite{oracle_dao}.
+
+%################################################
+\section{\color{colorIPN}{Estructura y componentes}}
+
+La figura \ref{img:estructura-dao} ubica las cuatro piezas del patrón sobre ese mismo ejemplo.
+
+\begin{figure}[H]
+	\centering
+	\begin{tikzpicture}[
+		caja/.style={draw, colorIPN, thick, rounded corners, align=center, font=\scriptsize, inner sep=6pt, minimum height=1.1cm, minimum width=3cm},
+		flecha/.style={colorESCOM, thick, -{Latex[length=2mm]}},
+		flechapunt/.style={colorIPN, thick, dashed, -{Latex[length=2mm]}},
+		nota/.style={align=center, font=\scriptsize, color=colorIPN}
+	]
+		\node[caja] (cliente)  at (0,4)  {\textbf{Objeto de negocio}\\ necesita datos de \texttt{Carrera}};
+		\node[caja] (factory)  at (5,4)  {\textbf{DAO Factory}};
+		\node[caja, dashed] (interfaz) at (10,4) {\textbf{DAO Interface}\\ declara create/read/update/delete};
+
+		\node[caja] (dto)      at (0,0)  {\textbf{Transfer Object}\\ \texttt{Carrera} (DTO)};
+		\node[caja] (concreto) at (5,0)  {\textbf{DAO Implementation}\\ \texttt{CarreraDAO}};
+		\node[caja] (datos)    at (10,0) {\textbf{Fuente de datos}\\ MySQL};
+
+		\draw[flecha] (cliente) -- (factory) node[midway, above, font=\scriptsize] {1. pide un DAO};
+		\draw[flecha] (factory) -- (interfaz) node[midway, above, font=\scriptsize] {2. entrega};
+		\draw[flechapunt] (concreto) -- (interfaz) node[midway, right, font=\scriptsize] {implementa};
+		\draw[flecha] (concreto) -- (datos) node[midway, above, font=\scriptsize] {3. SQL / JDBC};
+		\draw[flecha] (cliente) -- (dto) node[midway, left, font=\scriptsize] {usa};
+		\draw[flechapunt] (dto) -- (concreto) node[midway, above, font=\scriptsize] {viaja de ida y vuelta};
+
+		\node[nota] at (5,-2) {El cliente solo conoce la interfaz y el DTO; nunca ve el SQL ni sabe qué motor hay detrás};
+	\end{tikzpicture}
+	\caption{Estructura del patrón DAO aplicada al ejemplo Carrera}
+	\label{img:estructura-dao}
+\end{figure}
+
+\textbf{DAO Interface.} Declara las operaciones disponibles (crear, leer, actualizar, eliminar) sin decir cómo se ejecutan. Es el contrato que ve el resto de la aplicación.
+
+\textbf{DAO Implementation.} Clase concreta que cumple ese contrato contra un motor de base de datos particular. \texttt{CarreraDAO} es esta pieza: abre la conexión JDBC, arma las consultas preparadas y las ejecuta.
+
+\textbf{Transfer Object (DTO).} Objeto simple que carga los datos de ida y vuelta entre el DAO y quien lo usa, sin ninguna lógica propia. \texttt{Carrera} cumple este papel: solo tiene atributos, constructores y accessors/mutators.
+
+\textbf{DAO Factory.} Clase que decide, en tiempo de ejecución, qué implementación concreta entregar, para que quien la pide nunca escriba el nombre de la clase concreta en su propio código. Es la pieza que este ejemplo no necesita, porque con un solo motor de base de datos no hace falta elegir entre implementaciones.
+
+%################################################
+\section{\color{colorIPN}{Ejemplo en Java}}
+
+El DTO y la implementación concreta retoman el ejemplo de \texttt{Carrera} presentado antes.
+
+\begin{lstlisting}[caption={Transfer Object: Carrera.java (fragmento)}]
+public class Carrera {
+    private int idCarrera;
+    private String nombreCarrera;
+    private String descripcionCarrera;
+
+    public Carrera() { }
+
+    public void setIdCarrera(int idCarrera) { this.idCarrera = idCarrera; }
+    public int getIdCarrera() { return this.idCarrera; }
+    public void setNombreCarrera(String n) { this.nombreCarrera = n; }
+    public String getNombreCarrera() { return this.nombreCarrera; }
+    public void setDescripcionCarrera(String d) { this.descripcionCarrera = d; }
+    public String getDescripcionCarrera() { return this.descripcionCarrera; }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={DAO Implementation: CarreraDAO.java (fragmento con create y read)}]
+public class CarreraDAO {
+    private static final String SQL_INSERT =
+        "INSERT INTO Carrera (nombreCarrera, descripcionCarrera) VALUES (?, ?)";
+    private static final String SQL_SELECT =
+        "SELECT * FROM Carrera WHERE idCarrera = ?";
+
+    private Connection conexion;
+
+    private void obtenerConexion() throws SQLException {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        conexion = DriverManager.getConnection(
+            "jdbc:mysql://localhost:3306/MisCursos", "root", "tu_password");
+    }
+
+    public void create(Carrera c) throws SQLException {
+        obtenerConexion();
+        PreparedStatement ps = conexion.prepareStatement(SQL_INSERT);
+        ps.setString(1, c.getNombreCarrera());
+        ps.setString(2, c.getDescripcionCarrera());
+        ps.executeUpdate();
+        ps.close();
+        conexion.close();
+    }
+
+    public Carrera read(Carrera c) throws SQLException {
+        obtenerConexion();
+        PreparedStatement ps = conexion.prepareStatement(SQL_SELECT);
+        ps.setInt(1, c.getIdCarrera());
+        ResultSet rs = ps.executeQuery();
+        Carrera resultado = null;
+        if (rs.next()) {
+            resultado = new Carrera();
+            resultado.setIdCarrera(rs.getInt("idCarrera"));
+            resultado.setNombreCarrera(rs.getString("nombreCarrera"));
+            resultado.setDescripcionCarrera(rs.getString("descripcionCarrera"));
+        }
+        rs.close();
+        ps.close();
+        conexion.close();
+        return resultado;
+    }
+}
+\end{lstlisting}
+
+La versión completa agrega los métodos restantes del CRUD (\texttt{update}, \texttt{delete}, \texttt{readAll}) y el manejo de excepciones, siguiendo el mismo patrón que \texttt{create} y \texttt{read}.
+
+Los dos códigos siguientes son ilustrativos: agregan la interfaz y la fábrica que el ejemplo anterior no necesitaba, porque con un solo motor de base de datos no hace falta elegir entre implementaciones. Se agregan aquí para completar los cuatro componentes del patrón.
+
+\begin{lstlisting}[caption={DAO Interface ilustrativa}]
+public interface DAO<T> {
+    void create(T objeto) throws SQLException;
+    T read(T objeto) throws SQLException;
+    List<T> readAll() throws SQLException;
+    void update(T objeto) throws SQLException;
+    void delete(T objeto) throws SQLException;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={DAO Factory ilustrativa}]
+public class DAOFactory {
+    public static DAO<Carrera> obtenerCarreraDAO() {
+        return new CarreraDAO();
+    }
+}
+\end{lstlisting}
+
+Con esas dos piezas agregadas, \texttt{CarreraDAO} pasaría a implementar \texttt{DAO<Carrera>} en vez de no declarar ninguna interfaz. Quien lo usa, en vez de escribir \texttt{new CarreraDAO()}, se lo pediría a la fábrica.
+
+%################################################
+\section{\color{colorIPN}{Ventajas y desventajas}}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{p{7.5cm} | p{7.5cm}}\hline \hline
+		\textbf{Ventajas} & \textbf{Desventajas} \\ \hline \hline
+		Separa la lógica de negocio del código de acceso a datos. & Agrega clases e interfaces adicionales; en un proyecto muy pequeño puede ser más estructura de la que hace falta. \\ \hline
+		Facilita cambiar de motor de base de datos sin tocar el resto de la aplicación, porque solo cambia la implementación concreta. & Si el DTO y el DAO no se diseñan con cuidado, es fácil filtrar detalles de la base de datos (nombres de columnas, tipos SQL) hacia capas superiores. \\ \hline
+		Concentra el SQL en un solo lugar, más fácil de revisar y de probar. & Cada operación nueva (una consulta distinta, un filtro) obliga a agregar un método a la interfaz y a todas sus implementaciones. \\ \hline
+		Permite sustituir la implementación real por una de prueba sin usar una base de datos real. & \\ \hline \hline
+	\end{tabular}
+	\caption{Ventajas y desventajas del patrón DAO}
+	\label{tabla:ventajas-dao}
+\end{table}
+
+%################################################
+\section{\color{colorIPN}{Conclusión}}
+
+El \texttt{CarreraDAO} de este ejemplo ya tiene la pieza central del patrón: quien lo usa nunca escribe SQL, solo llama a \texttt{create}, \texttt{read} o \texttt{delete} y deja que el DAO se encargue de la conexión y de las consultas preparadas. Lo que le falta, la interfaz y la fábrica, no se nota mientras el proyecto tenga un solo motor de base de datos y una sola implementación. Se volvería necesario en cuanto apareciera una segunda implementación real, por ejemplo una versión de prueba sin base de datos para los exámenes unitarios, o un cambio de motor de base de datos ya avanzado el proyecto.
+
+La utilidad del patrón está en dejar preparado el punto donde la aplicación va a necesitar cambiar más adelante, aunque ese cambio no exista todavía el primer día. Separar responsabilidades cuesta algunas clases de más al principio; a cambio, ese cambio futuro se resuelve escribiendo una clase nueva en vez de reescribiendo la aplicación entera.
+
+\color{colorIPN}{
+	\begin{flushright}
+		\textit{
+			Angel Frausto Robles
+		}
+	\end{flushright} \hfill \break
+}
+
+\pagebreak
+
+%################################################
+\section{\color{colorIPN}{Referencias Bibliográficas}}
+\nocite{*}
+\color{colorESCOM}{
+	\printbibliography[heading=none]
+}
+
+\end{document}
