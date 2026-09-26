@@ -25,3 +25,18 @@ __MACOSX/
 
 # Compilados de Java (practicas de 7CM2/7CM4)
 *.class
+
+# GNS3 / Dynamips: imagenes de memoria y estado de ejecucion (cientos de MB, se regeneran)
+*_iomem
+*_bootflash
+*_nvram
+*_lock
+*_rommon_vars
+*.ghost
+dynamips_*_log.txt
+dynamips_*_stdout.txt
+c7200_*_log.txt
+
+# Descargas sueltas y archivos de bloqueo de Office
+OneDrive_*.zip
+~$*
