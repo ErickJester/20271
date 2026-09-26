@@ -1,0 +1,24 @@
+package com.example.pestanas;
+
+import android.os.Bundle;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTabHost;
+
+// EJEMPLO 2: pestañas con FragmentTabHost y fragmentos.
+public class MainActivityFragmentos extends FragmentActivity {
+    private FragmentTabHost tabHost;
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_tabs2);
+        tabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
+        tabHost.setup(this, getSupportFragmentManager(), android.R.id.tabcontent);
+        tabHost.addTab(tabHost.newTabSpec("tab1").setIndicator("Pestaña 1"), Tab1.class,
+                null);
+        tabHost.addTab(tabHost.newTabSpec("tab2").setIndicator("Pestaña 2"), Tab2.class,
+                null);
+        tabHost.addTab(tabHost.newTabSpec("tab3").setIndicator("Pestaña 3"), Tab3.class,
+                null);
+    }
+}

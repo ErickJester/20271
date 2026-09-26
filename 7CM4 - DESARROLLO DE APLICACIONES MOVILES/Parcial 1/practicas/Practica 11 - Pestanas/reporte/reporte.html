@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 11 - Pestañas con TabHost</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  h3, h4 { break-after: avoid; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Pestañas con las clases TabHost, TabSpec y TabWidget</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 11</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>25 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Las pestañas permiten organizar una interfaz en varias páginas que el usuario selecciona al tocar
+    las etiquetas de la parte superior. Se construyen con tres clases: <code class="inline">TabHost</code>
+    (el contenedor), <code class="inline">TabHost.TabSpec</code> (cada pestaña, con su etiqueta, su contenido
+    y un identificador) y <code class="inline">TabWidget</code> (la barra que muestra las etiquetas). Cuando el
+    contenido de cada pestaña es un fragmento, el contenedor es un <code class="inline">FragmentTabHost</code>.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Crear pestañas con <code class="inline">TabHost</code> y <code class="inline">TabSpec</code> sin fragmentos (Ejemplo 1).</li>
+    <li>Crear pestañas con <code class="inline">FragmentTabHost</code> y un fragmento por pestaña (Ejemplo 2).</li>
+    <li>Configurar un <code class="inline">TabHost</code> con tres pestañas en Kotlin (Ejemplo 3).</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>Entorno de trabajo</h3>
+  <p>
+    Un solo proyecto con tres actividades, una por ejemplo: <code class="inline">MainActivity</code> (Java),
+    <code class="inline">MainActivityFragmentos</code> (Java, con los fragmentos <code class="inline">Tab1</code>,
+    <code class="inline">Tab2</code> y <code class="inline">Tab3</code>) y <code class="inline">MainActivityKotlin</code>
+    (Kotlin). El código sigue el material del profesor. El material del Ejemplo 2 usa las clases de la antigua
+    biblioteca de soporte (<code class="inline">android.support.v4</code>), y en el proyecto se usaron sus equivalentes
+    de AndroidX (<code class="inline">androidx.fragment.app</code>). Cada pantalla lleva mi nombre como encabezado
+    para identificar las capturas.
+  </p>
+
+  <h3>Ejemplo 1. TabHost sin fragmentos</h3>
+  <p>
+    El diseño define un <code class="inline">TabHost</code> con un <code class="inline">TabWidget</code> y un
+    <code class="inline">FrameLayout</code> que contiene el contenido de cada pestaña. En
+    <code class="inline">MainActivity</code>, <code class="inline">setup()</code> prepara el contenedor y, por cada
+    pestaña, se crea un <code class="inline">TabSpec</code> con <code class="inline">newTabSpec</code>, se asigna su
+    contenido con <code class="inline">setContent</code> y su etiqueta con <code class="inline">setIndicator</code>, y se
+    agrega con <code class="inline">addTab</code>. Un <code class="inline">OnTabChangeListener</code> muestra en un
+    <code class="inline">Toast</code> la pestaña seleccionada.
+  </p>
+  <div class="par">
+    <figure><img src="../screenshots/01_ej1_tab1.png" alt="TAB1"><figcaption>Fig. 1. La primera pestaña, TAB1.</figcaption></figure>
+    <figure><img src="../screenshots/02_ej1_tab2.png" alt="TAB2"><figcaption>Fig. 2. La segunda pestaña, TAB2, con su Toast.</figcaption></figure>
+  </div>
+
+  <h3>Ejemplo 2. FragmentTabHost con fragmentos</h3>
+  <p>
+    El contenedor raíz es un <code class="inline">FragmentTabHost</code>, que contiene el
+    <code class="inline">TabWidget</code> y un <code class="inline">FrameLayout</code> donde se muestra el fragmento activo.
+    La actividad extiende <code class="inline">FragmentActivity</code> y agrega tres pestañas con
+    <code class="inline">addTab</code>, asociando a cada una su clase de fragmento. Cada fragmento infla su propio archivo
+    de diseño (<code class="inline">tab1.xml</code>, <code class="inline">tab2.xml</code> y <code class="inline">tab3.xml</code>).
+  </p>
+  <div class="rejilla">
+    <figure><img src="../screenshots/03_ej2_pestana1.png" alt="Pestaña 1"><figcaption>Fig. 3. La pestaña 1.</figcaption></figure>
+    <figure><img src="../screenshots/04_ej2_pestana2.png" alt="Pestaña 2"><figcaption>Fig. 4. La pestaña 2.</figcaption></figure>
+    <figure><img src="../screenshots/05_ej2_pestana3.png" alt="Pestaña 3"><figcaption>Fig. 5. La pestaña 3.</figcaption></figure>
+  </div>
+
+  <h3>Ejemplo 3. TabHost en Kotlin</h3>
+  <p>
+    La versión en Kotlin configura un <code class="inline">TabHost</code> con tres pestañas, y el contenido de cada una
+    (un <code class="inline">TextView</code> centrado) está definido en el mismo archivo de diseño.
+  </p>
+  <div class="rejilla">
+    <figure><img src="../screenshots/06_ej3_pestana1.png" alt="Pestaña 1 Kotlin"><figcaption>Fig. 6. La pestaña 1.</figcaption></figure>
+    <figure><img src="../screenshots/07_ej3_pestana2.png" alt="Pestaña 2 Kotlin"><figcaption>Fig. 7. La pestaña 2.</figcaption></figure>
+    <figure><img src="../screenshots/08_ej3_pestana3.png" alt="Pestaña 3 Kotlin"><figcaption>Fig. 8. La pestaña 3.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>[Conclusiones personales del alumno sobre TabHost, TabSpec, TabWidget y los fragmentos.]</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>Pestañas con las Clases TabHost, TabSpec y TabWidget</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>TabHost</em>. <code class="inline">developer.android.com/reference/android/widget/TabHost</code></li>
+    <li>Android Developers. <em>FragmentTabHost</em>. <code class="inline">developer.android.com/reference/androidx/fragment/app/FragmentTabHost</code></li>
+  </ul>
+</section>
+
+</body>
+</html>
