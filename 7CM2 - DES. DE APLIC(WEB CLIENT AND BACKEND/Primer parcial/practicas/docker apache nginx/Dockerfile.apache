@@ -1,0 +1,13 @@
+# Minisitio de nuevo ingreso de ESCOM, servido con Apache (httpd).
+# Sitio 100% estatico: basta el servidor web + los archivos.
+
+FROM httpd:2.4-alpine
+
+# DocumentRoot de la imagen oficial de Apache
+COPY . /usr/local/apache2/htdocs/
+
+# Apache dentro del contenedor escucha en el 80.
+# Build:  docker build -f Dockerfile.apache -t minisitio-apache ./sitio
+# Run:    docker run --name minisitio-apache -dit -p 8080:80 minisitio-apache
+# La pagina queda en  http://localhost:8080
+EXPOSE 80

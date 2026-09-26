@@ -1,0 +1,13 @@
+# Minisitio de nuevo ingreso de ESCOM, servido con Nginx.
+# Sitio 100% estatico: basta el servidor web + los archivos.
+
+FROM nginx:alpine
+
+# Raiz web por defecto de la imagen oficial de Nginx
+COPY . /usr/share/nginx/html/
+
+# Nginx dentro del contenedor escucha en el 80.
+# Build:  docker build -f Dockerfile.nginx -t minisitio-nginx ./sitio
+# Run:    docker run --name minisitio-nginx -dit -p 8081:80 minisitio-nginx
+# La pagina queda en  http://localhost:8081
+EXPOSE 80
