@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tarea 7 - La clase ListView (Planetas)</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola img { width: 46%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .planeta { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .planeta h3 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">La clase ListView: Planetas del sistema solar</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Tarea:</td><td>Tarea: La Clase ListView</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>19 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta tarea trabaja con la clase <code class="inline">ListView</code>, una vista adaptadora que
+    muestra una colección desplazable de elementos sin conocer de antemano su tipo ni su contenido.
+    En su lugar, pide cada vista a un <code class="inline">ListAdapter</code> conforme el usuario se
+    desplaza. El material del profesor presenta un ejemplo con una lista de aves (imagen + nombre +
+    descripción, seleccionable con un <code class="inline">Toast</code>), y el Ejercicio 1 pide
+    replicar exactamente ese mismo patrón para mostrar los planetas del sistema solar, incluyendo al
+    Sol y a la Luna.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Construir un <code class="inline">BaseAdapter</code> propio (<code class="inline">ListaAdapter</code>) que reutilice vistas para mejorar el rendimiento del scroll.</li>
+    <li>Modelar cada elemento de la lista con una clase de datos simple (<code class="inline">ListaEntrada</code>).</li>
+    <li>Reaccionar a la selección de un elemento con <code class="inline">setOnItemClickListener</code> mostrando un <code class="inline">Toast</code>.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>Entorno de trabajo</h3>
+  <p>
+    Proyecto Java con <code class="inline">MainActivity</code> extendiendo
+    <code class="inline">android.app.Activity</code> directamente. La estructura es la misma que el
+    ejemplo de las aves del material del profesor: <code class="inline">ListaEntrada</code> (modelo de
+    datos: imagen, texto superior, texto inferior), <code class="inline">ListaAdapter</code> (adaptador
+    abstracto reutilizable) y <code class="inline">MainActivity</code> (arma la lista de 10 elementos:
+    el Sol, los ocho planetas y la Luna, y conecta el <code class="inline">ListView</code>). El layout
+    <code class="inline">listado.xml</code> contiene únicamente el <code class="inline">ListView</code>,
+    y <code class="inline">activity_main.xml</code> se reutiliza como la plantilla de cada fila (imagen +
+    dos líneas de texto), igual que en el ejemplo original.
+  </p>
+
+  <h3>Vista general de la lista</h3>
+  <div class="figura-sola">
+    <figure>
+      <img src="../screenshots/00_lista_completa.png" alt="Lista de planetas">
+      <figcaption>Fig. 0. La lista completa con las 10 entradas (Sol, planetas y Luna).</figcaption>
+    </figure>
+  </div>
+
+  <h3>Selección de cada elemento (Toast)</h3>
+  <p>Al tocar cada fila se dispara un <code class="inline">Toast</code> con el texto "Seleccionado: " seguido de la descripción del cuerpo celeste.</p>
+
+  <div class="planeta">
+    <h4>Sol</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/01_sol.png" alt="Sol"><figcaption>Fig. 1. Toast al seleccionar el Sol.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Mercurio</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/02_mercurio.png" alt="Mercurio"><figcaption>Fig. 2. Toast al seleccionar Mercurio.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Venus</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/03_venus.png" alt="Venus"><figcaption>Fig. 3. Toast al seleccionar Venus.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Tierra</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/04_tierra.png" alt="Tierra"><figcaption>Fig. 4. Toast al seleccionar la Tierra.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Luna</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/05_luna.png" alt="Luna"><figcaption>Fig. 5. Toast al seleccionar la Luna.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Marte</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/06_marte.png" alt="Marte"><figcaption>Fig. 6. Toast al seleccionar Marte.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Júpiter</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/07_jupiter.png" alt="Júpiter"><figcaption>Fig. 7. Toast al seleccionar Júpiter.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Saturno</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/08_saturno.png" alt="Saturno"><figcaption>Fig. 8. Toast al seleccionar Saturno.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Urano</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/09_urano.png" alt="Urano"><figcaption>Fig. 9. Toast al seleccionar Urano.</figcaption></figure></div>
+  </div>
+
+  <div class="planeta">
+    <h4>Neptuno</h4>
+    <div class="figura-sola"><figure><img src="../screenshots/10_neptuno.png" alt="Neptuno"><figcaption>Fig. 10. Toast al seleccionar Neptuno.</figcaption></figure></div>
+  </div>
+
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>[Conclusiones personales del alumno sobre el uso de ListView, BaseAdapter y la reutilización de vistas.]</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>Tarea: La Clase ListView</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>ListView</em>. <code class="inline">developer.android.com/reference/android/widget/ListView</code></li>
+  </ul>
+</section>
+
+</body>
+</html>
