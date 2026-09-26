@@ -155,6 +155,8 @@ misma filosofía salvo que el usuario pida otra cosa.
 | Asignación 1 — Infografía: concepto de liderazgo (U I) | [`asignaciones/Asignacion 1/`](asignaciones/Asignacion%201/) | Entregada |
 | Asignación 2 — Organizador gráfico: liderazgo personal (U II) | [`asignaciones/Asignacion 2/`](asignaciones/Asignacion%202/) | Entregada |
 | Asignación 3 — Diez talentos personales (U II, autoconocimiento) | [`asignaciones/Asignacion 3/`](asignaciones/Asignacion%203/) | Entregada |
+| Línea del tiempo: seis estilos de liderazgo (Goleman) con seis líderes históricos | [`asignaciones/Linea del tiempo/`](asignaciones/Linea%20del%20tiempo/) | Lista, sin créditos al pie por decisión del usuario (trabajo escolar). La foto de Mandela es de 1994 |
+| Proyecto de equipo (aparte del portafolio): programa de radio, 9.85 FM | [`proyecto-radio/`](proyecto-radio/) | Dos propuestas de guion listas ("Código 500" con Batalla de Aura, "Modo incógnito" sin ella); falta que el equipo elija una y grabar |
 | Guía de estudio U I — Fundamentos teóricos | — | Pendiente |
 | Guía de estudio U II — Gestión del liderazgo y desarrollo humano | — | Pendiente |
 | Guía de estudio U III — Liderazgo social | — | Pendiente |
