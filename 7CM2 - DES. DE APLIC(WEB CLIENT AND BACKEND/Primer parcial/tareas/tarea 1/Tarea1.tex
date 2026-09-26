@@ -257,6 +257,18 @@ El resultado admite comprobación objetiva. El núcleo compila sin infraestructu
 
 Las formulaciones hexagonal, de cebolla y limpia difieren en nomenclatura y en el grado de detalle con que prescriben los anillos interiores, pero coinciden en la regla y en la estructura resultante. Elegir entre ellas importa menos que sostener la dirección de las dependencias de forma consistente durante todo el proyecto.
 
+La implementación práctica tiene además errores característicos, distintos de los costos estructurales que ya señaló el análisis comparativo. Los más frecuentes son estos:
+
+\begin{itemize}
+	\item \textbf{Filtrar anotaciones de framework al núcleo.} Declarar \texttt{@Entity} o \texttt{@Component} en una clase del dominio rompe el aislamiento descrito en la sección Modelo del dominio. Se corrige quitando la anotación y moviendo la configuración de persistencia a una clase de mapeo dentro del módulo de infraestructura.
+	\item \textbf{Declarar interfaces sin una segunda implementación prevista.} Abstraer un repositorio que nunca va a tener más de un adaptador agrega indirección sin ningún beneficio de sustitución. Conviene reservar la interfaz para los puertos que sí cambian de tecnología o que se necesitan para pruebas con dobles.
+	\item \textbf{Sustituir entidades del dominio por mocks en vez de sustituir los puertos externos.} Bogdanović ya documentó este error en la sección Pruebas \cite{optivem2023}: si el doble reemplaza a una entidad, la prueba pasa a verificar llamadas en lugar de comportamiento. Se corrige aplicando los dobles solo sobre las interfaces que cruzan hacia infraestructura.
+	\item \textbf{Ensamblar las dependencias en varios puntos dispersos del código.} Sin una raíz de composición única, ningún lugar del sistema deja claro qué implementación satisface a cada interfaz. Conviene concentrar ese ensamblado en una sola clase de configuración, como se describió en la sección Infraestructura.
+	\item \textbf{Aplicar los cuatro anillos a un sistema sin reglas de negocio propias.} Un CRUD que solo traslada formularios a tablas paga el costo del mapeo entre fronteras sin necesitarlo. La arquitectura completa amortiza su costo en sistemas cuyas reglas cambian con el tiempo, no en aplicaciones triviales.
+\end{itemize}
+
+Estos cinco errores comparten una misma causa: alguna pieza del sistema dejó de respetar la dirección de la dependencia que exige el anillo al que pertenece. Revisar esa dirección en cada frontera, antes de dar por cerrada una implementación, es la forma más directa de evitarlos.
+
 Para el proyecto del curso la traducción es directa. Las reglas de negocio se escriben en Java sin anotaciones, Spring y JPA quedan confinados al anillo exterior, Angular es un mecanismo de entrega más, y una raíz de composición se encarga de unir las piezas.
 
 
