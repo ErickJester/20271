@@ -1,0 +1,16 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.EditText" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.EditText" parent="Base.Theme.EditText" />
+
+    <!-- Ejercicio 24: cambio de color del borde del EditText -->
+    <style name="miEstilo" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">#CD82C7</item>
+        <item name="colorControlActivated">#123ABC</item>
+        <item name="android:textColorHighlight">#D0ADD6</item>
+    </style>
+</resources>

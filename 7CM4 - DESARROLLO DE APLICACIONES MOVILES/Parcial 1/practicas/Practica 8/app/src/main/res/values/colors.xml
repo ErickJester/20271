@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!-- Usado en el ejercicio 21 (cambio de color de hint) -->
+    <color name="colorHint">#FF8A00</color>
+    <!-- Usado en el ejercicio 20 (tinte del ícono al recibir foco) -->
+    <color name="micolor">#1565C0</color>
+</resources>

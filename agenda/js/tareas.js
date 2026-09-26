@@ -324,17 +324,17 @@ const TAREAS = [
   {
     id: "wad-docker-apache-nginx",
     curso: "7CM2",
-    titulo: "Descarga, creación y ejecución de imagen Docker del minisitio de nuevo ingreso de ESCOM",
+    titulo: "Práctica — Descarga, creación y ejecución de imagen Docker del minisitio de nuevo ingreso de ESCOM",
     tipo: "practica",
     entrega: null,
-    fechaPorConfirmar: false,
+    fechaPorConfirmar: true,
     parcial: 1,
-    estado: "en-curso",
-    descripcion: "CONFIRMADO: es entrega formal con rúbrica oficial de 100 puntos (portada 5, introducción 10, conceptos teóricos 10, evidencia de descarga 10, Dockerfile 15, docker build 10, docker run 10, sitio en navegador 15, conclusiones 10, referencias 5) y reporte en LaTeX con la plantilla del aula virtual — deja de ser solo el ejercicio informal de la clase 6. Reusa el minisitio ya descargado en tarea 2. Carpeta ya armada: sitio/ (contenido), Dockerfile.apache (httpd, :8080), Dockerfile.nginx (nginx, :8081), README.md con los comandos exactos, y reporte/Practica-Docker-Apache-Nginx.tex ya redactado siguiendo la rúbrica punto por punto, con imágenes placeholder en reporte/imagenes/ listas para sustituir por capturas reales. Docker no está instalado en la máquina de trabajo (verificado: ni en PATH, ni Docker Desktop, ni en WSL Ubuntu) — falta que el alumno instale Docker, corra los build/run de README.md, tome las 6 capturas reales (mismo nombre de archivo que las placeholder) y compile el .tex. Sin fecha de entrega confirmada por el profesor todavía.",
-    entregable: "Dos Dockerfiles + dos contenedores corriendo (Apache :8080, Nginx :8081) + reporte en LaTeX con capturas reales",
-    pasos: ["Instalar Docker Desktop (pendiente en esta máquina)", "docker build -f Dockerfile.apache (ya escrito)", "docker build -f Dockerfile.nginx (ya escrito)", "docker run de ambos con -p 8080:80 y -p 8081:80", "Tomar las 6 capturas que pide README.md y reemplazar los placeholder en reporte/imagenes/", "Compilar Practica-Docker-Apache-Nginx.tex a PDF"],
+    estado: "hecha",
+    descripcion: "Entrega formal con rúbrica oficial de 100 puntos (portada 5, introducción 10, conceptos teóricos 10, evidencia de descarga 10, Dockerfile 15, docker build 10, docker run 10, sitio en navegador 15, conclusiones 10, referencias 5) y reporte en LaTeX con la plantilla del aula virtual. Resuelta por completo en practicas/docker apache nginx/: los dos Dockerfile (apache y nginx) sobre un único contexto compartido sitio/ (para no duplicar los ~14 MB del sitio), ambas imágenes construidas y corriendo en paralelo (:8080 y :8081, verificadas con HTTP 200), y PracticaDockerApacheNginx.pdf con los 7 apartados de la rúbrica y 5 capturas reales (contenido descargado, ambos Dockerfile explicados, docker build, docker run con docker ps, sitio en el navegador con la URL visible en ambos puertos). NOTA: existe una segunda carpeta, practicas/SegundaOpcion/, generada en otra máquina sin Docker instalado, con imágenes placeholder (reporte/_gen_placeholders.py) en vez de capturas reales — no usar esa versión para entregar, solo sirve como borrador de la redacción. Sin fecha de entrega confirmada por el profesor todavía.",
+    entregable: "PracticaDockerApacheNginx.pdf + Dockerfile.apache + Dockerfile.nginx + imagenes/ (5 capturas), en practicas/docker apache nginx/",
+    pasos: ["Dockerfile de Apache (ya existe, tarea 2)", "Dockerfile de Nginx (FROM nginx, COPY a /usr/share/nginx/html/)", "docker build de ambas imágenes (captura)", "docker run -p 8080:80 (Apache) y -p 8081:80 (Nginx) (captura, explicar mapeo de puertos)", "Verificar ambos sitios en el navegador con la URL visible (captura)", "Redactar reporte en LaTeX con la plantilla del aula virtual", "Compilar PDF", "Subir", "Decidir si se borra practicas/SegundaOpcion/ (duplicado con placeholders)"],
     origen: "Clase 6 · confirmado con rúbrica oficial el 18 sept",
-    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/SegundaOpcion"
+    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/docker apache nginx"
   },
   {
     id: "wad-api-temperaturas",
@@ -459,8 +459,25 @@ const TAREAS = [
     pasos: ["Crear proyecto Android standalone en Java (constante de Kaprekar)", "Probar la app", "Redactar reporte (carátula, introducción, desarrollo, conclusiones, bibliografía)", "Comprimir con la nomenclatura NombreAlumno_TipoDeTrabajo_Grupo.zip", "Enviar al correo indicado"],
     origen: "Plataforma del curso — entrega semanal de los viernes",
     ruta: "7CM4 - DESARROLLO DE APLICACIONES MOVILES/Parcial 1/tareas/Tarea 6"
+  },
+
+  /* ---------- 7CM3 · Administración de servicios en red ---------- */
+  {
+    id: "red-practica-1-gns3",
+    curso: "7CM3",
+    titulo: "Práctica 1 — Instalación y configuración de GNS3",
+    tipo: "practica",
+    entrega: "2026-09-20T23:00",
+    fechaPorConfirmar: false,
+    parcial: 1,
+    estado: "en-curso",
+    descripcion: "Es la Práctica 1 del programa oficial (13 prácticas listadas, unidades I/II). La parte técnica ya está hecha y verificada esta semana: GNS3 2.2.61 instalado, y la GNS3 VM importada y corriendo dentro de VirtualBox (se probó que enciende, saca IP por DHCP y el servidor de adentro contesta). Falta confirmar con el profesor el formato de entrega — no hay transcripción de clase ni rúbrica que diga si es reporte con capturas, zip, o solo tenerlo funcionando para el laboratorio.",
+    entregable: "Por confirmar con el profesor",
+    pasos: ["Instalar GNS3 (hecho)", "Configurar la GNS3 VM en VirtualBox (hecho, verificado que enciende y responde)", "Confirmar con el profesor el formato exacto de entrega", "Preparar el entregable", "Entregar antes del 20"],
+    origen: "Usuario, 14 sept — sin transcripción de clase que lo confirme; el programa oficial la lista como Práctica 1",
+    ruta: "7CM3 - ADMINISTRACIÓN DE SERVICIOS EN RED"
   }
 
-  /* 7CM3 y 8CM1 todavía no tienen entregas registradas.
+  /* 8CM1 todavía no tiene entregas registradas.
      En cuanto salga la primera, se agrega aquí. */
 ];

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Practica 8 - El campo de texto EditText</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { page-break-inside: avoid; margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 12.5px; margin: 14px 0 6px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  pre {
+    background: #f4f4f4; border: 1px solid #ddd; border-radius: 5px;
+    padding: 10px 12px; font-size: 10.5px; line-height: 1.4;
+    white-space: pre-wrap; word-break: break-word; margin: 6px 0 12px;
+    page-break-inside: avoid;
+  }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .ejercicio { page-break-inside: avoid; margin-bottom: 18px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .ejercicio h3 { margin-top: 0; }
+  .ejercicio .num { display: inline-block; background: #333; color: #fff; border-radius: 50%; width: 20px; height: 20px; text-align: center; line-height: 20px; font-size: 11px; margin-right: 6px; }
+
+  .figura-sola { text-align: center; margin: 8px 0; }
+  .figura-sola img { width: 42%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">El campo de texto EditText</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 8: El campo de texto EditText</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>18 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta práctica recorre a fondo el componente <code class="inline">EditText</code>, la clase de
+    Android encargada de capturar y editar texto del usuario (hereda de <code class="inline">TextView</code>,
+    que a su vez es una <code class="inline">View</code>). El material del profesor propone 26
+    ejercicios cortos: en cada uno se modifica únicamente la etiqueta <code class="inline">&lt;EditText&gt;</code>
+    del layout (y en algunos casos el código de <code class="inline">MainActivity.java</code>) para
+    mostrar un comportamiento distinto: tipos de teclado, límites de caracteres, manejo del foco,
+    del cursor, de eventos del teclado virtual y de apariencia.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Identificar los atributos XML más comunes de <code class="inline">EditText</code>
+      (<code class="inline">inputType</code>, <code class="inline">hint</code>,
+      <code class="inline">maxLength</code>, <code class="inline">singleLine</code>,
+      <code class="inline">ems</code>, <code class="inline">digits</code>, entre otros).</li>
+    <li>Manejar el foco, el cursor y la selección de texto desde Java.</li>
+    <li>Reaccionar a eventos del teclado virtual (<code class="inline">TextWatcher</code>,
+      <code class="inline">OnEditorActionListener</code>, <code class="inline">OnFocusChangeListener</code>).</li>
+    <li>Personalizar la apariencia del campo (colores, tamaño de fuente, borde, autocompletado).</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>Entorno de trabajo</h3>
+  <p>
+    Proyecto <code class="inline">Empty Views Activity</code> en Java. <code class="inline">MainActivity</code>
+    extiende <code class="inline">android.app.Activity</code> directamente (no
+    <code class="inline">AppCompatActivity</code>), salvo en los ejercicios 20 y 26, donde el propio
+    material del profesor requiere clases de AndroidX (<code class="inline">ContextCompat</code>,
+    <code class="inline">DrawableCompat</code> y <code class="inline">AppCompatActivity</code>). Cada
+    ejercicio parte del mismo proyecto: solo cambia <code class="inline">activity_main.xml</code> y, en
+    algunos casos, <code class="inline">MainActivity.java</code>. El código exacto de cada variante
+    está en la carpeta <code class="inline">variantes/</code> del repositorio.
+  </p>
+
+  <div class="ejercicio">
+    <h3><span class="num">1</span>Un componente EditText</h3>
+    <p>Un <code class="inline">EditText</code> centrado dentro de un <code class="inline">RelativeLayout</code>, con un <code class="inline">hint</code> como único atributo visible.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/01_atributos_basicos.png" alt="Ejercicio 1"><figcaption>Fig. 1. EditText básico.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">2</span>Obtener el texto del EditText</h3>
+    <p>Un botón "Guardar" invoca <code class="inline">getText().toString()</code> sobre el campo y muestra el valor capturado en un <code class="inline">Toast</code>.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/02_obtener_texto.png" alt="Ejercicio 2"><figcaption>Fig. 2. Toast con el texto capturado.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">3</span>Tipos de entrada en EditText</h3>
+    <p><code class="inline">android:inputType="phone"</code> cambia el teclado virtual a uno numérico orientado a teléfonos.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/03_tipos_de_entrada.png" alt="Ejercicio 3"><figcaption>Fig. 3. Teclado de teléfono.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">4</span>Límite de la cantidad máxima de caracteres</h3>
+    <p><code class="inline">android:maxLength="9"</code> impide escribir más de 9 caracteres en el campo "Apodo".</p>
+    <div class="figura-sola"><figure><img src="../screenshots/04_maxlength.png" alt="Ejercicio 4"><figcaption>Fig. 4. Texto truncado a 9 caracteres.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">5</span>Un EditText de una sola línea</h3>
+    <p><code class="inline">android:singleLine="true"</code> hace que la tecla Intro del teclado cierre la edición en vez de saltar de línea.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/05_una_sola_linea.png" alt="Ejercicio 5"><figcaption>Fig. 5. Campo de una sola línea.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">6</span>La propiedad ems</h3>
+    <p><code class="inline">android:ems="6"</code> fija el ancho del campo a 6 veces el tamaño de un carácter, en vez de <code class="inline">match_parent</code>.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/06_propiedad_ems.png" alt="Ejercicio 6"><figcaption>Fig. 6. Ancho fijado con ems.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">7</span>Ingreso de dígitos del 0 al 9</h3>
+    <p><code class="inline">android:digits="1234567890 "</code> filtra qué caracteres puede aceptar el campo, combinado con <code class="inline">maxLength="15"</code> y <code class="inline">ems="9"</code>.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/07_digitos_0_9.png" alt="Ejercicio 7"><figcaption>Fig. 7. Solo dígitos permitidos.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">8</span>Teclado virtual oculto desde Java</h3>
+    <p>Un botón usa <code class="inline">InputMethodManager.hideSoftInputFromWindow()</code> para cerrar el teclado virtual manualmente.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/08_teclado_oculto.png" alt="Ejercicio 8"><figcaption>Fig. 8. Teclado oculto tras el clic.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">9</span>Un EditText no editable</h3>
+    <p><code class="inline">android:enabled="false"</code> deshabilita por completo la edición del campo.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/09_no_editable.png" alt="Ejercicio 9"><figcaption>Fig. 9. Campo deshabilitado.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">10</span>Manejo del foco en EditText</h3>
+    <p><code class="inline">setFocusable(false)</code> (desde Java o el atributo <code class="inline">android:focusable</code>) impide que el campo reciba el foco y el cursor.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/10_manejo_del_foco.png" alt="Ejercicio 10"><figcaption>Fig. 10. Campo sin foco.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">11</span>Asignación del foco a un EditText</h3>
+    <p>Con dos campos en pantalla, <code class="inline">requestFocus()</code> mueve el foco al segundo campo apenas arranca la actividad.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/11_asignacion_del_foco.png" alt="Ejercicio 11"><figcaption>Fig. 11. Foco en el segundo campo.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">12</span>Asignación del foco hacia otros componentes</h3>
+    <p><code class="inline">android:nextFocusRight</code>/<code class="inline">nextFocusLeft</code> permiten navegar entre dos campos con las flechas del teclado.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/12_foco_otros_componentes.png" alt="Ejercicio 12"><figcaption>Fig. 12. Navegación entre campos.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">13</span>Cambio de la posición del cursor</h3>
+    <p><code class="inline">setSelection(3)</code> coloca el cursor en el índice 3 del texto al arrancar la actividad.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/13_posicion_del_cursor.png" alt="Ejercicio 13"><figcaption>Fig. 13. Cursor en la posición 3.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">14</span>Obtención de la posición del cursor</h3>
+    <p><code class="inline">getSelectionEnd()</code> obtiene la posición actual del cursor y la registra con <code class="inline">Log.d()</code> (visible en Logcat). Como este ejercicio no cambia nada visible en pantalla, la evidencia real es la línea de Logcat capturada junto con la pantalla.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/14_posicion_del_cursor_obtencion.png" alt="Ejercicio 14"><figcaption>Fig. 14. Pantalla del ejercicio 14.</figcaption></figure></div>
+    <pre>09-18 23:30:04.949  7491  7491 D Obteniendo cursor...: 0</pre>
+    <p>El campo no tiene foco al arrancar la actividad (no se llamó <code class="inline">requestFocus()</code> ni <code class="inline">setSelection()</code>), así que <code class="inline">getSelectionEnd()</code> reporta la posición 0 por defecto.</p>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">15</span>Seleccionando dinámicamente el texto</h3>
+    <p>Un bucle recorre el texto buscando el primer espacio y usa <code class="inline">setSelection(ini, fin)</code> para seleccionar solo la primera palabra.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/15_seleccion_dinamica.png" alt="Ejercicio 15"><figcaption>Fig. 15. Primera palabra seleccionada.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">16</span>Selección completa del texto</h3>
+    <p><code class="inline">selectAll()</code> selecciona todo el contenido del campo de una sola vez.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/16_seleccion_completa.png" alt="Ejercicio 16"><figcaption>Fig. 16. Todo el texto seleccionado.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">17</span>Editor del método de entrada (imeOptions)</h3>
+    <p><code class="inline">android:imeOptions="actionSend"</code> cambia el botón Intro del teclado por un ícono de enviar, con la etiqueta "Enviar" (<code class="inline">imeActionLabel</code>).</p>
+    <div class="figura-sola"><figure><img src="../screenshots/17_ime_options.png" alt="Ejercicio 17"><figcaption>Fig. 17. Botón de acción "Enviar".</figcaption></figure></div>
+    <div class="figura-sola"><figure><img src="../screenshots/17_ime_options_horizontal.png" alt="Ejercicio 17 en horizontal"><figcaption>Fig. 17b. Misma pantalla al rotar el emulador a horizontal.</figcaption></figure></div>
+    <p>Al rotar el dispositivo a horizontal, el campo ocupa todo el ancho disponible, baja de altura, y el teclado virtual se cierra. Esto pasa porque, al cambiar de orientación, Android destruye y vuelve a crear la actividad (no se declaró <code class="inline">android:configChanges</code> para conservar el estado de la vista), así que el <code class="inline">EditText</code> pierde el foco y el teclado permanece oculto hasta que el usuario vuelve a tocar el campo.</p>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">18</span>Manejo de los eventos (TextWatcher)</h3>
+    <p><code class="inline">addTextChangedListener()</code> con <code class="inline">afterTextChanged()</code> cuenta los caracteres del campo en tiempo real y los muestra en un <code class="inline">TextView</code>.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/18_manejo_de_eventos.png" alt="Ejercicio 18"><figcaption>Fig. 18. Contador de caracteres en vivo.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">19</span>Control de los eventos de los botones</h3>
+    <p><code class="inline">OnEditorActionListener</code> detecta <code class="inline">IME_ACTION_SEARCH</code> y muestra un <code class="inline">Toast</code> con el texto buscado, ocultando el teclado después.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/19_control_eventos_botones.png" alt="Ejercicio 19"><figcaption>Fig. 19. Búsqueda confirmada con Toast.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">20</span>Uso de OnFocusChangeListener para cambiar el foco</h3>
+    <p><code class="inline">setOnFocusChangeListener()</code> cambia el tinte de un ícono (<code class="inline">DrawableCompat.setTint</code>) cuando el campo numérico recibe el foco.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/20_onfocuschangelistener.png" alt="Ejercicio 20"><figcaption>Fig. 20. Ícono con tinte al enfocar.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">21</span>Cambio de color de hint</h3>
+    <p><code class="inline">android:textColorHint</code> cambia el color del texto auxiliar (hint), referenciando un color definido en <code class="inline">colors.xml</code>.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/21_color_de_hint.png" alt="Ejercicio 21"><figcaption>Fig. 21. Hint en color naranja.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">22</span>Cambio del color del texto seleccionado</h3>
+    <p><code class="inline">android:textColorHighlight</code> cambia el color de fondo de la selección de texto.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/22_color_texto_seleccionado.png" alt="Ejercicio 22"><figcaption>Fig. 22. Selección con color personalizado.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">23</span>Centrado del texto</h3>
+    <p><code class="inline">android:gravity="center"</code> centra el texto horizontal y verticalmente dentro del campo.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/23_centrado_del_texto.png" alt="Ejercicio 23"><figcaption>Fig. 23. Texto centrado.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">24</span>Cambio de color del borde</h3>
+    <p>Un estilo <code class="inline">miEstilo</code> que hereda de <code class="inline">Theme.AppCompat.Light</code> y redefine <code class="inline">colorControlNormal</code>/<code class="inline">colorControlActivated</code> cambia el color del borde inferior del campo.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/24_color_del_borde.png" alt="Ejercicio 24"><figcaption>Fig. 24. Borde con color personalizado.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">25</span>Cambio del tamaño de la fuente</h3>
+    <p><code class="inline">android:textSize="34sp"</code> agranda el texto del campo usando pixeles escalables (sp).</p>
+    <div class="figura-sola"><figure><img src="../screenshots/25_tamano_de_fuente.png" alt="Ejercicio 25"><figcaption>Fig. 25. Fuente más grande.</figcaption></figure></div>
+  </div>
+
+  <div class="ejercicio">
+    <h3><span class="num">26</span>Uso de AutoCompleteTextView</h3>
+    <p>Un <code class="inline">AutoCompleteTextView</code> con un <code class="inline">ArrayAdapter</code> sugiere palabras de una lista fija conforme el usuario escribe.</p>
+    <div class="figura-sola"><figure><img src="../screenshots/26_autocompletetextview.png" alt="Ejercicio 26"><figcaption>Fig. 26. Sugerencias de autocompletado.</figcaption></figure></div>
+  </div>
+
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>[Conclusiones personales del alumno sobre lo aprendido con EditText, el manejo del foco/cursor y los eventos del teclado virtual.]</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>El campo de texto EditText</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>EditText</em>. <code class="inline">developer.android.com/reference/android/widget/EditText</code></li>
+    <li>Android Developers. <em>Text fields</em>. <code class="inline">developer.android.com/develop/ui/views/touch-and-input/keyboard-input</code></li>
+  </ul>
+</section>
+
+</body>
+</html>
