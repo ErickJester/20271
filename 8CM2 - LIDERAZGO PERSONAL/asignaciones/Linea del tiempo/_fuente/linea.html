@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Línea del tiempo</title>
+<style>
+/*FONTS*/
+
+:root{
+  --paper:#F3F0E9;
+  --paper2:#E7E2D6;
+  --ink:#1E1C19;
+  --ink70:#54504A;
+  --ink45:#8B857B;
+  --ink20:#C9C3B6;
+  --guinda:#6E1F3E;
+  --hair:0.22mm;
+}
+@page{ size:420mm 297mm; margin:0; }
+*{ box-sizing:border-box; margin:0; padding:0; }
+html,body{ background:var(--paper); -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{ font-family:'CrimsonPro',Georgia,serif; color:var(--ink);
+  -webkit-font-smoothing:antialiased; text-rendering:geometricPrecision; }
+.page{ width:420mm; height:297mm; background:var(--paper); padding:12mm 18mm 11mm;
+  display:flex; flex-direction:column; position:relative; overflow:hidden; }
+.page > *{ flex:none; }
+
+.mono{ font-family:'DMMono',monospace; text-transform:uppercase; letter-spacing:.14em;
+  font-size:7.4pt; color:var(--ink45); }
+
+h1{ font-family:'Italiana',serif; font-weight:400; font-size:96pt; line-height:1;
+  letter-spacing:.012em; white-space:nowrap; padding-top:3mm; }
+.rule{ height:var(--hair); background:var(--ink); opacity:.5; margin-top:3mm; }
+
+/* fechas */
+.dates{ display:grid; grid-template-columns:repeat(6,1fr); margin-top:4mm; }
+.dates div{ text-align:center; font-family:'Italiana',serif; font-size:19pt; letter-spacing:.01em; }
+.dates div small{ font-family:'DMMono',monospace; font-size:7.4pt; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink45); display:block; margin-top:.5mm; }
+
+.axis{ display:block; width:384mm; height:14mm; margin-top:1mm; }
+
+/* tarjetas */
+.cards{ display:grid; grid-template-columns:repeat(6,1fr); }
+.card{ padding:0 4mm; border-left:var(--hair) solid var(--ink20); }
+.card:first-child{ border-left:none; }
+.photo{ width:56mm; height:70mm; position:relative; overflow:hidden;
+  border:var(--hair) solid var(--ink); background:var(--paper2); margin:0 auto; }
+.photo img{ display:block; width:100%; height:100%; object-fit:cover; object-position:50% 12%;
+  filter:grayscale(1) contrast(1.05); }
+.photo.crop img{ position:absolute; height:auto; object-fit:initial;
+  width:calc(100% / var(--cw));
+  left:calc(-100% * var(--cx) / var(--cw));
+  top:calc(-100% * var(--cy) / var(--ch)); }
+
+.name{ font-family:'Italiana',serif; font-size:23pt; line-height:1.02; margin-top:3.6mm;
+  min-height:2.05em; letter-spacing:.008em; }
+.tag{ font-family:'DMMono',monospace; font-size:8.4pt; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--guinda); margin-top:1.6mm; }
+.phrase{ font-size:15pt; font-style:italic; line-height:1.15; margin-top:1.4mm; min-height:2.3em; }
+.lbl{ font-family:'DMMono',monospace; font-size:7.4pt; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink45); margin-bottom:1mm; }
+.data{ font-size:11.6pt; line-height:1.3; margin-top:2mm; padding-top:2.6mm;
+  border-top:var(--hair) solid var(--ink20); }
+.why{ font-size:11.6pt; line-height:1.3; color:var(--ink70); margin-top:3mm; }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>LÍNEA DEL TIEMPO</h1>
+  <div class="rule"></div>
+
+  <div class="dates">
+    <div>551&thinsp;-&thinsp;479<small>a. C.</small></div>
+    <div>356&thinsp;-&thinsp;323<small>a. C.</small></div>
+    <div>1809&thinsp;-&thinsp;1865<small>d. C.</small></div>
+    <div>1878&thinsp;-&thinsp;1953<small>d. C.</small></div>
+    <div>1918&thinsp;-&thinsp;2013<small>d. C.</small></div>
+    <div>1929&thinsp;-&thinsp;1968<small>d. C.</small></div>
+  </div>
+
+  <svg class="axis" viewBox="0 0 384 14" aria-hidden="true">
+    <line x1="0" y1="4" x2="123" y2="4" stroke="#1E1C19" stroke-width=".3"/>
+    <line x1="133" y1="4" x2="379" y2="4" stroke="#1E1C19" stroke-width=".3"/>
+    <path d="M125.6,7 L127.4,1 M128.6,7 L130.4,1" stroke="#1E1C19" stroke-width=".3" fill="none"/>
+    <path d="M379,2.2 L383.4,4 L379,5.8 Z" fill="#6E1F3E"/>
+    <g id="nodes"></g>
+  </svg>
+
+  <div class="cards">
+
+    <div class="card">
+      <div class="photo"><img src="imagenes/confucio.jpg" alt="Retrato de Confucio" style="object-position:50% 4%"></div>
+      <p class="name">Confucio</p>
+      <p class="tag">Formativo</p>
+      <p class="phrase">“Intenta esto”</p>
+      <div class="data"><p class="lbl">Quién fue</p>Maestro y filósofo chino nacido en Qufu. Enseñaba sin distinguir la clase social de sus alumnos, y sus ideas se recogieron después en los Analectas.</div>
+      <div class="why"><p class="lbl">Por qué encaja</p>Su método era formar personas a largo plazo, para que desarrollaran virtud y criterio al servir en el gobierno. Es el estilo que desarrolla a las personas para el futuro.</div>
+    </div>
+
+    <div class="card">
+      <div class="photo"><img src="imagenes/alejandro.jpg" alt="Alejandro Magno en el mosaico de Pompeya" style="object-position:50% 6%"></div>
+      <p class="name">Alejandro Magno</p>
+      <p class="tag">Ejemplar</p>
+      <p class="phrase">“Haz como yo, ahora”</p>
+      <div class="data"><p class="lbl">Quién fue</p>Rey de Macedonia a los 20 años, tras el asesinato de su padre Filipo II. En pocos años derrotó al Imperio persa y llegó hasta el noroeste de la India. Murió a los 32 en Babilonia.</div>
+      <div class="why"><p class="lbl">Por qué encaja</p>Peleaba al frente de su caballería, en las mismas batallas que exigía a sus tropas. Fijaba un estándar altísimo con su propio ejemplo, como el estilo que fija altos estándares para el desempeño.</div>
+    </div>
+
+    <div class="card">
+      <div class="photo crop" style="--cx:.2996;--cw:.4085;--cy:.24;--ch:.375"><img src="imagenes/lincoln.jpg" alt="Retrato de perfil de Abraham Lincoln, 1863" style="filter:grayscale(1) contrast(1.35) brightness(.9)"></div>
+      <p class="name">Abraham Lincoln</p>
+      <p class="tag">Democrático</p>
+      <p class="phrase">“¿Qué piensas tú?”</p>
+      <div class="data"><p class="lbl">Quién fue</p>16.º presidente de Estados Unidos (1861-1865). Condujo al país durante la Guerra de Secesión y firmó la Proclamación de Emancipación en 1863.</div>
+      <div class="why"><p class="lbl">Por qué encaja</p>Incluyó en su gabinete a antiguos rivales políticos y pedía opiniones distintas antes de decidir. Buscaba consenso con la participación de otros, lo propio del estilo democrático.</div>
+    </div>
+
+    <div class="card">
+      <div class="photo crop" style="--cx:.645;--cw:.28;--cy:.2726;--ch:.4336"><img src="imagenes/stalin.jpg" alt="Iósif Stalin en la Conferencia de Yalta, 1945"></div>
+      <p class="name">Iósif Stalin</p>
+      <p class="tag">Coercitivo</p>
+      <p class="phrase">“Haz lo que te digo”</p>
+      <div class="data"><p class="lbl">Quién fue</p>Concentró el poder en la Unión Soviética desde los años veinte y la dirigió hasta su muerte en 1953. Impuso planes quinquenales de industrialización desde 1928 y la Gran Purga de 1936 a 1938.</div>
+      <div class="why"><p class="lbl">Por qué encaja</p>Exigía obediencia inmediata y castigaba la desobediencia con miedo y represión. Es el estilo que exige cumplimiento inmediato, con el impacto negativo que trae al clima.</div>
+    </div>
+
+    <div class="card">
+      <div class="photo"><img src="imagenes/mandela.jpg" alt="Retrato de Nelson Mandela, 1994" style="object-position:50% 6%"></div>
+      <p class="name">Nelson Mandela</p>
+      <p class="tag">Afiliativo</p>
+      <p class="phrase">“Las personas son lo primero”</p>
+      <div class="data"><p class="lbl">Quién fue</p>Pasó 27 años preso por luchar contra el apartheid. Fue presidente de Sudáfrica de 1994 a 1999, el primero elegido con el voto de todas las razas.</div>
+      <div class="why"><p class="lbl">Por qué encaja</p>Al salir buscó unir a un país dividido en lugar de cobrar venganza. Puso primero las relaciones y la reconciliación, como el estilo que crea armonía y construye lazos emocionales.</div>
+    </div>
+
+    <div class="card">
+      <div class="photo"><img src="imagenes/mlk.jpg" alt="Retrato de Martin Luther King Jr." style="object-position:50% 10%"></div>
+      <p class="name">Martin Luther King Jr.</p>
+      <p class="tag">Orientativo</p>
+      <p class="phrase">“Ven conmigo”</p>
+      <div class="data"><p class="lbl">Quién fue</p>Pastor y líder del movimiento por los derechos civiles. Pronunció “Tengo un sueño” en Washington en 1963 y recibió el Nobel de la Paz en 1964.</div>
+      <div class="why"><p class="lbl">Por qué encaja</p>Dio a cientos de miles de personas una visión clara, la igualdad, y las movilizó hacia ella con marchas pacíficas. Es el estilo que moviliza a las personas hacia una visión.</div>
+    </div>
+
+  </div>
+
+
+</div>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  function el(n,a){ var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); return e; }
+
+  var nodes=document.getElementById('nodes');
+  for(var i=0;i<6;i++){
+    var cx=32+64*i;
+    nodes.appendChild(el('line',{x1:cx,y1:4,x2:cx,y2:14,stroke:'#1E1C19','stroke-width':.3}));
+    nodes.appendChild(el('circle',{cx:cx,cy:4,r:1.7,fill:'#6E1F3E'}));
+  }
+
+})();
+</script>
+</body>
+</html>
