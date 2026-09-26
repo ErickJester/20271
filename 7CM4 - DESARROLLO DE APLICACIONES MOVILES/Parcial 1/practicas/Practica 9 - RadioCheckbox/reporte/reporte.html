@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 9 - Selecciones con RadioButton/RadioGroup y CheckBox</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Selecciones con RadioButton/RadioGroup y CheckBox</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 9</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>25 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    Esta práctica trabaja con los dos componentes que Android ofrece para que el usuario elija entre
+    varias opciones. Los <code class="inline">RadioButton</code>, agrupados en un
+    <code class="inline">RadioGroup</code>, permiten elegir una sola opción a la vez, porque el grupo
+    desmarca las demás al marcar una. El <code class="inline">CheckBox</code> permite marcar cualquier
+    combinación de opciones y se consulta con <code class="inline">isChecked()</code>.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Construir una calculadora con <code class="inline">RadioGroup</code> que ejecute la operación elegida sobre dos valores.</li>
+    <li>Ampliar la calculadora con cociente, potencia, raíz, seno, coseno y tangente (Ejercicio 1).</li>
+    <li>Construir una pantalla de selección múltiple con <code class="inline">CheckBox</code> que muestre u oculte un campo de texto con un <code class="inline">OnCheckedChangeListener</code>.</li>
+    <li>Mostrar en un <code class="inline">Toast</code> todas las opciones seleccionadas (Ejercicio 2).</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>Entorno de trabajo</h3>
+  <p>
+    Proyecto Java con dos actividades: <code class="inline">MainActivity</code> para la Parte 1 y
+    <code class="inline">CheckActivity</code> para la Parte 2. Ambas siguen el código del material del
+    profesor, que usa <code class="inline">AppCompatActivity</code> y, en la calculadora,
+    <code class="inline">ConstraintLayout</code>. Cada pantalla lleva mi nombre como encabezado para
+    identificar las capturas.
+  </p>
+
+  <h3>Parte 1. Selección con RadioButton y RadioGroup</h3>
+  <p>
+    La calculadora tiene dos campos numéricos (<code class="inline">inputType="number"</code>), un
+    <code class="inline">RadioGroup</code> con las operaciones y un botón que llama al método
+    <code class="inline">calcular</code> mediante <code class="inline">android:onClick</code>. El método
+    lee los dos valores, revisa qué <code class="inline">RadioButton</code> está marcado y escribe la
+    operación con su resultado en el <code class="inline">TextView</code> de solución.
+  </p>
+
+  <div class="par">
+    <figure><img src="../screenshots/01_calculadora_inicio.png" alt="Inicio de la calculadora"><figcaption>Fig. 1. Inicio de la aplicación.</figcaption></figure>
+    <figure><img src="../screenshots/02_calculadora_suma.png" alt="Suma 25 + 42"><figcaption>Fig. 2. Ingreso de valores y la solución (25 + 42 = 67).</figcaption></figure>
+  </div>
+
+  <h3>Ejercicio 1. Operaciones agregadas</h3>
+  <p>
+    Se agregaron seis <code class="inline">RadioButton</code> al grupo y su lógica en
+    <code class="inline">calcular</code>. El cociente y la potencia usan los dos valores. La raíz
+    cuadrada, el seno, el coseno y la tangente usan solo el primero, y los ángulos se dan en grados
+    (se convierten con <code class="inline">Math.toRadians</code>). El resultado se muestra sin
+    decimales cuando es entero y con cuatro decimales en otro caso. La pantalla también avisa si se
+    divide entre cero, si se pide la raíz de un negativo o si falta algún valor.
+  </p>
+
+  <div class="rejilla">
+    <figure><img src="../screenshots/05_calculadora_cociente.png" alt="Cociente"><figcaption>Fig. 3. Cociente: 84 / 8 = 10.5000.</figcaption></figure>
+    <figure><img src="../screenshots/06_calculadora_potencia.png" alt="Potencia"><figcaption>Fig. 4. Potencia: 2 ^ 10 = 1024.</figcaption></figure>
+    <figure><img src="../screenshots/07_calculadora_raiz.png" alt="Raíz"><figcaption>Fig. 5. Raíz cuadrada: √144 = 12.</figcaption></figure>
+  </div>
+  <div class="rejilla">
+    <figure><img src="../screenshots/08_calculadora_seno.png" alt="Seno"><figcaption>Fig. 6. Seno: sen(30°) = 0.5000.</figcaption></figure>
+    <figure><img src="../screenshots/09_calculadora_coseno.png" alt="Coseno"><figcaption>Fig. 7. Coseno: cos(60°) = 0.5000.</figcaption></figure>
+    <figure><img src="../screenshots/10_calculadora_tangente.png" alt="Tangente"><figcaption>Fig. 8. Tangente: tan(45°) = 1.0000.</figcaption></figure>
+  </div>
+
+  <p>Las tres operaciones originales del ejemplo también funcionan con esta versión:</p>
+  <div class="rejilla">
+    <figure><img src="../screenshots/03_calculadora_resta.png" alt="Resta"><figcaption>Fig. 9. Resta: 50 - 18 = 32.</figcaption></figure>
+    <figure><img src="../screenshots/04_calculadora_producto.png" alt="Producto"><figcaption>Fig. 10. Producto: 6 * 7 = 42.</figcaption></figure>
+  </div>
+
+  <h3>Parte 2. Selección con CheckBox</h3>
+  <p>
+    La pantalla tiene cuatro <code class="inline">CheckBox</code> de deportes y uno llamado "Otro:".
+    El campo de texto de "Otro:" empieza con <code class="inline">visibility="gone"</code> y un
+    <code class="inline">OnCheckedChangeListener</code> lo muestra o lo oculta según el estado de esa
+    casilla. El botón "Confirmar" llama a <code class="inline">opcion</code>, que muestra un
+    <code class="inline">Toast</code>.
+  </p>
+
+  <div class="par">
+    <figure><img src="../screenshots/11_checkbox_inicio.png" alt="Inicio CheckBox"><figcaption>Fig. 11. Inicio de la aplicación.</figcaption></figure>
+    <figure><img src="../screenshots/12_checkbox_seleccion.png" alt="Selección múltiple"><figcaption>Fig. 12. Selección múltiple y la opción "Otro" con el texto Natacion.</figcaption></figure>
+  </div>
+
+  <h3>Ejercicio 2. Toast con todas las opciones seleccionadas</h3>
+  <p>
+    El ejemplo original mostraba solo el texto de "Otro". Ahora <code class="inline">opcion</code>
+    recorre los cinco <code class="inline">CheckBox</code>, arma una cadena con los que están marcados
+    (usando el texto escrito en "Otro:") y la muestra en el <code class="inline">Toast</code>. Si no hay
+    ninguna marcada, el mensaje lo indica.
+  </p>
+
+  <div class="par">
+    <figure><img src="../screenshots/13_checkbox_toast_ejercicio2.png" alt="Toast con dos opciones"><figcaption>Fig. 13. Toast con Futbol Americano y Otro: Natacion.</figcaption></figure>
+    <figure><img src="../screenshots/14_checkbox_toast_todas.png" alt="Toast con todas las opciones"><figcaption>Fig. 14. Toast con las cinco opciones marcadas.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>[Conclusiones personales del alumno sobre RadioButton/RadioGroup y CheckBox.]</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro. <em>Selecciones con: RadioButton/RadioGroup y CheckBox</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>RadioButton</em>. <code class="inline">developer.android.com/reference/android/widget/RadioButton</code></li>
+    <li>Android Developers. <em>CheckBox</em>. <code class="inline">developer.android.com/reference/android/widget/CheckBox</code></li>
+  </ul>
+</section>
+
+</body>
+</html>

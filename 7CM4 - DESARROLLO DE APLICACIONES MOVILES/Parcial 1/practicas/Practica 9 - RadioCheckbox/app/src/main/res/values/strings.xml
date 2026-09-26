@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">RadioCheckbox</string>
+    <string name="app_calculadora">Calculadora</string>
+    <string name="app_checkbox">CheckBox</string>
+</resources>
