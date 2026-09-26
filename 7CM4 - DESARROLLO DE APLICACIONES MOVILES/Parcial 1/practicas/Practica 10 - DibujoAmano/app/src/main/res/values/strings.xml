@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DibujoAmano</string>
+    <string name="app_java">Dibujo Java</string>
+    <string name="app_kotlin">Dibujo Kotlin</string>
+</resources>

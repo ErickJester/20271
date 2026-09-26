@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 10 - Dibujo a mano</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  h3, h4 { break-after: avoid; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+
+  <div class="tema-box">
+    <div class="etiqueta">Tema</div>
+    <div class="tema">Dibujo a mano con Canvas y Paint</div>
+  </div>
+
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 10</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>25 de septiembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>
+    En Android, un <code class="inline">Canvas</code> define qué se dibuja (formas, líneas o texto) y un
+    <code class="inline">Paint</code> define cómo se dibuja (color, grosor del trazo, relleno o contorno).
+    Para dibujar a mano alzada se crea una clase que extiende <code class="inline">View</code>, se
+    sobrescribe <code class="inline">onDraw</code> para pintar y <code class="inline">onTouchEvent</code>
+    para leer los toques del usuario.
+  </p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Construir una vista propia (<code class="inline">MiLienzo</code>) que dibuje el trazo del dedo con un <code class="inline">Path</code>.</li>
+    <li>Realizar el mismo ejercicio en Java (Ejemplo 1) y en Kotlin (Ejemplo 2).</li>
+    <li>Documentar la ejecución de cada ejemplo con capturas.</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+
+  <h3>Entorno de trabajo</h3>
+  <p>
+    Un solo proyecto con dos actividades: <code class="inline">MainActivity</code> (Java) y
+    <code class="inline">MainActivityKotlin</code> (Kotlin). Ambas extienden
+    <code class="inline">android.app.Activity</code> y usan como contenido una vista propia en lugar de un
+    archivo de layout. Cada lienzo pinta mi nombre como encabezado con
+    <code class="inline">drawText</code> para identificar las capturas.
+  </p>
+
+  <h3>Cómo funciona el trazo</h3>
+  <p>
+    <code class="inline">onTouchEvent</code> guarda las coordenadas del toque y marca el estado:
+    <code class="inline">ACTION_DOWN</code> ("abajo") mueve el <code class="inline">Path</code> al punto
+    tocado con <code class="inline">moveTo</code>, y <code class="inline">ACTION_MOVE</code> ("mover")
+    agrega una línea hasta el nuevo punto con <code class="inline">lineTo</code>. Después llama a
+    <code class="inline">invalidate()</code>, que provoca un nuevo <code class="inline">onDraw</code>. Este
+    pinta el fondo gris, y dibuja el <code class="inline">Path</code> con un
+    <code class="inline">Paint</code> de contorno rojo de 6 píxeles de grosor. Como el
+    <code class="inline">Path</code> se conserva entre llamadas, el dibujo completo permanece en pantalla.
+  </p>
+
+  <h3>Ejemplo 1. Java</h3>
+  <div class="par">
+    <figure><img src="../screenshots/01_java_inicio.png" alt="Inicio Java"><figcaption>Fig. 1. Inicio de la aplicación en Java: lienzo gris vacío.</figcaption></figure>
+    <figure><img src="../screenshots/02_java_dibujo.png" alt="Dibujo Java"><figcaption>Fig. 2. Dibujo a mano de una casa con trazos del dedo.</figcaption></figure>
+  </div>
+
+  <h3>Ejemplo 2. Kotlin</h3>
+  <p>
+    La versión en Kotlin hace lo mismo con la clase <code class="inline">MiLienzoKotlin</code>. Aquí la
+    lógica de los eventos usa <code class="inline">when</code> en lugar de <code class="inline">if</code>.
+  </p>
+  <div class="par">
+    <figure><img src="../screenshots/03_kotlin_inicio.png" alt="Inicio Kotlin"><figcaption>Fig. 3. Inicio de la aplicación en Kotlin.</figcaption></figure>
+    <figure><img src="../screenshots/04_kotlin_dibujo.png" alt="Dibujo Kotlin"><figcaption>Fig. 4. Dibujo a mano de una estrella y un zigzag.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>[Conclusiones personales del alumno sobre Canvas, Paint y el dibujo a mano.]</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro. <em>Dibujo a mano</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>Canvas</em>. <code class="inline">developer.android.com/reference/android/graphics/Canvas</code></li>
+    <li>Android Developers. <em>Paint</em>. <code class="inline">developer.android.com/reference/android/graphics/Paint</code></li>
+  </ul>
+</section>
+
+</body>
+</html>
