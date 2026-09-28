@@ -1,0 +1,1234 @@
+<title>Clase 8 · API REST con Spring Boot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDF1F1; --surface:#FFFFFF; --surface-2:#F4F7F7;
+    --text:#131A1A; --text-muted:#566565; --border:#D6DEDE;
+    --accent:#1C6B73; --accent-soft:#DCEFF0; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --u-port:#2F5FA8; --u-port-soft:#E0EAF7;
+    --u-base:#6B4FB0; --u-base-soft:#ECE6F8;
+    --u-met:#B0530E; --u-met-soft:#FAEBDD;
+    --u-par:#A63D6E; --u-par-soft:#F8E3EC;
+    --code-bg:#EFF3F3;
+    --shadow:0 1px 2px rgba(19,26,26,.06), 0 10px 26px -14px rgba(19,26,26,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#0E1415; --surface:#161E1F; --surface-2:#1C2526;
+      --text:#E6EDED; --text-muted:#94A7A8; --border:#293536;
+      --accent:#6FC3CB; --accent-soft:#12292B; --accent-ink:#0E1415;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --u-port:#8DB4EE; --u-port-soft:#15243C;
+      --u-base:#B7A2F0; --u-base-soft:#241C3D;
+      --u-met:#F0A468; --u-met-soft:#35210F;
+      --u-par:#EE93BB; --u-par-soft:#3A1828;
+      --code-bg:#131B1C;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0E1415; --surface:#161E1F; --surface-2:#1C2526;
+    --text:#E6EDED; --text-muted:#94A7A8; --border:#293536;
+    --accent:#6FC3CB; --accent-soft:#12292B; --accent-ink:#0E1415;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --u-port:#8DB4EE; --u-port-soft:#15243C;
+    --u-base:#B7A2F0; --u-base-soft:#241C3D;
+    --u-met:#F0A468; --u-met-soft:#35210F;
+    --u-par:#EE93BB; --u-par-soft:#3A1828;
+    --code-bg:#131B1C;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+  .lede + .lede{margin-top:10px;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+
+  /* --- la URL de la API: el dispositivo estructural de esta clase.
+         Cada pedazo tiene su color según de dónde sale en el código. --- */
+  .urlbar{display:flex; flex-wrap:wrap; align-items:baseline; margin:14px 0 8px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:10px;
+    padding:14px 16px; font-family:'IBM Plex Mono',monospace; font-size:.88rem; line-height:2;}
+  .up{padding:1px 2px; border-bottom:3px solid var(--uc); background:var(--ub); border-radius:3px 3px 0 0;}
+  .up.port{--uc:var(--u-port); --ub:var(--u-port-soft);}
+  .up.base{--uc:var(--u-base); --ub:var(--u-base-soft);}
+  .up.met{--uc:var(--u-met); --ub:var(--u-met-soft);}
+  .up.par{--uc:var(--u-par); --ub:var(--u-par-soft);}
+  .urlleg{display:flex; flex-direction:column; gap:7px; margin:0 0 16px; max-width:68ch;}
+  .urlleg div{display:flex; gap:10px; align-items:baseline; font-family:'Source Serif 4',Georgia,serif;
+    font-size:.88rem; line-height:1.5; color:var(--text-muted);}
+  .urlleg .sw{flex:0 0 auto; width:22px; height:8px; border-radius:2px; background:var(--uc); transform:translateY(-1px);}
+  .urlleg .port{--uc:var(--u-port);} .urlleg .base{--uc:var(--u-base);}
+  .urlleg .met{--uc:var(--u-met);} .urlleg .par{--uc:var(--u-par);}
+  .urlleg b{color:var(--text); font-weight:600;}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; margin:16px 0; max-width:68ch; display:flex; gap:11px;}
+  .note .ic{flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--border);
+    color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;}
+  .note p{font-family:'Source Serif 4',Georgia,serif; font-size:.86rem; line-height:1.55;
+    color:var(--text-muted); margin:0;}
+  .note b{color:var(--text); font-weight:600;}
+
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer; text-align:left;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;
+    overflow-x:auto;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px; white-space:pre;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.74rem; padding:7px 11px;
+    border-radius:8px; cursor:pointer; text-align:left; max-width:100%; overflow-wrap:anywhere;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .crow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px;
+    padding:11px 13px; margin-bottom:10px;}
+  .crow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .crow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .crow .cq{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; margin-bottom:8px; line-height:1.5;}
+  .crow .cl{display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem;}
+  .crow input{font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding:6px 9px;
+    background:var(--surface); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; width:12ch; max-width:100%;}
+  .crow .ch{font-family:'Source Serif 4',Georgia,serif; font-size:.85rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .crow .ch.show{display:block;}
+  .crow .ch b{color:var(--text); font-weight:600;}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:520px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:480px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+  td.mono{font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Web Client · Clase 8 · miércoles 9 de septiembre · taller en vivo</p>
+    <h1>Tu primera API REST con Spring Boot</h1>
+    <p class="lede">Clase de <b>taller</b>: el profesor crea desde cero un proyecto Spring Boot en IntelliJ y escribe un conversor de temperaturas como API REST. Da dos de las seis conversiones en vivo y deja las otras cuatro para el grupo. Es la clase donde la teoría de SOAP y REST de la sesión anterior se vuelve código que corre.</p>
+    <p class="lede">El dispositivo de la página es la <b>URL de la API</b>. Cada pedazo se pinta del color de la línea de código de donde sale: <span class="up port" style="padding:1px 5px">puerto</span> <span class="up base" style="padding:1px 5px">ruta base</span> <span class="up met" style="padding:1px 5px">método</span> <span class="up par" style="padding:1px 5px">parámetro</span>. Los botones con <b style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">?</b> explican los términos que dio por sabidos. Hay seis ejercicios intercalados.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="arranque">
+    <h2>Lo que salió de esta clase</h2>
+    <ol>
+      <li><span class="t">≈32:10</span><span class="d"><b>Tarea:</b> terminar el <b>conversor de temperaturas</b>. En clase hizo Celsius a Fahrenheit y Celsius a Kelvin. Faltan <b>cuatro</b>: F a C, F a K, K a C y K a F.</span></li>
+      <li><span class="t">40:20</span><span class="d"><b>Revisión:</b> "lo demás lo revisamos mañana en el laboratorio". Terminar el ejercicio antes de llegar.</span></li>
+      <li><span class="t">≈48:15</span><span class="d"><b>Por confirmar:</b> mencionó "la fecha del 17 de septiembre" al hablar de altas y bajas. No queda claro a qué se refiere.</span></li>
+      <li><span class="t">≈49:50</span><span class="d"><b>Pendiente administrativo:</b> el laboratorio de mañana (jueves 10) es en el <b>Laboratorio 3</b>, no en el de siempre.</span></li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <span class="ic">i</span>
+    <p><b>Sobre esta transcripción.</b> Es la versión ya limpia de la grabación, con marcas de tiempo solo en algunos momentos. Los bloques que no traen marca propia van dentro del bloque más cercano. Hay tres tropiezos del profesor, o de la transcripción, que marco donde aparecen y que conviene no copiar tal cual: la versión de Java (bloque 1), el nombre del endpoint de Kelvin (bloque 4) y lo que lee en la salida de <code>jq</code> (bloque 5).</p>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 1 · minuto 00:00 a 07:35</p>
+      <h2 class="sec">Crear el proyecto en el IDE</h2>
+      <p>Empieza con el asistente de proyecto nuevo de IntelliJ, que es en el fondo Spring Initializr. Va campo por campo y dice qué elegir.</p>
+    </div>
+
+    <p class="quote">"Si ustedes quieren crear el repositorio Git de una vez, le pican a la casilla; si no, lo pueden hacer a manita desde terminal, se meten a la carpeta y le dan un <b>git init</b> y san se acabó."</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Campo</th><th>Qué dijo</th><th>Valor en clase</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Lenguaje</td><td class="d">"Vamos a agarrar Java", ya viene marcado.</td><td class="mono">Java</td></tr>
+        <tr><td class="sym">Tipo</td><td class="d">Maven, ya viene marcado.</td><td class="mono">Maven</td></tr>
+        <tr><td class="sym">Group ID</td><td class="d">"Pónganle el que ustedes quieran." Lo dejó "por puro gusto".</td><td class="mono">com.ipn.mx</td></tr>
+        <tr><td class="sym">Artifact ID</td><td class="d">Cómo se llama lo que desarrollas. Normalmente toma el nombre del proyecto y se puede cambiar.</td><td class="mono">ApiSimple</td></tr>
+        <tr><td class="sym">Package</td><td class="d">Quitó el sufijo que ponía por defecto y dejó <code>com.ipn.mx</code>. Al nombre le puso <code>ApiSimple7CM2</code>.</td><td class="mono">com.ipn.mx</td></tr>
+        <tr><td class="sym">JDK</td><td class="d">El que tengas instalado. Él tiene el 26. Si no tienes ninguno, el asistente puede descargar uno.</td><td class="mono">26</td></tr>
+        <tr><td class="sym">Versión de Java</td><td class="d">"Lo mínimo que necesitamos para trabajar es la <b>17</b>, es lo mínimo que se requiere de soporte."</td><td class="mono">≥ 17</td></tr>
+        <tr><td class="sym">Empaquetado</td><td class="d">Solo JAR o WAR. Se queda con JAR.</td><td class="mono">JAR</td></tr>
+        <tr><td class="sym">Configuración</td><td class="d">Acepta <code>application.properties</code> o <code>application.yml</code>. Se queda con properties.</td><td class="mono">properties</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="note">
+      <span class="ic">!</span>
+      <p><b>Tropiezo en la versión de Java.</b> Al explicarlo dijo algo como "tienes un JDK 25, pues ponen 26". Eso no puede ser: la versión de Java del proyecto no puede pasar de la del JDK instalado. Lo natural es al revés, y su regla clara es que el piso es 17. Yo lo tomo como un lapsus.</p>
+    </div>
+
+    <details class="dio"><summary>¿Qué son groupId, artifactId y Maven?</summary><div class="db">
+      <p><b>Maven</b> es la herramienta que descarga las dependencias y construye el proyecto a partir del archivo <code>pom.xml</code>. El <b>groupId</b> identifica a quien lo hace, normalmente con el dominio al revés (<code>com.ipn.mx</code>). El <b>artifactId</b> es el nombre del proyecto. Juntos son la "dirección" con la que se identifica el proyecto.</p>
+    </div></details>
+
+    <h3 class="sub">JAR, WAR, EAR y RAR</h3>
+
+    <p class="body">Explicó los cuatro tipos de empaquetado de Java:</p>
+    <ul class="body">
+      <li><b>.jar</b> (Java Archive): lo típico para aplicaciones de escritorio y de consola, un ejecutable.</li>
+      <li><b>.war</b> (Web Application Archive): para web. Se mete en la carpeta correspondiente de un Tomcat, un TomEE, un GlassFish o un Payara y se carga.</li>
+      <li><b>.ear</b> (Enterprise Application Archive): para módulos empresariales con EJB. Si no se separan los proyectos por parte, todo se empaqueta en un JAR o en un WAR "y tampoco pasa nada".</li>
+      <li><b>.rar</b> (Resource Adapter Archive): "no es el ZIP tradicional", vive en el ecosistema empresarial y "rara vez se utiliza". Es para recursos.</li>
+    </ul>
+
+    <p class="quote">"Por definición aquí solo tenemos dos archivos: JAR o WAR. ¿Funcionan muy similar? Sí y no. El JAR lo que trae incrustada es una versión muy minimalista de un Tomcat, <b>Tomcat embebido</b>. Por eso puede funcionar."</p>
+
+    <details class="dio"><summary>¿Qué es EJB?</summary><div class="db">
+      <p><b>Enterprise JavaBeans</b>: la tecnología empresarial de Java para componentes de lógica de negocio que corren dentro de un servidor de aplicaciones. El profesor solo lo nombró para explicar cuándo tiene sentido un EAR.</p>
+    </div></details>
+
+    <h3 class="sub"><code>properties</code> o <code>yml</code></h3>
+
+    <p class="body">Los dos hacen lo mismo. El <b>YAML</b> se organiza por sangría: empiezas con el elemento principal y vas bajando según la propiedad. Comentó que a quien viene de Python le resulta natural, y que a él le cuesta. Aquí usa <code>properties</code>.</p>
+
+    <details class="dio"><summary>¿Cómo se ve la misma propiedad en cada formato?</summary><div class="db">
+      <pre><code># application.properties
+server.port=8082
+
+# application.yml
+server:
+  port: 8082</code></pre>
+      <p>En YAML cada nivel del nombre baja una línea y una sangría. Un espacio de más o de menos cambia a qué elemento pertenece la clave. El profesor lo llamó "tabuladores", pero en YAML la sangría debe ser con espacios.</p>
+    </div></details>
+
+    <h3 class="sub">Las dependencias</h3>
+
+    <p class="body">Fue enumerando lo que necesitaría el proyecto completo: <b>Spring Web</b>, <b>Validation</b>, <b>Spring Data JPA</b>, el conector de <b>MySQL</b> y <b>DevTools</b>. Contaba "1, 2, 3, 4, 5" y se preguntó si le faltaba uno.</p>
+
+    <p class="quote"><b>Alumno:</b> "¿Security?" <b>Profesor:</b> "No, ahorita no. Eso vamos a dejarlo para después. Pero sí, el Security sí, eventualmente sí, pero me parece que el que trae este es la versión 6 todavía. La versión actual es la 7. [...] Vamos a la documentación y tomamos la dependencia y se la pegamos al <b>pom.xml</b>."</p>
+
+    <p class="body">Para hoy se queda solo con dos:</p>
+    <ul class="body">
+      <li><b>DevTools</b>, "nada más para que esté jugando" (reinicio automático al guardar).</li>
+      <li><b>Web</b>, que es lo que permite hacer la API.</li>
+    </ul>
+
+    <details class="dio"><summary>¿Para qué sirven Validation, Data JPA y DevTools?</summary><div class="db">
+      <ul>
+        <li><b>Spring Web</b>: trae Spring MVC y un Tomcat embebido para recibir peticiones HTTP.</li>
+        <li><b>Validation</b>: comprobar que los datos que llegan cumplan reglas (obligatorio, rango, formato).</li>
+        <li><b>Spring Data JPA</b>: hablar con la base de datos sin escribir el SQL a mano.</li>
+        <li><b>MySQL</b>: el controlador (driver) para conectarse a esa base.</li>
+        <li><b>DevTools</b>: reinicia la aplicación sola cuando guardas un cambio.</li>
+      </ul>
+      <p>Solo se usaron Web y DevTools en esta clase. Lombok se le olvidó agregarlo; salió después.</p>
+    </div></details>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 1 · el asistente de proyecto</p>
+    <h3>Los campos y el empaquetado</h3>
+    <p class="ask">Cinco preguntas sobre lo que eligió en el asistente y por qué. Contesta las cinco y dale a <b>Revisar</b>.</p>
+    <div class="qrows" id="q1"></div>
+    <div class="btnrow">
+      <button class="btn" id="q1go" type="button">Revisar</button>
+      <button class="btn ghost" id="q1rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q1fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 2 · minuto 07:35 a 13:20</p>
+      <h2 class="sec">Lo que generó el asistente, y tres tipos de servidor</h2>
+      <p>Con el proyecto creado, recorrió los archivos y de ahí saltó a una explicación de servidores que desemboca en el único cambio de configuración del día.</p>
+    </div>
+
+    <p class="body">Recomendó abrir <code>HELP.md</code> "en algún momento". Apunta a la documentación oficial de Maven, de Spring y de Web, y trae guías como "Construye un servicio REST" o "Construye una aplicación web con MVC". Sobre la estructura: como el proyecto es en teoría web, genera las carpetas para un proyecto de ese estilo, aunque no se haya agregado Spring MVC explícitamente.</p>
+
+    <p class="body">En <code>src/main/resources</code> hay dos carpetas que hoy no se tocan:</p>
+    <ul class="body">
+      <li><code>static/</code>: recursos estáticos, como estilos e imágenes.</li>
+      <li><code>templates/</code>: los HTML, cuando el proyecto pinta páginas. Funciona con un framework extra, <b>Thymeleaf</b>, que hace de motor de plantillas.</li>
+    </ul>
+
+    <p class="quote">"Nosotros no lo vamos a tocar, solo vamos a modificar algo de aquí: del <b>application.properties</b>. Y lo único que le vamos a poner por ahorita va a ser un <b>server.port=8082</b>. ¿Por qué? Por puro gusto."</p>
+
+    <details class="dio"><summary>¿Qué es Thymeleaf?</summary><div class="db">
+      <p>Un motor de plantillas para Java: escribes HTML normal con marcas especiales y el servidor las rellena con datos antes de mandar la página. Es la opción para páginas del lado del servidor, distinta de una API que devuelve JSON. El profesor solo lo nombró para explicar la carpeta <code>templates</code>.</p>
+    </div></details>
+
+    <h3 class="sub">Web Server, Web Container y Application Server</h3>
+
+    <p class="body">Para explicar por qué cambia el puerto, hizo un recorrido por los servidores del ecosistema Java. Tres capas, cada una con su especialidad:</p>
+
+    <figure>
+      <svg viewBox="0 0 640 262" role="img" aria-label="Tres servidores apilados: Web Server con Apache HTTP Server, Web Container con Tomcat y Application Server con GlassFish, Payara, WebLogic, WebSphere o WildFly">
+        <rect x="14" y="10" width="612" height="74" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="30" y="34" font-family="IBM Plex Mono" font-size="11" font-weight="700" style="fill:var(--accent)">WEB SERVER</text>
+        <text x="30" y="54" font-family="IBM Plex Sans" font-size="12.5" font-weight="600" style="fill:var(--text)">Apache HTTP Server</text>
+        <text x="30" y="72" font-family="IBM Plex Sans" font-size="11.5" style="fill:var(--text-muted)">Entiende HTML, CSS, JavaScript y recursos estáticos: audio, video, imágenes.</text>
+
+        <rect x="14" y="94" width="612" height="74" rx="10" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"></rect>
+        <text x="30" y="118" font-family="IBM Plex Mono" font-size="11" font-weight="700" style="fill:var(--accent)">WEB CONTAINER · el de esta clase</text>
+        <text x="30" y="138" font-family="IBM Plex Sans" font-size="12.5" font-weight="600" style="fill:var(--text)">Tomcat (aquí, embebido)</text>
+        <text x="30" y="156" font-family="IBM Plex Sans" font-size="11.5" style="fill:var(--text-muted)">Servlets, JSP y frameworks web de Java: Spring MVC, Jakarta Faces. Puerto 8080 por defecto.</text>
+
+        <rect x="14" y="178" width="612" height="74" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="30" y="202" font-family="IBM Plex Mono" font-size="11" font-weight="700" style="fill:var(--accent)">APPLICATION SERVER</text>
+        <text x="30" y="222" font-family="IBM Plex Sans" font-size="12.5" font-weight="600" style="fill:var(--text)">GlassFish · Payara · WebLogic · WebSphere · WildFly (JBoss)</text>
+        <text x="30" y="240" font-family="IBM Plex Sans" font-size="11.5" style="fill:var(--text-muted)">Servicios, data source, pool de conexiones. Puerto 8080 por defecto.</text>
+      </svg>
+      <figcaption>La idea de "capas físicas": una carcasa web simple pide el primero; la parte que procesa Java para web, el segundo; la que maneja servicios y pool de conexiones, el tercero.</figcaption>
+    </figure>
+
+    <p class="quote">"Y esos dos deben tener un puerto diferente. Entonces nosotros vamos a jugar con una versión minimalista del Tomcat, lo vamos a meter en el <b>8082</b>."</p>
+
+    <details class="dio"><summary>¿Qué es un pool de conexiones y un data source?</summary><div class="db">
+      <p>Abrir una conexión a la base de datos cuesta. Un <b>pool</b> mantiene un grupo de conexiones ya abiertas y se las presta a quien las pida. El <b>data source</b> es el objeto configurado que sabe a qué base conectarse y entrega esas conexiones. Los servidores de aplicaciones los administran por ti.</p>
+    </div></details>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 2 · servidores y puertos</p>
+    <h3>¿Qué hace cada uno?</h3>
+    <p class="ask">Cuatro preguntas sobre la diferencia entre los tres tipos de servidor y el puerto.</p>
+    <div class="qrows" id="q2"></div>
+    <div class="btnrow">
+      <button class="btn" id="q2go" type="button">Revisar</button>
+      <button class="btn ghost" id="q2rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q2fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3 · minuto 13:20 a 32:10</p>
+      <h2 class="sec">El DTO, el controlador y el primer endpoint</h2>
+      <p>Es el bloque más largo y el centro de la clase. Va de tres paquetes vacíos a un método que responde en el navegador.</p>
+    </div>
+
+    <h3 class="sub">El DTO, como <code>record</code></h3>
+
+    <p class="quote">"Nos dicen que un DTO es una clase Java simple que probablemente implemente la interfaz de serialización, que tenga atributos privados a la clase, un constructor con argumento cero... ¡Ya me acordé qué otra cosa me hacía falta! Se me olvidó poner <b>Lombok</b> para no escribir cosas."</p>
+
+    <p class="body">En lugar de una clase común, usa un <b><code>record</code></b>, "porque esta cosa no va a cambiar". Lo llama <code>ConversionResponse</code>, lo quiere "para respuesta", y lo crea en un paquete <code>dto</code>:</p>
+
+    <pre><code>package com.ipn.mx.dto;
+
+public record ConversionResponse(
+    Double valorOriginal,
+    String unidadOriginal,
+    Double valorRespuesta,
+    String unidadRespuesta
+) {}</code></pre>
+
+    <p class="body">Podría ser una clase, con getters y setters para cada campo. Este es "literal, un objeto que funciona simplemente pasándole valores a los atributos y recuperando los valores". Es <b>inmutable</b>, y por eso le queda bien a un DTO.</p>
+
+    <details class="dio"><summary>¿Qué es un <code>record</code> y qué gano con él?</summary><div class="db">
+      <p>Una forma corta de declarar una clase de datos. Escribes solo los campos entre paréntesis y Java genera el constructor, los métodos de lectura, <code>equals</code>, <code>hashCode</code> y <code>toString</code>. Sus campos no se pueden cambiar después de creado el objeto (es inmutable), y no hay setters.</p>
+      <p>Para un DTO de respuesta es justo lo que hace falta: se arma una vez, se manda y no se toca. Necesita Java 16 o superior, por eso conecta con el mínimo de 17 de antes.</p>
+    </div></details>
+
+    <h3 class="sub">El controlador</h3>
+
+    <p class="body">Nuevo paquete <code>controller</code>, nueva clase <code>TemperaturaController</code>. Dos anotaciones sobre la clase:</p>
+    <ul class="body">
+      <li><code>@RestController</code>: "porque vamos a crear un API". Al ser REST, "debería de permitirnos utilizar todos los verbos del protocolo".</li>
+      <li><code>@RequestMapping("/api/temperatura")</code>: "tengo que encontrar la forma para llegar a este cuate". Es la ruta base de todo lo que tenga dentro.</li>
+    </ul>
+
+    <pre><code>@RestController
+@RequestMapping("/api/temperatura")
+public class TemperaturaController {
+
+}</code></pre>
+
+    <p class="body">Con eso ya se sabe cómo empieza cualquier URL de la API. Y aquí llega la pieza que ordena la clase: <b>cada pedazo de la URL sale de una línea concreta</b>.</p>
+
+    <div class="urlbar">
+      <span class="up port">http://localhost:8082</span><span class="up base">/api/temperatura</span><span class="up met">/convertir-a-fahrenheit</span><span class="up par">?valor=10</span>
+    </div>
+    <div class="urlleg">
+      <div class="port"><span class="sw"></span><span><b>Servidor y puerto.</b> El puerto viene de <code>server.port</code> en <code>application.properties</code>. El host es donde corre el servidor: "mi localhost, mi 127.0.0.1, mi 192.168.x.x", o el nombre si hay DNS.</span></div>
+      <div class="base"><span class="sw"></span><span><b>Ruta base.</b> El <code>@RequestMapping</code> de la clase.</span></div>
+      <div class="met"><span class="sw"></span><span><b>Nombre del método.</b> El <code>@GetMapping</code> de cada método.</span></div>
+      <div class="par"><span class="sw"></span><span><b>Parámetro.</b> El <code>@RequestParam</code>, que llega después del signo de interrogación.</span></div>
+    </div>
+
+    <p class="quote">"Cualquier cosa que nosotros vayamos a solicitar a la URL tenemos que pegar esto de arranque, hasta ahí. ¿De dónde sale? De este archivito. [...] Y el resto lo obtenemos justo de la definición del RequestMapping en el controller."</p>
+
+    <details class="dio"><summary>¿Qué es <code>localhost</code> y por qué da lo mismo que <code>127.0.0.1</code>?</summary><div class="db">
+      <p><code>localhost</code> es el nombre que tu propia máquina se da a sí misma; se traduce a la dirección <code>127.0.0.1</code>. Si el servidor corre en la misma computadora que el navegador, apuntas ahí. Si corriera en otra, pondrías su IP (como <code>192.168.x.x</code> en una red local) o su nombre de dominio.</p>
+    </div></details>
+
+    <h3 class="sub">El primer método: Celsius a Fahrenheit</h3>
+
+    <p class="body">Solo hace falta un verbo, <code>@GetMapping</code>, porque "no vamos a insertar, no vamos a actualizar, no vamos a eliminar". La idea es: "método fulanito, te paso un argumento, opera con él y devuélveme un resultado".</p>
+
+    <p class="body">El método es público, devuelve un <code>ResponseEntity</code> de <code>ConversionResponse</code> y se llama <code>celsiusToFahrenheit</code>. Recibe el parámetro <code>valor</code> como <code>Double</code>, guardado en una variable <code>celsius</code>:</p>
+
+    <pre><code>@GetMapping("/convertir-a-fahrenheit")
+public ResponseEntity&lt;ConversionResponse&gt; celsiusToFahrenheit(
+    @RequestParam(name = "valor") Double celsius
+) {
+    Double fahrenheit = (celsius * 9 / 5) + 32;
+    ConversionResponse response = new ConversionResponse(celsius, "°C", fahrenheit, "°F");
+    return ResponseEntity.ok(response);
+}</code></pre>
+
+    <p class="body">Los argumentos del constructor van en el orden del record: valor original (<code>celsius</code>), unidad original (<code>"°C"</code>), valor de la respuesta (<code>fahrenheit</code>) y unidad de la respuesta (<code>"°F"</code>).</p>
+
+    <details class="dio"><summary>¿Qué hace <code>@RequestParam</code>?</summary><div class="db">
+      <p>Le dice a Spring que tome un valor de los parámetros de la URL, los que van después del <code>?</code>. Con <code>name = "valor"</code> busca <code>?valor=...</code> y lo convierte al tipo que declares, aquí <code>Double</code>. El nombre de la variable de Java (<code>celsius</code>) puede ser distinto del nombre del parámetro (<code>valor</code>).</p>
+    </div></details>
+
+    <p class="quote">"Tomen ustedes una decisión: ¿le van a poner nombre o simplemente se van a referir a esto? Cada método que ustedes mapeen puede llevar un nombre en particular. [...] Como son puros GET, sí hay que diferenciarlos: eventualmente o reciben un argumento o tienen un nombre. En este caso lo más sano es <b>ponerle un nombre</b>."</p>
+
+    <details class="dio"><summary>¿Por qué dos <code>@GetMapping</code> sin nombre chocarían?</summary><div class="db">
+      <p>Si dos métodos responden al mismo verbo y a la misma ruta, Spring no sabe a cuál mandar la petición y falla al arrancar. Con un nombre distinto en cada <code>@GetMapping</code> (<code>/convertir-a-fahrenheit</code>, <code>/convertir-celsius-a-kelvin</code>) cada uno tiene su propia ruta.</p>
+    </div></details>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p><b><code>ResponseEntity</code> desde el primer método.</b> En la clase anterior el profesor dijo que la entidad no debe regresarse sola, sino dentro de un <code>ResponseEntity</code>. Aquí es lo primero que hace. <code>ResponseEntity.ok(response)</code> devuelve el objeto con código 200.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 3 · de dónde sale cada pedazo</p>
+    <h3>La URL, línea por línea</h3>
+    <p class="ask">Cada trozo de <code>http://localhost:8082/api/temperatura/convertir-a-fahrenheit?valor=10</code> viene de una línea distinta. Une cada uno con su origen.</p>
+    <div class="qrows" id="q3"></div>
+    <div class="btnrow">
+      <button class="btn" id="q3go" type="button">Revisar</button>
+      <button class="btn ghost" id="q3rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q3fb"></div>
+  </div>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 4 · arma el método</p>
+    <h3><code>celsiusToFahrenheit</code>, en orden</h3>
+    <p class="ask">Toca las líneas en el orden en que las escribió. Si te equivocas te doy una pista; toca una línea ya puesta para quitarla.</p>
+    <div class="built" id="built"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow"><button class="btn ghost" id="bldRs" type="button">Reiniciar</button></div>
+    <div class="fb" id="bldFb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 4 · minuto 32:10 a 36:45</p>
+      <h2 class="sec">Probarlo, la tarea y Celsius a Kelvin en vivo</h2>
+      <p>Corrió el proyecto, pegó la URL en el navegador y comprobó dos valores. Luego dejó el resto del conversor.</p>
+    </div>
+
+    <p class="body">Pegó <code>http://localhost:8082/api/temperatura/convertir-a-fahrenheit?valor=10</code> en el navegador. Con 10 respondió 50, y con 20 respondió 68:</p>
+
+    <pre><code>{
+  "valorOriginal": 20.0,
+  "unidadOriginal": "°C",
+  "valorRespuesta": 68.0,
+  "unidadRespuesta": "°F"
+}</code></pre>
+
+    <p class="quote">"¿Estamos de acuerdo, jóvenes? Sencillito, ¿no?"</p>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Tarea 1</span><span class="task-when">≈32:10 a 36:45 · reafirmada 39:20 y 40:20</span></div>
+      <h3>Terminar el conversor de temperaturas</h3>
+      <p>Después de la prueba anunció cinco conversiones para el grupo (C a K, F a K, F a C, K a C y K a F), con "30 minutos para acabar". Enseguida hizo él la de <b>Celsius a Kelvin</b>, así que quedan <b>cuatro</b>. Lo demás se revisa "mañana en el laboratorio".</p>
+      <p class="said">"Bueno, tienen 30 minutos para acabar [...]. Literal, todo el conversor. Eso es un API."</p>
+    </div>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Conversión</th><th>Fórmula</th><th>Estado</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">C → F</td><td class="mono"><code>(celsius * 9 / 5) + 32</code></td><td class="d">Hecha por el profesor</td></tr>
+        <tr><td class="sym">C → K</td><td class="mono"><code>celsius + 273.15</code></td><td class="d">Hecha por el profesor</td></tr>
+        <tr><td class="sym">F → C</td><td class="mono"><code>(fahrenheit - 32) * 5 / 9</code></td><td class="d">Tarea. Fórmula dicha en clase (bloque 12)</td></tr>
+        <tr><td class="sym">K → F</td><td class="mono"><code>(kelvin - 273.15) * 9 / 5 + 32</code></td><td class="d">Tarea. Fórmula dicha en clase (bloque 12)</td></tr>
+        <tr><td class="sym">F → K</td><td class="mono"><code>(fahrenheit - 32) * 5 / 9 + 273.15</code></td><td class="d">Tarea. No la dijo; sale de combinar F → C y C → K</td></tr>
+        <tr><td class="sym">K → C</td><td class="mono"><code>kelvin - 273.15</code></td><td class="d">Tarea. No la dijo; es la inversa de C → K</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">Celsius a Kelvin, copiando el método</h3>
+
+    <p class="body">Copió el método anterior y lo fue ajustando. "Ya rezongó" es el IDE marcando error cada vez que cambia algo a medias; se arregla al terminar de renombrar. Cambió la variable a <code>kelvin</code>, la operación a <code>celsius + 273.15</code> y la unidad de respuesta a <code>"K"</code>. Como ya no hay operación extra, "hasta le podemos quitar ese paréntesis".</p>
+
+    <pre><code>@GetMapping("/convertir-celsius-a-kelvin")
+public ResponseEntity&lt;ConversionResponse&gt; celsiusToKelvin(
+    @RequestParam(name = "valor") Double celsius
+) {
+    Double kelvin = celsius + 273.15;
+    ConversionResponse response = new ConversionResponse(celsius, "°C", kelvin, "K");
+    return ResponseEntity.ok(response);
+}</code></pre>
+
+    <p class="body">La prueba: <code>http://localhost:8082/api/temperatura/convertir-celsius-a-kelvin?valor=20</code> devolvió <b>293.15</b>. "Pues creo que sí hace su chamba, ¿no?"</p>
+
+    <div class="note">
+      <span class="ic">!</span>
+      <p><b>El nombre del endpoint de Kelvin.</b> El bloque de código de la transcripción dice <code>/convertir-a-kelvin</code>, pero en voz alta lo renombra a <code>convertir-celsius-a-kelvin</code> y esa es la URL que prueba. Yo dejo la versión que se probó. Ojo con la diferencia de estilo: el de Fahrenheit se quedó como <code>convertir-a-fahrenheit</code>, sin "celsius". Él dijo que el nombre lo decide cada quien.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 5 · haz las cuentas</p>
+    <h3>¿Qué devolvería <code>valorRespuesta</code>?</h3>
+    <p class="ask">Escribe el número que el endpoint pondría en <code>valorRespuesta</code>. Vale con punto o coma decimal.</p>
+    <div id="q5"></div>
+    <div class="btnrow"><button class="btn ghost" id="q5rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q5fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 5 · minuto 36:45 a 39:20</p>
+      <h2 class="sec">curl y jq como cliente</h2>
+      <p>Un compañero había comentado que lo ideal es probar con <code>curl</code>. El profesor lo mostró.</p>
+    </div>
+
+    <pre><code>curl -s "http://localhost:8082/api/temperatura/convertir-a-fahrenheit?valor=10"
+
+# con jq, para verlo con formato
+curl -s "http://localhost:8082/api/temperatura/convertir-a-fahrenheit?valor=10" | jq</code></pre>
+
+    <p class="body">La primera versión devuelve el JSON tal cual, en una sola línea. Con un <b>pipe</b> (<code>|</code>) hacia <code>jq</code> se imprime "bonito", con encabezados y formato. También pidió disculpas por los tonos de colores de la terminal, que no se veían bien.</p>
+
+    <details class="dio"><summary>¿Qué son <code>curl</code>, el pipe y <code>jq</code>?</summary><div class="db">
+      <ul>
+        <li><b>curl</b> es un programa de línea de comandos para hacer peticiones HTTP. La opción <code>-s</code> (silencioso) oculta su barra de progreso.</li>
+        <li>El <b>pipe</b> (<code>|</code>) toma la salida de un comando y se la pasa como entrada al siguiente.</li>
+        <li><b>jq</b> lee JSON y lo imprime con sangría y colores. Sin él la respuesta sale en una línea difícil de leer.</li>
+      </ul>
+    </div></details>
+
+    <div class="note">
+      <span class="ic">!</span>
+      <p><b>Tropiezo al leer la salida.</b> Al leer el resultado de <code>valor=10</code> dice "valorOriginal: 50". Es un lapsus: con 10 de entrada, <code>valorOriginal</code> es <b>10</b> y <code>valorRespuesta</code> es <b>50</b>.</p>
+    </div>
+
+    <p class="body">Cierra el bloque avisando cuánto tiempo queda: "les quedan 26 minutos, tiempo suficiente para terminarlo".</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 6 · minuto 39:20 a 40:20</p>
+      <h2 class="sec">Lo que ya se vio sin nombrarlo</h2>
+      <p>Con unas diapositivas, junta en un minuto los conceptos que la práctica tocó sin decirlos.</p>
+    </div>
+
+    <ul class="body">
+      <li><b>El verbo GET.</b> "Ya estamos revisando el primero."</li>
+      <li><b>Códigos de respuesta.</b> "A lo mejor no lo visualizamos, pero esto nos está devolviendo un <b>200</b> (<code>HttpStatus.OK</code>)."</li>
+      <li><b>Endpoints.</b> "Construimos el endpoint con el que estamos trabajando."</li>
+    </ul>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p><b>Conexión con la clase 7.</b> El 200 es el primero de los códigos que el profesor puso en <code>@ResponseStatus</code> allá (OK, CREATED, NO_CONTENT). Y los códigos HTTP son la tarea que arrastra desde la clase 5.</p>
+    </div>
+
+    <p class="quote">"Señores, lo demás lo revisamos <b>mañana en el laboratorio</b>, pero terminen este ejercicio, ¿va?"</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 7 · minuto 40:20 a 43:30</p>
+      <h2 class="sec">Probar en una herramienta gráfica</h2>
+      <p>Un cliente con interfaz en lugar de navegador o terminal. El profesor lo ofrece como opción: "ya ustedes elijan con qué trabajar".</p>
+    </div>
+
+    <p class="body">Pasos que siguió:</p>
+    <ol class="body">
+      <li>Crear una <b>colección</b>, que sirve solo para organizar. La llamó <b>Conversor Temperaturas</b>.</li>
+      <li>Crear el primer <b>request</b>, de tipo <code>GET</code>, y pegarle la URL.</li>
+      <li>Pasar el parámetro por la URL, o bien agregarlo en la sección de <b>Query Params</b>: <b>Name</b> = <code>valor</code>, <b>Value</b> = <code>50</code>.</li>
+      <li>Darle <b>Send</b>.</li>
+    </ol>
+
+    <p class="body">Observó algo útil: si quitas <code>?valor=...</code> de la URL, funciona igual, porque el valor está en Query Params. La URL que se pega en la herramienta "no lleva el signo de interrogación", pero el <i>preview</i> de la URL lo vuelve a mostrar. La respuesta trae el <b>código 200 OK</b>, el tiempo y otros datos.</p>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p><b>Cuál herramienta.</b> El profesor no la nombra en el texto, solo dice "con este". El encabezado de la transcripción habla de Postman o Insomnia. Los pasos aplican a las dos.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 8 · minuto 43:30 a 45:10</p>
+      <h2 class="sec">Qué pasa si quitas <code>server.port</code></h2>
+      <p>Una demostración corta de lo único que hace esa propiedad.</p>
+    </div>
+
+    <p class="body">El <code>application.properties</code> trae por defecto <code>spring.application.name</code>, el nombre del proyecto. Lo único que se agregó fue <code>server.port</code>. Sin ella, el proyecto igual arranca, pero busca el puerto <b>8080</b>.</p>
+
+    <p class="body">Lo demostró con la herramienta gráfica: dejando la URL en 8082 y quitando la propiedad, el <b>Send</b> dice que no se puede conectar al servidor, porque Tomcat se apropió del 8080. Lo dejó de nuevo como estaba: <code>server.port=8082</code>.</p>
+
+    <p class="quote">"Es lo único que hace esa propiedad."</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 9 · minuto 45:10 a 48:15</p>
+      <h2 class="sec">El mismo DTO, como clase con Lombok</h2>
+      <p>Respondió a "¿y si quiero una clase en lugar de un record?": por supuesto que se puede.</p>
+    </div>
+
+    <pre><code>package com.ipn.mx.dto;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import java.io.Serializable;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ConversionResponse implements Serializable {
+    private Double valorOriginal;
+    private String unidadOriginal;
+    private Double valorRespuesta;
+    private String unidadRespuesta;
+}</code></pre>
+
+    <p class="body">El clásico <code>implements Serializable</code>, y con <b>Lombok</b>: <code>@Data</code>, <code>@NoArgsConstructor</code>, <code>@AllArgsConstructor</code> "y, ¿por qué no?, <code>@Builder</code>". Cuatro atributos privados, y ya. El controlador "ni siquiera cambiaría": debería funcionar igual.</p>
+
+    <details class="dio"><summary>¿Qué hace cada anotación de Lombok?</summary><div class="db">
+      <ul>
+        <li><code>@Data</code>: genera getters, setters, <code>toString</code>, <code>equals</code> y <code>hashCode</code>.</li>
+        <li><code>@NoArgsConstructor</code>: el constructor sin argumentos.</li>
+        <li><code>@AllArgsConstructor</code>: el constructor con todos los campos.</li>
+        <li><code>@Builder</code>: permite armar el objeto paso a paso con el patrón Builder.</li>
+      </ul>
+    </div></details>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p><b>Dos cosas que conectan, dichas por mí y no por el profesor.</b> Primero: para usar esta versión hay que agregar la dependencia de Lombok al proyecto, y en el asistente del bloque 1 no se marcó. Con el <code>record</code> no hace falta. Segundo: <code>@Builder</code> es el patrón Builder que dejó de investigación en la clase 5 ("qué es, para qué sirve, con qué se come"). Aquí lo tienes en un ejemplo real.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 6 · repaso de la clase</p>
+    <h3>Puerto, record, código de estado y herramienta gráfica</h3>
+    <p class="ask">Cuatro preguntas sobre lo que sigue en pie de la clase.</p>
+    <div class="qrows" id="q6"></div>
+    <div class="btnrow">
+      <button class="btn" id="q6go" type="button">Revisar</button>
+      <button class="btn ghost" id="q6rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q6fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 10 · minuto 48:15 a 55:40</p>
+      <h2 class="sec">Avisos de grupo y cambio de laboratorio</h2>
+      <p>Rato de trabajo individual con avisos administrativos de por medio. No hay contenido técnico nuevo.</p>
+    </div>
+
+    <p class="body">Contó a los presentes, comentó que "aguantaron hasta la fecha del 17 de septiembre" y preguntó por los alumnos a los que dieron de baja por no haber tomado una materia previa. Un alumno dijo que venía de movilidad y que ya lo iban a inscribir. Otra frase suya: sabe de "al menos tres que no han cursado la deserción".</p>
+
+    <div class="note">
+      <span class="ic">!</span>
+      <p><b>La fecha del 17 de septiembre.</b> No queda claro qué se cumple ese día: puede ser el plazo de altas y bajas del grupo, pero no lo aclara. En el repo el 17 de septiembre (18:00) es la entrega de la investigación de HTTP, que es otra cosa. Si te afecta, pregúntale.</p>
+    </div>
+
+    <p class="quote">"Oigan, por cierto: mañana nos toca laboratorio, pero nos toca en el <b>Laboratorio 3</b>. Ya nos van a cambiar. Los jueves es en el 3, ¿vale?"</p>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Pendiente administrativo</span><span class="task-when">≈49:50 y cierre 64:47</span></div>
+      <h3>Laboratorio del jueves 10, en el Laboratorio 3</h3>
+      <p>Ahí se revisan los demás endpoints. Al cierre lo repitió: "mañana continuamos en el Laboratorio 3".</p>
+      <p class="said">"Los jueves es en el 3, ¿vale?"</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 11 · minuto 55:40 a 59:00</p>
+      <h2 class="sec">La documentación de Spring y el Initializr web</h2>
+      <p>Cerró la parte técnica con dónde seguir aprendiendo y una forma de crear proyectos sin el IDE.</p>
+    </div>
+
+    <p class="quote">"Que sea su documentación, que sea su <b>biblia</b> en esas noches de insomnio, cuando no tengan nada de ganas de hacer nada, en lugar de ponerse a maratonear series, se ponen a leer."</p>
+
+    <p class="body">Mostró la página de Spring, con todos los proyectos que tienen soporte: Spring Boot, Cloud, Data, Integration, Batch y Security. Dijo que eventualmente se usarán Data y, "definitivamente", Security. Tiene además herramientas de desarrollo: <b>Spring Tools</b>, con el plugin para Visual Studio Code, y <b>STS</b>, que se puede bajar como programa independiente o como complemento de Eclipse.</p>
+
+    <h3 class="sub">Crear el proyecto desde <code>start.spring.io</code> (minuto 57:00)</h3>
+
+    <ol class="body">
+      <li>Abres el Initializr en el navegador.</li>
+      <li>Eliges: proyecto <b>Maven</b>, lenguaje <b>Java</b>, y una versión de Spring Boot "generalmente aceptada" (no <i>snapshot</i>).</li>
+      <li>Llenas los datos del proyecto: package y versión de Java (él pone 26).</li>
+      <li>Agregas las dependencias: DevTools, Lombok, Web, Data JPA, PostgreSQL o MySQL, Validation, Security.</li>
+      <li>Das <b>Generate</b> y se descarga un <b>.zip</b>. Lo desempaquetas, lo abres y lo corres.</li>
+    </ol>
+
+    <details class="dio"><summary>¿Qué es una versión <i>snapshot</i>?</summary><div class="db">
+      <p>Una versión en desarrollo, todavía no publicada como estable. Cambia sin aviso. Para trabajar conviene la última estable, que es a la que se refiere "generalmente aceptada".</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 12 · minuto 59:00 a 64:47</p>
+      <h2 class="sec">Dudas finales y cierre</h2>
+      <p>Los últimos minutos fueron el profesor caminando entre las computadoras. Salieron tres fórmulas de las tareas, y una revisión de que las respuestas se vieran bien.</p>
+    </div>
+
+    <p class="quote"><b>Alumno:</b> "Profe, ¿cómo era la fórmula de Fahrenheit a Celsius?" <b>Profesor:</b> "(fahrenheit - 32) * 5 / 9." <b>Alumno:</b> "¿Y de Celsius a Kelvin?" <b>Profesor:</b> "celsius + 273.15." <b>Alumno:</b> "¿Y de Kelvin a Fahrenheit?" <b>Profesor:</b> "(kelvin - 273.15) * 9 / 5 + 32."</p>
+
+    <p class="body">Entre 61:30 y 64:47 se acercó a revisar que las respuestas JSON y el código 200 se vieran bien en la herramienta gráfica de cada quien. Hay una frase suelta ("Ya aprovechando que tienen que hacer los cursos... Está bien. Con calma") que no queda clara: probablemente habla de algo externo a la materia.</p>
+
+    <p class="quote">"Listo, señores. Mañana continuamos en el Laboratorio 3."</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Código de la clase</p>
+      <h2 class="sec">El proyecto de corrido</h2>
+      <p>Los tres archivos que se escribieron o tocaron, completos y en el estado en que terminó la clase. El controlador ya trae los dos métodos hechos y un espacio para los cuatro que faltan.</p>
+    </div>
+
+    <h3 class="sub"><code>application.properties</code></h3>
+    <pre><code><span class="cm"># spring.application.name lo genera el asistente con el nombre del proyecto</span>
+server.port=8082</code></pre>
+
+    <h3 class="sub"><code>dto/ConversionResponse.java</code></h3>
+    <pre><code>package com.ipn.mx.dto;
+
+public record ConversionResponse(
+    Double valorOriginal,
+    String unidadOriginal,
+    Double valorRespuesta,
+    String unidadRespuesta
+) {}</code></pre>
+
+    <h3 class="sub"><code>controller/TemperaturaController.java</code></h3>
+    <pre><code>package com.ipn.mx.controller;
+
+import com.ipn.mx.dto.ConversionResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/temperatura")
+public class TemperaturaController {
+
+    @GetMapping("/convertir-a-fahrenheit")
+    public ResponseEntity&lt;ConversionResponse&gt; celsiusToFahrenheit(
+        @RequestParam(name = "valor") Double celsius
+    ) {
+        Double fahrenheit = (celsius * 9 / 5) + 32;
+        ConversionResponse response = new ConversionResponse(celsius, "°C", fahrenheit, "°F");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/convertir-celsius-a-kelvin")
+    public ResponseEntity&lt;ConversionResponse&gt; celsiusToKelvin(
+        @RequestParam(name = "valor") Double celsius
+    ) {
+        Double kelvin = celsius + 273.15;
+        ConversionResponse response = new ConversionResponse(celsius, "°C", kelvin, "K");
+        return ResponseEntity.ok(response);
+    }
+
+    <span class="cm">// Tarea: F a C, F a K, K a C y K a F</span>
+}</code></pre>
+
+    <details class="dio"><summary>¿En qué se diferencia esta versión de lo que quedó en el pizarrón?</summary><div class="db">
+      <p>Son cabos sueltos del ritmo de la clase, no correcciones a lo que dijo:</p>
+      <ul>
+        <li><b>Imports.</b> No los mostró en la transcripción; los agregué para que compile. Los del <code>RestController</code> y <code>RequestMapping</code> sí aparecen ahí, el resto los pone el IDE solo.</li>
+        <li><b>Nombre del endpoint de Kelvin.</b> Aquí va <code>convertir-celsius-a-kelvin</code>, el que probó en vivo, y no <code>convertir-a-kelvin</code>, que trae el bloque de código de la transcripción.</li>
+        <li><b>Nombres asimétricos.</b> El de Fahrenheit se queda sin "celsius" en el nombre. Lo dejé literal; tú decides cómo nombrar los cuatro que faltan.</li>
+        <li><b>Formato.</b> Solo salto de línea en los parámetros para que se lea en pantalla angosta.</li>
+        <li><b>Comentario de tarea.</b> El <code>// Tarea</code> es mío, para marcar dónde van los otros cuatro.</li>
+      </ul>
+    </div></details>
+  </section>
+
+  <section class="final">
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Checklist de la clase 8</h2>
+      <p>Se guarda en tu navegador. Nada se sube a ningún lado ni se comparte con nadie más.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 0</div>
+    </div>
+
+    <div id="finalTasks"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- motor de quiz ---------- */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt";
+          b.textContent=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click",function(){
+      var rows=root.children, right=0, answered=0;
+      Array.prototype.forEach.call(rows,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length
+        ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  /* ---------- 1. el asistente de proyecto ---------- */
+  quiz("q1",[
+    {q:"¿Qué Group ID usó?",
+     opts:["com.ipn.mx","com.spring.api","ApiSimple7CM2"], ans:0,
+     why:"<b>com.ipn.mx.</b> \"Pónganle el que ustedes quieran. En este caso lo voy a dejar com.ipn.mx, nada más por puro gusto.\""},
+    {q:"¿Cuál es la versión mínima de Java para trabajar?",
+     opts:["11","17","21"], ans:1,
+     why:"<b>17.</b> \"Es lo mínimo que se requiere de soporte. De ahí en fuera, ustedes elijan con la que tengan.\""},
+    {q:"Una aplicación web que se va a meter en la carpeta de un Tomcat o un Payara, ¿en qué empaquetado va?",
+     opts:[".jar",".war",".rar"], ans:1,
+     why:"<b>.war</b> (Web Application Archive). \"Es el empaquetado que nosotros metemos en un Tomcat, en un TomEE, en un GlassFish o en un Payara.\""},
+    {q:"¿Por qué el .jar de un proyecto Spring puede correr solo, sin un servidor aparte?",
+     opts:["Trae un Tomcat embebido, minimalista","Se convierte solo en .war","Windows lo ejecuta directo"], ans:0,
+     why:"<b>Tomcat embebido.</b> \"El JAR lo que trae incrustada es una versión muy minimalista de un Tomcat. Por eso puede funcionar.\""},
+    {q:"¿Qué dependencias marcó al final para la clase de hoy?",
+     opts:["DevTools y Web","Data JPA y MySQL","Security y Validation"], ans:0,
+     why:"<b>DevTools y Web.</b> \"Hoy no vamos a jugar con esas cosas, entonces hoy nada más nos vamos a quedar con el DevTools y el Web.\""}
+  ],"q1go","q1rs","q1fb",
+  "<b>Las cinco.</b> Con eso puedes replicar el asistente sin ver la grabación: Maven, Java, JAR, properties, y las dos dependencias de hoy.");
+
+  /* ---------- 2. servidores y puertos ---------- */
+  quiz("q2",[
+    {q:"¿Qué entiende un <b>Web Server</b> como el Apache HTTP Server?",
+     opts:["HTML, CSS, JavaScript y recursos estáticos","Servlets y JSP","Data sources y pools de conexiones"], ans:0,
+     why:"<b>Recursos estáticos.</b> \"Entiende HTML, CSS, JavaScript [...] más un montón de recursos de carácter estático: audio, video, imágenes.\""},
+    {q:"¿Y un <b>Web Container</b> como Tomcat?",
+     opts:["Solo archivos HTML","Tecnología Java para web: Servlets, JSP, Spring MVC, Jakarta Faces","Bases de datos"], ans:1,
+     why:"<b>Tecnología Java para web.</b> \"Servlets y las JSP y cualquier framework de Java que a ustedes se les ocurra para web: Spring MVC, Jakarta Faces.\""},
+    {q:"¿Cuál de estos es un <b>Application Server</b>?",
+     opts:["Nginx","Payara","Insomnia"], ans:1,
+     why:"<b>Payara.</b> Como GlassFish, WebLogic, WebSphere y WildFly (JBoss). Se usan cuando hay servicios, data source y pool de conexiones."},
+    {q:"Tomcat y un servidor de aplicaciones usan por defecto el mismo puerto. ¿Cuál?",
+     opts:["80","8080","3306"], ans:1,
+     why:"<b>8080.</b> \"Esos dos deben tener un puerto diferente.\" En esta clase el Tomcat embebido se pasó al 8082, \"por puro gusto\"."}
+  ],"q2go","q2rs","q2fb",
+  "<b>Las cuatro.</b> El hilo: estático al Web Server, Java para web al Web Container, servicios de empresa al Application Server. Los dos últimos comparten 8080 por defecto.");
+
+  /* ---------- 3. de dónde sale cada pedazo ---------- */
+  var ORIG=["application.properties","@RequestMapping (clase)","@GetMapping (método)","@RequestParam"];
+  quiz("q3",[
+    {q:"<code>:8082</code> del <code>localhost:8082</code>",
+     opts:ORIG, ans:0,
+     why:"<b>application.properties.</b> \"Necesitamos el puerto, que es esta cosa y que básicamente es mi server.port.\""},
+    {q:"<code>/api/temperatura</code>",
+     opts:ORIG, ans:1,
+     why:"<b>@RequestMapping de la clase.</b> \"Tengo que encontrar la forma para llegar a este cuate.\" Vale para todos los métodos del controlador."},
+    {q:"<code>/convertir-a-fahrenheit</code>",
+     opts:ORIG, ans:2,
+     why:"<b>@GetMapping del método.</b> \"Cada método que ustedes mapeen puede llevar un nombre en particular.\" Como todos son GET, el nombre los diferencia."},
+    {q:"<code>?valor=10</code>",
+     opts:ORIG, ans:3,
+     why:"<b>@RequestParam.</b> \"¿Qué nombre va a tener el parámetro que va a recibir? Por ejemplo, valor.\""}
+  ],"q3go","q3rs","q3fb",
+  "<b>Las cuatro.</b> Ahora puedes leer cualquier URL de esta API y decir de qué línea sale cada trozo, y al revés: cambiar el puerto o el nombre sabiendo dónde tocar.");
+
+  /* ---------- 4. arma el método en orden ---------- */
+  var STEPS=[
+    '@GetMapping("/convertir-a-fahrenheit")',
+    'public ResponseEntity<ConversionResponse> celsiusToFahrenheit(@RequestParam(name = "valor") Double celsius) {',
+    'Double fahrenheit = (celsius * 9 / 5) + 32;',
+    'ConversionResponse response = new ConversionResponse(celsius, "°C", fahrenheit, "°F");',
+    'return ResponseEntity.ok(response);',
+    '}'
+  ];
+  var INDENT=[0,0,1,1,1,0];
+  var STEPWHY=[
+    "Primero el verbo y el nombre del método: <code>@GetMapping</code>.",
+    "Luego la firma: público, devuelve <code>ResponseEntity&lt;ConversionResponse&gt;</code> y recibe el parámetro <code>valor</code> como <code>Double celsius</code>.",
+    "Dentro: la cuenta. Se multiplica por 9, se divide entre 5 y se suma 32.",
+    "Después se arma el objeto respuesta, en el orden del record: valor original, unidad original, valor de respuesta, unidad de respuesta.",
+    "Se devuelve con <code>ResponseEntity.ok(response)</code>, o sea, código 200.",
+    "Y se cierra el método."
+  ];
+  var placed=[], bank=document.getElementById("bank"),
+      built=document.getElementById("built"), bldFb=document.getElementById("bldFb");
+
+  function shuffled(){
+    var idx=STEPS.map(function(_,i){return i;});
+    for(var i=idx.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), t=idx[i]; idx[i]=idx[j]; idx[j]=t;
+    }
+    return idx;
+  }
+  function pad(n){ return new Array(n*4+1).join(" "); }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled().forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS[i];
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          bldFb.className="fb show good";
+          bldFb.innerHTML = placed.length===STEPS.length
+            ? "<b>Ese es el método completo.</b> Para Celsius a Kelvin cambia cuatro cosas: el nombre del mapeo, el nombre del método, la cuenta (<code>celsius + 273.15</code>) y la unidad de respuesta (<code>\"K\"</code>)."
+            : "<b>Va.</b> "+STEPWHY[i];
+        } else {
+          bldFb.className="fb show bad";
+          bldFb.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed.length===0
+              ? "Empieza por la anotación del verbo."
+              : "Antes va otra. Pista: "+STEPWHY[placed.length].replace(/<[^>]+>/g,""));
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando el método…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=pad(INDENT[i])+STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){
+        placed=placed.slice(0,n); renderBuilt(); renderBank(); bldFb.className="fb";
+      });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){
+    placed=[]; renderBuilt(); renderBank(); bldFb.className="fb";
+  });
+  renderBuilt(); renderBank();
+
+  /* ---------- 5. cuentas (input numérico validado) ---------- */
+  var NUMS=[
+    {q:"<b>10 °C</b> a Fahrenheit, con <code>/convertir-a-fahrenheit?valor=10</code>.", ans:50,
+     f:"(celsius * 9 / 5) + 32 = (10 * 9 / 5) + 32 = 18 + 32"},
+    {q:"<b>20 °C</b> a Kelvin, con <code>/convertir-celsius-a-kelvin?valor=20</code>.", ans:293.15,
+     f:"celsius + 273.15 = 20 + 273.15"},
+    {q:"<b>212 °F</b> a Celsius, con la fórmula que dio al final.", ans:100,
+     f:"(fahrenheit - 32) * 5 / 9 = 180 * 5 / 9"},
+    {q:"<b>273.15 K</b> a Fahrenheit, con la fórmula que dio al final.", ans:32,
+     f:"(kelvin - 273.15) * 9 / 5 + 32 = 0 * 9 / 5 + 32"}
+  ];
+  var q5=document.getElementById("q5"), q5fb=document.getElementById("q5fb"), q5ok={};
+  function buildNums(){
+    q5.innerHTML=""; q5ok={}; q5fb.className="fb";
+    NUMS.forEach(function(c,i){
+      var row=document.createElement("div"); row.className="crow";
+      row.innerHTML='<div class="cq">'+c.q+'</div>'+
+        '<div class="cl"><span>valorRespuesta =</span>'+
+        '<input type="text" inputmode="decimal" id="q5i'+i+'" autocomplete="off" spellcheck="false" aria-label="Valor de respuesta">'+
+        '<button class="btn" type="button">Comprobar</button></div>'+
+        '<div class="ch"></div>';
+      var inp=row.querySelector("input"), btn=row.querySelector("button"), ch=row.querySelector(".ch");
+      function check(){
+        var raw=inp.value.trim().replace(",",".");
+        row.classList.remove("right","wrong");
+        if(!raw){ ch.className="ch"; return; }
+        var v=parseFloat(raw);
+        ch.className="ch show";
+        if(!isNaN(v) && Math.abs(v-c.ans)<0.005){
+          row.classList.add("right"); q5ok[i]=true;
+          ch.innerHTML="<b>Correcto:</b> <code>"+c.f+"</code> = "+c.ans+".";
+          if(Object.keys(q5ok).length===NUMS.length){
+            q5fb.className="fb show good";
+            q5fb.innerHTML="<b>Las cuatro.</b> Ya tienes las fórmulas que dio, en las dos direcciones más usadas. Con esas más las tuyas sale el resto del conversor.";
+          }
+        } else {
+          row.classList.add("wrong"); delete q5ok[i]; q5fb.className="fb";
+          ch.innerHTML="<b>No coincide.</b> Prueba con la fórmula: <code>"+c.f.split(" = ")[0]+"</code>.";
+        }
+      }
+      btn.addEventListener("click",check);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter") check(); });
+      q5.appendChild(row);
+    });
+  }
+  document.getElementById("q5rs").addEventListener("click",buildNums);
+  buildNums();
+
+  /* ---------- 6. repaso ---------- */
+  quiz("q6",[
+    {q:"¿Qué código HTTP devuelve <code>ResponseEntity.ok(response)</code>?",
+     opts:["200 (OK)","201 (CREATED)","204 (NO_CONTENT)"], ans:0,
+     why:"<b>200.</b> \"A lo mejor no lo conceptualizamos, pero nos está devolviendo un 200 (HttpStatus.OK).\""},
+    {q:"¿Por qué usó un <code>record</code> para <code>ConversionResponse</code> y no una clase común?",
+     opts:["Porque no va a cambiar: es inmutable","Porque las clases no funcionan en Spring","Porque necesita más getters"], ans:0,
+     why:"<b>Es inmutable.</b> \"Esta cosa no va a cambiar\": se arma una vez con sus valores y se manda. La versión con clase también funciona; solo pide getters, setters y (con Lombok) sus anotaciones."},
+    {q:"Quitas <code>server.port</code> del <code>application.properties</code> y llamas a <code>localhost:8082</code>. ¿Qué pasa?",
+     opts:["Responde igual","Error de conexión: el servidor se quedó en el 8080","Spring elige otro puerto libre"], ans:1,
+     why:"<b>No conecta.</b> Sin la propiedad, Tomcat se apropia del 8080. \"Es lo único que hace esa propiedad.\""},
+    {q:"En la herramienta gráfica, ¿cómo mandas <code>valor=50</code> sin escribirlo en la URL?",
+     opts:["En Body, con un JSON","En Query Params: Name = valor, Value = 50","No se puede, va siempre en la URL"], ans:1,
+     why:"<b>Query Params.</b> \"Name: valor, Value: 50.\" La herramienta vuelve a construir el preview de la URL con el <code>?valor=50</code> incluido."}
+  ],"q6go","q6rs","q6fb",
+  "<b>Las cuatro.</b> Un 200 con <code>ResponseEntity.ok</code>, un DTO inmutable, un puerto que se configura en un solo lugar, y el parámetro que puede ir en la URL o en Query Params.");
+
+  /* ---------- checklist ---------- */
+  var FINAL=[
+    {id:"c8-conversor", t:"Tarea 1 · terminar el conversor de temperaturas",
+     d:"Faltan cuatro: Fahrenheit a Celsius, Fahrenheit a Kelvin, Kelvin a Celsius y Kelvin a Fahrenheit. Celsius a Fahrenheit y Celsius a Kelvin los hizo él. Valores de prueba: 10 °C a 50 °F, 20 °C a 68 °F, 20 °C a 293.15 K."},
+    {id:"c8-lab", t:"Pendiente administrativo · laboratorio del jueves 10 en el Laboratorio 3",
+     d:"Ahí se revisan los demás endpoints. Es un cambio de aula: \"los jueves es en el 3\". Lo dijo dos veces, a media clase y al cierre."},
+    {id:"c8-17", t:"Por confirmar · qué vence \"la fecha del 17 de septiembre\"",
+     d:"La mencionó al hablar de altas y bajas, sin aclarar. Pregúntale si te afecta. No confundir con la entrega de la investigación de HTTP."},
+    {id:"c8-help", t:"Recomendación · leer HELP.md y la documentación de Spring",
+     d:"No es tarea: dijo que vale la pena revisar el HELP.md del proyecto y que la documentación de Spring sea \"su biblia\"."}
+  ];
+  var KEY="clase8-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var fh=document.getElementById("finalTasks"), bar=document.getElementById("bar"),
+      pc=document.getElementById("pcount");
+  FINAL.forEach(function(it){
+    var l=document.createElement("label"); l.className="ftask";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!st[it.id];
+    var b=document.createElement("div");
+    b.innerHTML='<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent=it.t;
+    b.querySelector(".td2").textContent=it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if(cb.checked) l.classList.add("done");
+    cb.addEventListener("change",function(){
+      st[it.id]=cb.checked; l.classList.toggle("done",cb.checked);
+      try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+  function refresh(){
+    var done=0, boxes=fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes,function(c){ if(c.checked) done++; });
+    pc.textContent=done+" / "+FINAL.length;
+    bar.style.width=Math.round(done/FINAL.length*100)+"%";
+  }
+  refresh();
+})();
+</script>

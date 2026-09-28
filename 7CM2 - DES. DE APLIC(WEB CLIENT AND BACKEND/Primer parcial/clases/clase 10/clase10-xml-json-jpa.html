@@ -1,0 +1,1206 @@
+<title>Clase 10 · De XML a JPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F1EEEA; --surface:#FFFFFF; --surface-2:#F7F4EF;
+    --text:#1C1712; --text-muted:#665D51; --border:#E1D8CB;
+    --accent:#8A5A1E; --accent-soft:#F3E6D2; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --xml:#8A5A1E; --xml-soft:#F3E6D2;
+    --json:#2E6B5E; --json-soft:#DEEFEA;
+    --jpa:#3A4F8A; --jpa-soft:#E3E8F7;
+    --code-bg:#F3EFE7;
+    --shadow:0 1px 2px rgba(28,23,18,.06), 0 10px 26px -14px rgba(28,23,18,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#15120E; --surface:#1E1A15; --surface-2:#241F19;
+      --text:#EEE8DE; --text-muted:#A99C8A; --border:#332C22;
+      --accent:#D0A25F; --accent-soft:#2C2214; --accent-ink:#15120E;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --xml:#D0A25F; --xml-soft:#2C2214;
+      --json:#6FC3AC; --json-soft:#122A24;
+      --jpa:#8FA0E6; --jpa-soft:#1B2136;
+      --code-bg:#191510;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#15120E; --surface:#1E1A15; --surface-2:#241F19;
+    --text:#EEE8DE; --text-muted:#A99C8A; --border:#332C22;
+    --accent:#D0A25F; --accent-soft:#2C2214; --accent-ink:#15120E;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --xml:#D0A25F; --xml-soft:#2C2214;
+    --json:#6FC3AC; --json-soft:#122A24;
+    --jpa:#8FA0E6; --jpa-soft:#1B2136;
+    --code-bg:#191510;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+  .lede + .lede{margin-top:10px;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+
+  /* --- las tres etapas del semestre: XML, JSON, JPA. cada bloque de esa
+         etapa lleva su color, como el mismo dato pasando de formato en formato --- */
+  .etapa{border-left:3px solid var(--ec); padding-left:16px;}
+  .etapa.xml{--ec:var(--xml);} .etapa.json{--ec:var(--json);} .etapa.jpa{--ec:var(--jpa);}
+  .etapa h2.sec{color:var(--ec);}
+  .etapabar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .etchip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .etchip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--ec);}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; margin:16px 0; max-width:68ch; display:flex; gap:11px;}
+  .note .ic{flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--border);
+    color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;}
+  .note p{font-family:'Source Serif 4',Georgia,serif; font-size:.86rem; line-height:1.55;
+    color:var(--text-muted); margin:0;}
+  .note b{color:var(--text); font-weight:600;}
+
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer; text-align:left;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;
+    overflow-x:auto;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px; white-space:pre;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.74rem; padding:7px 11px;
+    border-radius:8px; cursor:pointer; text-align:left; max-width:100%; overflow-wrap:anywhere;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .crow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px;
+    padding:11px 13px; margin-bottom:10px;}
+  .crow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .crow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .crow .cq{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; margin-bottom:8px; line-height:1.5;}
+  .crow .cl{display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem;}
+  .crow input, .crow textarea{font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding:7px 9px;
+    background:var(--surface); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; width:100%;}
+  .crow textarea{min-height:78px; resize:vertical;}
+  .crow .ch{font-family:'Source Serif 4',Georgia,serif; font-size:.85rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .crow .ch.show{display:block;}
+  .crow .ch b{color:var(--text); font-weight:600;}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:520px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:480px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+  td.mono{font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Web Client · Clase 10 · miércoles · antes del puente</p>
+    <h1>El mismo dato, tres veces: XML, JSON y JPA</h1>
+    <p class="lede">Clase de teoría con pizarrón, cerrando la Unidad II. El profesor recorre el mismo problema —cómo representar un empleado o un producto fuera de una tabla— con tres formatos distintos: XML "a la antigua", JSON "porque es más simple", y al final el salto real de la clase, JPA, que vuelve a conectar una clase Java con una tabla relacional sin escribir SQL.</p>
+    <p class="lede">Cada bloque lleva el color de su formato: <span style="color:var(--xml);font-weight:700;">XML</span>, <span style="color:var(--json);font-weight:700;">JSON</span> y <span style="color:var(--jpa);font-weight:700;">JPA</span>. Los botones con <b style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">?</b> explican los términos que dio por sabidos. Hay seis ejercicios intercalados.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="arranque">
+    <h2>Lo que salió de esta clase</h2>
+    <ol>
+      <li><span class="t">≈00:00</span><span class="d"><b>Práctica nueva:</b> instalar <b>SonarQube</b> (Docker recomendado) y llevar el proyecto del conversor de temperaturas a <b>100 de 100</b> en cobertura, con pruebas de JUnit y Mockito. Sin fecha fija.</span></li>
+      <li><span class="t">≈00:00</span><span class="d"><b>Arrastre:</b> terminar el conversor de temperaturas si aún faltaba (viene de la clase 8). Confía en que ya está.</span></li>
+      <li><span class="t">≈00:00</span><span class="d"><b>Examen del primer parcial:</b> anunciado para el <b>30 de septiembre</b>, hasta el tema 2.5. La 2.6 (seguridad de servicios) se mueve al siguiente parcial.</span></li>
+      <li><span class="t">cierre</span><span class="d"><b>"Nos vemos el jueves. Disfruten su puente."</b> Es la única referencia de fecha explícita en todo el texto.</span></li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <span class="ic">i</span>
+    <p><b>Sobre la fecha y los minutos.</b> No hay marcas de tiempo reales; puse "≈00:00" en el arranque porque esa parte no trae ninguna referencia de minuto. El profesor menciona "hoy estamos a 16, 17, 18" para ubicar el examen "en dos semanas" el 30 de septiembre, lo que sitúa esta clase alrededor del <b>16 al 18 de septiembre</b>. Cierra con "nos vemos el jueves, disfruten su puente" — probablemente el puente por el 16 de septiembre. Con la clase 9 puesta el jueves 10, y esta claramente antes del examen del 30 y con un puente de por medio, lo más probable es que esta clase sea el <b>miércoles 16 de septiembre</b>. Confírmalo con tu calendario antes de fiarte de esa fecha para otra cosa.</p>
+  </div>
+
+  <section>
+    <div class="etapa xml">
+      <div class="etapabar"><span class="etchip">XML · el metalenguaje</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 1 · repaso de XML</p>
+        <h2 class="sec">Por qué XML no tiene etiquetas propias</h2>
+        <p>Retoma XML como cierre de lo visto en la clase 7 sobre SOAP y WSDL, y empieza aclarando algo que suena contradictorio.</p>
+      </div>
+
+      <p class="quote">"XML es considerado como un metalenguaje. En realidad funciona a base de definiciones de metadatos. [...] XML no tiene etiquetas. Existen reglas para crear etiquetas, y las etiquetas ustedes las pueden crear según lo que ustedes consideren."</p>
+
+      <p class="body">A diferencia de HTML, que trae un catálogo fijo de etiquetas (<code>&lt;p&gt;</code>, <code>&lt;div&gt;</code>, <code>&lt;table&gt;</code>...), en XML tú inventas el nombre. Si estás modelando un alumno, tú decides que existan etiquetas como matrícula, nombre o carrera. Lo único que XML impone son las <b>reglas de forma</b>, no el vocabulario.</p>
+
+      <details class="dio"><summary>¿Qué es un metalenguaje?</summary><div class="db">
+        <p>Un lenguaje que sirve para describir o construir otros lenguajes. XML no te da un vocabulario de etiquetas: te da las reglas con las que puedes inventar el tuyo (cómo se abre una etiqueta, cómo se cierra, qué es un atributo). Por eso el mismo XML sirve para facturas, para configuración, o para un WSDL: cada quien define su propio conjunto de etiquetas encima de esas mismas reglas.</p>
+      </div></details>
+
+      <p class="body">En su momento se pensó que XML sería el estándar para el intercambio de información entre sistemas heterogéneos, "por su simplicidad en ese momento". A la larga resultó no ser tan simple, porque sus reglas de cumplimiento se volvieron bastante estrictas.</p>
+
+      <div class="tablewrap"><table>
+        <thead><tr><th>Sigla</th><th>Qué es, según él</th></tr></thead>
+        <tbody>
+          <tr><td class="sym">WSDL</td><td class="d">El contrato: cómo llegar a un método, dónde está publicado, qué espera recibir y qué devuelve.</td></tr>
+          <tr><td class="sym">UDDI</td><td class="d">"No es la UDDI de allá": sirve para registrar y descubrir qué servicios web existen.</td></tr>
+        </tbody>
+      </table></div>
+
+      <details class="dio"><summary>¿Qué significa UDDI y por qué aclaró "no es la de allá"?</summary><div class="db">
+        <p><b>Universal Description, Discovery and Integration</b>: un directorio donde se publican y buscan servicios web SOAP disponibles, como unas páginas amarillas de servicios. La aclaración es un chiste sobre la coincidencia del nombre con otras siglas o marcas fuera de la informática; no aporta contenido técnico.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="etapa xml">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 2 · estructura de un documento XML</p>
+        <h2 class="sec">Prólogo, elemento raíz y subelementos</h2>
+        <p>La estructura mínima de cualquier XML, y de dónde puede venir el contenido que se modela.</p>
+      </div>
+
+      <p class="body">Todo XML debería tener, como mínimo, una <b>instrucción de procesamiento</b> (la declaración de versión y codificación), un <b>elemento raíz</b>, y dentro de él, tantos <b>subelementos</b> como se necesiten.</p>
+
+      <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;book&gt;
+  &lt;titulo&gt;...&lt;/titulo&gt;
+  &lt;autor&gt;...&lt;/autor&gt;
+&lt;/book&gt;</code></pre>
+
+      <p class="quote">"¿Quién me dice que la etiqueta <code>&lt;book&gt;</code> existe? Pues en realidad se le ocurrió a la persona que definió que iba a modelar un libro."</p>
+
+      <p class="body">Con eso ya se cumplen las reglas mínimas. En su momento, XML también se usó para agentes inteligentes y ontologías, "y todo este relajo".</p>
+
+      <h3 class="sub">Elementos con solo atributos, y elementos con cuerpo</h3>
+
+      <p class="body">Partió de un caso concreto: una tabla <code>Empleado(id, nombre)</code> de un modelo relacional. Esa misma información en XML se puede repartir entre <b>atributos</b> y <b>subelementos</b>:</p>
+
+      <pre><code>&lt;empleados&gt;
+  &lt;empleado id="100"&gt;
+    &lt;nombre&gt;Juan&lt;/nombre&gt;
+  &lt;/empleado&gt;
+&lt;/empleados&gt;</code></pre>
+
+      <p class="body">Aquí <code>id</code> es un atributo del elemento <code>empleado</code>, y <code>nombre</code> es un subelemento suyo. Pero también se puede modelar todo como atributos, sin cuerpo, cerrando la etiqueta en la misma línea:</p>
+
+      <pre><code>&lt;empleado id="100" nombre="Richard" /&gt;</code></pre>
+
+      <p class="quote">"Quiere decir que, cuando se creó la definición del documento XML, se determinó que el elemento empleado solo iba a tener atributos y no iba a tener cuerpo."</p>
+
+      <details class="dio"><summary>¿Cuándo conviene un atributo y cuándo un subelemento?</summary><div class="db">
+        <p>El profesor no dio una regla fija, solo una advertencia: puedes modelar un registro con puros atributos, con puros subelementos, o mezclando los dos, "la que ustedes quieran". La única condición es decidirlo con cabeza, porque quien reciba el XML va a tener que <b>parsearlo</b> (leerlo con código), y mezclar mucho ambos estilos hace ese parser más complicado. "Se pone divertido más que complejo."</p>
+      </div></details>
+
+      <h3 class="sub">CDATA, comentarios y secuencias de escape</h3>
+
+      <p class="body">Las secciones <b>CDATA</b> guardan contenido tal cual, sin que se interprete como marcado: "no es precisamente un comentario, pero es una formulita". Sirven, por ejemplo, para meter texto con símbolos que de otro modo XML confundiría con etiquetas.</p>
+
+      <p class="body">Los comentarios usan la misma sintaxis que HTML, porque HTML la heredó de XML/SGML:</p>
+
+      <pre><code>&lt;!-- Esto es un comentario --&gt;</code></pre>
+
+      <p class="body">Para meter caracteres especiales dentro del contenido (como <code>&lt;</code> o <code>&gt;</code> dentro de una comparación), XML usa <b>secuencias de escape</b>, igual que HTML.</p>
+
+      <details class="dio"><summary>¿Qué son las secuencias de escape en XML?</summary><div class="db">
+        <p>Códigos que representan un carácter que, si se escribiera literal, rompería la sintaxis. Por ejemplo <code>&amp;lt;</code> representa <code>&lt;</code> y <code>&amp;gt;</code> representa <code>&gt;</code>. El profesor lo ilustró con una condición del estilo "si A es mayor que B y B es mayor que C" (como las que se escriben en C, Java o JavaScript), donde los signos de mayor/menor tendrían que escribirse así para no confundirse con etiquetas.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 1 · atributos y subelementos</p>
+    <h3>Leyendo un XML de empleados</h3>
+    <p class="ask">Cuatro preguntas sobre la estructura y las reglas de XML que vimos arriba. Contesta las cuatro y dale a <b>Revisar</b>.</p>
+    <div class="qrows" id="q1"></div>
+    <div class="btnrow">
+      <button class="btn" id="q1go" type="button">Revisar</button>
+      <button class="btn ghost" id="q1rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q1fb"></div>
+  </div>
+
+  <section>
+    <div class="etapa xml">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 3 · bien formado y válido</p>
+        <h2 class="sec">Las dos reglas de un XML, y quién las juzga</h2>
+        <p>Retoma la distinción de la clase 7 y la aterriza con un ejemplo de cómo se relaciona con lo que ya sabían de bases de datos.</p>
+      </div>
+
+      <p class="quote">"Cualquier documento que nosotros queramos escribir con extensión <code>.xml</code> se va a mostrar en el navegador, igualito que el HTML. [...] Y no quiere decir que sea un documento válido, simplemente es un documento bien formado."</p>
+
+      <p class="body">Un XML tiene que cumplir dos reglas: estar <b>bien formado</b> y ser <b>válido</b>. Puede estar bien formado sin ser válido. Lo bien formado depende de reglas fijas (elemento raíz único, etiquetas de apertura y cierre que coincidan, nombres de atributo únicos dentro del mismo elemento, etc.). Lo válido depende de un criterio externo.</p>
+
+      <p class="body">Ese criterio externo llega por el atributo <code>xmlns</code>, que normalmente apunta a una URL. Esa URL puede terminar en <code>.xsd</code> o en <code>.dtd</code>, y ahí vienen las reglas concretas que dicen si el documento es válido.</p>
+
+      <details class="dio"><summary>¿Qué diferencia hay entre un DTD y un XSD?</summary><div class="db">
+        <p>Los dos describen qué elementos, atributos y estructura debe tener un XML para ser válido contra ese esquema. El <b>DTD</b> (Document Type Definition) es el más antiguo y usa su propia sintaxis, no basada en XML. El <b>XSD</b> (XML Schema Definition) es más moderno, está escrito en el propio XML, y permite describir tipos de datos con más detalle (enteros, fechas, listas, cardinalidad exacta).</p>
+      </div></details>
+
+      <p class="body">Conectó esto con lo ya visto en bases de datos: las mismas restricciones que se ponen ahí (cardinalidad uno a uno, uno a muchos, listas de subelementos en cierto orden, que aparezca una, varias o muchas veces un subelemento) se pueden expresar en el DTD o el XSD correspondiente.</p>
+
+      <p class="quote">"Alguna vez, en el ecosistema de Java, nosotros jugamos con algo que se llamaba <b>Struts</b>. [...] Bastaba con ir al DTD, porque venía muy explicadito de qué elementos podíamos tener y para qué servía. Ese fue uno de los proyectos para mi gusto mejor documentados."</p>
+
+      <details class="dio"><summary>¿Qué fue Struts?</summary><div class="db">
+        <p>Uno de los primeros frameworks Modelo-Vista-Controlador para aplicaciones web en Java, de código abierto. El profesor lo mencionó solo como anécdota, para destacar que su archivo de configuración DTD estaba muy bien documentado.</p>
+      </div></details>
+
+      <p class="body">Cerró la parte de XML con la pregunta que se hace toda esta unidad: ¿se sigue usando? "Sí, para las facturas, de arranque." El resto, no lo sabe.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 2 · bien formado o válido</p>
+    <h3>¿Cuál de los dos falla?</h3>
+    <p class="ask">Tres casos. Decide si el problema es de buena formación o de validez.</p>
+    <div class="qrows" id="q2"></div>
+    <div class="btnrow">
+      <button class="btn" id="q2go" type="button">Revisar</button>
+      <button class="btn ghost" id="q2rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q2fb"></div>
+  </div>
+
+  <section>
+    <div class="etapa json">
+      <div class="etapabar"><span class="etchip">JSON · la alternativa simple</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 4 · por qué JSON</p>
+        <h2 class="sec">El mismo empleado, mucho más corto</h2>
+        <p>Introduce JSON con una broma sobre el nombre de su ícono habitual, y va directo a la razón de ser: XML funciona, pero es tedioso.</p>
+      </div>
+
+      <p class="quote">"¿Por qué buscamos otra alternativa? Porque el XML es tedioso, aburrido y propenso a errores. Nada más por eso."</p>
+
+      <p class="body"><b>JSON</b> (JavaScript Object Notation) es un formato liviano, una cadena de texto, y resulta natural para quien ya viene programando en JavaScript: modelar un objeto es casi lo mismo que crear una variable.</p>
+
+      <p class="body">Escribió primero una versión incorrecta a propósito, para que el grupo la corrigiera:</p>
+
+      <pre><code><span class="cm">// incorrecto</span>
+{
+  id: 1,
+  nombre: "yo"
+}</code></pre>
+
+      <p class="quote">"Miren, mi profe dice algo como esto en clases: equivóquense aquí, y no allá afuera. En el caso de ustedes, equivóquense aquí."</p>
+
+      <p class="body">La corrección: los nombres de los atributos van entre comillas dobles, porque un objeto JSON es una lista de pares nombre-valor separados por comas, con dos puntos entre el nombre y el valor.</p>
+
+      <pre><code>{
+  "id": 1,
+  "nombre": "yo"
+}</code></pre>
+
+      <p class="body">Comparó el costo de arrancar cada formato: en XML hace falta la declaración de versión y codificación, el elemento raíz, los subelementos... para modelar lo mismo que en JSON basta con unas llaves. "No le resta credibilidad al otro, no le resta poder al otro, simplemente se volvió más simple."</p>
+
+      <details class="dio"><summary>¿Por qué JSON es "más simple para los humanos" y no solo para las máquinas?</summary><div class="db">
+        <p>No hay etiquetas de apertura y cierre que repetir (como <code>&lt;nombre&gt;...&lt;/nombre&gt;</code>), no hay que declarar versión ni codificación, y la sintaxis de llaves y corchetes ya es familiar para cualquiera que haya programado en un lenguaje de la familia C o JavaScript. Menos símbolos repetidos, menos oportunidades de error al escribirlo a mano.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="etapa json">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 5 · objetos anidados y listas</p>
+        <h2 class="sec">Un JSON dentro de otro, y colecciones</h2>
+        <p>Con la sintaxis básica ya corregida, muestra que JSON aguanta la misma variedad de estructuras que un modelo relacional con asociaciones.</p>
+      </div>
+
+      <p class="body">Partió de un caso con dos tablas relacionadas, <code>evento</code> y <code>asistente</code>, con una asociación uno a muchos entre ellas. Eso se modela metiendo un objeto (o una lista de objetos) dentro de otro objeto:</p>
+
+      <pre><code>{
+  "evento": 1,
+  "nombre": "Premiere The Flash",
+  "descripcion": "película relacionada con Flashpoint",
+  "fecha": "2024-06-14",
+  "listaDeAsistentes": [
+    { "id": 5, "nombre": "Barry", "paterno": "Allen", "materno": "West",
+      "correo": "flash@ligadelajusticia" },
+    { "id": 6, "nombre": "Bruno", "paterno": "Díaz", "materno": "",
+      "correo": "batman@ligadelajusticia" },
+    { "id": 7, "nombre": "Kara", "paterno": "Danvers", "materno": "",
+      "correo": "supergirl@ligadelajusticia" }
+  ]
+}</code></pre>
+
+      <p class="quote">"¿Cómo se llama el atributo? El atributo se llama <code>listaDeAsistentes</code>, es igual... es una colección, va entre corchetes, y cada objeto va entre su respectiva llave."</p>
+
+      <p class="body">La lectura práctica: si un aplicativo recibe este JSON al crear un evento, puede insertar en la tabla <code>evento</code> y, con la lista de asistentes, insertar también en la tabla <code>asistente</code>. Un solo objeto JSON puede representar una operación que toca varias tablas relacionadas.</p>
+
+      <p class="body">También repasó valores <b>booleanos</b> (si algo es administrador, si un documento es descargable), y varios ejemplos rápidos de listas simples: deportes, entidades federativas, niveles de estudio. La conclusión de todos: "¿podemos hacer eso con JSON? Sí."</p>
+
+      <details class="dio"><summary>¿Cómo se usa este JSON directamente en JavaScript?</summary><div class="db">
+        <pre><code>let datos = { ... };
+console.log(datos.listaDeAsistentes[0].nombre); <span class="cm">// "Barry"</span></code></pre>
+        <p>A diferencia de XML, no hace falta ningún parser aparte: el objeto JSON ya es una estructura de JavaScript en cuanto se asigna a una variable. El profesor lo resumió así: "métanlo en alguna variable y san se acabó. Y operen con él."</p>
+      </div></details>
+
+      <p class="body">Cerró la parte de JSON con una pregunta suelta sobre <code>var</code>, <code>let</code> y <code>const</code>, sin responderla, como algo para que el grupo repase.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 3 · corrige el JSON</p>
+    <h3>Encuentra los errores</h3>
+    <p class="ask">El mismo ejercicio que hizo en el pizarrón: aquí el JSON tiene errores de sintaxis. Corrígelo y comprueba.</p>
+    <div id="q3"></div>
+    <div class="btnrow">
+      <button class="btn" id="q3check" type="button">Comprobar</button>
+      <button class="btn ghost" id="q3rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q3fb"></div>
+  </div>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 4 · arma la lista de asistentes</p>
+    <h3>Objetos dentro de un arreglo</h3>
+    <p class="ask">Toca las líneas en el orden en que arma el objeto <code>evento</code> con su lista de asistentes. Si te equivocas te doy una pista.</p>
+    <div class="built" id="built"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow"><button class="btn ghost" id="bldRs" type="button">Reiniciar</button></div>
+    <div class="fb" id="bldFb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 6 · avisos de grupo</p>
+      <h2 class="sec">SonarQube, el examen y el temario</h2>
+      <p>Cierra la parte teórica y dedica el resto de la clase a tres avisos: una práctica nueva, la fecha del examen, y qué se salta del temario.</p>
+    </div>
+
+    <h3 class="sub">La práctica: 100 de 100 en SonarQube</h3>
+
+    <p class="quote">"Necesito que me instalen <b>SonarQube</b>. [...] Si lo instalan a manita, en la máquina en forma local, les va a pedir una base de datos. Trabaja con... de manera natural trabaja con PostgreSQL. Pero le pueden meter con lo que quieran. [...] O mejor aún, para que sea divertido: métanlo en un <b>Docker</b>. Sí, y así repasan contenedores."</p>
+
+    <p class="body">El proyecto sobre el que se corre SonarQube es el conversor de temperaturas de la clase 8, "que se supone que ya lo terminaron. Yo confiaré en ustedes." El reto:</p>
+
+    <p class="quote">"Que en esta cosa, me obtengan, por favor, un <b>100 de 100</b>. [...] Así como está, si lo echan a andar, van a obtener un cero de 100 en <i>coverage</i>, porque no hay cobertura para pruebas. Hay que escribir pruebas. [...] Pueden agarrar <b>JUnit</b>, <b>Mockito</b>, para hacer pruebas."</p>
+
+    <p class="body">Un alumno preguntó si bastaba con probar el "happy path" o también los casos donde la prueba falla. Respuesta: "sorpréndanme". Lo que le interesa es que lo echen a andar y verifiquen que hay cumplimiento. Puso un ejemplo de caso de falla: mandar un carácter en vez de un número al endpoint de conversión.</p>
+
+    <details class="dio"><summary>¿Qué es SonarQube y qué mide el "coverage"?</summary><div class="db">
+      <p><b>SonarQube</b> es una herramienta de análisis estático de código: revisa tu proyecto y reporta bugs potenciales, vulnerabilidades, código duplicado y, entre otras métricas, la <b>cobertura de pruebas</b> (<i>coverage</i>): qué porcentaje de las líneas de tu código se ejecuta al menos una vez cuando corres tus pruebas automatizadas. Si no tienes pruebas, la cobertura es 0%, sin importar qué tan bien funcione el código.</p>
+    </div></details>
+
+    <details class="dio"><summary>¿Qué son JUnit y Mockito?</summary><div class="db">
+      <p><b>JUnit</b> es el framework estándar de Java para escribir y ejecutar pruebas unitarias: cada prueba llama a un método y compara el resultado contra lo esperado. <b>Mockito</b> sirve para crear objetos "de mentiras" (mocks) que simulan una dependencia real, como una base de datos, para poder probar una clase sin depender de que esa pieza externa esté funcionando.</p>
+    </div></details>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Práctica</span><span class="task-when">≈00:00 · sin fecha fija</span></div>
+      <h3>Instalar SonarQube y llegar a 100/100 en el conversor de temperaturas</h3>
+      <p>No dio fecha exacta: "no sé si es para la próxima semana, para dentro de 15 días, para dentro de un mes. Pero háganlo porque lo van a ocupar para el resto del semestre." Se recomienda instalarlo en Docker.</p>
+      <p class="said">"Necesito que recuerden sus buenas clases de Quality Assurance."</p>
+    </div>
+
+    <h3 class="sub">Fecha del examen y el temario que falta</h3>
+
+    <p class="body">Repasó el avance de la Unidad II: el tema 2.6 (seguridad de servicios) se pospone hasta que haya servicios con acceso real a datos, roles y permisos, porque "esa se aguanta". El 2.2 se cierra con esta clase. El 2.3 (principios arquitectónicos de un API REST) ya se hizo en la práctica, aunque falta la teoría. Decidió saltarse la teoría de 2.3, y el 2.4 y 2.5 completos, "porque si no, no nos va a alcanzar el tiempo", con intención de volver a ellos después.</p>
+
+    <p class="quote">"El examen solo va a venir hasta la 2.5, por lo tanto lo tengo que ver antes de que termine este parcial. La 2.6 la voy a mover para el otro periodo. [...] Hoy estamos a 16, 17, 18... Ah, okay, más bien en dos semanas: 28, 29 y 30. Entonces vamos a dejar el examen para el <b>30</b>."</p>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Fecha confirmada</span><span class="task-when">30 de septiembre</span></div>
+      <h3>Examen del primer parcial</h3>
+      <p>Cubre hasta el tema 2.5 de la Unidad II. El 2.6 (seguridad de servicios) queda fuera y se ve en el siguiente parcial.</p>
+      <p class="said">"Se traen muchas ganas, bolígrafo, corrector, y demás cosas."</p>
+    </div>
+
+    <p class="body">Antes de pasar al bloque de JPA, dejó escrito en el pizarrón el arranque de la práctica que viene: crear una base de datos.</p>
+
+    <pre><code>CREATE DATABASE productos_CM2;</code></pre>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 5 · avisos de la clase</p>
+    <h3>SonarQube, el examen y el temario</h3>
+    <p class="ask">Cuatro preguntas sobre lo anunciado en este bloque.</p>
+    <div class="qrows" id="q5"></div>
+    <div class="btnrow">
+      <button class="btn" id="q5go" type="button">Revisar</button>
+      <button class="btn ghost" id="q5rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q5fb"></div>
+  </div>
+
+  <section>
+    <div class="etapa jpa">
+      <div class="etapabar"><span class="etchip">JPA · el objeto vuelve a la tabla</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 7 · el modelo de la tabla Producto</p>
+        <h2 class="sec">De la tabla a la clase Java, sin anotaciones todavía</h2>
+        <p>Retoma la tabla <code>CREATE DATABASE productos_CM2</code> del bloque anterior y empieza a modelar la tabla <code>Producto</code>, primero en SQL y luego como clase Java corriente.</p>
+      </div>
+
+      <div class="tablewrap"><table>
+        <thead><tr><th>Columna</th><th>Tipo</th><th>Restricciones</th></tr></thead>
+        <tbody>
+          <tr><td class="sym">id_producto</td><td class="mono">INT</td><td class="d">NOT NULL, AUTO_INCREMENT, PRIMARY KEY</td></tr>
+          <tr><td class="sym">nombre</td><td class="mono">VARCHAR(50)</td><td class="d">NOT NULL</td></tr>
+          <tr><td class="sym">descripcion</td><td class="mono">VARCHAR(200)</td><td class="d">NOT NULL</td></tr>
+          <tr><td class="sym">precio</td><td class="mono">DOUBLE</td><td class="d">NOT NULL. Buscaba el tipo específico para moneda y no lo recordó; se quedó con <code>double</code></td></tr>
+          <tr><td class="sym">existencia</td><td class="mono">INT</td><td class="d">NOT NULL</td></tr>
+        </tbody>
+      </table></div>
+
+      <details class="dio"><summary>¿Cuál es "el tipo específico para moneda" que no recordó?</summary><div class="db">
+        <p>En SQL Server existe el tipo <code>MONEY</code>, y varios motores tienen <code>DECIMAL(p, s)</code> o <code>NUMERIC</code>, que guardan un número exacto con parte entera y fraccionaria sin el redondeo binario de <code>double</code>. Para dinero real conviene <code>DECIMAL</code> antes que <code>double</code>, precisamente porque los flotantes pueden acumular error de redondeo. El profesor lo dejó como <code>double</code> "para no complicar" el ejemplo.</p>
+      </div></details>
+
+      <p class="body">Con la tabla ya definida, escribe la clase Java "muy naturalita", sin patrones de diseño todavía:</p>
+
+      <pre><code>public class Producto implements Serializable {
+    private int id_producto;
+    private String nombre;
+    private String descripcion;
+    private double precio;
+    private int existencia;
+
+    <span class="cm">// @Data @NoArgsConstructor @AllArgsConstructor @Builder van aquí</span>
+}</code></pre>
+
+      <p class="quote">"Imagínense que va un <b>@Data</b>, un <b>@NoArgsConstructor</b>, un <b>@AllArgsConstructor</b>, y a lo mejor un <b>@Builder</b>. [...] Nuestra clase tiene un constructor con argumentos cero, un constructor con todos los parámetros, un montón de getters, un montón de setters, un <code>toString</code>, un <code>equals</code>, un <code>hashCode</code>, un <code>canEqual</code>, y el <code>clone</code> y lo que ustedes quieran."</p>
+
+      <div class="note">
+        <span class="ic">i</span>
+        <p><b>Nota mía.</b> Es la misma jugada de la clase 9 con <code>Producto</code>: primero se escribe todo a mano (o se da por sabido) y luego se resume con Lombok. Aquí ni siquiera lo vuelve a escribir en el pizarrón; da por hecho que ya saben ponerlo. Ojo: <code>@Data</code> no genera <code>canEqual</code> ni <code>clone</code> por sí solo — <code>canEqual</code> sí lo agrega automáticamente junto con <code>equals</code>/<code>hashCode</code>, pero <code>clone</code> no es parte de Lombok y habría que escribirlo aparte si de verdad se necesita.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="etapa jpa">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 8 · el problema que resuelve JPA</p>
+        <h2 class="sec">Modelo Entidad-Relación, Relacional, y por qué un objeto no se inserta solo</h2>
+        <p>Antes de llegar a las anotaciones, plantea el problema de fondo: ¿cómo casa una clase orientada a objetos con una tabla?</p>
+      </div>
+
+      <p class="quote">"¿Cómo se llama este modelo? [...] Entidad-Relación. Nada más es una entidad, todavía no tiene relaciones."</p>
+
+      <p class="body">Repasó la cadena que ya conocían de Bases de Datos: <b>Entidad-Relación</b> primero, <b>Modelo Relacional</b> después (con la notación de llave primaria y tipos de columna), y de ahí el <b>SQL</b> que crea la tabla real. En Entidad-Relación, la tabla es una <b>Entidad</b> y sus columnas son <b>Atributos</b>.</p>
+
+      <figure>
+        <svg viewBox="0 0 640 210" role="img" aria-label="Tres representaciones de lo mismo: Entidad-Relación, Modelo Relacional y una instancia de objeto, todas apuntando a la misma fila de la tabla Producto">
+          <rect x="14" y="20" width="180" height="170" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+          <text x="104" y="42" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="700" style="fill:var(--jpa)">ENTIDAD-RELACIÓN</text>
+          <ellipse cx="104" cy="90" rx="66" ry="26" fill="var(--jpa-soft)" stroke="var(--jpa)" stroke-width="1.4"></ellipse>
+          <text x="104" y="94" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" font-weight="600" style="fill:var(--text)">Producto</text>
+          <ellipse cx="70" cy="150" rx="42" ry="18" fill="var(--surface-2)" stroke="var(--border)" stroke-width="1.2"></ellipse>
+          <text x="70" y="154" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">id_producto</text>
+          <ellipse cx="146" cy="150" rx="36" ry="18" fill="var(--surface-2)" stroke="var(--border)" stroke-width="1.2"></ellipse>
+          <text x="146" y="154" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">nombre</text>
+
+          <rect x="230" y="20" width="180" height="170" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+          <text x="320" y="42" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="700" style="fill:var(--jpa)">RELACIONAL / SQL</text>
+          <rect x="248" y="60" width="144" height="120" rx="6" fill="var(--jpa-soft)" stroke="var(--jpa)" stroke-width="1.2"></rect>
+          <text x="320" y="80" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--jpa)">Producto</text>
+          <line x1="248" y1="88" x2="392" y2="88" style="stroke:var(--border)"></line>
+          <text x="258" y="104" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text)">PK id_producto: int</text>
+          <text x="258" y="120" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text)">nombre: varchar(50)</text>
+          <text x="258" y="136" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text)">precio: double</text>
+          <text x="258" y="152" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text)">existencia: int</text>
+
+          <rect x="446" y="20" width="180" height="170" rx="10" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+          <text x="536" y="42" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="700" style="fill:var(--jpa)">ORIENTADO A OBJETOS</text>
+          <circle cx="536" cy="100" r="10" fill="var(--jpa)"></circle>
+          <text x="536" y="130" text-anchor="middle" font-family="IBM Plex Sans" font-size="11" font-weight="600" style="fill:var(--text)">instancia de Producto</text>
+          <text x="536" y="148" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">balón de soccer, $100</text>
+          <text x="536" y="164" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">existencia: 100</text>
+        </svg>
+        <figcaption>Tres formas de ver el mismo producto. JPA es el puente entre la de la derecha y la del centro: sin él, no hay forma directa de pasar de una instancia de objeto a una fila de tabla.</figcaption>
+      </figure>
+
+      <p class="quote">"¿Puedo meter una instancia de un objeto en esta cosa? No, o no directamente. [...] Si yo creo la instancia de Producto y le digo <code>Producto p = new Producto(...)</code>, lo lleno, y voy a decir 'p, insértate', no se puede."</p>
+
+      <p class="body">Recordó cómo se hacía antes, en el CRUD manual (como el de la clase 9): ibas parámetro por parámetro, llamando a cada <i>getter</i> para sacar el valor primitivo correspondiente y armando el <code>INSERT</code> a mano. Eso es exactamente lo que JPA promete evitar.</p>
+
+      <details class="dio"><summary>¿Qué es ORM y por qué se llama "mapeo"?</summary><div class="db">
+        <p><b>ORM</b> (Object-Relational Mapping): la técnica de hacer corresponder ("mapear") clases orientadas a objetos con tablas relacionales, y atributos de esas clases con columnas de esas tablas. La palabra "mapeo" viene de esa correspondencia: dado un objeto, el ORM sabe a qué fila de qué tabla corresponde, sin que el programador escriba el <code>INSERT</code>/<code>SELECT</code> a mano.</p>
+      </div></details>
+
+      <p class="quote">"Da lo mismo con qué estemos programando, mientras sea orientado a objetos necesito casarlo con mi tablita."</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 6 · el problema de fondo</p>
+    <h3>Por qué hace falta un ORM</h3>
+    <p class="ask">Tres preguntas sobre la idea central de este bloque, antes de ver las anotaciones concretas.</p>
+    <div class="qrows" id="q6"></div>
+    <div class="btnrow">
+      <button class="btn" id="q6go" type="button">Revisar</button>
+      <button class="btn ghost" id="q6rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q6fb"></div>
+  </div>
+
+  <section>
+    <div class="etapa jpa">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 9 · las anotaciones de JPA</p>
+        <h2 class="sec"><code>@Entity</code>, <code>@Table</code>, <code>@Id</code>, <code>@GeneratedValue</code> y <code>@Column</code></h2>
+        <p>Con el problema ya planteado, va anotación por anotación, construyendo la clase <code>Producto</code> real, la que sí conecta con la tabla.</p>
+      </div>
+
+      <p class="body">Primero, decirle a Java que esta clase representa una entidad:</p>
+
+      <pre><code>@Entity</code></pre>
+
+      <p class="quote">"Mira, Producto, estoy modelando esta entidad, por lo tanto es un <code>@Entity</code>."</p>
+
+      <p class="body">Después, decir a qué tabla concreta corresponde, por si el nombre de la clase no coincide con el nombre de la tabla:</p>
+
+      <pre><code>@Table(name = "producto")</code></pre>
+
+      <p class="body">Adoptó una regla propia para simplificar el resto de la explicación: "tal cual se llama mi entidad, tal cual se llama mi tabla, tal cual se llama mi clase" — aunque en la práctica <code>@Table</code> existe justo para el caso en que eso no se cumpla (como una clase llamada <code>Productos</code>, en plural, apuntando a una tabla <code>producto</code>, en singular).</p>
+
+      <p class="body">Sobre el campo llave, tres anotaciones trabajando juntas:</p>
+
+      <pre><code>@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+@Column(name = "id_producto", nullable = false)
+private long id_producto;</code></pre>
+
+      <ul class="body">
+        <li><code>@Id</code>: marca el atributo como llave primaria.</li>
+        <li><code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code>: le dice al manejador de la base que él genera el autonumérico. "Yo no voy a generar el ID porque tengo flojera, va a ser el manejador."</li>
+        <li><code>@Column(name = "id_producto", nullable = false)</code>: hace explícito el nombre real de la columna y que es obligatoria (el <code>NOT NULL</code> de la tabla).</li>
+      </ul>
+
+      <p class="quote">"Aquí sí, así como en SQL no es estándar para todo, sobre todo en generación de autonuméricos: por ejemplo Postgres utiliza un tipo de dato serial, en realidad es una secuencia. Ahí tendría que cambiar, porque tendría que ser un <b>SEQUENCE</b>, y tendríamos que poner un <b>@SequenceGenerator</b>."</p>
+
+      <details class="dio"><summary>¿Por qué cambia la estrategia según el motor de base de datos?</summary><div class="db">
+        <p><code>IDENTITY</code> funciona bien con motores como MySQL, que generan el autonumérico directamente en la columna. <code>SEQUENCE</code> es el mecanismo que usan motores como PostgreSQL u Oracle, donde el autonumérico en realidad es un objeto de base de datos aparte (una secuencia) del que se pide el siguiente valor. JPA soporta ambas estrategias, pero hay que elegir la que corresponda al motor real que estés usando.</p>
+      </div></details>
+
+      <p class="body">Cerró remarcando cuándo es indispensable <code>@Column(name = ...)</code>: solo cuando el nombre del atributo de Java no coincide exactamente con el de la columna. Si coinciden, JPA hace el mapeo automáticamente y esa anotación es opcional.</p>
+
+      <p class="quote">"Ahora sí le estamos diciendo: 'ah, mira, hay una tabla en mi base de datos que se llama producto, que tiene un atributo que se llama id_producto, que es obligatorio, que es autoincrementable y que es mi llave primaria'. Se acabó."</p>
+
+      <div class="note">
+        <span class="ic">i</span>
+        <p><b>La clase se corta aquí.</b> El profesor terminó la clase justo después de explicar el campo <code>id_producto</code> completo, con "nos vemos el jueves, disfruten su puente". No llegó a poner <code>@Column</code> en <code>nombre</code>, <code>descripcion</code>, <code>precio</code> ni <code>existencia</code>; queda como ejercicio natural para la siguiente sesión, aplicando la misma regla que para el id.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 7 · arma el atributo <code>id_producto</code></p>
+    <h3>Las tres anotaciones, en orden</h3>
+    <p class="ask">Toca las líneas en el orden en que las escribió, de arriba abajo.</p>
+    <div class="built" id="built2"></div>
+    <div class="bank" id="bank2"></div>
+    <div class="btnrow"><button class="btn ghost" id="bldRs2" type="button">Reiniciar</button></div>
+    <div class="fb" id="bldFb2"></div>
+  </div>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 8 · escribe la anotación que falta</p>
+    <h3><code>@Column</code> para los otros cuatro atributos</h3>
+    <p class="ask">Escribe la anotación completa para cada atributo, siguiendo el mismo patrón que usó para <code>id_producto</code>. Solo cambia lo que corresponde: el nombre de columna y si es obligatorio.</p>
+    <div id="q8"></div>
+    <div class="btnrow"><button class="btn ghost" id="q8rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q8fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Código de la clase</p>
+      <h2 class="sec">La entidad completa</h2>
+      <p>La clase <code>Producto</code> tal como quedaría si se completa el patrón que dejó a medias, con Lombok y las cuatro anotaciones de JPA que sí explicó.</p>
+    </div>
+
+    <pre><code>package com.ipn.mx.modelo;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "producto")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Producto {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_producto", nullable = false)
+    private long id_producto;
+
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
+
+    @Column(name = "descripcion", nullable = false)
+    private String descripcion;
+
+    @Column(name = "precio", nullable = false)
+    private double precio;
+
+    @Column(name = "existencia", nullable = false)
+    private int existencia;
+}</code></pre>
+
+    <details class="dio"><summary>¿En qué se diferencia esta versión de lo que quedó en el pizarrón?</summary><div class="db">
+      <p>Son cabos sueltos del ritmo de la clase, no correcciones a lo que dijo:</p>
+      <ul>
+        <li><b><code>@Column</code> en los otros cuatro atributos.</b> No llegó a escribirlos; los completé siguiendo la misma regla que usó para <code>id_producto</code> (nombre igual al atributo, todos obligatorios porque la tabla los declaró <code>NOT NULL</code>).</li>
+        <li><b><code>implements Serializable</code>.</b> Lo puso en la versión "natural" sin anotaciones, antes de introducir JPA. Con <code>@Entity</code>, Serializable ya no es obligatorio (aunque sigue siendo buena práctica si la entidad viaja entre capas), y no lo repitió al hablar de las anotaciones. Lo dejé fuera de esta versión final para no inventar una decisión que no tomó en voz alta.</li>
+        <li><b>Imports y paquete.</b> No aparecen en la transcripción; agregué los de <code>jakarta.persistence</code> (la especificación moderna de JPA) para que compile.</li>
+        <li><b>Tipo del id.</b> Dijo "pudo haber sido un <code>Integer</code> o un <code>int</code>, y lo voy a dejar en <code>long</code>", pero el pizarrón de la versión "natural" (antes de JPA) lo tenía como <code>int id_producto</code>. Aquí lo dejé como <code>long</code>, que es lo que explícitamente decidió al llegar a esa línea.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="final">
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Checklist de la clase 10</h2>
+      <p>Se guarda en tu navegador. Nada se sube a ningún lado ni se comparte con nadie más.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 0</div>
+    </div>
+
+    <div id="finalTasks"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- motor de quiz ---------- */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt";
+          b.textContent=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click",function(){
+      var rows=root.children, right=0, answered=0;
+      Array.prototype.forEach.call(rows,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length
+        ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  /* ---------- 1. XML: estructura ---------- */
+  quiz("q1",[
+    {q:"¿Quién define qué etiquetas existen en un documento XML?",
+     opts:["El estándar XML trae un catálogo fijo","Quien lo modela, según lo que quiera representar","Siempre el navegador que lo abre"], ans:1,
+     why:"<b>Quien lo modela.</b> \"XML no tiene etiquetas. Existen reglas para crear etiquetas, y las etiquetas ustedes las pueden crear según lo que ustedes consideren.\""},
+    {q:"<code>&lt;empleado id=\"100\" nombre=\"Richard\" /&gt;</code>: ¿qué tiene y qué no?",
+     opts:["Solo atributos, sin cuerpo","Solo un subelemento","Un atributo y un subelemento"], ans:0,
+     why:"<b>Solo atributos, sin cuerpo.</b> Se determinó así al modelarlo y por eso se cierra en la misma línea, como los elementos vacíos de HTML."},
+    {q:"¿Qué hace una sección CDATA?",
+     opts:["Comenta el contenido para que no se muestre","Guarda contenido tal cual, sin interpretarlo como marcado","Valida el documento contra un XSD"], ans:1,
+     why:"<b>Guarda contenido tal cual.</b> \"No es precisamente un comentario, [...] va a aparecer tal cual se ponga, no se va a interpretar.\""},
+    {q:"¿De dónde vienen los comentarios de HTML, según el profesor?",
+     opts:["Los inventó HTML primero y XML los copió","XML/SGML los tenía primero y HTML los heredó","Son exclusivos de JavaScript"], ans:1,
+     why:"<b>De XML/SGML.</b> \"Y de ahí heredó el HTML sus características.\" Por eso ambos usan <code>&lt;!-- --&gt;</code>."}
+  ],"q1go","q1rs","q1fb",
+  "<b>Las cuatro.</b> El vocabulario de etiquetas lo eliges tú, la forma en que cierras un elemento depende de si tiene cuerpo, CDATA congela el contenido, y hasta los comentarios vienen de la familia XML/SGML.");
+
+  /* ---------- 2. bien formado vs válido ---------- */
+  quiz("q2",[
+    {q:"Un XML con dos elementos raíz al mismo nivel.",
+     opts:["No está bien formado","Está bien formado pero no es válido","Es válido pero no está bien formado"], ans:0,
+     why:"<b>No está bien formado.</b> Un XML necesita exactamente un elemento raíz; tener dos rompe la regla más básica de forma, antes de siquiera hablar de un XSD."},
+    {q:"Un XML con todas sus etiquetas bien cerradas, pero que le falta un subelemento obligatorio según su XSD.",
+     opts:["No está bien formado","Está bien formado pero no es válido","Ninguna de las dos cosas se puede saber"], ans:1,
+     why:"<b>Bien formado pero no válido.</b> Cumple la sintaxis general de XML, pero no cumple las reglas específicas de su esquema (XSD/DTD)."},
+    {q:"¿Qué archivo suele definir esas reglas específicas, apuntado desde <code>xmlns</code>?",
+     opts:["Un .css o .js","Un .xsd o un .dtd","Un .sql"], ans:1,
+     why:"<b>.xsd o .dtd.</b> \"Esa liga puede terminar en un .xsd o en un .dtd [...] ahí vienen los criterios y todas las reglas para decir que ese XML es un documento válido.\""}
+  ],"q2go","q2rs","q2fb",
+  "<b>Las tres.</b> Bien formado es sintaxis general; válido es cumplir un esquema concreto. Puedes tener lo primero sin lo segundo, nunca al revés.");
+
+  /* ---------- 3. corrige el JSON (validado) ---------- */
+  var q3=document.getElementById("q3"), q3fb=document.getElementById("q3fb");
+  var Q3_BAD='{\n  id: 1,\n  nombre: "yo",\n  activo: true\n}';
+  function buildQ3(){
+    q3.innerHTML='<label class="lb" style="display:block;font-family:\'IBM Plex Mono\',monospace;font-size:.7rem;color:var(--text-muted);margin-bottom:6px;">Corrige este JSON</label>'+
+      '<textarea id="q3ta" spellcheck="false">'+Q3_BAD+'</textarea>';
+    q3fb.className="fb";
+  }
+  document.getElementById("q3check").addEventListener("click",function(){
+    var raw=document.getElementById("q3ta").value;
+    try{
+      var obj=JSON.parse(raw);
+      if(obj && typeof obj==="object" && obj.id===1 && obj.nombre==="yo" && obj.activo===true){
+        q3fb.className="fb show good";
+        q3fb.innerHTML="<b>Es JSON válido y conserva los datos.</b> Los nombres de atributo van entre comillas dobles: <code>\"id\"</code>, <code>\"nombre\"</code>, <code>\"activo\"</code>. Los valores de texto también entre comillas; los números y booleanos, sin ellas.";
+      } else {
+        q3fb.className="fb show bad";
+        q3fb.innerHTML="<b>Ya es JSON válido, pero cambiaste algún valor.</b> Debe quedar <code>id</code> en 1, <code>nombre</code> en \"yo\" y <code>activo</code> en true.";
+      }
+    }catch(e){
+      q3fb.className="fb show bad";
+      q3fb.innerHTML="<b>Todavía no es JSON válido:</b> "+e.message.replace(/</g,"&lt;")+". Revisa que todos los nombres de atributo tengan comillas dobles.";
+    }
+  });
+  document.getElementById("q3rs").addEventListener("click",buildQ3);
+  buildQ3();
+
+  /* ---------- 4. arma el JSON del evento ---------- */
+  var STEPS4=[
+    '{',
+    '"evento": 1,',
+    '"nombre": "Premiere The Flash",',
+    '"listaDeAsistentes": [',
+    '{ "id": 5, "nombre": "Barry" },',
+    '{ "id": 6, "nombre": "Bruno" }',
+    ']',
+    '}'
+  ];
+  var INDENT4=[0,1,1,1,2,2,1,0];
+  var STEPWHY4=[
+    "Se abre el objeto principal, el evento.",
+    "Un atributo simple: número de evento.",
+    "Otro atributo simple: el nombre.",
+    "El atributo que es una colección se abre con corchete.",
+    "El primer objeto de la lista, entre llaves.",
+    "El segundo objeto de la lista, separado por coma.",
+    "Se cierra el corchete de la lista.",
+    "Y se cierra el objeto principal."
+  ];
+  var placed4=[], bank4=document.getElementById("bank"),
+      built4=document.getElementById("built"), bldFb4=document.getElementById("bldFb");
+  function shuffled(n){
+    var idx=[]; for(var i=0;i<n;i++) idx.push(i);
+    for(var i=idx.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=idx[i]; idx[i]=idx[j]; idx[j]=t; }
+    return idx;
+  }
+  function pad(n){ return new Array(n*2+1).join(" "); }
+  function renderBank4(){
+    bank4.innerHTML="";
+    shuffled(STEPS4.length).forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS4[i];
+      b.disabled = placed4.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed4.length){
+          placed4.push(i); renderBuilt4(); renderBank4();
+          bldFb4.className="fb show good";
+          bldFb4.innerHTML = placed4.length===STEPS4.length
+            ? "<b>Ese es el objeto completo.</b> Un evento con dos atributos simples y una lista de asistentes anidada, tal como lo armó en el pizarrón."
+            : "<b>Va.</b> "+STEPWHY4[i];
+        } else {
+          bldFb4.className="fb show bad";
+          bldFb4.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed4.length===0? "Empieza abriendo el objeto principal." : "Antes va otra. Pista: "+STEPWHY4[placed4.length]);
+        }
+      });
+      bank4.appendChild(b);
+    });
+  }
+  function renderBuilt4(){
+    if(!placed4.length){ built4.innerHTML='<span class="ph">Aquí se va armando el JSON…</span>'; return; }
+    built4.innerHTML="";
+    placed4.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=pad(INDENT4[i])+STEPS4[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){ placed4=placed4.slice(0,n); renderBuilt4(); renderBank4(); bldFb4.className="fb"; });
+      built4.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){ placed4=[]; renderBuilt4(); renderBank4(); bldFb4.className="fb"; });
+  renderBuilt4(); renderBank4();
+
+  /* ---------- 5. avisos de la clase ---------- */
+  quiz("q5",[
+    {q:"¿Qué proyecto se somete a SonarQube?",
+     opts:["El conversor de temperaturas de la clase 8","El controlador de productos de la clase 9","Un proyecto nuevo, todavía sin nombre"], ans:0,
+     why:"<b>El conversor de temperaturas.</b> \"La de que como práctica era el conversor de temperatura, el API de conversión de temperaturas. Que se supone que ya lo terminaron.\""},
+    {q:"Sin escribir ninguna prueba, ¿qué cobertura (<i>coverage</i>) va a marcar SonarQube?",
+     opts:["100%, porque el código funciona","0%, porque no hay pruebas que ejecuten el código","50%, un punto de partida típico"], ans:1,
+     why:"<b>0%.</b> \"Si lo echan a andar, van a obtener un cero de 100 en coverage, porque no hay cobertura para pruebas.\""},
+    {q:"¿Qué tema del temario se pospone hasta que haya servicios con acceso real a datos, roles y permisos?",
+     opts:["2.3, principios arquitectónicos de REST","2.6, seguridad de servicios","2.1, introducción a APIs"], ans:1,
+     why:"<b>2.6, seguridad de servicios.</b> \"La vamos a dejar para después [...] esa se aguanta.\" Se mueve al siguiente parcial."},
+    {q:"¿Hasta qué tema entra el examen del primer parcial, fijado para el 30 de septiembre?",
+     opts:["Hasta el 2.5","Hasta el 2.6","Hasta el final de la Unidad II"], ans:0,
+     why:"<b>Hasta el 2.5.</b> \"El examen solo va a venir hasta la 2.5. [...] La 2.6 la voy a mover para el otro periodo.\""}
+  ],"q5go","q5rs","q5fb",
+  "<b>Las cuatro.</b> Práctica sobre el conversor de temperaturas, 0% de cobertura sin pruebas, seguridad de servicios pospuesta, y examen el 30 de septiembre hasta el tema 2.5.");
+
+  /* ---------- 6. por qué hace falta un ORM ---------- */
+  quiz("q6",[
+    {q:"¿Se puede insertar directamente una instancia de <code>Producto</code> en la tabla, sin ningún mecanismo intermedio?",
+     opts:["Sí, Java lo hace automáticamente","No: no hay forma directa de pasar de un objeto a una fila","Sí, pero solo si implementa Serializable"], ans:1,
+     why:"<b>No.</b> \"¿Puedo meter una instancia de un objeto en esta cosa? No, o no directamente. [...] Le digo 'p, insértate', no se puede.\""},
+    {q:"¿Cómo se resolvía este problema antes de JPA, con el CRUD manual (como el de la clase 9)?",
+     opts:["Iban getter por getter, armando el INSERT a mano con cada valor primitivo","No se podía resolver de ninguna forma","Java lo convertía solo con toString()"], ans:0,
+     why:"<b>Getter por getter, a mano.</b> \"Íbamos por el parámetro, íbamos por la instancia e íbamos por el método que me devolvía un tipo de dato primitivo correspondiente al atributo a modificar.\""},
+    {q:"¿Qué nombre recibe la técnica de hacer corresponder clases orientadas a objetos con tablas relacionales?",
+     opts:["DAO","ORM","MVC"], ans:1,
+     why:"<b>ORM</b> (Object Relational Mapping). \"A ese cachito que está ahí [...] le pusieron un nombre, y se llama ORM.\""}
+  ],"q6go","q6rs","q6fb",
+  "<b>Las tres.</b> Sin un mecanismo intermedio, un objeto y una fila de tabla son cosas distintas; el CRUD manual las conectaba a mano, y JPA/ORM automatiza justo esa conexión.");
+
+  /* ---------- 7. arma el atributo id_producto ---------- */
+  var STEPS7=[
+    '@Id',
+    '@GeneratedValue(strategy = GenerationType.IDENTITY)',
+    '@Column(name = "id_producto", nullable = false)',
+    'private long id_producto;'
+  ];
+  var STEPWHY7=[
+    "Primero se marca el atributo como llave primaria: <code>@Id</code>.",
+    "Luego se dice quién genera el autonumérico y con qué estrategia.",
+    "Después se hace explícito el nombre real de la columna y que es obligatoria.",
+    "Y al final va la declaración del atributo en Java."
+  ];
+  var placed7=[], bank7=document.getElementById("bank2"),
+      built7=document.getElementById("built2"), bldFb7=document.getElementById("bldFb2");
+  function renderBank7(){
+    bank7.innerHTML="";
+    shuffled(STEPS7.length).forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS7[i];
+      b.disabled = placed7.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed7.length){
+          placed7.push(i); renderBuilt7(); renderBank7();
+          bldFb7.className="fb show good";
+          bldFb7.innerHTML = placed7.length===STEPS7.length
+            ? "<b>Ese es el campo id_producto completo.</b> El mismo patrón (@Column con name y nullable) se repite para nombre, descripcion, precio y existencia."
+            : "<b>Va.</b> "+STEPWHY7[i];
+        } else {
+          bldFb7.className="fb show bad";
+          bldFb7.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed7.length===0? "Empieza marcando la llave primaria." : "Antes va otra. Pista: "+STEPWHY7[placed7.length].replace(/<[^>]+>/g,""));
+        }
+      });
+      bank7.appendChild(b);
+    });
+  }
+  function renderBuilt7(){
+    if(!placed7.length){ built7.innerHTML='<span class="ph">Aquí se va armando el atributo…</span>'; return; }
+    built7.innerHTML="";
+    placed7.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=STEPS7[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){ placed7=placed7.slice(0,n); renderBuilt7(); renderBank7(); bldFb7.className="fb"; });
+      built7.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs2").addEventListener("click",function(){ placed7=[]; renderBuilt7(); renderBank7(); bldFb7.className="fb"; });
+  renderBuilt7(); renderBank7();
+
+  /* ---------- 8. @Column para los otros atributos (input validado) ---------- */
+  var COLS=[
+    {label:"nombre", q:"Atributo <code>nombre</code> (VARCHAR(50), NOT NULL)", ans:'@column(name="nombre",nullable=false)'},
+    {label:"descripcion", q:"Atributo <code>descripcion</code> (VARCHAR(200), NOT NULL)", ans:'@column(name="descripcion",nullable=false)'},
+    {label:"precio", q:"Atributo <code>precio</code> (DOUBLE, NOT NULL)", ans:'@column(name="precio",nullable=false)'},
+    {label:"existencia", q:"Atributo <code>existencia</code> (INT, NOT NULL)", ans:'@column(name="existencia",nullable=false)'}
+  ];
+  var q8=document.getElementById("q8"), q8fb=document.getElementById("q8fb"), q8ok={};
+  function norm8(s){ return s.toLowerCase().replace(/\s+/g,"").replace(/'/g,'"'); }
+  function buildQ8(){
+    q8.innerHTML=""; q8ok={}; q8fb.className="fb";
+    COLS.forEach(function(c,i){
+      var row=document.createElement("div"); row.className="crow";
+      row.innerHTML='<div class="cq">'+c.q+'</div>'+
+        '<div class="cl"><input type="text" id="q8i'+i+'" autocomplete="off" spellcheck="false" placeholder="@Column(...)" aria-label="Anotación Column"><button class="btn" type="button">Comprobar</button></div>'+
+        '<div class="ch"></div>';
+      var inp=row.querySelector("input"), btn=row.querySelector("button"), ch=row.querySelector(".ch");
+      function check(){
+        var v=norm8(inp.value);
+        row.classList.remove("right","wrong");
+        if(!v){ ch.className="ch"; return; }
+        ch.className="ch show";
+        if(v===c.ans){
+          row.classList.add("right"); q8ok[i]=true;
+          ch.innerHTML="<b>Correcto:</b> mismo patrón que id_producto, solo cambia el nombre de columna.";
+          if(Object.keys(q8ok).length===COLS.length){
+            q8fb.className="fb show good";
+            q8fb.innerHTML="<b>Los cuatro.</b> Con esto la clase Producto queda completa y coincide con la tabla, columna por columna.";
+          }
+        } else {
+          row.classList.add("wrong"); delete q8ok[i]; q8fb.className="fb";
+          ch.innerHTML="<b>No coincide.</b> Sigue el patrón: <code>@Column(name = \""+c.label+"\", nullable = false)</code>.";
+        }
+      }
+      btn.addEventListener("click",check);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter") check(); });
+      q8.appendChild(row);
+    });
+  }
+  document.getElementById("q8rs").addEventListener("click",buildQ8);
+  buildQ8();
+
+  /* ---------- checklist ---------- */
+  var FINAL=[
+    {id:"c10-sonar", t:"Práctica · instalar SonarQube y llegar a 100/100 en el conversor",
+     d:"Instálalo de preferencia en Docker. Necesitas pruebas con JUnit y Mockito para subir la cobertura del 0%; sin fecha fija, pero se usa el resto del semestre."},
+    {id:"c10-examen", t:"Examen del primer parcial · 30 de septiembre",
+     d:"Cubre hasta el tema 2.5 de la Unidad II. La 2.6 (seguridad de servicios) queda para el siguiente parcial."},
+    {id:"c10-columns", t:"Completar la entidad Producto",
+     d:"Faltan las anotaciones @Column en nombre, descripcion, precio y existencia; la clase se cortó justo después de terminar id_producto."},
+    {id:"c10-conv", t:"Arrastre · conversor de temperaturas (clase 8)",
+     d:"El profesor asume que ya está terminado. Si te falta alguna conversión, es la base sobre la que corre la práctica de SonarQube."}
+  ];
+  var KEY="clase10-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var fh=document.getElementById("finalTasks"), bar=document.getElementById("bar"),
+      pc=document.getElementById("pcount");
+  FINAL.forEach(function(it){
+    var l=document.createElement("label"); l.className="ftask";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!st[it.id];
+    var b=document.createElement("div");
+    b.innerHTML='<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent=it.t;
+    b.querySelector(".td2").textContent=it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if(cb.checked) l.classList.add("done");
+    cb.addEventListener("change",function(){
+      st[it.id]=cb.checked; l.classList.toggle("done",cb.checked);
+      try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+  function refresh(){
+    var done=0, boxes=fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes,function(c){ if(c.checked) done++; });
+    pc.textContent=done+" / "+FINAL.length;
+    bar.style.width=Math.round(done/FINAL.length*100)+"%";
+  }
+  refresh();
+})();
+</script>

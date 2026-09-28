@@ -1,0 +1,1256 @@
+<title>Clase 9 · API de Productos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFEFF5; --surface:#FFFFFF; --surface-2:#F5F5FA;
+    --text:#15161F; --text-muted:#5B5D70; --border:#DADBE7;
+    --accent:#4548A8; --accent-soft:#E5E6F7; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --v-get:#1B7A4B; --v-get-soft:#E1F1E8;
+    --v-post:#A85F08; --v-post-soft:#FBEEDA;
+    --v-put:#2F5FA8; --v-put-soft:#E0EAF7;
+    --v-del:#B03A2E; --v-del-soft:#F9E4E1;
+    --code-bg:#F0F0F6;
+    --shadow:0 1px 2px rgba(21,22,31,.06), 0 10px 26px -14px rgba(21,22,31,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#0F1016; --surface:#181A24; --surface-2:#1E202B;
+      --text:#E8E9F2; --text-muted:#9A9CB2; --border:#2C2F3E;
+      --accent:#9EA1F0; --accent-soft:#1D1F3D; --accent-ink:#0F1016;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --v-get:#5FC496; --v-get-soft:#122A20;
+      --v-post:#F0B060; --v-post-soft:#35250F;
+      --v-put:#8DB4EE; --v-put-soft:#15243C;
+      --v-del:#EE8F84; --v-del-soft:#331B18;
+      --code-bg:#14161F;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0F1016; --surface:#181A24; --surface-2:#1E202B;
+    --text:#E8E9F2; --text-muted:#9A9CB2; --border:#2C2F3E;
+    --accent:#9EA1F0; --accent-soft:#1D1F3D; --accent-ink:#0F1016;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --v-get:#5FC496; --v-get-soft:#122A20;
+    --v-post:#F0B060; --v-post-soft:#35250F;
+    --v-put:#8DB4EE; --v-put-soft:#15243C;
+    --v-del:#EE8F84; --v-del-soft:#331B18;
+    --code-bg:#14161F;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+  .lede + .lede{margin-top:10px;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+
+  /* --- los verbos HTTP: el dispositivo estructural de esta clase.
+         Cada endpoint que se escribe lleva el color de su verbo. --- */
+  .vb{display:inline-flex; align-items:center; font-family:'IBM Plex Mono',monospace;
+    font-size:.68rem; font-weight:700; letter-spacing:.06em; padding:3px 9px; border-radius:5px;
+    background:var(--vs); color:var(--vc);}
+  .vb.get{--vc:var(--v-get); --vs:var(--v-get-soft);}
+  .vb.post{--vc:var(--v-post); --vs:var(--v-post-soft);}
+  .vb.put{--vc:var(--v-put); --vs:var(--v-put-soft);}
+  .vb.del{--vc:var(--v-del); --vs:var(--v-del-soft);}
+  .verbo{border-left:3px solid var(--vc); padding-left:16px;}
+  .verbo.get{--vc:var(--v-get);} .verbo.post{--vc:var(--v-post);}
+  .verbo.put{--vc:var(--v-put);} .verbo.del{--vc:var(--v-del);}
+  .verbo h2.sec{color:var(--vc);}
+  .verbobar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .endp{font-family:'IBM Plex Mono',monospace; font-size:.8rem; color:var(--text-muted);}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; margin:16px 0; max-width:68ch; display:flex; gap:11px;}
+  .note .ic{flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--border);
+    color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;}
+  .note p{font-family:'Source Serif 4',Georgia,serif; font-size:.86rem; line-height:1.55;
+    color:var(--text-muted); margin:0;}
+  .note b{color:var(--text); font-weight:600;}
+
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer; text-align:left;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;
+    overflow-x:auto;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px; white-space:pre;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.74rem; padding:7px 11px;
+    border-radius:8px; cursor:pointer; text-align:left; max-width:100%; overflow-wrap:anywhere;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  /* --- el "Insomnia de mentiras" --- */
+  .cli{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:14px;}
+  .cli-top{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px;}
+  .verbsel{display:flex; gap:5px;}
+  .verbsel button{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:700;
+    letter-spacing:.05em; padding:8px 11px; border-radius:7px; cursor:pointer;
+    border:1px solid var(--border); background:var(--surface); color:var(--text-muted);}
+  .verbsel button.on{border-color:var(--vc); background:var(--vs); color:var(--vc);}
+  .verbsel .get{--vc:var(--v-get); --vs:var(--v-get-soft);}
+  .verbsel .post{--vc:var(--v-post); --vs:var(--v-post-soft);}
+  .verbsel .put{--vc:var(--v-put); --vs:var(--v-put-soft);}
+  .verbsel .del{--vc:var(--v-del); --vs:var(--v-del-soft);}
+  .cli input[type=text], .cli textarea{font-family:'IBM Plex Mono',monospace; font-size:.78rem;
+    background:var(--surface); color:var(--text); border:1px solid var(--border);
+    border-radius:7px; padding:8px 10px; width:100%;}
+  .cli .url{flex:1 1 260px; min-width:0;}
+  .cli textarea{min-height:76px; resize:vertical; margin-bottom:10px;}
+  .cli label.lb{display:block; font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin:0 0 5px;}
+  .resp{background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:11px 13px;
+    min-height:60px;}
+  .resp .st{display:inline-flex; font-family:'IBM Plex Mono',monospace; font-size:.74rem; font-weight:700;
+    padding:3px 9px; border-radius:5px; margin-bottom:8px;}
+  .resp .st.s2{background:var(--ok-soft); color:var(--ok);}
+  .resp .st.s4{background:var(--bad-soft); color:var(--bad);}
+  .resp .hd{font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:var(--text-muted); margin:0 0 6px;}
+  .resp pre{margin:0; font-size:.74rem; max-height:280px; overflow:auto;}
+  .resp .explain{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin:8px 0 0;}
+  .resp .ph{font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.86rem; color:var(--text-muted);}
+  .missions{list-style:none; margin:12px 0 0; padding:0; display:flex; flex-direction:column; gap:6px;}
+  .missions li{display:flex; gap:9px; align-items:baseline; font-family:'Source Serif 4',Georgia,serif;
+    font-size:.87rem; line-height:1.45;}
+  .missions .mk{flex:0 0 auto; width:17px; height:17px; border-radius:50%; border:1.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; font-size:.68rem; color:var(--accent-ink);
+    transform:translateY(3px);}
+  .missions li.done .mk{background:var(--ok); border-color:var(--ok);}
+  .missions li.done .mt{color:var(--text-muted);}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:520px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:480px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+  td.mono{font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Web Client · Clase 9 · jueves 10 de septiembre (por confirmar) · laboratorio</p>
+    <h1>Una API de productos, verbo por verbo</h1>
+    <p class="lede">Laboratorio en vivo. El profesor arma desde cero, en IntelliJ, un modelo <code>Producto</code>, un controlador y una lista en memoria que hace de base de datos falsa. Va probando cada endpoint en Insomnia: primero el que lista, luego el que busca por id, después el que crea y al final el que borra. En el camino se topa con un error de <code>DataSource</code> y lo resuelve enfrente del grupo.</p>
+    <p class="lede">Cada endpoint lleva el color de su verbo: <span class="vb get">GET</span> <span class="vb post">POST</span> <span class="vb put">PUT</span> <span class="vb del">DELETE</span>. El <b>PUT</b> es el que no llegó a escribir. Los botones con <b style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">?</b> explican los términos que dio por sabidos, y al final hay un cliente de práctica para repetir las pruebas de la clase. Hay seis ejercicios.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="arranque">
+    <h2>Lo que salió de esta clase</h2>
+    <ol>
+      <li><span class="t">01:31 a 58:50</span><span class="d"><b>Lo construido:</b> el modelo <code>Producto</code> y el <code>ProductoController</code> con cuatro endpoints: <span class="vb get">GET</span> lista, <span class="vb get">GET</span> por id, <span class="vb post">POST</span> y <span class="vb del">DELETE</span>.</span></li>
+      <li><span class="t">≈1:04:00</span><span class="d"><b>Falta el <span class="vb put">PUT</span>.</b> Dijo "ya es la misma lógica". No lo dejó como tarea, pero es la que cierra el CRUD.</span></li>
+      <li><span class="t">arrastre</span><span class="d"><b>Conversor de temperaturas (clase 8):</b> en esta transcripción no aparece que lo hayan revisado.</span></li>
+      <li><span class="t">cierre</span><span class="d"><b>"Nos vemos el próximo miércoles, y nos vemos en laboratorio."</b> Ver la nota de abajo antes de fiarte de esa frase.</span></li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <span class="ic">!</span>
+    <p><b>Sobre los minutos y las citas.</b> Los minutos vienen por bloques, no por línea. Las frases entre comillas siguen lo que dijo el profesor: fíate del sentido, no de que sean palabra por palabra.</p>
+  </div>
+
+  <div class="note">
+    <span class="ic">i</span>
+    <p><b>Fecha y cosas que no cuadran.</b> Dice "la propiedad que le pusimos ayer era <code>server.port</code>", y la clase 8 (9 de septiembre) terminó con laboratorio al día siguiente, así que esta cae el <b>jueves 10</b>. Confírmalo. La frase de cierre ("el próximo miércoles, y nos vemos en laboratorio") es idéntica a la de la clase 7 y aquí ya estamos en laboratorio; puede ser un calco. También dice "ya vamos tres de cinco métodos" cuando lleva dos.</p>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 1 · minuto 00:00 a 01:30</p>
+      <h2 class="sec">Retomar el proyecto y cambiar el puerto</h2>
+      <p>Abre la documentación de Spring Boot, cierra el <code>HELP.md</code> que ya no necesita y va al archivo de configuración.</p>
+    </div>
+
+    <p class="body">Muestra en el navegador la guía de inicio, con Spring Web, Spring Data JPA, DevTools y Validation, y de ahí sigue en <code>application.properties</code>. La propiedad de ayer era <code>server.port</code>. Por defecto es 8080; ahora define <b>8083</b>, "por poner un número".</p>
+
+    <pre><code>server.port=8083</code></pre>
+
+    <div class="note">
+      <span class="ic">!</span>
+      <p><b>Dependencias que esta clase da por puestas.</b> Hoy se usan Spring Data JPA, el conector de MySQL y Lombok. En la clase 8 solo se marcaron Web y DevTools, y al profesor se le olvidó Lombok. Aquí dice que "en las dependencias de ayer metimos Lombok". No pude reconciliar las dos versiones. Si tu proyecto no las tiene, agrégalas al <code>pom.xml</code> antes de seguir.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 2 · minuto 01:31 a 03:30</p>
+      <h2 class="sec">El modelo: la clase <code>Producto</code></h2>
+      <p>Anticipa un error, "un errorzote", y decide dejarlo pasar para corregirlo después. Mientras tanto, crea el paquete y la clase del modelo.</p>
+    </div>
+
+    <p class="quote">"Casi es un hecho de que les va a marcar un errorzote. Entonces, hay que agregar por lo menos otras cuatro propiedades, pero vamos a dejarlo que nos genere el error y ya vemos cómo lo corregimos."</p>
+
+    <p class="body">Nuevo paquete <code>modelo</code>, dentro una clase <code>Producto</code>. Empieza con <code>implements Serializable</code> y tres atributos:</p>
+
+    <pre><code>public class Producto implements Serializable {
+    private Long id;
+    private String nombre;
+    private double precio;
+}</code></pre>
+
+    <p class="body">"Lo demás que ustedes quieran agregarle."</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 3 · minuto 03:31 a 08:15</p>
+      <h2 class="sec">Todo lo repetitivo, a mano con el IDE</h2>
+      <p>Antes de usar Lombok, hace la clase completa con el menú <b>Código → Generar</b>. Es la versión larga de lo que luego se resuelve con tres anotaciones.</p>
+    </div>
+
+    <ol class="body">
+      <li><b>Constructor sin argumentos:</b> Código → Generar → constructor, y "Select None" para no marcar ningún atributo.</li>
+      <li><b>Constructor con todos los atributos:</b> mismo menú, los selecciona todos.</li>
+      <li><b>Getters y setters:</b> por separado, o de una vez con "Getters and Setters".</li>
+      <li><b><code>equals()</code> y <code>hashCode()</code>:</b> "a final de cuentas sabemos que el ID es único, que trabaje contra el ID".</li>
+      <li><b><code>toString()</code>:</b> "no lo quiero concatenado, quiero que trabaje con un <code>StringBuilder</code>".</li>
+    </ol>
+
+    <details class="dio"><summary>¿Por qué <code>equals()</code> y <code>hashCode()</code> solo con el id?</summary><div class="db">
+      <p>Dos productos se consideran "el mismo" si tienen el mismo id, aunque el nombre o el precio hayan cambiado. Es lo que se espera de una entidad con identificador único. Los dos métodos deben ir juntos: si dos objetos son iguales según <code>equals</code>, tienen que dar el mismo <code>hashCode</code>.</p>
+    </div></details>
+
+    <p class="body">Cuando termina dice "ya tenemos la clase completita" y la reformatea, "porque no me gusta cómo aparece". Espera a que el grupo se ponga al día: "ustedes me dicen cuando ya hayan llegado hasta ahí".</p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Digresión · minuto 08:16 a 12:45</p>
+      <h2 class="sec">Dónde se buscan las dependencias</h2>
+      <p>Mientras el grupo copia el código, aprovecha para mostrar cómo se agrega una librería a Maven.</p>
+    </div>
+
+    <p class="body">Abre en el navegador el <b>repositorio de Maven</b>, busca una librería cualquiera (usó <b>JFreeChart</b> como ejemplo) y muestra que ahí mismo te dan el fragmento para pegar en el proyecto. Lo cierra con "esto ya es otro tema".</p>
+
+    <details class="dio"><summary>¿Cómo se agrega una dependencia a un proyecto Maven?</summary><div class="db">
+      <p>Buscas la librería en el repositorio, eliges una versión y copias el bloque <code>&lt;dependency&gt;</code> que te muestra. Lo pegas dentro de <code>&lt;dependencies&gt;</code> en el <code>pom.xml</code> y recargas Maven; el IDE descarga la librería. Es lo mismo que hace Spring Initializr al marcar casillas, pero a mano.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 4 · minuto 12:46 a 15:00</p>
+      <h2 class="sec">Lombok reemplaza todo lo anterior</h2>
+      <p>Borra de golpe lo que acaba de generar y lo sustituye por tres anotaciones.</p>
+    </div>
+
+    <p class="quote">"Vamos a agarrar todo esto, de aquí hasta acá, y se va. Vamos a borrarlo. Y simplemente vamos a ponerle un <b>@Data</b>. [...] Nos hace falta un constructor: <b>@NoArgsConstructor</b>. [...] Y vamos con el <b>@AllArgsConstructor</b>."</p>
+
+    <pre><code>@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Producto implements Serializable {
+    private Long id;
+    private String nombre;
+    private double precio;
+}</code></pre>
+
+    <p class="body">Un alumno preguntó si ese paquete no lo tenían de ayer. Respuesta: sí, "en las dependencias de ayer metimos Lombok, para evitarnos conflictos y hacer el código más rápido".</p>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p><b>Un detalle mío, no del profesor.</b> Hizo <code>equals</code> y <code>hashCode</code> a mano solo con el id. <code>@Data</code> los regenera con <b>todos</b> los campos, así que el criterio cambia sin que nadie lo mencione. Aquí no afecta, porque el controlador compara ids directamente. Si quisieras conservar la igualdad por id con Lombok, se hace con <code>@EqualsAndHashCode(onlyExplicitlyIncluded = true)</code> y <code>@EqualsAndHashCode.Include</code> sobre el campo <code>id</code>.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 1 · el modelo</p>
+    <h3>El <code>Producto</code> a mano y con Lombok</h3>
+    <p class="ask">Cuatro preguntas sobre lo que pidió generar y cómo quedó al final. Contesta las cuatro y dale a <b>Revisar</b>.</p>
+    <div class="qrows" id="q1"></div>
+    <div class="btnrow">
+      <button class="btn" id="q1go" type="button">Revisar</button>
+      <button class="btn ghost" id="q1rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q1fb"></div>
+  </div>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 2 · Lombok</p>
+    <h3>Qué cambia con las tres anotaciones</h3>
+    <p class="ask">Tres preguntas sobre lo que se borró y lo que se puso.</p>
+    <div class="qrows" id="q4"></div>
+    <div class="btnrow">
+      <button class="btn" id="q4go" type="button">Revisar</button>
+      <button class="btn ghost" id="q4rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q4fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 5 · minuto 15:01 a 17:30</p>
+      <h2 class="sec">El controlador</h2>
+      <p>Vuelve al paquete base, crea un paquete nuevo para los controladores y empieza con las anotaciones de la clase 8.</p>
+    </div>
+
+    <p class="body">Paquete <code>controlador</code>, clase <code>ProductoController</code>. Las anotaciones son "igual a las de ayer": <code>@RestController</code>, y un <code>@RequestMapping</code> con la ruta base. Para "mantener la costumbre", la ruta lleva versión:</p>
+
+    <pre><code>@RestController
+@RequestMapping("/api/v1/productos")
+public class ProductoController {
+
+}</code></pre>
+
+    <details class="dio"><summary>¿Por qué <code>/api/v1/</code> en la ruta?</summary><div class="db">
+      <p>El <code>v1</code> es la <b>versión</b> de la API. Si un día cambias cómo responde algún endpoint y no quieres romper a quien ya lo usa, publicas <code>/api/v2/...</code> y las dos conviven. En la clase 7 lo mencionó como parte de lo que sube el nivel de madurez de una API.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 6 · minuto 17:31 a 20:50</p>
+      <h2 class="sec">Una lista en memoria como base de datos falsa</h2>
+      <p>No hay base de datos todavía. Los datos son una lista dentro del propio controlador, con cinco productos de ejemplo.</p>
+    </div>
+
+    <pre><code>private final List&lt;Producto&gt; productos = new ArrayList&lt;&gt;(List.of(
+    new Producto(1L, "Laptop 1", 5000),
+    new Producto(2L, "Laptop 2", 6000),
+    new Producto(3L, "Laptop 3", 7000)
+    <span class="cm">// ...hasta 5 productos</span>
+));</code></pre>
+
+    <p class="body">Copia y pega hasta tener cinco. Luego el IDE marca un error y el profesor le pregunta al grupo cómo corregirlo. Un alumno responde: importando la lista y <code>Producto</code>. Hace falta eso, pero no es lo que rompía:</p>
+
+    <p class="quote">"Hay que castigarlo... porque es un valor entero y el tipo es <b>Long</b>. Entonces le decimos que es un Long poniéndole una <b>L</b> al final."</p>
+
+    <details class="dio"><summary>¿Por qué <code>1L</code> y no <code>1</code>?</summary><div class="db">
+      <p>El literal <code>1</code> es un <code>int</code>, y el constructor pide un <code>Long</code>. Java no convierte solo un <code>int</code> a <code>Long</code> (el objeto envoltorio). Con <code>1L</code> el literal ya es <code>long</code> y se empaqueta a <code>Long</code>. Con <code>5000</code> en el precio no hay problema, porque el campo es <code>double</code> y un entero sí se ensancha a <code>double</code>.</p>
+    </div></details>
+
+    <details class="dio"><summary>¿Por qué envolver <code>List.of(...)</code> en un <code>new ArrayList&lt;&gt;(...)</code>?</summary><div class="db">
+      <p><code>List.of</code> devuelve una lista <b>inmutable</b>: no deja agregar ni quitar. Como el <code>POST</code> va a hacer <code>add</code> y el <code>DELETE</code> va a hacer <code>removeIf</code>, la lista tiene que ser modificable. <code>new ArrayList&lt;&gt;(...)</code> copia los elementos a una lista que sí lo es. El profesor no lo explicó en la clase; lo puso así desde el inicio.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="verbo get">
+      <div class="verbobar"><span class="vb get">GET</span><span class="endp">/api/v1/productos</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 7 · minuto 20:51 a 25:25</p>
+        <h2 class="sec">Primer endpoint: listar productos</h2>
+        <p>El más simple. No recibe nada y devuelve toda la lista.</p>
+      </div>
+
+      <pre><code>@GetMapping
+public ResponseEntity&lt;List&lt;Producto&gt;&gt; listarProductos() {
+    return ResponseEntity.ok(productos);
+}</code></pre>
+
+      <p class="body">"En teoría no tenemos más nada que hacer." Le da <b>Run</b> y anticipa que va a salir "el kilo de errores".</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 3 · arma el controlador</p>
+    <h3><code>ProductoController</code>, en orden</h3>
+    <p class="ask">Toca las líneas en el orden en que las escribió, de arriba abajo. Si te equivocas te doy una pista; toca una línea ya puesta para quitarla.</p>
+    <div class="built" id="built"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow"><button class="btn ghost" id="bldRs" type="button">Reiniciar</button></div>
+    <div class="fb" id="bldFb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 8 · minuto 25:26 a 32:00</p>
+      <h2 class="sec">El error del <code>DataSource</code></h2>
+      <p>La aplicación no arranca. La consola muestra una excepción y él la usa para explicar por qué.</p>
+    </div>
+
+    <p class="quote">"Y si les aparece algo como eso... vamos bien. ¿Por qué? Bueno, nos dice que trató de arrancar, no pudo, y nos da una referencia: 'Oye, mira, no has configurado un <b>DataSource</b>'. [...] Pero no estamos usando base de datos. La respuesta es no, pero por el simple hecho de haber agregado la dependencia de <b>Spring Data</b>, hay que configurarlo."</p>
+
+    <p class="body">La solución es agregar cuatro propiedades al <code>application.properties</code>:</p>
+
+    <pre><code>spring.datasource.url=jdbc:mysql://localhost:3306/bd
+spring.datasource.username=root
+spring.datasource.password=&lt;la contraseña de tu MySQL&gt;
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver</code></pre>
+
+    <p class="body">Dictó una contraseña de ejemplo; aquí la dejo como marcador. Vuelve a correr y esta vez Tomcat arranca en el <b>8083</b> sin errores.</p>
+
+    <details class="dio"><summary>¿Qué es un <code>DataSource</code> y por qué lo exige Spring Data?</summary><div class="db">
+      <p>Es el objeto que sabe conectarse a la base de datos: la URL, el usuario, la contraseña y el driver. Al agregar <b>Spring Data JPA</b>, Spring asume que vas a usar una base y trata de crear ese objeto al arrancar. Si no le dices dónde está, se detiene. Por eso da error aunque el código de hoy nunca toque una base.</p>
+      <p>Cada propiedad: <code>url</code> es la dirección de la base (servidor, puerto 3306 y nombre <code>bd</code>); <code>username</code> y <code>password</code> son las credenciales; <code>driver-class-name</code> es la clase Java del conector de MySQL.</p>
+    </div></details>
+
+    <p class="quote">"En teoría ya tenemos conectado Spring con la base de datos... aunque la base no exista todavía. Si les corrió, literal, es porque algo hicieron mal."</p>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p><b>Dos notas mías sobre esto.</b> La última frase parece hablar de quien arrancó sin error antes de configurar el DataSource: sin la dependencia de Data, no habría error. Y sobre "aunque la base no exista": con JPA y MySQL, Spring suele intentar conectarse al arrancar. Si a ti te truena porque no hay un MySQL corriendo o la base <code>bd</code> no existe, no es un error tuyo; lo más probable es que él sí tuviera uno activo. Otra salida, que él no mencionó, es quitar la dependencia de Data mientras no la uses.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 4 · el arranque</p>
+    <h3>Puerto, DataSource y propiedades</h3>
+    <p class="ask">Cuatro preguntas sobre por qué falló el primer arranque y cómo se arregló.</p>
+    <div class="qrows" id="q3"></div>
+    <div class="btnrow">
+      <button class="btn" id="q3go" type="button">Revisar</button>
+      <button class="btn ghost" id="q3rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q3fb"></div>
+  </div>
+
+  <section>
+    <div class="verbo get">
+      <div class="verbobar"><span class="vb get">GET</span><span class="endp">/api/v1/productos</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 9 · minuto 32:01 a 36:50</p>
+        <h2 class="sec">Probar el listado en Insomnia</h2>
+        <p>Primera prueba real del endpoint, con una herramienta gráfica.</p>
+      </div>
+
+      <p class="body">Abre <b>Insomnia</b>, "insisto, porque me gustó". Ustedes usen Postman, Thunder Client "o el que quieran". Pasos:</p>
+      <ol class="body">
+        <li>Crear una colección, <b>Productos</b>.</li>
+        <li>Nuevo request, <b>Mostrar Lista Productos</b>.</li>
+        <li>URL: <code>http://localhost:8083/api/v1/productos</code>. Verbo <span class="vb get">GET</span>.</li>
+        <li>Darle <b>Send</b>.</li>
+      </ol>
+
+      <p class="body">La respuesta es un <b>200 OK</b> con el arreglo JSON de las cinco laptops, la misma lista que se creó en la clase. "Ya nos está devolviendo la lista de productos."</p>
+
+      <div class="note">
+        <span class="ic">i</span>
+        <p><b>Esto resuelve una duda de la clase 8.</b> Allí el profesor usaba una herramienta gráfica sin nombrarla, y no pude saber si era Postman o Insomnia. Aquí dice que prefiere Insomnia. Es probable que fuera la misma, pero la clase 8 no lo confirma.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="verbo get">
+      <div class="verbobar"><span class="vb get">GET</span><span class="endp">/api/v1/productos/{id}</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 10 · minuto 36:51 a 45:20</p>
+        <h2 class="sec">Segundo endpoint: buscar por id</h2>
+        <p>Empieza por probar la ruta antes de programarla, para ver el 404, y luego escribe el método.</p>
+      </div>
+
+      <p class="body">Duplica el request anterior, lo llama <b>Mostrar un producto</b> y agrega <code>/2</code> a la URL. La respuesta es un <b>404 Not Found</b>. "Tiene sentido porque no lo hemos programado."</p>
+
+      <p class="body">Regresa al código y escribe el método:</p>
+
+      <pre><code>@GetMapping("/{id}")
+public ResponseEntity&lt;Producto&gt; mostrarProducto(@PathVariable Long id) {
+    Optional&lt;Producto&gt; producto = productos.stream()
+        .filter(p -&gt; p.getId().equals(id))
+        .findFirst();
+    if (producto.isPresent()) {
+        return ResponseEntity.ok(producto.get());
+    } else {
+        return ResponseEntity.notFound().build();
+    }
+}</code></pre>
+
+      <p class="body">Guarda, reinicia el servidor y prueba: el id <b>2</b> devuelve <b>200 OK</b> con la Laptop 2. El id <b>30</b>, que no existe, devuelve <b>404 Not Found</b>. "Funciona."</p>
+
+      <details class="dio"><summary>¿Qué es <code>@PathVariable</code> y en qué se distingue de <code>@RequestParam</code>?</summary><div class="db">
+        <p><code>@PathVariable</code> toma un valor que va <b>dentro de la ruta</b>: en <code>/productos/2</code>, el 2 es el <code>{id}</code>. <code>@RequestParam</code>, de la clase 8, toma un valor que va <b>después del signo de interrogación</b>: <code>?valor=10</code>. Por eso aquí el <code>@GetMapping</code> lleva <code>"/{id}"</code> entre llaves y allá no.</p>
+      </div></details>
+
+      <details class="dio"><summary>¿Qué hace ese <code>stream().filter(...).findFirst()</code> y qué es un <code>Optional</code>?</summary><div class="db">
+        <p>Recorre la lista, se queda solo con los productos cuyo id coincide con el pedido, y toma el primero. Como puede que no haya ninguno, el resultado no es un <code>Producto</code> sino un <code>Optional&lt;Producto&gt;</code>: una caja que puede tener el producto o estar vacía. Con <code>isPresent()</code> se pregunta si la caja trae algo, y con <code>get()</code> se saca.</p>
+      </div></details>
+
+      <p class="quote">"Si no, devuélveme un <b>ResponseEntity.notFound().build()</b>."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="verbo post">
+      <div class="verbobar"><span class="vb post">POST</span><span class="endp">/api/v1/productos</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 11 · minuto 45:21 a 58:50</p>
+        <h2 class="sec">Tercer endpoint: crear un producto</h2>
+        <p>El bloque más largo. Escribe el método y prueba el envío con un cuerpo JSON.</p>
+      </div>
+
+      <p class="body">Dice "ya vamos tres de cinco métodos. Hace falta el PUT y el POST". Escribe primero el POST, sin cambiar la ruta:</p>
+
+      <pre><code>@PostMapping
+public ResponseEntity&lt;Producto&gt; crearProducto(@RequestBody Producto producto) {
+    productos.add(producto);
+    return ResponseEntity
+        .created(URI.create("/api/v1/productos/" + producto.getId()))
+        .body(producto);
+}</code></pre>
+
+      <p class="body">El producto no se guarda en ninguna base: solo se agrega a la lista en memoria. Devuelve un <b>201 Created</b>, con la ruta del nuevo recurso y el objeto en el cuerpo.</p>
+
+      <details class="dio"><summary>¿Qué hace <code>@RequestBody</code>?</summary><div class="db">
+        <p>Toma el <b>cuerpo</b> de la petición, que llega como JSON, y lo convierte en un objeto <code>Producto</code> haciendo coincidir los nombres de los campos (<code>id</code>, <code>nombre</code>, <code>precio</code>). Es lo que usan <code>POST</code> y <code>PUT</code> para recibir datos, porque un <code>GET</code> no lleva cuerpo.</p>
+      </div></details>
+
+      <p class="body">En Insomnia clona la petición, cambia el verbo a <span class="vb post">POST</span>, elige el tipo <b>JSON</b> y escribe el cuerpo "de lo que modelé":</p>
+
+      <pre><code>{
+  "id": 6,
+  "nombre": "Laptop 6",
+  "precio": 15000
+}</code></pre>
+
+      <p class="body">Al enviar responde <b>201 Created</b>. Vuelve a "Mostrar lista" y el producto 6 ya está. "Mientras la aplicación no se detenga, ahí va a estar."</p>
+
+      <div class="note">
+        <span class="ic">i</span>
+        <p><b>Es el "happy path" de la clase 7, otra vez.</b> Este POST no valida nada: si mandas otro producto con id 6, lo agrega de nuevo y responde 201. Tampoco hay manejo de errores, que es justo lo que el profesor pidió controlar a mano. Aquí no lo hace porque es un ejemplo; en tu proyecto sí tendrías que.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="verbo del">
+      <div class="verbobar"><span class="vb del">DELETE</span><span class="endp">/api/v1/productos/{id}</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 12 · minuto 58:51 a 1:05:00</p>
+        <h2 class="sec">Cuarto endpoint: eliminar, y cierre</h2>
+        <p>El último método de la clase y el cierre. El PUT queda en el aire.</p>
+      </div>
+
+      <pre><code>@DeleteMapping("/{id}")
+public ResponseEntity&lt;Void&gt; eliminarProducto(@PathVariable Long id) {
+    productos.removeIf(p -&gt; p.getId().equals(id));
+    return ResponseEntity.noContent().build();
+}</code></pre>
+
+      <p class="body">"No quiero que me devuelva nada", así que responde <b>204 No Content</b>. Por eso el tipo de retorno es <code>ResponseEntity&lt;Void&gt;</code>: no hay cuerpo.</p>
+
+      <p class="body">En Insomnia crea una petición <span class="vb del">DELETE</span> hacia <code>/api/v1/productos/4</code>. Responde <b>204 No Content</b>. Al listar de nuevo, la lista "salta del 3 al 5": el 4 ya no existe.</p>
+
+      <p class="quote">"A final de cuentas estamos jugando con los métodos. Faltaría el <b>PUT</b> para actualizar, pero ya es la misma lógica. Sería todo por el día de hoy, no les doy más lata."</p>
+
+      <div class="note">
+        <span class="ic">i</span>
+        <p><b>Otra nota mía.</b> Este <code>DELETE</code> devuelve 204 aunque el id no exista, porque <code>removeIf</code> no falla cuando no encuentra nada. Es la misma limitación de "happy path" de arriba.</p>
+      </div>
+
+      <div class="task">
+        <div class="task-head"><span class="task-badge">Pendiente sugerido</span><span class="task-when">≈1:04:00</span></div>
+        <h3>El <span class="vb put">PUT</span> para actualizar</h3>
+        <p>No lo dejó como tarea. Lo dijo como lo que falta y como "la misma lógica" que el resto. Con esto el CRUD queda completo. Es lo natural para practicar antes de la siguiente clase.</p>
+        <p class="said">"Faltaría el PUT para actualizar, pero ya es la misma lógica."</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 5 · códigos de respuesta</p>
+    <h3>Cada caso, con su código y su llamada</h3>
+    <p class="ask">Cuatro casos de los que probó en Insomnia. Elige el código y la forma de devolverlo.</p>
+    <div class="qrows" id="q5"></div>
+    <div class="btnrow">
+      <button class="btn" id="q5go" type="button">Revisar</button>
+      <button class="btn ghost" id="q5rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q5fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Laboratorio</p>
+      <h2 class="sec">Repite las pruebas de la clase</h2>
+      <p>Un cliente de práctica que se comporta como el servidor de la clase. Es un simulador que corre en tu navegador, no un Spring de verdad. Sirve para repetir las cuatro pruebas y ver qué pasa si mandas algo que él no probó.</p>
+    </div>
+
+    <div class="ex">
+      <p class="ex-tag">Ejercicio 6 · el Insomnia de mentiras</p>
+      <h3>Completa las cinco pruebas</h3>
+      <p class="ask">Elige el verbo, escribe la ruta (el servidor está en <code>localhost:8083</code>) y dale a <b>Send</b>. Las pruebas de abajo se marcan solas. <b>Reiniciar servidor</b> deja la lista como al arrancar, igual que reiniciar el proyecto.</p>
+
+      <div class="cli">
+        <div class="cli-top">
+          <div class="verbsel" id="verbsel">
+            <button type="button" class="get on" data-v="GET">GET</button>
+            <button type="button" class="post" data-v="POST">POST</button>
+            <button type="button" class="put" data-v="PUT">PUT</button>
+            <button type="button" class="del" data-v="DELETE">DELETE</button>
+          </div>
+          <input type="text" class="url" id="cliUrl" value="http://localhost:8083/api/v1/productos" autocomplete="off" spellcheck="false" aria-label="URL de la petición">
+          <button class="btn" id="cliSend" type="button">Send</button>
+        </div>
+        <div id="bodyWrap" hidden>
+          <label class="lb" for="cliBody">Body (JSON)</label>
+          <textarea id="cliBody" spellcheck="false">{
+  "id": 6,
+  "nombre": "Laptop 6",
+  "precio": 15000
+}</textarea>
+        </div>
+        <div class="resp" id="cliResp"><span class="ph">La respuesta aparece aquí.</span></div>
+        <div class="btnrow">
+          <button class="btn ghost" id="cliRestart" type="button">Reiniciar servidor</button>
+        </div>
+      </div>
+
+      <ul class="missions" id="missions"></ul>
+      <p class="body" style="margin-top:12px;font-size:.84rem;color:var(--text-muted);">Los precios de las laptops 4 y 5 no se leen en la transcripción; puse 8000 y 9000 siguiendo el patrón. Los códigos 400, 405 y 500 que puede devolver este simulador no los probó él: salen de cómo se comporta Spring con ese código.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Código de la clase</p>
+      <h2 class="sec">El proyecto de corrido</h2>
+      <p>Los tres archivos como quedaron al final de la clase: el modelo con Lombok, el controlador con los cuatro endpoints y la configuración.</p>
+    </div>
+
+    <h3 class="sub"><code>application.properties</code></h3>
+    <pre><code>server.port=8083
+
+spring.datasource.url=jdbc:mysql://localhost:3306/bd
+spring.datasource.username=root
+spring.datasource.password=&lt;la contraseña de tu MySQL&gt;
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver</code></pre>
+
+    <h3 class="sub"><code>modelo/Producto.java</code></h3>
+    <pre><code>package com.ipn.mx.modelo;
+
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Producto implements Serializable {
+    private Long id;
+    private String nombre;
+    private double precio;
+}</code></pre>
+
+    <h3 class="sub"><code>controlador/ProductoController.java</code></h3>
+    <pre><code>package com.ipn.mx.controlador;
+
+import com.ipn.mx.modelo.Producto;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/productos")
+public class ProductoController {
+
+    private final List&lt;Producto&gt; productos = new ArrayList&lt;&gt;(List.of(
+        new Producto(1L, "Laptop 1", 5000),
+        new Producto(2L, "Laptop 2", 6000),
+        new Producto(3L, "Laptop 3", 7000),
+        new Producto(4L, "Laptop 4", 8000),
+        new Producto(5L, "Laptop 5", 9000)
+    ));
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Producto&gt;&gt; listarProductos() {
+        return ResponseEntity.ok(productos);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Producto&gt; mostrarProducto(@PathVariable Long id) {
+        Optional&lt;Producto&gt; producto = productos.stream()
+            .filter(p -&gt; p.getId().equals(id))
+            .findFirst();
+        if (producto.isPresent()) {
+            return ResponseEntity.ok(producto.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;Producto&gt; crearProducto(@RequestBody Producto producto) {
+        productos.add(producto);
+        return ResponseEntity
+            .created(URI.create("/api/v1/productos/" + producto.getId()))
+            .body(producto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; eliminarProducto(@PathVariable Long id) {
+        productos.removeIf(p -&gt; p.getId().equals(id));
+        return ResponseEntity.noContent().build();
+    }
+
+    <span class="cm">// Falta: @PutMapping("/{id}") para actualizar</span>
+}</code></pre>
+
+    <details class="dio"><summary>¿En qué se diferencia esta versión de lo que quedó en el pizarrón?</summary><div class="db">
+      <p>Son cabos sueltos del ritmo de la clase, no correcciones a lo que dijo:</p>
+      <ul>
+        <li><b>Imports.</b> Los agregué para que compile. El IDE los pone solo, pero la transcripción no los muestra.</li>
+        <li><b>Paquete base.</b> Supuse <code>com.ipn.mx</code>, el de la clase 8. La transcripción solo dice "el paquete base".</li>
+        <li><b>Precios 4 y 5.</b> No se leen; puse 8000 y 9000 por el patrón.</li>
+        <li><b>Contraseña.</b> La dictó de ejemplo. Aquí va un marcador.</li>
+        <li><b><code>equals</code> y <code>hashCode</code>.</b> A mano los hizo solo por id. Con <code>@Data</code> se regeneran con todos los campos, como dije en el bloque 4.</li>
+        <li><b>El comentario de <code>PUT</code>.</b> Es mío, para marcar lo que falta.</li>
+      </ul>
+    </div></details>
+  </section>
+
+  <section class="final">
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Checklist de la clase 9</h2>
+      <p>Se guarda en tu navegador. Nada se sube a ningún lado ni se comparte con nadie más.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 0</div>
+    </div>
+
+    <div id="finalTasks"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- motor de quiz ---------- */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt";
+          b.textContent=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click",function(){
+      var rows=root.children, right=0, answered=0;
+      Array.prototype.forEach.call(rows,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length
+        ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  /* ---------- 1. el modelo ---------- */
+  quiz("q1",[
+    {q:"¿Cómo se llama el paquete del modelo y la clase que crea?",
+     opts:["modelo y Producto","dto y Producto","entity y Item"], ans:0,
+     why:"<b>modelo y Producto.</b> \"Y a este le vamos a dejar como modelo. Y dentro del modelo vamos a crear una clase [...] Producto.\""},
+    {q:"¿Qué interfaz implementa la clase?",
+     opts:["Serializable","Comparable","Cloneable"], ans:0,
+     why:"<b>Serializable.</b> \"Lo primero que le vamos a poner va a ser un implements Serializable.\""},
+    {q:"¿Contra qué atributo trabajan <code>equals()</code> y <code>hashCode()</code> cuando los genera a mano?",
+     opts:["nombre","id","precio"], ans:1,
+     why:"<b>id.</b> \"A final de cuentas sabemos que el ID es único, que trabaje contra el ID.\""},
+    {q:"¿Cómo pide que se genere el <code>toString()</code>?",
+     opts:["Concatenado con +","Con un StringBuilder","No lo genera"], ans:1,
+     why:"<b>Con StringBuilder.</b> \"No lo quiero concatenado, quiero que trabaje con un StringBuilder.\""}
+  ],"q1go","q1rs","q1fb",
+  "<b>Las cuatro.</b> Modelo <code>Producto</code>, <code>Serializable</code>, igualdad por id y <code>toString</code> con <code>StringBuilder</code>: todo lo que después se borra para dejar solo Lombok.");
+
+  /* ---------- 2. arma el controlador en orden ---------- */
+  var STEPS=[
+    '@RestController',
+    '@RequestMapping("/api/v1/productos")',
+    'public class ProductoController {',
+    'private final List<Producto> productos = new ArrayList<>(List.of(new Producto(1L, "Laptop 1", 5000), ...));',
+    '@GetMapping',
+    'public ResponseEntity<List<Producto>> listarProductos() {',
+    'return ResponseEntity.ok(productos);',
+    '}',
+    '}'
+  ];
+  var INDENT=[0,0,0,1,1,1,2,1,0];
+  var STEPWHY=[
+    "Primero la anotación que marca la clase como API: <code>@RestController</code>.",
+    "Luego la ruta base: <code>@RequestMapping(\"/api/v1/productos\")</code>.",
+    "Después la declaración de la clase.",
+    "Dentro va la lista en memoria con los productos de ejemplo.",
+    "Ahora el verbo del primer endpoint: <code>@GetMapping</code>.",
+    "La firma: devuelve un <code>ResponseEntity</code> de lista de <code>Producto</code> y no recibe argumentos.",
+    "El cuerpo: <code>ResponseEntity.ok(productos)</code>, o sea, 200 con la lista.",
+    "Se cierra el método.",
+    "Y por último se cierra la clase."
+  ];
+  var placed=[], bank=document.getElementById("bank"),
+      built=document.getElementById("built"), bldFb=document.getElementById("bldFb");
+
+  function shuffled(){
+    var idx=STEPS.map(function(_,i){return i;});
+    for(var i=idx.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), t=idx[i]; idx[i]=idx[j]; idx[j]=t;
+    }
+    return idx;
+  }
+  function pad(n){ return new Array(n*4+1).join(" "); }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled().forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS[i];
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          bldFb.className="fb show good";
+          bldFb.innerHTML = placed.length===STEPS.length
+            ? "<b>Ese es el controlador de la primera mitad de la clase.</b> Los otros tres endpoints se agregan dentro de la clase, cada uno con su verbo."
+            : "<b>Va.</b> "+STEPWHY[i];
+        } else {
+          bldFb.className="fb show bad";
+          bldFb.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed.length===0
+              ? "Empieza por la anotación de la clase."
+              : "Antes va otra. Pista: "+STEPWHY[placed.length].replace(/<[^>]+>/g,""));
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando el controlador…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=pad(INDENT[i])+STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){
+        placed=placed.slice(0,n); renderBuilt(); renderBank(); bldFb.className="fb";
+      });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){
+    placed=[]; renderBuilt(); renderBank(); bldFb.className="fb";
+  });
+  renderBuilt(); renderBank();
+
+  /* ---------- 3. el arranque ---------- */
+  quiz("q3",[
+    {q:"¿Por qué no arrancó la aplicación la primera vez?",
+     opts:["Falta la anotación @GetMapping","No se había configurado un DataSource","El puerto 8083 estaba ocupado"], ans:1,
+     why:"<b>Falta el DataSource.</b> \"Nos dice que trató de arrancar, no pudo, y nos da una referencia: no has configurado un DataSource.\""},
+    {q:"El proyecto no usa base de datos. ¿Por qué entonces pide el DataSource?",
+     opts:["Porque Tomcat siempre lo pide","Por haber agregado la dependencia de Spring Data","Porque el modelo implementa Serializable"], ans:1,
+     why:"<b>Por Spring Data.</b> \"Por el simple hecho de haber agregado la dependencia de Spring Data, hay que configurarlo.\""},
+    {q:"¿Cuáles son las cuatro propiedades que agrega?",
+     opts:["url, username, password y driver-class-name","port, name, host y path","url, table, schema y dialect"], ans:0,
+     why:"<b>spring.datasource.</b> <code>url</code>, <code>username</code>, <code>password</code> y <code>driver-class-name</code>."},
+    {q:"Con la configuración lista, ¿en qué puerto arranca Tomcat?",
+     opts:["8080","8082","8083"], ans:2,
+     why:"<b>8083.</b> En la clase 8 usó el 8082. Aquí, \"por poner un número\", el 8083."}
+  ],"q3go","q3rs","q3fb",
+  "<b>Las cuatro.</b> Spring Data exige un DataSource aunque no lo uses; se le da con cuatro propiedades y el proyecto arranca en el 8083.");
+
+  /* ---------- 4. Lombok ---------- */
+  quiz("q4",[
+    {q:"¿Qué tres anotaciones ponen en lugar de constructores, getters, setters y métodos?",
+     opts:["@Data, @NoArgsConstructor y @AllArgsConstructor","@Getter, @Setter y @ToString","@Builder y @Value"], ans:0,
+     why:"<b>@Data, @NoArgsConstructor y @AllArgsConstructor.</b> Es lo que pone justo después de borrar todo lo generado."},
+    {q:"¿Qué genera <code>@AllArgsConstructor</code>?",
+     opts:["El constructor sin argumentos","El constructor con todos los elementos","Los getters"], ans:1,
+     why:"<b>El constructor con todos los elementos.</b> \"Y vamos con el @AllArgsConstructor, y ahí está el constructor con todos los elementos.\""},
+    {q:"¿Para qué dice que usa Lombok?",
+     opts:["Para evitar conflictos y hacer el código más rápido","Porque Spring lo exige","Para poder usar records"], ans:0,
+     why:"<b>Evitar conflictos y ir más rápido.</b> \"Para evitarnos de conflictos y hacer el código más rápido.\""}
+  ],"q4go","q4rs","q4fb",
+  "<b>Las tres.</b> Lombok escribe en compilación lo que a mano son decenas de líneas. La clase queda con sus campos y tres anotaciones.");
+
+  /* ---------- 5. códigos de respuesta ---------- */
+  quiz("q5",[
+    {q:"<code>GET /api/v1/productos/30</code>, que no existe.",
+     opts:["200, ResponseEntity.ok(null)","404, ResponseEntity.notFound().build()","204, ResponseEntity.noContent().build()"], ans:1,
+     why:"<b>404 con notFound().build().</b> \"Busquemos un ID que no exista, un 30... y nos devuelve un 404 Not Found.\""},
+    {q:"<code>POST /api/v1/productos</code> con un producto nuevo.",
+     opts:["200, ResponseEntity.ok(...)","201, ResponseEntity.created(URI...).body(producto)","204, ResponseEntity.noContent().build()"], ans:1,
+     why:"<b>201 con created(...).body(...).</b> \"Vamos a retornar un 201 Created.\" La ruta del nuevo recurso va en la URI."},
+    {q:"<code>DELETE /api/v1/productos/4</code>.",
+     opts:["200, con el producto borrado","204, ResponseEntity.noContent().build()","404 siempre"], ans:1,
+     why:"<b>204 sin contenido.</b> \"No quiero que me devuelva nada, así que va a ser un 204 No Content.\" Por eso el retorno es <code>ResponseEntity&lt;Void&gt;</code>."},
+    {q:"Probó <code>GET /productos/2</code> antes de programarlo y devolvió 404. ¿Por qué?",
+     opts:["Porque el producto 2 no existe","Porque todavía no había ningún método mapeado a esa ruta","Porque falta el DataSource"], ans:1,
+     why:"<b>Ninguna ruta atendía eso.</b> \"Esto nos devuelve un 404 Not Found. Tiene sentido porque no lo hemos programado.\""}
+  ],"q5go","q5rs","q5fb",
+  "<b>Las cuatro.</b> 200 al encontrar, 404 al no encontrar, 201 al crear y 204 al borrar: los códigos que fue dejando en cada endpoint.");
+
+  /* ---------- 6. simulador ---------- */
+  var SEED=[[1,"Laptop 1",5000],[2,"Laptop 2",6000],[3,"Laptop 3",7000],[4,"Laptop 4",8000],[5,"Laptop 5",9000]];
+  var data=[];
+  function seed(){ data=SEED.map(function(r){ return {id:r[0],nombre:r[1],precio:r[2]}; }); }
+  seed();
+
+  function num(x){ return Number.isInteger(x)? x.toFixed(1) : String(x); }
+  function ser(p,ind){
+    return ind+"{\n"+ind+'  "id": '+(p.id===null?"null":p.id)+",\n"+
+      ind+'  "nombre": '+JSON.stringify(p.nombre)+",\n"+
+      ind+'  "precio": '+num(p.precio)+"\n"+ind+"}";
+  }
+  function serList(a){
+    return a.length? "[\n"+a.map(function(p){return ser(p,"  ");}).join(",\n")+"\n]" : "[]";
+  }
+
+  var verb="GET";
+  var verbsel=document.getElementById("verbsel"), bodyWrap=document.getElementById("bodyWrap"),
+      urlIn=document.getElementById("cliUrl"), bodyIn=document.getElementById("cliBody"),
+      resp=document.getElementById("cliResp");
+
+  verbsel.addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    verb=b.getAttribute("data-v");
+    Array.prototype.forEach.call(verbsel.children,function(c){ c.classList.toggle("on",c===b); });
+    bodyWrap.hidden = !(verb==="POST"||verb==="PUT");
+  });
+
+  var MISSIONS=[
+    {id:"m1", t:"<b>GET</b> a la lista: responde 200 con las cinco laptops."},
+    {id:"m2", t:"<b>GET</b> al id <b>30</b>, que no existe: responde 404."},
+    {id:"m3", t:"<b>POST</b> del producto 6: responde 201."},
+    {id:"m4", t:"<b>DELETE</b> al id <b>4</b>: responde 204."},
+    {id:"m5", t:"<b>GET</b> a la lista otra vez: la lista salta del 3 al 5."}
+  ];
+  var mdone={}, deleted4=false;
+  var mul=document.getElementById("missions");
+  function renderMissions(){
+    mul.innerHTML="";
+    MISSIONS.forEach(function(m){
+      var li=document.createElement("li"); li.className=mdone[m.id]?"done":"";
+      li.innerHTML='<span class="mk">'+(mdone[m.id]?"✓":"")+'</span><span class="mt">'+m.t+"</span>";
+      mul.appendChild(li);
+    });
+  }
+  renderMissions();
+
+  function show(code,text,body,explain,loc){
+    var cls = code>=400? "s4":"s2";
+    var h='<span class="st '+cls+'">'+code+" "+text+"</span>";
+    if(loc) h+='<p class="hd">Location: '+loc+"</p>";
+    if(body!==null && body!==undefined && body!=="") h+="<pre></pre>";
+    if(explain) h+='<p class="explain">'+explain+"</p>";
+    resp.innerHTML=h;
+    var pre=resp.querySelector("pre"); if(pre) pre.textContent=body;
+  }
+
+  function send(){
+    var raw=urlIn.value.trim(), m=raw.match(/^https?:\/\/([^\/]+)(\/[^?#]*)?/i);
+    if(!m){ resp.innerHTML='<span class="st s4">Error</span><p class="explain">La URL debe empezar con <code>http://localhost:8083</code>.</p>'; return; }
+    if(m[1].toLowerCase()!=="localhost:8083" && m[1]!=="127.0.0.1:8083"){
+      resp.innerHTML='<span class="st s4">Error de conexión</span><p class="explain">No se puede conectar al servidor <code>'+m[1].replace(/</g,"&lt;")+"</code>. El proyecto de esta clase escucha en <code>localhost:8083</code>; en la clase 8 era el 8082.</p>";
+      return;
+    }
+    var path=(m[2]||"/").replace(/\/+$/,"");
+    var base="/api/v1/productos";
+    var idm=path.match(/^\/api\/v1\/productos\/([^\/]+)$/);
+
+    if(path===base){
+      if(verb==="GET"){
+        show(200,"OK",serList(data),"Devuelve la lista completa, como <code>listarProductos()</code>.");
+        mdone.m1=true;
+        if(deleted4 && !data.some(function(p){return p.id===4;})) mdone.m5=true;
+      } else if(verb==="POST"){
+        var obj;
+        try{ obj=JSON.parse(bodyIn.value); }
+        catch(e){ show(400,"Bad Request","","El cuerpo no es un JSON válido. Spring lo rechaza antes de llegar al método."); renderMissions(); return; }
+        var np={id:(typeof obj.id==="number"&&isFinite(obj.id))?Math.trunc(obj.id):null,
+                nombre:(typeof obj.nombre==="string")?obj.nombre:null,
+                precio:(typeof obj.precio==="number")?obj.precio:0};
+        data.push(np);
+        var dup = data.filter(function(p){return p.id===np.id;}).length>1;
+        show(201,"Created",ser(np,""),
+          "Se agregó a la lista en memoria."+(dup?" <b>Ojo:</b> ya había un producto con ese id y se agregó de todos modos, porque este POST no valida nada.":""),
+          "/api/v1/productos/"+np.id);
+        if(np.id===6) mdone.m3=true;
+      } else {
+        show(405,"Method Not Allowed","","La ruta existe, pero no tiene un método para "+verb+". "+(verb==="PUT"?"Es el <code>@PutMapping</code> que faltó escribir en clase.":"Solo hay GET y POST aquí."));
+      }
+    } else if(idm){
+      var idtxt=idm[1];
+      if(!/^-?\d+$/.test(idtxt)){
+        show(400,"Bad Request","","El id debe ser un número (<code>Long</code>); <code>"+idtxt.replace(/</g,"&lt;")+"</code> no lo es.");
+      } else if(verb==="GET" || verb==="DELETE"){
+        var id=Number(idtxt);
+        if(data.some(function(p){return p.id===null;})){
+          show(500,"Internal Server Error","","Hay un producto con id <code>null</code> en la lista (mandaste un POST sin id). Al comparar <code>p.getId().equals(id)</code> Java lanza <code>NullPointerException</code>. Reinicia el servidor.");
+        } else if(verb==="GET"){
+          var f=data.filter(function(p){return p.id===id;})[0];
+          if(f) show(200,"OK",ser(f,""),"Lo encontró: <code>ResponseEntity.ok(producto.get())</code>.");
+          else show(404,"Not Found","","No hay producto con ese id: <code>ResponseEntity.notFound().build()</code>. La respuesta no lleva cuerpo.");
+          if(id===30 && !f) mdone.m2=true;
+        } else {
+          var antes=data.length;
+          data=data.filter(function(p){return p.id!==id;});
+          show(204,"No Content","",
+            (data.length===antes? "El id no existía y aun así responde 204: <code>removeIf</code> no falla si no encuentra nada." : "Se borró de la lista.")+" La respuesta no lleva cuerpo.");
+          if(id===4 && data.length<antes){ mdone.m4=true; deleted4=true; }
+        }
+      } else {
+        show(405,"Method Not Allowed","","La ruta existe, pero no tiene un método para "+verb+". "+(verb==="PUT"?"Es el <code>@PutMapping(\"/{id}\")</code> que faltó escribir en clase.":"Aquí solo hay GET y DELETE."));
+      }
+    } else {
+      show(404,"Not Found","","Ninguna ruta atiende <code>"+path.replace(/</g,"&lt;")+"</code>. Es el mismo 404 que vio al probar un endpoint que todavía no había programado.");
+    }
+    renderMissions();
+  }
+
+  document.getElementById("cliSend").addEventListener("click",send);
+  urlIn.addEventListener("keydown",function(e){ if(e.key==="Enter") send(); });
+  document.getElementById("cliRestart").addEventListener("click",function(){
+    seed(); deleted4=false; mdone.m5=false;
+    resp.innerHTML='<span class="ph">Servidor reiniciado: la lista vuelve a tener cinco laptops.</span>';
+    renderMissions();
+  });
+
+  /* ---------- checklist ---------- */
+  var FINAL=[
+    {id:"c9-put", t:"Pendiente sugerido · escribir el PUT para actualizar",
+     d:"No lo dejó como tarea. Dijo que faltaba y que \"ya es la misma lógica\". Con él el CRUD queda completo: GET lista, GET por id, POST, PUT y DELETE."},
+    {id:"c9-repro", t:"Reproducir el proyecto en tu máquina",
+     d:"Modelo Producto con Lombok, ProductoController con cuatro endpoints, application.properties con el puerto 8083 y las cuatro propiedades del DataSource. Prueba cada uno en Insomnia."},
+    {id:"c9-conv", t:"Arrastre · terminar el conversor de temperaturas (clase 8)",
+     d:"Faltaban F a C, F a K, K a C y K a F. En esta transcripción no aparece que lo hayan revisado en el laboratorio."},
+    {id:"c9-cierre", t:"Por confirmar · ¿hay clase o laboratorio el próximo miércoles?",
+     d:"Cerró con \"nos vemos el próximo miércoles, y nos vemos en laboratorio\", frase idéntica a la de la clase 7. Confírmalo con tu horario."}
+  ];
+  var KEY="clase9-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var fh=document.getElementById("finalTasks"), bar=document.getElementById("bar"),
+      pc=document.getElementById("pcount");
+  FINAL.forEach(function(it){
+    var l=document.createElement("label"); l.className="ftask";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!st[it.id];
+    var b=document.createElement("div");
+    b.innerHTML='<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent=it.t;
+    b.querySelector(".td2").textContent=it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if(cb.checked) l.classList.add("done");
+    cb.addEventListener("change",function(){
+      st[it.id]=cb.checked; l.classList.toggle("done",cb.checked);
+      try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+  function refresh(){
+    var done=0, boxes=fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes,function(c){ if(c.checked) done++; });
+    pc.textContent=done+" / "+FINAL.length;
+    bar.style.width=Math.round(done/FINAL.length*100)+"%";
+  }
+  refresh();
+})();
+</script>

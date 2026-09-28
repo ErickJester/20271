@@ -254,9 +254,9 @@ const TAREAS = [
     entrega: "2026-09-07T23:00",
     fechaPorConfirmar: false,
     parcial: 1,
-    estado: "pendiente",
-    descripcion: "El profesor dijo en clase 4 'para la próxima semana'. Confirmado: la lista oficial de tareas trae esta fila literalmente mezclada con 'Instalación de Java' (no es un error de lectura — el renglón real de la plataforma dice \"Instalación de Java. Ejercicio dos cambiar el ejercicios con prepareStatement y ponerlo con CalledeStatemnt\"), con fecha 7 de septiembre — ya vencida. Requiere antes crear los 5 stored procedures en MySQL (solo el de insertar quedó en el pizarrón) y haber leído JDBC. Los índices de parámetro siguen empezando en 1; cambia prepareStatement() por prepareCall() y el texto por \"{call sp_nombre(?, ?)}\". Verificado en el repo: CarreraDAO.java (en practicas/gui carrera/) SIGUE usando PreparedStatement en los 5 métodos, no hay ni un CallableStatement, y no existe ningún stored procedure en SQL en todo el repo. No se ha empezado.",
-    entregable: "CarreraDAO modificado + los 5 stored procedures en SQL",
+    estado: "hecha",
+    descripcion: "Terminado. Los 5 stored procedures (sp_crear_carrera, sp_leer_carrera, sp_listar_carreras, sp_actualizar_carrera, sp_eliminar_carrera) están en practicas/callable statement/init/02-procedimientos.sql, y CarreraDAO.java de esa misma carpeta ya usa CallableStatement con \"{call sp_nombre(?, ?)}\" en los 5 métodos, en vez de PreparedStatement. El reporte (Reporte-Callable-Carrera.pdf) cubre la rúbrica de 10 puntos: tabla real, GUI con CRUD completo (incluyendo el error de nombre duplicado), procedimientos y métodos con evidencia, DAO/DTO explicados, y evidencia de las llamadas JDBC vía el general_log de MySQL. Revisado: código, capturas y bibliografía verificados, sin inconsistencias. Ya subido al repo.",
+    entregable: "CarreraDAO modificado + los 5 stored procedures en SQL + reporte en PDF",
     pasos: ["Escribir los 5 stored procedures en MySQL", "Cambiar create() a CallableStatement", "Cambiar update()", "Cambiar delete()", "Cambiar read() y readAll()", "Probar contra la base"],
     origen: "Clase 4 · confirmada en la lista oficial de tareas (7 sept, en fila mezclada con Instalación de Java)",
     ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/callable statement"

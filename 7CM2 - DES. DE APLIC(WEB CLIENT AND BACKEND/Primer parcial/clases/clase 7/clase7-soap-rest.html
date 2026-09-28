@@ -1,0 +1,1127 @@
+<title>Clase 7 · SOAP y REST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF0F4; --surface:#FFFFFF; --surface-2:#F5F6FA;
+    --text:#14171F; --text-muted:#5A6272; --border:#D9DDE6;
+    --accent:#2F5F8A; --accent-soft:#E0EBF5; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --soap:#5B3FA3; --soap-soft:#ECE6F8; --soap-bd:#B9A6E2;
+    --rest:#B0530E; --rest-soft:#FAEBDD; --rest-bd:#E2B48C;
+    --code-bg:#F0F2F6;
+    --shadow:0 1px 2px rgba(20,23,31,.06), 0 10px 26px -14px rgba(20,23,31,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#0F1218; --surface:#171B24; --surface-2:#1D222D;
+      --text:#E8EBF2; --text-muted:#98A0B2; --border:#2B3140;
+      --accent:#86B7E3; --accent-soft:#142536; --accent-ink:#0F1218;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --soap:#B69EF0; --soap-soft:#241C3D; --soap-bd:#4F3F86;
+      --rest:#F0A468; --rest-soft:#35210F; --rest-bd:#7A4A22;
+      --code-bg:#141822;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#0F1218; --surface:#171B24; --surface-2:#1D222D;
+    --text:#E8EBF2; --text-muted:#98A0B2; --border:#2B3140;
+    --accent:#86B7E3; --accent-soft:#142536; --accent-ink:#0F1218;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --soap:#B69EF0; --soap-soft:#241C3D; --soap-bd:#4F3F86;
+    --rest:#F0A468; --rest-soft:#35210F; --rest-bd:#7A4A22;
+    --code-bg:#141822;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+  .lede + .lede{margin-top:10px;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+
+  /* --- los dos protocolos: el dispositivo estructural de esta clase --- */
+  .pro{display:inline-flex; align-items:center; font-family:'IBM Plex Mono',monospace;
+    font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+    padding:3px 9px; border-radius:5px;}
+  .pro.soap{background:var(--soap-soft); color:var(--soap);}
+  .pro.rest{background:var(--rest-soft); color:var(--rest);}
+  .lado{border-left:3px solid var(--c); padding-left:16px;}
+  .lado h2.sec{color:var(--c);}
+  .ladobar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .ladochip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .ladochip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--c);}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; margin:16px 0; max-width:68ch; display:flex; gap:11px;}
+  .note .ic{flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--border);
+    color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;}
+  .note p{font-family:'Source Serif 4',Georgia,serif; font-size:.86rem; line-height:1.55;
+    color:var(--text-muted); margin:0;}
+  .note b{color:var(--text); font-weight:600;}
+
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer; text-align:left;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;
+    overflow-x:auto;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px; white-space:pre;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.74rem; padding:7px 11px;
+    border-radius:8px; cursor:pointer; text-align:left; max-width:100%; overflow-wrap:anywhere;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .crow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px;
+    padding:11px 13px; margin-bottom:10px;}
+  .crow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .crow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .crow .cq{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; margin-bottom:8px; line-height:1.5;}
+  .crow .cl{display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem;}
+  .crow input{font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding:6px 9px;
+    background:var(--surface); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; width:15ch; max-width:100%;}
+  .crow .ch{font-family:'Source Serif 4',Georgia,serif; font-size:.85rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .crow .ch.show{display:block;}
+  .crow .ch b{color:var(--text); font-weight:600;}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:520px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:480px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  th.soap{color:var(--soap);} th.rest{color:var(--rest);}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+  td.soapc{background:var(--soap-soft);} td.restc{background:var(--rest-soft);}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+</style>
+
+<header class="page">
+  <div class="wrap">
+    <p class="kicker">Web Client · Clase 7 · abre la Unidad II · fecha por confirmar</p>
+    <h1>SOAP y REST: cómo hacer que el software hable entre sí</h1>
+    <p class="lede">Sesión de <b>puras diapositivas</b>, sin código en vivo. El profesor abre formalmente la Unidad II (servicios y APIs) con una pregunta: si un sistema mezcla Java, .NET, PHP, Android y iPhone, ¿cómo los pones a platicar? Responde con dos estilos de servicio web, SOAP y REST, y termina asomándose al primer controlador de Spring, que es justo lo que se construye en la clase siguiente.</p>
+    <p class="lede">La página lleva los dos protocolos en color: <span class="pro soap">SOAP</span> en violeta, el contrato formal, y <span class="pro rest">REST</span> en naranja, el ligero. Los botones con <b style="color:var(--accent);font-family:'IBM Plex Mono',monospace;">?</b> explican los términos que dio por sabidos. Hay seis ejercicios intercalados.</p>
+  </div>
+</header>
+
+<main>
+
+  <div class="arranque">
+    <h2>Lo que salió de esta clase</h2>
+    <ol>
+      <li><span class="t">≈00:00</span><span class="d"><b>Opcional:</b> la <b>aplicación de propósito general</b> (Práctica 1). Dijo que no es obligatoria, pero que quien quiera adelantarla puede. Vuelve a salir al ≈19:20.</span></li>
+      <li><span class="t">≈15:05</span><span class="d"><b>Arrastre de la clase 5:</b> los <b>códigos de respuesta HTTP</b>. Los volvió a nombrar como algo que se sigue respetando; sigue sin fecha.</span></li>
+      <li><span class="t">≈35:05</span><span class="d"><b>Pendiente administrativo:</b> nos vemos el <b>próximo miércoles en el laboratorio</b>.</span></li>
+      <li><span class="t">aclaración</span><span class="d">En esta sesión <b>no dictó ninguna tarea nueva con fecha</b>. El checklist del final junta las tres cosas de arriba más un recordatorio de XML.</span></li>
+    </ol>
+  </div>
+
+  <div class="note">
+    <span class="ic">i</span>
+    <p><b>Sobre los minutos y la fecha.</b> La transcripción de esta clase no traía tiempos reales: las marcas <b>≈</b> están estimadas por el ritmo del habla (cada 1 o 2 minutos), así que valen ±1 minuto. La fecha tampoco viene. Por lo que dice el repo, esta clase es la <b>7</b> y va antes de la del 9 de septiembre. Confírmala con tu calendario antes de usarla para otra cosa.</p>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 1 · minuto ≈00:00 a 03:22</p>
+      <h2 class="sec">Por qué existe SOAP</h2>
+      <p>Abre la Unidad II retomando la aplicación de propósito general que ya mencionó antes, y de ahí salta a la pregunta de fondo: cómo se comunican piezas hechas con tecnologías distintas.</p>
+    </div>
+
+    <p class="quote">"Formalmente dando carpetazo a la de inicio a la unidad dos. Que tiene que ver con servicios, APIs y demás. Entonces, como primera escala, vamos a platicar tantito de <b>SOAP</b>. Que es, literal, el <b>protocolo simple de acceso a objetos</b>."</p>
+
+    <p class="body">La idea de partida: tengo un problema que resolver con varios tipos de software y varios lenguajes, así que necesito una forma de <b>ponerlos a platicar</b>. Si lo logro, ya no dependo de una base de datos, de un sistema operativo ni de un lenguaje en particular. Para lograrlo se apoya en <b>protocolos estándar</b>, es decir, reglas que todos aceptan.</p>
+
+    <details class="dio"><summary>¿Qué significa "sistemas heterogéneos"?</summary><div class="db">
+      <p>Sistemas hechos con tecnologías distintas: uno en Java, otro en .NET, otro en Python, con bases de datos y sistemas operativos diferentes. Lo contrario es un sistema <b>homogéneo</b>, donde todo usa la misma tecnología. Lo difícil de la integración es que cada pieza "habla" un formato distinto.</p>
+    </div></details>
+
+    <p class="body">Aclaró que SOAP se enfoca sobre todo en el <b>ámbito empresarial</b>, porque cumple con los principios <b>ACID</b> del manejo de transacciones. Al recitarlos se trabó con el orden y él mismo se corrigió con un "bueno, en el orden correcto".</p>
+
+    <details class="dio"><summary>¿Cuáles son los principios ACID, en el orden correcto?</summary><div class="db">
+      <ul>
+        <li><b>A</b>tomicidad: la transacción se hace completa o no se hace.</li>
+        <li><b>C</b>onsistencia: la base pasa de un estado válido a otro válido.</li>
+        <li><b>A</b>islamiento: dos transacciones simultáneas no se estorban entre sí.</li>
+        <li><b>D</b>urabilidad: lo confirmado no se pierde, aunque se caiga el sistema.</li>
+      </ul>
+      <p>Él dijo "atomicidad, consistencia, durabilidad, aislamiento" y se corrigió; el orden de las siglas es el de arriba. Lo recordamos de cuando jugamos con bases de datos.</p>
+    </div></details>
+
+    <div class="note">
+      <span class="ic">i</span>
+      <p><b>Precisión mía, no del profesor.</b> Él dice que SOAP "le da cumplimiento" a ACID. Para el examen conviene decirlo así: SOAP se asocia con transacciones confiables. Ese soporte lo aportan las extensiones del estándar (la familia WS-*, como WS-AtomicTransaction), no el mensaje SOAP básico por sí solo.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 2 · minuto ≈03:22 a 05:25</p>
+      <h2 class="sec">Web Services: el intermediario entre lenguajes</h2>
+      <p>Definió el servicio web y lo aterrizó con un sistema de facturación imaginario.</p>
+    </div>
+
+    <p class="quote">"Es aquel conjunto de normas, de reglas, de protocolos, de estándares, que nos van a poder permitir hacer que una aplicación escrita en <b>.NET</b>, por ejemplo, se comunique con una aplicación en <b>Java</b>, con una aplicación en <b>Python</b> o con cualquier cosa que se les ocurra."</p>
+
+    <p class="body">El ejemplo fue el típico <b>sistema de facturación</b> con módulos en PHP, Java, .NET, Python y Go, que además corre en varias plataformas: Android, iPhone y HarmonyOS de Huawei, más web, escritorio y consola. Hay dos caminos para que se hablen: escribir tú un <b>middleware</b>, o usar servicios. Un servicio web hace el trabajo de un middleware.</p>
+
+    <details class="dio"><summary>¿Qué es un middleware?</summary><div class="db">
+      <p>Software que se coloca <b>en medio</b> de dos aplicaciones para traducir o coordinar lo que se dicen. Cada aplicación habla con el middleware en vez de hablar directo con la otra, y el middleware sabe cómo tratar con cada una.</p>
+    </div></details>
+  </section>
+
+  <section>
+    <div class="lado" style="--c:var(--soap);">
+      <div class="ladobar"><span class="ladochip">SOAP · el contrato formal</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 3 · minuto ≈05:25 a 08:08</p>
+        <h2 class="sec">El WSDL: el contrato</h2>
+        <p>Para usar un servicio web hace falta un convenio entre las dos partes. Ese convenio es un documento XML.</p>
+      </div>
+
+      <p class="quote">"Necesitamos un convenio, de alguna manera, entre las dos partes. Y ese convenio no es otra cosa más que un documento basado en <b>XML</b>. [...] Se llama <b>Web Service Descriptor Language</b>, <b>WSDL</b>, que es el contrato."</p>
+
+      <p class="body">La analogía fue la renta de un cuarto: quien ha rentado firmó un convenio con reglas (no llegar muy noche, no hacer escándalo, cuidar los espacios). Esas reglas son obligatorias para ambos. En un servicio web, el WSDL cumple ese papel: dice qué se debe seguir.</p>
+
+      <p class="body">Concretamente, el WSDL dice:</p>
+      <ul class="body">
+        <li>cómo se llama el <b>método</b>;</li>
+        <li>qué <b>tipo de dato</b> espera recibir;</li>
+        <li>qué <b>devuelve</b>;</li>
+        <li>cómo se lo vamos a llamar.</li>
+      </ul>
+
+      <p class="body">Sirve para que las aplicaciones se pongan de acuerdo en el <b>formato de recepción y de respuesta</b>. Todo funciona por <b>paso de mensajes</b>, y lo que viaja es "una cadenota XML".</p>
+
+      <p class="quote">"¿Han hecho interfaces en Java? Y no interfaces gráficas de usuario, sino el <b>public interface</b>. El contrato, el que les dice el 'qué' se tiene que hacer. Bueno, pues es lo mismo."</p>
+
+      <details class="dio"><summary>¿Por qué compara el WSDL con un <code>public interface</code>?</summary><div class="db">
+        <p>Una interfaz de Java declara qué métodos existen, con qué parámetros y qué devuelven, pero no dice <b>cómo</b> se hacen. Quien la implementa decide el cómo. El WSDL hace lo mismo entre programas: fija el "qué" y deja libre el "cómo" a cada lado, sin importar en qué lenguaje esté hecho.</p>
+      </div></details>
+
+      <p class="body">Al fondo de este bloque se le complicó cambiar de diapositiva con el proyector ("no quiere"). Fue una pausa breve, sin contenido.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 4 · minuto ≈08:08 a 10:43</p>
+      <h2 class="sec">Los cinco estándares que sostienen a SOAP</h2>
+      <p>SOAP funciona porque se apoya en estándares que todos aceptan. Los fue nombrando uno por uno.</p>
+    </div>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th>Estándar</th><th>Para qué sirve, según él</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">HTTP</td><td class="d">El protocolo de transferencia de hipertexto: "todos hemos agarrado el HTTP" para enviar datos y hacer peticiones.</td></tr>
+        <tr><td class="sym">SOAP</td><td class="d">El protocolo del que trata la clase: define cómo se arma el mensaje.</td></tr>
+        <tr><td class="sym">WSDL</td><td class="d">El descriptor: "dice qué podemos hacer con respecto al servicio web".</td></tr>
+        <tr><td class="sym">XML</td><td class="d">El formato en que se envían los datos que esperamos recibir.</td></tr>
+        <tr><td class="sym">XSD</td><td class="d">Define los elementos que se esperan dentro del XML: qué tipo de dato es, si es obligatorio, si es lista, si tiene asociaciones. Son las <b>reglas de validación</b> del documento.</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="quote">"Ustedes recordarán en sus clases que les dijeron que un XML tendría que ser <b>bien formado</b> y <b>validado</b>. La buena formación, pues, un montón de reglas que debe de cumplir. La validez, lo que le da el peso al documento, es cómo está conformado, la manera en que aparecen cada uno de los elementos."</p>
+
+    <details class="dio"><summary>¿Qué diferencia hay entre "bien formado" y "válido"?</summary><div class="db">
+      <p><b>Bien formado</b>: cumple las reglas de sintaxis de XML. Todas las etiquetas cierran, hay un solo elemento raíz, los atributos van entre comillas. Cualquier lector de XML lo acepta.</p>
+      <p><b>Válido</b>: además de estar bien formado, respeta las reglas de <b>un esquema concreto</b> (el XSD): que exista tal elemento, en tal orden, con tal tipo de dato. Un documento puede estar bien formado y no ser válido.</p>
+      <p>Al presentar el WSDL (bloque 3) el profesor pidió recordar la tercera y cuarta unidad de <b>Tecnologías para el Desarrollo de Aplicaciones Web</b>, donde se vio XML.</p>
+    </div></details>
+
+    <p class="body">Lo que se logra con todo esto: sin importar en qué esté desarrollado tu proyecto, los distintos lenguajes van a poder intercambiar información. Bromeó con no saber si el proyector fallaba por el adaptador o por el cable; sin contenido técnico.</p>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 1 · quién hace qué</p>
+    <h3>Los estándares de SOAP</h3>
+    <p class="ask">Cuatro preguntas sobre el papel de cada pieza. Contesta las cuatro y dale a <b>Revisar</b>.</p>
+    <div class="qrows" id="q1"></div>
+    <div class="btnrow">
+      <button class="btn" id="q1go" type="button">Revisar</button>
+      <button class="btn ghost" id="q1rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q1fb"></div>
+  </div>
+
+  <section>
+    <div class="lado" style="--c:var(--rest);">
+      <div class="ladobar"><span class="ladochip">REST · el ligero</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 5 · minuto ≈10:43 a 12:30</p>
+        <h2 class="sec">REST, JSON y por qué el XML sigue vivo</h2>
+        <p>Entra el otro estilo. También es un conjunto de principios para intercambiar información, pero con otra forma de mensaje.</p>
+      </div>
+
+      <p class="body">Dice la gente que el XML ya no se usa y que deberíamos usar JSON. El profesor explica la razón: el documento sigue siendo "una cadenota de texto", pero <b>JSON</b> nace de JavaScript y es fácil de leer tanto para máquinas como para humanos. Ganó auge porque se necesitaba transferir datos sobre todo para <b>dispositivos móviles</b> y <b>servicios web ligeros</b>.</p>
+
+      <p class="body">Luego preguntó si seguimos usando XML. La respuesta fue que sí, y el ejemplo fue la factura:</p>
+
+      <p class="quote">"¿Ustedes han facturado algo alguna vez? ¿Cuál es la factura? El XML. El XML es la factura. Literal. [...] Ustedes a lo mejor dicen 'ah, no, es que mi factura es el PDF'. No es cierto, esa es la <b>representación impresa</b> de tu factura. Tu factura es el XML."</p>
+
+      <details class="dio"><summary>¿Quién es "la entidad recaudadora más importante de México"?</summary><div class="db">
+        <p>No la nombró. Es el <b>SAT</b>. El comprobante fiscal digital (CFDI) es un archivo XML; el PDF que te llega es una representación impresa. Por eso, dijo, "tenemos que darle cumplimiento" al XML en los sistemas de facturación.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="lado" style="--c:var(--rest);">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 6 · minuto ≈12:30 a 15:23</p>
+        <h2 class="sec">REST se apoya en HTTP</h2>
+        <p>REST no inventa un protocolo nuevo. Aprovecha lo que ya trae HTTP.</p>
+      </div>
+
+      <p class="body">Usa los <b>verbos</b> de HTTP para cada acción. Los que normalmente usamos: <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code> y <code>PATCH</code>. Sirven para recuperar uno o muchos, insertar, hacer actualizaciones totales o parciales, y borrar. Puede devolver los resultados en HTML, XML o lo que se te ocurra, pero <b>lo típico es JSON</b>.</p>
+
+      <p class="quote">"En el sentido estricto, cuando jugamos con REST, lo único que tenemos que hacer es seguir todo el conjunto de reglas que pudiera existir dentro del manejo del mismo protocolo. [...] Sabemos que el HTTP por definición es un <b>protocolo sin estado</b>, entonces a ustedes les toca encontrar la forma de garantizar la <b>trazabilidad</b> de las peticiones."</p>
+
+      <details class="dio"><summary>¿Qué quiere decir que HTTP no tiene estado?</summary><div class="db">
+        <p>Cada petición llega sola: el servidor no recuerda por sí mismo quién eres ni qué pediste antes. Si necesitas que una serie de peticiones se reconozcan como parte de lo mismo (una sesión, un carrito, un usuario ya autenticado), tienes que construir esa continuidad tú: con sesiones, cookies, tokens, etc. A eso se refiere con "trazabilidad".</p>
+      </div></details>
+
+      <p class="body">También se siguen respetando los <b>códigos de respuesta y de estado</b>, "sobre todo para indicar si la petición fue satisfactoria, si es un recurso prohibido, si hay variedad de opciones y demás".</p>
+
+      <div class="task">
+        <div class="task-head"><span class="task-badge">Arrastre · clase 5</span><span class="task-when">≈15:05</span></div>
+        <h3>Códigos de respuesta del protocolo HTTP</h3>
+        <p>Aquí no dictó nada nuevo, pero volvió a nombrarlos. En la clase 5 los pidió con un "se requieren, desafortunadamente" y sin fecha; sigue sin haberla.</p>
+        <p class="said">"Se siguen respetando los códigos de respuesta y los códigos de estado."</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 7 · minuto ≈15:23 a 19:20</p>
+      <h2 class="sec">API, gateway y sistemas legados</h2>
+      <p>Definió qué es una API, dibujó cómo se organiza y cerró con la pregunta de cuándo usar SOAP y cuándo REST.</p>
+    </div>
+
+    <p class="quote">"Por definición es una <b>interfaz de programación de aplicaciones</b>, y la regla es simple: es aquel conjunto de reglas, de normas, de protocolos que vamos a usar para poder integrar software de aplicaciones."</p>
+
+    <p class="body">En la diapositiva aparecen dos piezas. El <b>Backend System</b> es lo que construimos del lado del servidor. El <b>API Management System</b>, o <b>API Gateway</b>, es el responsable de "determinar qué se puede hacer, quién puede responder y redireccionar al espacio correspondiente". Delante pueden estar aplicaciones de escritorio, web, móviles, de consola o dispositivos IoT, y todas se integran mientras exista manera de comunicarse. Ejemplo: sensores que disparan una acción y guardan datos; al usuario final solo le importa ver "numeritos" o una gráfica.</p>
+
+    <details class="dio"><summary>¿Qué hace un API Gateway?</summary><div class="db">
+      <p>Es la puerta de entrada única a tus servicios. Recibe todas las peticiones, decide si el solicitante puede hacerlas, y las manda al servicio interno correcto. Así los clientes no necesitan conocer la dirección de cada servicio.</p>
+    </div></details>
+
+    <h3 class="sub">La diferencia entre los dos</h3>
+
+    <p class="quote">"<b>Sistemas legados</b>. Esas cosas raras que existen, que funcionan, sepa la... cómo. Donde ni siquiera hay documentación, o más bien la documentación pues ya se fue. ¿Y qué es más fácil? ¿Mantenerlos o actualizarlos? Típicamente trabajan con SOAP."</p>
+
+    <div class="tablewrap"><table>
+      <thead><tr><th></th><th class="soap">SOAP</th><th class="rest">REST</th></tr></thead>
+      <tbody>
+        <tr><td class="sym">Formato del mensaje</td><td class="soapc">XML, "sí o sí"</td><td class="restc">JSON. También puede recibir y generar XML</td></tr>
+        <tr><td class="sym">Dónde lo verás</td><td class="soapc">Sistemas legados; empresas muy formales; donde los esquemas de seguridad son un requisito de cumplimiento</td><td class="restc">Servicios web ligeros, Internet de las cosas, aplicaciones móviles, <em>serverless</em></td></tr>
+        <tr><td class="sym">Carácter</td><td class="soapc">Verboso, con contrato (WSDL)</td><td class="restc">Ligero, apoyado en los verbos de HTTP</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="body">Su conclusión práctica: cuando hagas cosas "muy empresariales, muy formales", lo más seguro es que tengas que lidiar con SOAP.</p>
+
+    <details class="dio"><summary>¿Qué es <em>serverless</em>?</summary><div class="db">
+      <p>Un modelo de nube donde subes funciones o pequeños servicios y el proveedor se encarga de los servidores: los levanta cuando llega una petición y cobra por uso. No significa que no haya servidores, sino que tú no los administras. El profesor solo lo listó como uno de los lugares donde REST es ideal.</p>
+    </div></details>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 2 · elige el estilo</p>
+    <h3>¿SOAP o REST?</h3>
+    <p class="ask">Cuatro escenarios con los criterios que dio. La última pregunta cierra un malentendido común.</p>
+    <div class="qrows" id="q2"></div>
+    <div class="btnrow">
+      <button class="btn" id="q2go" type="button">Revisar</button>
+      <button class="btn ghost" id="q2rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q2fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 8 · minuto ≈19:20 a 24:14</p>
+      <h2 class="sec">La aplicación de propósito general, por dentro</h2>
+      <p>Retomó el resultado esperado de la práctica y contó cuántas piezas habría que hacer sin servicios, y cómo cambia con ellos.</p>
+    </div>
+
+    <p class="quote">"¿Se acuerdan de la aplicación de propósito general? El resultado que esperamos obtener es esta cosa, a final de cuentas, pero eso es <b>interfaz gráfica de usuario</b>. ¿Cómo lo van a hacer? No tengo ni la menor idea."</p>
+
+    <p class="body">Fue enumerando opciones. Para web: React, Angular o Vue, "un montón de componentes visuales". Para escritorio "nos casamos con la tecnología": Python, .NET o Java, cada uno con su librería gráfica. En .NET se genera un ejecutable o un instalador (un MSI). En Java, con Swing o JavaFX se genera un <code>.jar</code>, "el equivalente" de un ejecutable. Sobre Python bromeó: "me han contado que se puede", porque él ya no lo usa.</p>
+
+    <p class="body">Y para llevarlo a web hay que instalar el servidor que pida cada tecnología:</p>
+    <ul class="body">
+      <li><b>ASP:</b> al menos un <b>IIS</b> (Internet Information Services), que ya viene en Windows y solo se habilita.</li>
+      <li><b>Java con JSP o un framework de Java:</b> un <b>Tomcat</b>, como mínimo.</li>
+      <li><b>PHP:</b> Apache HTTP Server, Nginx o incluso IIS. Los servidores se pueden intercambiar entre tecnologías, pero hay que instalar y configurar.</li>
+    </ul>
+
+    <p class="body">Sumó además la app para Android, la de iOS y la de Harmony: "tendría como 9 aplicaciones de algún modo". Ahí entra la idea central del bloque:</p>
+
+    <p class="quote">"El cliente, párenle de contar, los necesita sí o sí. [...] Pero lo que sí podemos quitar es <b>toda la lógica de la aplicación</b>: la podemos meter en un servicio basado en web. Y hacer que esas cosas se puedan poner a platicar entre ellas."</p>
+
+    <figure>
+      <svg viewBox="0 0 640 250" role="img" aria-label="Varios clientes (web, escritorio, móvil) consumen un único servicio web que contiene la lógica de la aplicación y se conecta a la base de datos">
+        <defs><marker id="arr7" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" style="fill:var(--text-muted)"></path></marker></defs>
+        <text x="90" y="22" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--text-muted)">CLIENTES</text>
+        <rect x="14" y="34" width="152" height="52" rx="9" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="90" y="56" text-anchor="middle" font-family="IBM Plex Sans" font-size="12" font-weight="600" style="fill:var(--text)">Web</text>
+        <text x="90" y="74" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">React · Angular · Vue</text>
+        <rect x="14" y="98" width="152" height="52" rx="9" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="90" y="120" text-anchor="middle" font-family="IBM Plex Sans" font-size="12" font-weight="600" style="fill:var(--text)">Escritorio</text>
+        <text x="90" y="138" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">.NET · Java · Python</text>
+        <rect x="14" y="162" width="152" height="52" rx="9" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="90" y="184" text-anchor="middle" font-family="IBM Plex Sans" font-size="12" font-weight="600" style="fill:var(--text)">Móvil</text>
+        <text x="90" y="202" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">Android · iOS · Harmony</text>
+
+        <path d="M170,60 L268,110" fill="none" style="stroke:var(--text-muted)" stroke-width="1.6" marker-end="url(#arr7)"></path>
+        <path d="M170,124 L268,124" fill="none" style="stroke:var(--text-muted)" stroke-width="1.6" marker-end="url(#arr7)"></path>
+        <path d="M170,188 L268,138" fill="none" style="stroke:var(--text-muted)" stroke-width="1.6" marker-end="url(#arr7)"></path>
+        <text x="219" y="102" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">HTTP</text>
+
+        <text x="360" y="22" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--accent)">SERVICIO WEB</text>
+        <rect x="272" y="34" width="176" height="180" rx="11" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"></rect>
+        <text x="360" y="118" text-anchor="middle" font-family="IBM Plex Sans" font-size="13" font-weight="700" style="fill:var(--accent)">Toda la lógica</text>
+        <text x="360" y="136" text-anchor="middle" font-family="IBM Plex Sans" font-size="13" font-weight="700" style="fill:var(--accent)">de la aplicación</text>
+        <text x="360" y="160" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">SOAP (XML) o REST (JSON)</text>
+
+        <path d="M452,124 L536,124" fill="none" style="stroke:var(--text-muted)" stroke-width="1.6" marker-end="url(#arr7)"></path>
+        <text x="580" y="22" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" font-weight="600" style="fill:var(--text-muted)">DATOS</text>
+        <rect x="540" y="92" width="86" height="64" rx="9" fill="var(--surface)" stroke="var(--border)" stroke-width="1.5"></rect>
+        <text x="583" y="129" text-anchor="middle" font-family="IBM Plex Sans" font-size="12" font-weight="600" style="fill:var(--text)">Base de datos</text>
+      </svg>
+      <figcaption>Cada cliente conserva solo lo visible (botones, menús, cuadros). Lo que antes se repetía en nueve aplicaciones vive una sola vez en el servicio.</figcaption>
+    </figure>
+
+    <p class="body">Su ejemplo: una aplicación Android escrita en Kotlin, "muy nativa", consume el servicio. Si el servicio es SOAP hace falta un <b>kSOAP</b> para trabajar con él. Si es REST hace falta un cliente REST, como el <b>RestTemplate</b> de Spring. Al final mencionó un "HTTP Template", pero no quedó claro si era otra cosa o una corrección del mismo nombre; se lo deja como dijo.</p>
+
+    <details class="dio"><summary>¿Qué son kSOAP y RestTemplate?</summary><div class="db">
+      <p><b>kSOAP</b> es una librería ligera para que una aplicación Android pueda armar y leer mensajes SOAP. <b>RestTemplate</b> es la clase de Spring que sirve para llamar a servicios REST desde Java: le das la URL y el verbo y te devuelve la respuesta ya convertida a objeto. Ambos son el "cliente" del servicio: el lado que consume.</p>
+    </div></details>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Opcional</span><span class="task-when">≈00:00 y ≈19:20</span></div>
+      <h3>La aplicación de propósito general (Práctica 1)</h3>
+      <p>No la dictó como tarea. Al principio de la clase dijo, casi de pasada, que no la tienen que hacer, y que quien quiera adelantarla, adelante. El resultado esperado es una interfaz gráfica; la tecnología es libre.</p>
+      <p class="said">"Práctica 1 o algo así. Eso, supuestamente. No lo tienen que hacer, por cierto, pero bueno. Sí, sí, claro, si lo quiere hacer, adelante."</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="lado" style="--c:var(--soap);">
+      <div class="ladobar"><span class="ladochip">SOAP · el mensaje por dentro</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 9 · minuto ≈24:14 a 26:45</p>
+        <h2 class="sec">Una petición SOAP, etiqueta por etiqueta</h2>
+        <p>Mostró en diapositiva el ejemplo de conversión de temperatura de W3Schools y lo fue leyendo de arriba abajo.</p>
+      </div>
+
+      <p class="body">La lectura fue esta: primero el <b>XML</b> con su versión y codificación. Luego el <b>SOAP Envelope</b>, donde se declara el <b>namespace</b>, es decir, la norma con las reglas de validación de los esquemas. Después el <b>SOAP Body</b>, con el método <code>CelsiusToFahrenheit</code> y su propio namespace apuntando a una URL. Dentro va el argumento <code>Celsius</code> con el valor <code>20</code>. Y se cierra todo en orden inverso: argumento, función, cuerpo, envelope.</p>
+
+      <p class="body">Así queda la petición. Ojo: el profesor la <b>describió leyéndola</b>, no la dictó línea por línea. Yo la reconstruyo con esa descripción y el ejemplo de W3Schools que citó, así que los namespaces exactos son los de ese ejemplo:</p>
+
+      <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"&gt;
+  &lt;soap:Body&gt;
+    &lt;CelsiusToFahrenheit xmlns="https://www.w3schools.com/xml/"&gt;
+      &lt;Celsius&gt;20&lt;/Celsius&gt;
+    &lt;/CelsiusToFahrenheit&gt;
+  &lt;/soap:Body&gt;
+&lt;/soap:Envelope&gt;</code></pre>
+
+      <figure>
+        <svg viewBox="0 0 640 230" role="img" aria-label="Cuatro rectángulos anidados: Envelope contiene Body, que contiene el método CelsiusToFahrenheit, que contiene el argumento Celsius con valor 20">
+          <rect x="14" y="10" width="612" height="210" rx="12" fill="var(--soap-soft)" stroke="var(--soap)" stroke-width="1.6"></rect>
+          <text x="30" y="32" font-family="IBM Plex Mono" font-size="11" font-weight="700" style="fill:var(--soap)">soap:Envelope</text>
+          <text x="610" y="32" text-anchor="end" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">declara el namespace de SOAP</text>
+          <rect x="44" y="46" width="552" height="160" rx="10" fill="var(--surface)" stroke="var(--soap)" stroke-width="1.3"></rect>
+          <text x="60" y="68" font-family="IBM Plex Mono" font-size="11" font-weight="700" style="fill:var(--soap)">soap:Body</text>
+          <text x="580" y="68" text-anchor="end" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">el contenido del mensaje</text>
+          <rect x="74" y="82" width="492" height="110" rx="9" fill="var(--surface-2)" stroke="var(--soap)" stroke-width="1.1"></rect>
+          <text x="90" y="104" font-family="IBM Plex Mono" font-size="11" font-weight="700" style="fill:var(--soap)">CelsiusToFahrenheit</text>
+          <text x="550" y="104" text-anchor="end" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">el método, con su namespace (URL)</text>
+          <rect x="104" y="120" width="432" height="60" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.1"></rect>
+          <text x="120" y="144" font-family="IBM Plex Mono" font-size="11" font-weight="700" style="fill:var(--accent)">Celsius</text>
+          <text x="120" y="164" font-family="IBM Plex Mono" font-size="9" style="fill:var(--text-muted)">el argumento (una cadena de texto)</text>
+          <text x="516" y="158" text-anchor="end" font-family="IBM Plex Mono" font-size="20" font-weight="700" style="fill:var(--accent)">20</text>
+        </svg>
+        <figcaption>Cuatro niveles, cada uno dentro del anterior. Por eso se cierra en orden inverso, y por eso dicen que SOAP es "verboso": para pedir un número hace falta este envoltorio.</figcaption>
+      </figure>
+
+      <p class="quote">"¿Por qué dicen que es <b>verboso</b>? Porque en realidad esta es la petición que ustedes envían cuando arman o quieren consumir un servicio en SOAP."</p>
+
+      <p class="body">Sobre el argumento, aclaró que <code>Celsius</code> se declara como <b>string</b>: "porque a final de cuentas es una cadena de texto. Está basado en XML".</p>
+
+      <p class="body">La <b>respuesta</b> sigue el mismo patrón: el método se llama <code>CelsiusToFahrenheitResponse</code>, el valor viaja en <code>CelsiusToFahrenheitResult</code> y también es una cadena de texto. Si abres el enlace de la diapositiva puedes ver el <b>WSDL completo</b> de ese servicio.</p>
+
+      <pre><code>&lt;CelsiusToFahrenheitResponse xmlns="https://www.w3schools.com/xml/"&gt;
+  &lt;CelsiusToFahrenheitResult&gt;68&lt;/CelsiusToFahrenheitResult&gt;
+&lt;/CelsiusToFahrenheitResponse&gt;</code></pre>
+
+      <div class="note">
+        <span class="ic">i</span>
+        <p><b>Conexión con la clase siguiente.</b> El resultado <code>68</code> es el mismo que el profesor usa como valor de prueba el 9 de septiembre (<code>20 °C → 68 °F</code>) cuando arma el mismo conversor como API REST. Es el mismo problema resuelto con las dos tecnologías, y vale la pena compararlos.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 3 · arma el mensaje</p>
+    <h3>La petición SOAP, en orden</h3>
+    <p class="ask">Toca las líneas en el orden en que aparecen, de arriba abajo. Si te equivocas te doy una pista; toca una línea ya puesta para quitarla.</p>
+    <div class="built" id="built"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow"><button class="btn ghost" id="bldRs" type="button">Reiniciar</button></div>
+    <div class="fb" id="bldFb"></div>
+  </div>
+
+  <section>
+    <div class="lado" style="--c:var(--rest);">
+      <div class="ladobar"><span class="ladochip">REST · verbos y CRUD</span></div>
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 10 · minuto ≈26:45 a 29:43</p>
+        <h2 class="sec">Los verbos de REST y el nivel de madurez</h2>
+        <p>Del lado de REST, lo primero es asociar cada verbo con las cuatro operaciones que de siempre hacemos: insertar, borrar, actualizar y seleccionar.</p>
+      </div>
+
+      <div class="tablewrap"><table>
+        <thead><tr><th>Verbo</th><th>Operación</th><th>Cuándo lo usó él</th></tr></thead>
+        <tbody>
+          <tr><td class="sym">GET</td><td>Seleccionar</td><td class="d">Para devolver uno o para devolver todos.</td></tr>
+          <tr><td class="sym">POST</td><td>Insertar</td><td class="d">Crear un recurso nuevo.</td></tr>
+          <tr><td class="sym">PUT</td><td>Actualizar</td><td class="d">Solo si la actualización es <b>completa</b>.</td></tr>
+          <tr><td class="sym">PATCH</td><td>Actualizar</td><td class="d">Cuando la actualización es <b>parcial</b>: cambiar un solo atributo.</td></tr>
+          <tr><td class="sym">DELETE</td><td>Eliminar</td><td class="d">Borrar el recurso.</td></tr>
+        </tbody>
+      </table></div>
+
+      <p class="body">La razón de PATCH la explicó con un usuario recién creado:</p>
+
+      <p class="quote">"Se creó el usuario originalmente. Y hasta que no le pique a la liga que le llegó al correo electrónico, o al código que mandan, el <b>OTP</b>, hasta ese momento no se activa el usuario. Digamos que se crea pero en un estatus de falso. Para cambiar una variable en particular, un atributo, utilizamos <b>PATCH</b>."</p>
+
+      <p class="body">Y si usas los cinco verbos, con versionado y documentación, ya le "estás pegando" a otro concepto: el <b>nivel de madurez de Richardson</b> para APIs. "Para empezar deberíamos cumplir los cinco, más otra cierta serie de características."</p>
+
+      <details class="dio"><summary>¿Qué es el modelo de madurez de Richardson?</summary><div class="db">
+        <p>Una escala que mide qué tan "REST de verdad" es una API, en cuatro niveles del 0 al 3. El profesor solo nombró el modelo; el resumen es mío:</p>
+        <ol>
+          <li><b>Nivel 0:</b> un solo punto de entrada y HTTP usado solo como transporte.</li>
+          <li><b>Nivel 1:</b> aparecen los <b>recursos</b>, cada uno con su propia URL.</li>
+          <li><b>Nivel 2:</b> se usan bien los <b>verbos</b> HTTP y los códigos de estado.</li>
+          <li><b>Nivel 3:</b> la respuesta trae enlaces que dicen qué se puede hacer después (HATEOAS).</li>
+        </ol>
+      </div></details>
+
+      <p class="body">La estructura del mensaje es la misma que en SOAP, "solo que en lugar de apuntar al XML, apuntamos a un JSON. Y san se acabó". Y consumirlo es más transparente: para interactuar basta con <b>apuntar al protocolo HTTP</b>, no hace falta más. En Spring existe <code>RestTemplate</code>; en Java puro, o en cualquier lenguaje, basta con llamar a los métodos de HTTP.</p>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 4 · elige el verbo</p>
+    <h3>De la operación al verbo HTTP</h3>
+    <p class="ask">Cinco situaciones. Elige el verbo que él asociaría a cada una.</p>
+    <div class="qrows" id="q4"></div>
+    <div class="btnrow">
+      <button class="btn" id="q4go" type="button">Revisar</button>
+      <button class="btn ghost" id="q4rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q4fb"></div>
+  </div>
+
+  <section>
+    <div class="lado" style="--c:var(--rest);">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 11 · minuto ≈29:43 a 31:26</p>
+        <h2 class="sec">Documentar una API: Swagger y RAML</h2>
+        <p>Antes de construir, hay que poder decirle a otros qué hace tu API.</p>
+      </div>
+
+      <p class="quote">"La forma más rápida de documentar un API es agarrar <b>Swagger</b>. [...] Y si lo quieren hacer más detallado, más elaborado, o batallar tantito... pues siempre tenemos el <b>RAML</b> (<i>RESTful API Modeling Language</i>)."</p>
+
+      <p class="body">Lo que busca es cumplir con <b>estándares aceptados</b> para generar la documentación, y Swagger lo hace. La pantalla que se ve enumera cada método y cómo interactuar con él. Ejemplos de lo que dijo que aparece:</p>
+      <ul class="body">
+        <li><code>GET /user</code> para devolver a todos los usuarios;</li>
+        <li><code>GET /user/{id}</code>, con un argumento que sirve de ID para la consulta;</li>
+        <li>para insertar, se pasa un objeto;</li>
+        <li>para actualizar, se pasa el objeto <b>más el ID</b>, "comúnmente".</li>
+      </ul>
+
+      <details class="dio"><summary>¿Qué son Swagger y RAML, y en qué se parecen?</summary><div class="db">
+        <p>Las dos son formas de <b>describir una API REST</b> en un archivo estándar: qué rutas tiene, con qué verbos, qué parámetros recibe y qué devuelve. A partir de ese archivo se genera una página de documentación navegable (la de Swagger permite hasta probar cada método). Swagger es la más popular y la más rápida; RAML es más elaborada y orientada a modelar la API con detalle.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <section>
+    <div class="lado" style="--c:var(--rest);">
+      <div class="sec-head">
+        <p class="eyebrow">Bloque 12 · minuto ≈31:26 a 35:05</p>
+        <h2 class="sec">El primer controlador en Spring</h2>
+        <p>Cierra asomándose a lo que se construye en la siguiente clase: un controlador REST en Java con Spring, y por qué no debe ser tan optimista.</p>
+      </div>
+
+      <p class="body">Creas un controlador y lo decoras con <code>@RestController</code>, "porque es un API REST". Le pones un nombre para llegar a él con <code>@RequestMapping</code>. Luego defines un método por verbo, cada uno con su anotación: <code>@PostMapping</code>, <code>@GetMapping</code>, <code>@PutMapping</code>, <code>@PatchMapping</code>, "cada una de esas cosas". La del borrado no la nombró en voz alta, pero es <code>@DeleteMapping</code>.</p>
+
+      <p class="body">Después no solo importa qué dato devuelves, sino <b>qué código de respuesta le pintas al usuario</b>. Para eso está <code>@ResponseStatus</code> con un <code>HttpStatus</code>:</p>
+
+      <div class="tablewrap"><table>
+        <thead><tr><th>Si el método…</th><th>El <code>HttpStatus</code> es</th></tr></thead>
+        <tbody>
+          <tr><td>borra</td><td class="sym">NO_CONTENT</td></tr>
+          <tr><td>crea</td><td class="sym">CREATED</td></tr>
+          <tr><td>actualiza</td><td class="sym">OK</td></tr>
+          <tr><td>consulta</td><td class="sym">OK</td></tr>
+        </tbody>
+      </table></div>
+
+      <p class="quote">"¿Qué otra cosa? Nada más. Con esos tenemos."</p>
+
+      <h3 class="sub">El problema: es muy "happy path"</h3>
+
+      <p class="body">Así como está, el controlador asume que <b>todo siempre sale bien</b>: se ejecuta, hace todo, devuelve y listo. No se valida nada. Pero rara vez ocurre así, y los códigos de respuesta los va a controlar el alumno. El ejemplo que dio, con la carrera:</p>
+
+      <p class="quote">"Voy a dar de alta una carrera para ESCOM, y la carrera que voy a dar de alta es ISC. El mismo nombre ya está registrado. Entonces no me debería de permitirlo. Por lo tanto, debería de botarme alguna <b>excepción</b>."</p>
+
+      <p class="body">Otros casos que nombró: no se logró conectar a la base de datos, ocurrió un error interno del servidor, no se encontró el recurso, o el recurso no está permitido para ese usuario con esos privilegios. "Todo eso los tenemos que manejar nosotros."</p>
+
+      <details class="dio"><summary>¿Qué es un "happy path"?</summary><div class="db">
+        <p>El camino en el que todo sale bien: los datos llegan correctos, la base responde, el usuario tiene permiso. El código de "happy path" solo cubre ese camino. El código de verdad tiene que prever los <b>errores</b>: datos duplicados, fallos de conexión, recursos que no existen.</p>
+      </div></details>
+
+      <p class="body">Por eso las firmas simples como <code>public Evento read()</code> o <code>public Evento save(@RequestBody Evento e)</code> no deberían quedar así. <code>@RequestBody</code> hace el mapeo del JSON recibido a la clase, pero lo que se devuelve no debería ser la entidad sola:</p>
+
+      <p class="quote">"Lo que deberíamos de devolver no es la entidad en sí. Tendríamos que devolver un <b><code>ResponseEntity</code></b>. Para poder interactuar con él, y a lo mejor poder determinar si se puede o si no se puede hacer tal o cual cosa."</p>
+
+      <div class="note">
+        <span class="ic">i</span>
+        <p><b>Lo que no se llegó a ver.</b> No escribió el controlador completo ni el manejo de excepciones; solo lo enseñó en diapositiva y lo nombró. El código de verdad aparece la clase siguiente (9 de septiembre), donde sí usa <code>ResponseEntity</code> en vivo.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 5 · escribe el código</p>
+    <h3><code>@ResponseStatus(HttpStatus.____)</code></h3>
+    <p class="ask">Escribe la constante que él puso para cada método. Vale con o sin el prefijo <code>HttpStatus.</code>.</p>
+    <div id="q5"></div>
+    <div class="btnrow"><button class="btn ghost" id="q5rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q5fb"></div>
+  </div>
+
+  <div class="ex">
+    <p class="ex-tag">Ejercicio 6 · el cierre</p>
+    <h3>Happy path y <code>ResponseEntity</code></h3>
+    <p class="ask">Tres preguntas sobre por qué el controlador simple se queda corto.</p>
+    <div class="qrows" id="q6"></div>
+    <div class="btnrow">
+      <button class="btn" id="q6go" type="button">Revisar</button>
+      <button class="btn ghost" id="q6rs" type="button">Reiniciar</button>
+    </div>
+    <div class="fb" id="q6fb"></div>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <p class="eyebrow">Bloque 13 · minuto ≈35:05</p>
+      <h2 class="sec">Cierre de la clase</h2>
+    </div>
+
+    <p class="quote">"Señores, yo hasta aquí le dejo porque ya voy retrasado. Aquí le paramos hoy. ¿Vale? Nos vemos el próximo miércoles, y nos vemos en el laboratorio."</p>
+
+    <div class="note">
+      <span class="ic">!</span>
+      <p><b>Pasaje irrecuperable.</b> La transcripción se corta en mitad de una frase: "Voy a una revisión de…". No sé qué iba a decir después, y no lo invento. Si fue una indicación para el laboratorio, pregúntasela al profesor.</p>
+    </div>
+
+    <div class="task">
+      <div class="task-head"><span class="task-badge">Pendiente administrativo</span><span class="task-when">≈35:05</span></div>
+      <h3>Laboratorio del próximo miércoles</h3>
+      <p>No dictó entregable. La cita es solo para el laboratorio del miércoles siguiente.</p>
+      <p class="said">"Nos vemos el próximo miércoles, y nos vemos en el laboratorio."</p>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="sec-head">
+      <p class="eyebrow">Cierre</p>
+      <h2 class="sec">Checklist de la clase 7</h2>
+      <p>Se guarda en tu navegador. Nada se sube a ningún lado ni se comparte con nadie más.</p>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><span id="bar"></span></div>
+      <div class="pcount" id="pcount">0 / 0</div>
+    </div>
+
+    <div id="finalTasks"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- motor de quiz ---------- */
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt";
+          b.textContent=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why);
+        root.appendChild(row);
+      });
+    }
+
+    document.getElementById(goId).addEventListener("click",function(){
+      var rows=root.children, right=0, answered=0;
+      Array.prototype.forEach.call(rows,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; }
+        else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length
+        ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  /* ---------- 1. los estándares de SOAP ---------- */
+  quiz("q1",[
+    {q:"¿Qué documento es el <em>contrato</em> que fija método, tipos de entrada y de salida?",
+     opts:["WSDL","XSD","HTTP"], ans:0,
+     why:"<b>WSDL.</b> \"Web Service Descriptor Language, que es el contrato.\" Como todo contrato, pone las reglas que se deben seguir."},
+    {q:"¿Cuál define las reglas de <em>validación</em> de los elementos del XML (tipo, si es obligatorio, si es lista)?",
+     opts:["WSDL","XSD","SOAP"], ans:1,
+     why:"<b>XSD.</b> \"Es el que determina las reglas de validación de un documento XML.\" El WSDL dice qué se puede hacer; el XSD dice cómo debe verse cada dato."},
+    {q:"¿En qué formato viajan los datos de un mensaje SOAP?",
+     opts:["JSON","XML","PDF"], ans:1,
+     why:"<b>XML.</b> Con SOAP se trabaja \"sí o sí\" con XML para el paso de mensajes. El PDF de una factura solo es su representación impresa."},
+    {q:"Un documento XML tiene todas sus etiquetas cerradas y un solo elemento raíz, pero no respeta el XSD. ¿Cómo está?",
+     opts:["Bien formado, pero no válido","Válido, pero mal formado","Ni bien formado ni válido"], ans:0,
+     why:"<b>Bien formado, pero no válido.</b> La buena formación son las reglas de sintaxis; la validez es cumplir el esquema. Puede tener lo primero sin lo segundo."}
+  ],"q1go","q1rs","q1fb",
+  "<b>Las cuatro.</b> El hilo: el WSDL es el contrato, el XSD valida cada dato, el XML es el mensaje, y HTTP lo transporta.");
+
+  /* ---------- 2. SOAP o REST ---------- */
+  quiz("q2",[
+    {q:"Una empresa formal exige cumplir esquemas de seguridad estrictos en sus servicios. ¿Qué es más probable que use?",
+     opts:["SOAP","REST"], ans:0,
+     why:"<b>SOAP.</b> \"Cuando hacemos cosas para empresas, muy empresariales, muy formales, lo más seguro es que tengan que lidiar con SOAP.\""},
+    {q:"Una aplicación móvil necesita traer datos rápido, con mensajes pequeños. ¿Qué encaja mejor?",
+     opts:["SOAP","REST"], ans:1,
+     why:"<b>REST.</b> Es \"ligero\": ideal para móviles, Internet de las cosas y <em>serverless</em>."},
+    {q:"Hay un sistema viejo que funciona, sin documentación, y hay que conectarlo con otra cosa. ¿Con qué suele venir?",
+     opts:["SOAP","REST"], ans:0,
+     why:"<b>SOAP.</b> \"Sistemas legados. Típicamente trabajan con SOAP.\""},
+    {q:"¿Es cierto que un servicio REST solo puede trabajar con JSON?",
+     opts:["Sí, solo JSON","No: también puede recibir y generar XML"], ans:1,
+     why:"<b>No solo JSON.</b> \"Que no quiere decir que no podamos trabajar con el XML en sí. Podemos tener RESTs que generen, que reciban estructuras basadas en XML.\" Lo <em>típico</em> es JSON."}
+  ],"q2go","q2rs","q2fb",
+  "<b>Las cuatro.</b> La regla práctica: contrato formal, legado y cumplimiento estricto apuntan a SOAP; ligereza, móviles y web apuntan a REST, sin que REST se limite a JSON.");
+
+  /* ---------- 3. arma la petición SOAP en orden ---------- */
+  var STEPS=[
+    '<?xml version="1.0" encoding="utf-8"?>',
+    '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">',
+    '<soap:Body>',
+    '<CelsiusToFahrenheit xmlns="https://www.w3schools.com/xml/">',
+    '<Celsius>20</Celsius>',
+    '</CelsiusToFahrenheit>',
+    '</soap:Body>',
+    '</soap:Envelope>'
+  ];
+  var INDENT=[0,0,1,2,3,2,1,0];
+  var STEPWHY=[
+    "Primero la declaración XML, con versión y codificación.",
+    "Luego el <b>SOAP Envelope</b>, con el namespace de SOAP.",
+    "Dentro del envelope va el <b>SOAP Body</b>.",
+    "En el cuerpo, el método que se llama: <code>CelsiusToFahrenheit</code>, con su propio namespace.",
+    "El argumento <code>Celsius</code> con su valor, 20.",
+    "Se cierra el método.",
+    "Se cierra el cuerpo.",
+    "Y por último se cierra el envelope."
+  ];
+  var placed=[], bank=document.getElementById("bank"),
+      built=document.getElementById("built"), bldFb=document.getElementById("bldFb");
+
+  function shuffled(){
+    var idx=STEPS.map(function(_,i){return i;});
+    for(var i=idx.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1)), t=idx[i]; idx[i]=idx[j]; idx[j]=t;
+    }
+    return idx;
+  }
+  function pad(n){ return new Array(n*2+1).join(" "); }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled().forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip";
+      b.textContent=STEPS[i];
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          bldFb.className="fb show good";
+          bldFb.innerHTML = placed.length===STEPS.length
+            ? "<b>Esa es la petición completa.</b> Cuatro niveles anidados y se cierran en orden inverso a como se abrieron. La respuesta usa el mismo patrón, con <code>CelsiusToFahrenheitResponse</code> y <code>CelsiusToFahrenheitResult</code>."
+            : "<b>Va.</b> "+STEPWHY[i];
+        } else {
+          bldFb.className="fb show bad";
+          bldFb.innerHTML="<b>Todavía no toca esa.</b> "+
+            (placed.length===0
+              ? "Empieza por la declaración XML."
+              : "Antes va otra. Pista: "+STEPWHY[placed.length].replace(/<[^>]+>/g,""));
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando el mensaje…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=pad(INDENT[i])+STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){
+        placed=placed.slice(0,n); renderBuilt(); renderBank(); bldFb.className="fb";
+      });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){
+    placed=[]; renderBuilt(); renderBank(); bldFb.className="fb";
+  });
+  renderBuilt(); renderBank();
+
+  /* ---------- 4. verbo HTTP ---------- */
+  quiz("q4",[
+    {q:"Devolver <em>un</em> usuario, o devolverlos <em>todos</em>.",
+     opts:["GET","POST","PUT","PATCH","DELETE"], ans:0,
+     why:"<b>GET.</b> \"Para seleccionar tenemos al verbo GET, que es el que usamos para devolver uno, para devolver todos.\""},
+    {q:"Dar de alta un usuario nuevo.",
+     opts:["GET","POST","PUT","PATCH","DELETE"], ans:1,
+     why:"<b>POST.</b> \"Para insertar tenemos el POST.\""},
+    {q:"Reemplazar <em>todos</em> los datos de un registro existente.",
+     opts:["GET","POST","PUT","PATCH","DELETE"], ans:2,
+     why:"<b>PUT.</b> \"Siempre y cuando sea una actualización completa, tenemos el PUT.\""},
+    {q:"Cambiar solo el estatus de un usuario, de falso a verdadero, cuando confirma su código OTP.",
+     opts:["GET","POST","PUT","PATCH","DELETE"], ans:3,
+     why:"<b>PATCH.</b> Es el ejemplo del usuario que se crea inactivo: para cambiar un atributo en particular, \"lo más sano es utilizar el verbo PATCH\"."},
+    {q:"Quitar un registro.",
+     opts:["GET","POST","PUT","PATCH","DELETE"], ans:4,
+     why:"<b>DELETE.</b> \"Si vamos a eliminar, tenemos el DELETE.\""}
+  ],"q4go","q4rs","q4fb",
+  "<b>Las cinco.</b> Cuatro operaciones de siempre (insertar, borrar, actualizar, seleccionar) y el quinto verbo, PATCH, existe para no reenviar todo el objeto cuando solo cambia un atributo.");
+
+  /* ---------- 5. HttpStatus por método (input validado) ---------- */
+  var CODES=[
+    {q:"Un método que <b>borra</b> un recurso.", ans:"NO_CONTENT", alt:["204","NOCONTENT"],
+     hints:{OK:"Para borrar dijo <b>NO_CONTENT</b>: la operación sale bien y no hay nada que devolver.", CREATED:"<b>CREATED</b> es para cuando se crea algo. Para borrar dijo otra."}},
+    {q:"Un método que <b>crea</b> un recurso.", ans:"CREATED", alt:["201"],
+     hints:{OK:"OK es para actualizar o consultar. Para crear dijo <b>CREATED</b>.", NO_CONTENT:"<b>NO_CONTENT</b> fue el de borrar. Para crear dijo otro."}},
+    {q:"Un método que <b>actualiza</b> (o consulta) un recurso.", ans:"OK", alt:["200"],
+     hints:{CREATED:"<b>CREATED</b> es para crear. Actualizar y consultar comparten el más simple.", NO_CONTENT:"<b>NO_CONTENT</b> fue el de borrar. Actualizar y consultar comparten el más simple."}}
+  ];
+  var q5=document.getElementById("q5"), q5fb=document.getElementById("q5fb"), q5ok={};
+  function norm(s){
+    return s.toUpperCase().replace(/\s+/g,"").replace(/^HTTPSTATUS\./,"").replace(/[();,]/g,"");
+  }
+  function buildCodes(){
+    q5.innerHTML=""; q5ok={}; q5fb.className="fb";
+    CODES.forEach(function(c,i){
+      var row=document.createElement("div"); row.className="crow";
+      row.innerHTML='<div class="cq">'+c.q+'</div>'+
+        '<div class="cl"><span>@ResponseStatus(HttpStatus.</span>'+
+        '<input type="text" id="q5i'+i+'" autocomplete="off" spellcheck="false" aria-label="Constante de HttpStatus">'+
+        '<span>)</span><button class="btn" type="button">Comprobar</button></div>'+
+        '<div class="ch"></div>';
+      var inp=row.querySelector("input"), btn=row.querySelector("button"), ch=row.querySelector(".ch");
+      function check(){
+        var v=norm(inp.value);
+        row.classList.remove("right","wrong");
+        if(!v){ ch.className="ch"; return; }
+        ch.className="ch show";
+        if(v===c.ans || c.alt.indexOf(v)!==-1){
+          row.classList.add("right"); q5ok[i]=true;
+          ch.innerHTML = v===c.ans
+            ? "<b>Correcto:</b> <code>"+c.ans+"</code>."
+            : "<b>Correcto.</b> Ese es el número; en el código se escribe el nombre <code>"+c.ans+"</code>, que es el que él puso.";
+          var n=Object.keys(q5ok).length;
+          if(n===CODES.length){
+            q5fb.className="fb show good";
+            q5fb.innerHTML="<b>Los tres.</b> Borrar: <code>NO_CONTENT</code>. Crear: <code>CREATED</code>. Actualizar o consultar: <code>OK</code>. Y todo eso, recuerda, es el camino feliz.";
+          }
+        } else {
+          row.classList.add("wrong"); delete q5ok[i]; q5fb.className="fb";
+          ch.innerHTML = c.hints[v] || "<b>No coincide.</b> Prueba con el nombre de la constante de <code>HttpStatus</code>, en mayúsculas y con guion bajo si lleva más de una palabra.";
+        }
+      }
+      btn.addEventListener("click",check);
+      inp.addEventListener("keydown",function(e){ if(e.key==="Enter") check(); });
+      q5.appendChild(row);
+    });
+  }
+  document.getElementById("q5rs").addEventListener("click",buildCodes);
+  buildCodes();
+
+  /* ---------- 6. happy path ---------- */
+  quiz("q6",[
+    {q:"¿Por qué dice que el controlador simple es \"muy happy path\"?",
+     opts:["Porque asume que la operación siempre sale bien y no valida nada","Porque usa demasiadas anotaciones","Porque solo funciona con SOAP"], ans:0,
+     why:"<b>Asume que todo sale bien.</b> \"Se ejecuta el método que dice, hace todo, me devuelve... y san se acabó. No validamos nada.\""},
+    {q:"Intentas dar de alta la carrera ISC y ya existe una con ese nombre. ¿Qué debería pasar?",
+     opts:["Que se guarde otra igual","Que el sistema lo rechace con una excepción","Que se borre la anterior"], ans:1,
+     why:"<b>Rechazarlo.</b> Es el ejemplo que dio: \"el mismo nombre ya está registrado. Entonces no me debería de permitirlo. Por lo tanto, debería de botarme alguna excepción\"."},
+    {q:"¿Qué debería devolver un método del controlador en lugar de solo la entidad?",
+     opts:["Un String con el mensaje","Un ResponseEntity","Un void"], ans:1,
+     why:"<b>ResponseEntity.</b> \"Tendríamos que devolver un ResponseEntity, para poder interactuar con él y a lo mejor poder determinar si se puede o si no se puede hacer tal o cual cosa.\""}
+  ],"q6go","q6rs","q6fb",
+  "<b>Las tres.</b> El controlador simple sirve para el camino feliz; en cuanto puede fallar algo (duplicados, conexión, permisos, recurso inexistente) hay que controlar la respuesta con <code>ResponseEntity</code>, y eso es lo que se construye en la clase siguiente.");
+
+  /* ---------- checklist ---------- */
+  var FINAL=[
+    {id:"c7-general", t:"Opcional · la aplicación de propósito general (Práctica 1)",
+     d:"No la dictó como tarea: dijo que no es obligatoria, pero que quien quiera adelantarla puede. Es una aplicación con interfaz gráfica; la tecnología de cliente es libre."},
+    {id:"c7-lab", t:"Pendiente administrativo · laboratorio del próximo miércoles",
+     d:"Cierre de la clase: \"nos vemos el próximo miércoles, y nos vemos en el laboratorio\". Lo que iba a decir después (\"voy a una revisión de…\") se cortó en la transcripción."},
+    {id:"c7-http", t:"Arrastre · códigos de respuesta del protocolo HTTP",
+     d:"Viene de la clase 5. Aquí volvió a decir que se siguen respetando los códigos de respuesta y de estado, y que los controlas tú. Sigue sin fecha."},
+    {id:"c7-xml", t:"Recordatorio · repasar XML bien formado y válido",
+     d:"No es tarea. Pidió recordar la tercera y cuarta unidad de Tecnologías para el Desarrollo de Aplicaciones Web, donde se vio XML, porque WSDL y XSD se apoyan en eso."}
+  ];
+  var KEY="clase7-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var fh=document.getElementById("finalTasks"), bar=document.getElementById("bar"),
+      pc=document.getElementById("pcount");
+  FINAL.forEach(function(it){
+    var l=document.createElement("label"); l.className="ftask";
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!st[it.id];
+    var b=document.createElement("div");
+    b.innerHTML='<div class="tt"></div><div class="td2"></div>';
+    b.querySelector(".tt").textContent=it.t;
+    b.querySelector(".td2").textContent=it.d;
+    l.appendChild(cb); l.appendChild(b);
+    if(cb.checked) l.classList.add("done");
+    cb.addEventListener("change",function(){
+      st[it.id]=cb.checked; l.classList.toggle("done",cb.checked);
+      try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){}
+      refresh();
+    });
+    fh.appendChild(l);
+  });
+  function refresh(){
+    var done=0, boxes=fh.querySelectorAll('input[type="checkbox"]');
+    Array.prototype.forEach.call(boxes,function(c){ if(c.checked) done++; });
+    pc.textContent=done+" / "+FINAL.length;
+    bar.style.width=Math.round(done/FINAL.length*100)+"%";
+  }
+  refresh();
+})();
+</script>
