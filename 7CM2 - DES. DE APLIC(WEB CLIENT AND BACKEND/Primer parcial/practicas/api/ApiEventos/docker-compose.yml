@@ -1,0 +1,14 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-eventos
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-admin}
+      MYSQL_DATABASE: GestionEventos7CM2  # 29sept: nombre de la base de la clase del primer día
+    ports:
+      - "3307:3306"
+    volumes:
+      - eventos-data:/var/lib/mysql
+
+volumes:
+  eventos-data:
