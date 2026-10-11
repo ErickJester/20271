@@ -351,6 +351,21 @@ const TAREAS = [
     origen: "Clase del 9 de septiembre (transcripción sin numerar aún) · lista oficial de tareas (18 sept)",
     ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/api temperaturas"
   },
+  {
+    id: "wad-api-eventos",
+    curso: "7CM2",
+    titulo: "Práctica — API de eventos (Spring Boot + JPA + MySQL + Swagger + correo + PDF)",
+    tipo: "practica",
+    entrega: null,
+    fechaPorConfirmar: true,
+    parcial: 1,
+    estado: "en-curso",
+    descripcion: "API REST de eventos que el profesor construye en clase (no es el proyecto del semestre). Clases: 29 sept (proyecto, base GestionEventos7CM2, entidad, repositorio, servicio, GET por id), 7 oct (CRUD con POST/PUT/DELETE, validaciones y Swagger) y 8 oct (correo con JavaMail y reporte PDF con iText). Reconstruida y probada contra MySQL 8.4 nativo en el puerto 8080: /api/v1/eventos (GET, GET /{id}, POST, PUT /{id}, DELETE /{id}, GET /pdf), Swagger en /documentacion/swagger-ui.html. Sin fecha de entrega confirmada por el profesor. Dijo que el proyecto debe llevar al menos Spring Data JPA, Swagger, JavaMail y PDF en el servidor, y que Swagger entra formalmente en el avance 2 del proyecto. Pendiente de la clase del lunes 12 oct: Categoría y Producto. El envío real de correo no se ha probado (faltan MAIL_USER, MAIL_PASSWORD de aplicación y MAIL_TO). Tarea de clase: sacar usuario/contraseña de la BD, URL y credenciales del correo a variables de entorno (el correo ya sale del entorno; la contraseña de la BD aún trae 'admin' por defecto). Ejercicio en clase sin aplicar: que DELETE y PUT respondan con mensaje y 404 cuando el evento no existe.",
+    entregable: "Proyecto Spring Boot ApiEventos (por confirmar qué pide el profesor)",
+    pasos: ["Proyecto, entidad, repositorio y servicio (hecho)", "CRUD con validaciones (hecho)", "Swagger con springdoc (hecho)", "Correo con JavaMail (hecho, sin probar el envío real)", "Reporte PDF con iText (hecho)", "Variables de entorno para BD y correo", "Ejercicio: 404 con mensaje en DELETE cuando no existe", "Categoría y Producto (clase del lunes 12 oct)", "Confirmar fecha y entregable con el profesor"],
+    origen: "Clases del 29 sept, 7 oct y 8 oct (transcripciones propias) · sin fecha de entrega",
+    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/api/ApiEventos"
+  },
 
   /* ---------- 8CM2 · Liderazgo Personal ---------- */
   {
