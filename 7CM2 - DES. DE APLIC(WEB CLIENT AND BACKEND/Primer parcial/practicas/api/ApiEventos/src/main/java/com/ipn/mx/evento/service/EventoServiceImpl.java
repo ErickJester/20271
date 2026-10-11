@@ -102,7 +102,8 @@ public class EventoServiceImpl implements EventoService {
 			documento.add(tabla);
 			documento.close();
 		} catch (DocumentException e) {
-			throw new IllegalStateException("No se pudo generar el PDF de eventos", e);
+			// clase del PDF (8 oct): el profesor deja el catch con e.printStackTrace()
+			e.printStackTrace();
 		}
 
 		return new ByteArrayInputStream(salida.toByteArray());

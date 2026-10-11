@@ -32,9 +32,8 @@ Los comentarios `29sept` y `zip` en el código marcan el origen de cada ajuste.
   (`MAIL_USER`, `MAIL_PASSWORD`, `MAIL_TO`), no están en el código. Sin `MAIL_TO` no se envía nada y
   el evento se crea igual. Si el envío falla se registra en el log y no tumba el `POST`.
 - **PDF**: idéntico al de la clase del 8 de octubre (título Courier 14 azul, encabezados Helvetica 9
-  negrita rojo sobre cian, cuerpo Helvetica 10 azul). Si falla la generación se lanza una excepción en
-  vez del `printStackTrace` de clase. En el zip `generarReporte`
-  está sin escribir; aquí está el de la clase del PDF.
+  negrita rojo sobre cian, cuerpo Helvetica 10 azul, `printStackTrace` en el `catch`). En el zip
+  `generarReporte` está sin escribir; aquí está el de la clase del PDF.
 - **Java 21**, no 25 como el zip, porque es el JDK instalado.
 - **`nullable = false`** en nombre y descripción (el zip dice `true`) y columna del id `idEvento` (el zip la
   llama `Evento`, parece un descuido).
@@ -46,7 +45,7 @@ Los comentarios `29sept` y `zip` en el código marcan el origen de cada ajuste.
   La tarea que dejó (404 con mensaje si no existe) no está aplicada.
 - Los mensajes de validación son frases completas y el controlador les antepone "El campo 'x'", así que
   se leen duplicados. Se dejó así por fidelidad a las dos fuentes.
-- **Puerto**: la API en el 8082, para no chocar con los contenedores Apache/Nginx (8080/8081). Usa el
+- **Puerto**: la API en el 8080, como en clase. Usa el
   MySQL nativo en el 3306 (usuario `root`, contraseña `admin` por defecto, cámbiala con `DB_PASSWORD`).
   El `docker-compose.yml` es una alternativa que publica MySQL en el 3307: arranca la API con `DB_PORT=3307`.
 
@@ -60,10 +59,10 @@ las pruebas y el despliegue. El paquete `dto` se creó el 29 de septiembre, pero
 ```bash
 # Con MySQL nativo (3306) basta crear la base una vez:  CREATE DATABASE GestionEventos7CM2;
 docker compose up -d                 # alternativa con Docker: MySQL en el 3307, usar DB_PORT=3307
-./mvnw spring-boot:run               # API en http://localhost:8082
+./mvnw spring-boot:run               # API en http://localhost:8080
 ```
 
-Swagger: <http://localhost:8082/documentacion/swagger-ui.html>
+Swagger: <http://localhost:8080/documentacion/swagger-ui.html>
 
 Para probar el correo, antes de arrancar:
 
@@ -74,7 +73,7 @@ export MAIL_USER=tu_correo@gmail.com MAIL_PASSWORD=contraseña_de_aplicacion MAI
 ## Pruebas rápidas
 
 ```bash
-URL=http://localhost:8082/api/v1/eventos
+URL=http://localhost:8080/api/v1/eventos
 curl -X POST $URL -H "Content-Type: application/json" -d '{"nombreEvento":"Huawei Day","descripcionEvento":"Charla de Huawei","fechaCreacion":"2026-10-20"}'
 curl $URL
 curl $URL/1
