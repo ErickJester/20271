@@ -24,6 +24,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
+		<!-- 29sept: JPA, validaciones y el driver de MySQL, de la creación del proyecto en la clase del primer día -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -51,7 +52,7 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- Clase 2 de Evento: correo y PDF -->
+		<!-- clase del correo y el PDF (8 oct): starter mail e iText 5.5.13.3, la versión que sale en clase -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
@@ -62,7 +63,8 @@
 			<version>5.5.13.3</version>
 		</dependency>
 
-		<!-- Clase 1 de Evento (segunda parte): Swagger. Spring Boot 4 usa springdoc 3.x (la 2.x es para Boot 3) -->
+		<!-- clase del CRUD, parte 2 (7 oct): springdoc-openapi-starter-webmvc-ui para Swagger.
+		     Spring Boot 4 usa springdoc 3.x (la 2.x es para Boot 3), así que la versión no es la del profesor -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
