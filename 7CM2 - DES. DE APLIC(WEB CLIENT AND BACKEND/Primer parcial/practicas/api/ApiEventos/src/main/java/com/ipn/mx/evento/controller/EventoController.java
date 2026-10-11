@@ -2,7 +2,7 @@ package com.ipn.mx.evento.controller;
 
 import com.ipn.mx.evento.domain.Evento;
 import com.ipn.mx.evento.service.EventoService;
-import com.ipn.mx.utilerias.service.EmailService;
+import com.ipn.mx.evento.utilerias.service.EmailService;
 import jakarta.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = {"http://localhost:4200"})
 @RestController
-// zip: la base es /api/v1/ApiEventos (con A mayúscula) y cada método agrega /eventos
-@RequestMapping("/api/v1/ApiEventos")
+// clase del CRUD (7 oct), parte 2: el profesor deja el RequestMapping en /api/v1/eventos
+@RequestMapping("/api/v1/eventos")
 public class EventoController {
 
 	@Autowired
@@ -41,13 +41,13 @@ public class EventoController {
 	private EmailService emailService;
 
 	// zip: se llama readAll
-	@GetMapping("/eventos")
+	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<Evento> readAll() {
 		return eventoService.findAll();
 	}
 
-	@GetMapping("/eventos/pdf")
+	@GetMapping("/pdf")
 	public ResponseEntity<InputStreamResource> generarPdf() {
 		List<Evento> listaDeEventos = eventoService.findAll();
 		ByteArrayInputStream salidaByteArray = eventoService.generarReporte(listaDeEventos);
@@ -63,7 +63,7 @@ public class EventoController {
 	}
 
 	// zip: se llama read
-	@GetMapping("/eventos/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<?> read(@PathVariable Long id) {
 		Evento evento = null;
 		Map<String, Object> respuesta = new HashMap<>();
@@ -84,7 +84,7 @@ public class EventoController {
 		return new ResponseEntity<>(evento, HttpStatus.OK);
 	}
 
-	@PostMapping("/eventos")
+	@PostMapping
 	public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody Evento evento, BindingResult result) {
 		Evento eventoNuevo = null;
 		Map<String, Object> respuesta = new HashMap<>();
@@ -102,19 +102,19 @@ public class EventoController {
 		try {
 			eventoNuevo = eventoService.save(evento);
 		} catch (DataAccessException e) {
-			respuesta.put("mensaje", "Error al insertar el Evento");
+			respuesta.put("mensaje", "Error al insertar el evento");
 			respuesta.put("error", e.getMessage().concat(" = ").concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		emailService.enviarCorreo(eventoNuevo);
 
-		respuesta.put("mensaje", "El Evento se creó satisfactoriamente");
+		respuesta.put("mensaje", "El evento se creó satisfactoriamente");
 		respuesta.put("evento", eventoNuevo);
 		return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/eventos/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<Map<String, Object>> update(@Valid @RequestBody Evento evento, BindingResult result, @PathVariable Long id) {
 		Evento eventoActual = eventoService.findById(id);
 		Evento eventoActualizado = null;
@@ -131,7 +131,7 @@ public class EventoController {
 		}
 
 		if (eventoActual == null) {
-			respuesta.put("mensaje", "Error: no se pudo editar, el Evento ID: ".concat(id.toString().concat(" no existe en la base de datos")));
+			respuesta.put("mensaje", "Error al actualizar el evento ".concat(id.toString()).concat(" no existe en la base de datos"));
 			return new ResponseEntity<>(respuesta, HttpStatus.NOT_FOUND);
 		}
 
@@ -142,35 +142,31 @@ public class EventoController {
 
 			eventoActualizado = eventoService.save(eventoActual);
 		} catch (DataAccessException e) {
-			respuesta.put("mensaje", "Error al actualizar el Evento");
+			respuesta.put("mensaje", "Error al actualizar el evento");
 			respuesta.put("error", e.getMessage().concat(" = ").concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		respuesta.put("mensaje", "El Evento se actualizó satisfactoriamente");
+		respuesta.put("mensaje", "El evento se actualizó satisfactoriamente");
 		respuesta.put("evento", eventoActualizado);
-		return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
+		// clase del CRUD (7 oct): el profesor cambia el CREATED del update por OK (200)
+		return new ResponseEntity<>(respuesta, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/eventos/{id}")
+	// clase del CRUD (7 oct): el delete no revisa si el evento existe; ese 404 lo dejó de tarea
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Map<String, Object>> delete(@PathVariable Long id) {
 		Map<String, Object> respuesta = new HashMap<>();
-		Evento eventoActual = eventoService.findById(id);
-
-		if (eventoActual == null) {
-			respuesta.put("mensaje", "Error: no se pudo eliminar, el Evento ID: ".concat(id.toString().concat(" no existe en la base de datos")));
-			return new ResponseEntity<>(respuesta, HttpStatus.NOT_FOUND);
-		}
 
 		try {
 			eventoService.delete(id);
 		} catch (DataAccessException e) {
-			respuesta.put("mensaje", "Error al eliminar el Evento");
+			respuesta.put("mensaje", "Error al eliminar el evento");
 			respuesta.put("error", e.getMessage().concat(" = ").concat(e.getMostSpecificCause().getMessage()));
 			return new ResponseEntity<>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		respuesta.put("mensaje", "El Evento se eliminó satisfactoriamente");
+		respuesta.put("mensaje", "El evento se eliminó satisfactoriamente");
 		return new ResponseEntity<>(respuesta, HttpStatus.NO_CONTENT);
 	}
 

@@ -1,7 +1,7 @@
-package com.ipn.mx.utilerias.service.impl;
+package com.ipn.mx.evento.utilerias.service.impl;
 
 import com.ipn.mx.evento.domain.Evento;
-import com.ipn.mx.utilerias.service.EmailService;
+import com.ipn.mx.evento.utilerias.service.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +32,9 @@ public class EmailServiceImpl implements EmailService {
 		SimpleMailMessage email = new SimpleMailMessage();
 		email.setTo(destinatario);
 		email.setSubject("Notificación de Evento");
+		// clase del correo: el texto cierra con "y tendrá una duración de dos días" (lo improvisó el profesor)
 		email.setText("El evento " + evento.getNombreEvento()
-				+ " se llevará a cabo el " + evento.getFechaCreacion() + ".");
+				+ " se llevará a cabo el " + evento.getFechaCreacion() + " y tendrá una duración de 2 días.");
 
 		try {
 			mailSender.send(email);
