@@ -31,8 +31,9 @@ Los comentarios `29sept` y `zip` en el código marcan el origen de cada ajuste.
 - **Correo**: usuario, contraseña de aplicación y destinatario salen de variables de entorno
   (`MAIL_USER`, `MAIL_PASSWORD`, `MAIL_TO`), no están en el código. Sin `MAIL_TO` no se envía nada y
   el evento se crea igual. Si el envío falla se registra en el log y no tumba el `POST`.
-- **PDF**: encabezados en negro sobre gris; en clase son rojo sobre fondo cian, y el cuerpo de la tabla
-  va en Helvetica 10 azul (aquí Courier 14). En el zip `generarReporte`
+- **PDF**: idéntico al de la clase del 8 de octubre (título Courier 14 azul, encabezados Helvetica 9
+  negrita rojo sobre cian, cuerpo Helvetica 10 azul). Si falla la generación se lanza una excepción en
+  vez del `printStackTrace` de clase. En el zip `generarReporte`
   está sin escribir; aquí está el de la clase del PDF.
 - **Java 21**, no 25 como el zip, porque es el JDK instalado.
 - **`nullable = false`** en nombre y descripción (el zip dice `true`) y columna del id `idEvento` (el zip la

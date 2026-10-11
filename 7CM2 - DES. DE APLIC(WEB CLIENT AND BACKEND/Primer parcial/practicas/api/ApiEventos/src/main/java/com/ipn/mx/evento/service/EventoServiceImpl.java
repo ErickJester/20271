@@ -17,6 +17,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,39 +62,41 @@ public class EventoServiceImpl implements EventoService {
 			PdfWriter.getInstance(documento, salida);
 			documento.open();
 
-			Font letraTexto = FontFactory.getFont(FontFactory.COURIER, 14, BaseColor.BLUE);
-			Font letraEncabezadoTabla = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.BOLD, BaseColor.BLACK);
+			// clase del PDF (8 oct): título en Courier 14 azul, texto en Helvetica 10 azul,
+			// encabezados en Helvetica 9 negrita rojo sobre fondo cian
+			Font tipoLetra = FontFactory.getFont(FontFactory.COURIER, 14, BaseColor.BLUE);
 
-			Paragraph parrafo = new Paragraph("Lista de Eventos", letraTexto);
+			Paragraph parrafo = new Paragraph("Lista de eventos", tipoLetra);
 			parrafo.setAlignment(Element.ALIGN_CENTER);
 			documento.add(parrafo);
-			documento.add(new Chunk(Chunk.NEWLINE));
+			documento.add(Chunk.NEWLINE);
+
+			Font letraTexto = FontFactory.getFont(FontFactory.HELVETICA, 10, BaseColor.BLUE);
 
 			PdfPTable tabla = new PdfPTable(4);
 			tabla.setWidthPercentage(100);
 
-			String[] encabezados = {"ID Evento", "Nombre del Evento", "Descripción del Evento", "Fecha de Creación"};
-			for (String encabezado : encabezados) {
-				PdfPCell celda = new PdfPCell(new Phrase(encabezado, letraEncabezadoTabla));
-				celda.setHorizontalAlignment(Element.ALIGN_CENTER);
-				celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
-				celda.setBackgroundColor(BaseColor.LIGHT_GRAY);
-				celda.setBorderWidth(1);
-				tabla.addCell(celda);
-			}
+			Stream.of("Clave del evento", "Nombre del evento", "Descripción del evento", "Fecha del evento")
+					.forEach(headerTitle -> {
+						Font letraEncabezadoTabla = FontFactory.getFont(FontFactory.HELVETICA, 9, Font.BOLD, BaseColor.RED);
+						PdfPCell encabezados = new PdfPCell(new Phrase(headerTitle, letraEncabezadoTabla));
+						encabezados.setVerticalAlignment(Element.ALIGN_CENTER);
+						encabezados.setHorizontalAlignment(Element.ALIGN_CENTER);
+						encabezados.setBackgroundColor(BaseColor.CYAN);
+						encabezados.setBorderWidth(1);
+						tabla.addCell(encabezados);
+					});
 
 			for (Evento e : listaDeEventos) {
-				String[] datos = {
-					String.valueOf(e.getIdEvento()),
-					e.getNombreEvento(),
-					e.getDescripcionEvento(),
-					String.valueOf(e.getFechaCreacion())
-				};
-				for (String dato : datos) {
-					PdfPCell celda = new PdfPCell(new Phrase(dato, letraTexto));
-					celda.setHorizontalAlignment(Element.ALIGN_CENTER);
-					tabla.addCell(celda);
-				}
+				PdfPCell celdaIdEvento = new PdfPCell(new Phrase(String.valueOf(e.getIdEvento()), letraTexto));
+				PdfPCell celdaNombreEvento = new PdfPCell(new Phrase(String.valueOf(e.getNombreEvento()), letraTexto));
+				PdfPCell celdaDescripcionEvento = new PdfPCell(new Phrase(String.valueOf(e.getDescripcionEvento()), letraTexto));
+				PdfPCell celdaFechaEvento = new PdfPCell(new Phrase(String.valueOf(e.getFechaCreacion()), letraTexto));
+
+				tabla.addCell(celdaIdEvento);
+				tabla.addCell(celdaNombreEvento);
+				tabla.addCell(celdaDescripcionEvento);
+				tabla.addCell(celdaFechaEvento);
 			}
 
 			documento.add(tabla);
