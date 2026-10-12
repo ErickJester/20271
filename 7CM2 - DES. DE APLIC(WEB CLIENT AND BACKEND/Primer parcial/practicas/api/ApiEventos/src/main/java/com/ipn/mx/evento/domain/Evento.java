@@ -53,7 +53,7 @@ public class Evento implements Serializable {
 	@Column(name = "nombreEvento", length = 200, nullable = false, unique = true)
 	private String nombreEvento;
 
-	// 29sept: la descripción tiene de 4 a 500 caracteres. zip: allí el mensaje de @Size dice "El nombre del
+    // 29sept: la descripción tiene de 4 a 500 caracteres. zip: allí el mensaje de @Size dice "El nombre del
 	// evento" (un error de copiar y pegar); aquí está corregido para que diga "La descripción".
 	@NotBlank(message = "La descripción del evento no debe estar vacía")
 	@Size(min = 4, max = 500, message = "La descripción del evento debe tener entre 4-500 caracteres")
