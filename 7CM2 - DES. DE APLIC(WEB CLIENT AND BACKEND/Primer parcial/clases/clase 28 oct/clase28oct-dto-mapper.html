@@ -1,0 +1,1211 @@
+<title>Clase 28 oct · Entidad y DTO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ECF0F3; --surface:#FFFFFF; --surface-2:#F4F7F9;
+    --text:#141B22; --text-muted:#586675; --border:#D3DCE4;
+    --accent:#2A5F8C; --accent-soft:#DDEAF4; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --ent:#6B4E9B; --ent-soft:#E9E2F4; --dto:#1F7A6D; --dto-soft:#DAF0EB;
+    --map:#A5600E; --map-soft:#F7E8D0; --srv:#2A5F8C; --srv-soft:#DDEAF4;
+    --ctl:#B23A48; --ctl-soft:#F8E3E6;
+    --code-bg:#EAEFF3;
+    --shadow:0 1px 2px rgba(20,27,34,.06), 0 10px 26px -14px rgba(20,27,34,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#10161C; --surface:#171F27; --surface-2:#1C2630;
+      --text:#E6EDF3; --text-muted:#93A4B5; --border:#2A3743;
+      --accent:#7DB4E3; --accent-soft:#162838; --accent-ink:#10161C;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --ent:#B79CE6; --ent-soft:#241C36; --dto:#5FC9B8; --dto-soft:#11302B;
+      --map:#E0A24A; --map-soft:#33260F; --srv:#7DB4E3; --srv-soft:#162838;
+      --ctl:#F08A96; --ctl-soft:#35191D;
+      --code-bg:#131B22;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#10161C; --surface:#171F27; --surface-2:#1C2630;
+    --text:#E6EDF3; --text-muted:#93A4B5; --border:#2A3743;
+    --accent:#7DB4E3; --accent-soft:#162838; --accent-ink:#10161C;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --ent:#B79CE6; --ent-soft:#241C36; --dto:#5FC9B8; --dto-soft:#11302B;
+    --map:#E0A24A; --map-soft:#33260F; --srv:#7DB4E3; --srv-soft:#162838;
+    --ctl:#F08A96; --ctl-soft:#35191D;
+    --code-bg:#131B22;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+  .lede + .lede{margin-top:10px;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+
+  /* --- las tres etapas del semestre: XML, JSON, JPA. cada bloque de esa
+         etapa lleva su color, como el mismo dato pasando de formato en formato --- */
+  .etapa{border-left:3px solid var(--ec); padding-left:16px;}
+  .etapa.xml{--ec:var(--xml);} .etapa.json{--ec:var(--json);} .etapa.jpa{--ec:var(--jpa);}
+  .etapa h2.sec{color:var(--ec);}
+  .etapabar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .etchip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .etchip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--ec);}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; margin:16px 0; max-width:68ch; display:flex; gap:11px;}
+  .note .ic{flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--border);
+    color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;}
+  .note p{font-family:'Source Serif 4',Georgia,serif; font-size:.86rem; line-height:1.55;
+    color:var(--text-muted); margin:0;}
+  .note b{color:var(--text); font-weight:600;}
+
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer; text-align:left;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;
+    overflow-x:auto;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px; white-space:pre;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.74rem; padding:7px 11px;
+    border-radius:8px; cursor:pointer; text-align:left; max-width:100%; overflow-wrap:anywhere;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .crow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px;
+    padding:11px 13px; margin-bottom:10px;}
+  .crow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .crow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .crow .cq{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; margin-bottom:8px; line-height:1.5;}
+  .crow .cl{display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem;}
+  .crow input, .crow textarea{font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding:7px 9px;
+    background:var(--surface); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; width:100%;}
+  .crow textarea{min-height:78px; resize:vertical;}
+  .crow .ch{font-family:'Source Serif 4',Georgia,serif; font-size:.85rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .crow .ch.show{display:block;}
+  .crow .ch b{color:var(--text); font-weight:600;}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:520px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:480px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+  td.mono{font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+
+  /* --- una capa del proyecto = un color. el mismo color marca esa capa en
+         los bloques, el diagrama y el código final (como los marcadores del pizarrón) --- */
+  .capa{border-left:3px solid var(--cc); padding-left:16px;}
+  .capa.ent{--cc:var(--ent);} .capa.dto{--cc:var(--dto);} .capa.map{--cc:var(--map);}
+  .capa.srv{--cc:var(--srv);} .capa.ctl{--cc:var(--ctl);} .capa.cfg{--cc:var(--text-muted);}
+  .capa h2.sec{color:var(--cc);}
+  .capa .eyebrow{color:var(--cc);}
+  .capabar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .cchip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .cchip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--cc);}
+  .capa pre{border-left:3px solid var(--cc);}
+  .acciones{margin-top:26px; display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));}
+  .acciones .task{margin:0;}
+  svg text{font-family:'IBM Plex Sans',sans-serif; fill:var(--text);}
+  svg .mono{font-family:'IBM Plex Mono',monospace;}
+  svg .mut{fill:var(--text-muted);}
+  .estado{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:.62rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; padding:2px 8px; border-radius:4px;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted);}
+  .estado.ok{background:var(--ok-soft); border-color:var(--ok-bd); color:var(--ok);}
+  .estado.no{background:var(--bad-soft); border-color:var(--bad-bd); color:var(--bad);}
+  .kv{font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+</style>
+<header class="page"><div class="wrap">
+  <p class="kicker">C704 · Clase del 28 de octubre de 2026 · Unidad II</p>
+  <h1>Separar la entidad del DTO</h1>
+  <p class="lede">El profesor toma la API de eventos que ya funcionaba y la parte en capas: un <code>record</code> para lo que sale, otro para lo que entra, una entidad que solo mapea la tabla, un mapper escrito a mano, y servicio y controlador reescritos para hablar en DTOs. Al final dejó el borrado y el PDF como tarea.</p>
+  <p class="lede">Reconstruida del video (lo que se ve en la pantalla proyectada) y de la transcripción. El pizarrón solo tiene la cadena de conexión.</p>
+</div></header>
+
+<main>
+
+<div class="acciones">
+  <div class="task">
+    <div class="task-head"><span class="task-badge">Tarea 1</span><span class="task-when">≈ minuto 58</span></div>
+    <h3>Terminar borrado y generar PDF en el controlador</h3>
+    <p class="said">"De hecho, los últimos 2 les toca terminarlos, que es el borrado y el generar PDF."</p>
+    <p>Pasarlos al esquema nuevo (DTOs, <code>ResponseEntity</code>, 404 si no existe). Sin fecha de entrega.</p>
+  </div>
+  <div class="task">
+    <div class="task-head"><span class="task-badge">Pendiente</span><span class="task-when">≈ minuto 70</span></div>
+    <h3>Corregir <code>EmailService</code> en tu proyecto</h3>
+    <p class="said">"Si este hay que corregirlo, pues también hay que quitarles estos [...] los gets."</p>
+    <p>El correo recibe ahora un <code>EventoDTO</code>: se lee <code>evento.nombreEvento()</code>, no <code>getNombreEvento()</code>.</p>
+  </div>
+  <div class="task">
+    <div class="task-head"><span class="task-badge">Examen</span><span class="task-when">≈ minuto 47</span></div>
+    <h3>Martes 3 de noviembre</h3>
+    <p class="said">"Martes 3 de noviembre. Examen."</p>
+    <p>Lo dijo entre dos explicaciones, sin decir el temario. Preguntar el alcance al profesor.</p>
+  </div>
+</div>
+
+<section id="b0">
+  <div class="sec-head">
+    <p class="eyebrow">Mapa de la clase</p>
+    <h2 class="sec">Qué pasó y en qué orden</h2>
+    <p>Los minutos son aproximados: salen de ver el video, y la transcripción no trae tiempos. Los recuadros con <b>?</b> explican en palabras simples cada comando o palabra que suena rara; ábrelos cuando algo no te quede claro. Al final hay un diccionario con todo junto.</p>
+  </div>
+  <div class="arranque">
+    <h2>Orden en que se tocó cada archivo</h2>
+    <ol>
+      <li><span class="t">0:00</span><span class="d"><code>application.properties</code> con variables de entorno.</span></li>
+      <li><span class="t">≈ 5:00</span><span class="d"><code>EventoDTO</code> y <code>CreateOrUpdateEventoDTO</code> como <code>record</code>.</span></li>
+      <li><span class="t">≈ 15:00</span><span class="d">La entidad <code>Evento</code> pierde las validaciones.</span></li>
+      <li><span class="t">≈ 20:00</span><span class="d"><code>EventoMapper</code>: cuatro métodos estáticos.</span></li>
+      <li><span class="t">≈ 40:00</span><span class="d"><code>EventoService</code> y su implementación.</span></li>
+      <li><span class="t">≈ 55:00</span><span class="d"><code>EventoController</code>: lista, id, create, update.</span></li>
+      <li><span class="t">≈ 70:00</span><span class="d"><code>EmailService</code> y cierre.</span></li>
+    </ol>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 786 214" role="img" aria-label="Capas del proyecto: controlador y servicio hablan en DTO, el mapper traduce, el repositorio habla en entidad">
+      <defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--text-muted)"/></marker></defs>
+      <rect x="8" y="8" width="170" height="104" rx="8" style="fill:var(--ctl-soft);stroke:var(--ctl);stroke-width:1.5"/>
+      <text x="93" y="32" text-anchor="middle" font-size="13" font-weight="700">Controller</text>
+      <text x="93" y="54" text-anchor="middle" font-size="11">recibe</text>
+      <text x="93" y="69" text-anchor="middle" font-size="11" class="mono">CreateOrUpdateEventoDTO</text>
+      <text x="93" y="88" text-anchor="middle" font-size="11">devuelve</text>
+      <text x="93" y="103" text-anchor="middle" font-size="11" class="mono">EventoDTO</text>
+      <rect x="208" y="8" width="170" height="104" rx="8" style="fill:var(--srv-soft);stroke:var(--srv);stroke-width:1.5"/>
+      <text x="293" y="32" text-anchor="middle" font-size="13" font-weight="700">Service</text>
+      <text x="293" y="58" text-anchor="middle" font-size="11">solo habla en DTOs</text>
+      <text x="293" y="78" text-anchor="middle" font-size="11" class="mono">findAll · findById</text>
+      <text x="293" y="95" text-anchor="middle" font-size="11" class="mono">save · update · delete</text>
+      <rect x="408" y="8" width="170" height="104" rx="8" style="fill:var(--map-soft);stroke:var(--map);stroke-width:1.5"/>
+      <text x="493" y="32" text-anchor="middle" font-size="13" font-weight="700">EventoMapper</text>
+      <text x="493" y="58" text-anchor="middle" font-size="11">traduce en los dos</text>
+      <text x="493" y="74" text-anchor="middle" font-size="11">sentidos</text>
+      <text x="493" y="96" text-anchor="middle" font-size="11" class="mono">DTO ⇄ Evento</text>
+      <rect x="608" y="8" width="170" height="104" rx="8" style="fill:var(--ent-soft);stroke:var(--ent);stroke-width:1.5"/>
+      <text x="693" y="32" text-anchor="middle" font-size="13" font-weight="700">Repository</text>
+      <text x="693" y="58" text-anchor="middle" font-size="11">solo habla en entidad</text>
+      <text x="693" y="78" text-anchor="middle" font-size="11" class="mono">Evento</text>
+      <text x="693" y="95" text-anchor="middle" font-size="11">→ tabla Evento</text>
+      <line x1="180" y1="60" x2="206" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <line x1="380" y1="60" x2="406" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <line x1="580" y1="60" x2="606" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <rect x="8" y="132" width="370" height="8" rx="3" style="fill:var(--dto)"/>
+      <text x="8" y="160" font-size="12" font-weight="600" style="fill:var(--dto)">Zona DTO: clases simples, aquí van las validaciones</text>
+      <rect x="408" y="132" width="170" height="8" rx="3" style="fill:var(--map)"/>
+      <text x="408" y="160" font-size="12" font-weight="600" style="fill:var(--map)">Frontera</text>
+      <rect x="608" y="132" width="170" height="8" rx="3" style="fill:var(--ent)"/>
+      <text x="608" y="160" font-size="12" font-weight="600" style="fill:var(--ent)">Zona entidad: solo la tabla</text>
+      <text x="8" y="196" font-size="11.5" class="mut">Colores del resto de la página: morado entidad, verde azulado DTO, ámbar mapper, azul servicio, rojo controlador.</text>
+    </svg>
+    <figcaption>Dibujo mío a partir de lo que el profesor fue haciendo. En clase no lo trazó así; lo dijo en una frase: "tenemos la variante del DAO que para nosotros es el repositorio".</figcaption>
+  </figure>
+</section>
+
+<section id="b1" class="capa cfg">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 1 · minuto 0:00 a ≈ 3:00</p>
+    <h2 class="sec">Variables de entorno en <code>application.properties</code></h2>
+    <p>La clase arranca ya con el archivo abierto. Es la tarea que venía de la sesión del 8 de octubre.</p>
+  </div>
+  <p class="body">Cada propiedad sensible deja de llevar el valor escrito y pasa a leerse del sistema. En el video se ve el archivo así:</p>
+<pre>server.port=8084
+spring.application.name=GestionEventos
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=${DB_DRIVER}
+spring.jpa.database-platform=${DB_PLATFORM}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+springdoc.api-docs.enabled=true
+springdoc.swagger-ui.enabled=true</pre>
+  <p class="body">El valor de <code>DB_URL</code> es lo único que escribió en el pizarrón, con "servidor" anotado debajo de <code>localhost</code>:</p>
+<pre>jdbc:bd://localhost:puerto/bd        <span class="cm">&lt;- como quedó en el pizarrón</span>
+jdbc:postgresql://localhost:5432/nombreBD   <span class="cm">&lt;- como lo dictó</span></pre>
+  <div class="quote">"Son pares <b>nombre-valor</b>. [...] Y san se acabó. Literal, así como está ahí, pero hay que meterlo acá."</div>
+  <p class="body">Probó en local y el puerto 8084 estaba ocupado: "ya no me quiero pelear con ese puerto, no sé quién lo tiene en uso, pero vamos a decirle que sí" (en IntelliJ, aceptar que arranque igual). Con eso la conexión salió satisfactoria y pasó a lo siguiente.</p>
+  <details class="dio"><summary>Qué significa cada línea de <code>application.properties</code></summary><div class="db">
+    <ul>
+      <li><code>server.port=8084</code>: el número de puerta por donde la aplicación recibe peticiones. Si otro programa ya usa esa puerta, no arranca (el choque que tuvo en clase).</li>
+      <li><code>${DB_URL}</code>: "toma el valor de la variable de entorno que se llama DB_URL". Las llaves con <code>$</code> son la forma de pedirle un valor al sistema.</li>
+      <li><code>jdbc:postgresql://localhost:5432/nombreBD</code>: <code>jdbc</code> es la tecnología de Java para hablar con bases de datos; <code>postgresql</code> es el motor; <code>localhost</code> es "esta misma computadora"; <code>5432</code> es la puerta del motor; <code>nombreBD</code> es la base dentro del motor.</li>
+      <li><code>ddl-auto=update</code>: al arrancar, Hibernate crea las tablas que falten y agrega columnas nuevas, sin borrar los datos que ya hay.</li>
+      <li><code>show-sql=true</code>: imprime en la consola cada SQL que Hibernate ejecuta. Sirve para ver qué hace por detrás.</li>
+      <li><code>springdoc...enabled=true</code>: enciende la documentación automática de la API (Swagger), una página donde se ven y se prueban los endpoints.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>¿Qué es una variable de entorno y dónde se define?</summary><div class="db">
+    <p>Un par nombre-valor que vive en el sistema operativo o en la configuración de ejecución, fuera del código. Spring la lee con <code>${NOMBRE}</code>.</p>
+    <p>En IntelliJ se agregan en <em>Run → Edit Configurations → Environment variables</em>. Así la contraseña de la base no queda en el repositorio.</p>
+  </div></details>
+  <div class="note"><span class="ic">!</span><p><b>Dato que se ve en pantalla y no se dijo:</b> en el video sigue habiendo líneas de <code>spring.datasource</code> comentadas con <code>#</code>, del valor anterior escrito a mano.</p></div>
+</section>
+
+<section id="b2" class="capa dto">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 2 · minuto ≈ 3:00 a ≈ 14:00</p>
+    <h2 class="sec">Dos <code>record</code>: uno para la salida, otro para la entrada</h2>
+    <p>Crea las clases en la carpeta <code>dto</code> que estaba vacía. Botón derecho, nueva clase Java, tipo <code>record</code>.</p>
+  </div>
+  <div class="capabar"><span class="cchip">DTO · salida completa</span></div>
+<pre>package com.ipn.mx.evento.dto;
+
+import java.time.LocalDate;
+
+<span class="cm">// DTO que representa la salida completa de un evento</span>
+public record EventoDTO(
+        Long idEvento,
+        String nombreEvento,
+        String descripcionEvento,
+        LocalDate fechaCreacion
+) {
+}</pre>
+  <p class="body">Lo hizo copiando los atributos de la entidad y "despedazando": quitar el ámbito (<code>private</code>), cambiar cada <code>;</code> por coma, dejar el último sin coma, importar <code>LocalDate</code> y reformatear el código.</p>
+  <div class="quote">"Necesito <b>encapsular los objetos de negocio</b>, no los debería de exponer. Pero esta me va a servir como plantilla, como contenedor para toda la salida de cualquier consulta."</div>
+  <div class="capabar"><span class="cchip">DTO · entrada con validaciones</span></div>
+<pre>package com.ipn.mx.evento.dto;
+
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
+
+public record CreateOrUpdateEventoDTO(
+        @NotBlank(message = "El nombre del evento no debe estar vacío")
+        @Size(min = 4, max = 200, message = "El nombre del evento debe tener entre 4 y 200")
+        String nombreEvento,
+
+        @NotBlank(message = "La descripción del evento no debe estar vacía")
+        @Size(min = 4, max = 500, message = "La descripción del evento debe tener entre 4 y 500")
+        String descripcionEvento,
+
+        @NotNull(message = "La fecha es obligatoria")
+        @FutureOrPresent(message = "La fecha del evento debe ser hoy o en el futuro")
+        LocalDate fechaCreacion
+) {
+}</pre>
+  <p class="body">Primero lo llamó <code>CreateEventoDTO</code>; después le cambió el nombre (<em>Refactor → Rename</em>) a <code>CreateOrUpdateEventoDTO</code> porque el mismo objeto sirve para insertar y para actualizar.</p>
+  <div class="quote">"Va a tener lo mismo, pero me va a servir para el update. [...] A menos que ustedes decidan lo contrario. Si a la mejor dices: la fecha de creación en una actualización no la voy a hacer cambiar, la puedo quitar."</div>
+  <p class="body">Sin <code>idEvento</code>: es autogenerado, así que al crear no se manda. La única validación nueva es la de fecha:</p>
+  <div class="quote">"No puedo registrar un evento que pasó ayer, inclusive que pasó hace unos cuantos minutos."</div>
+  <details class="dio"><summary>¿Por qué <code>record</code> y no una clase con Lombok?</summary><div class="db">
+    <p>Un <code>record</code> es una clase inmutable que ya trae constructor, <code>equals</code>, <code>hashCode</code>, <code>toString</code> y un método por campo con el mismo nombre del campo.</p>
+    <p>Por eso <strong>no hay <code>getX()</code> ni <code>setX()</code></strong>: se lee <code>dto.nombreEvento()</code>. El profesor lo repite varias veces durante el mapper y el correo.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué hace <code>@FutureOrPresent</code>?</summary><div class="db">
+    <p>Acepta fechas de hoy en adelante y rechaza las pasadas. Es de <code>jakarta.validation</code>, igual que <code>@NotBlank</code>, <code>@NotNull</code> y <code>@Size</code>.</p>
+    <p>La validación corre cuando llega la petición al controlador, no después (ver Bloque 6).</p>
+  </div></details>
+
+  <details class="dio"><summary>¿Qué es un DTO y por qué "encapsular" los objetos de negocio?</summary><div class="db">
+    <p>DTO significa <em>Data Transfer Object</em>: un objeto que solo sirve para llevar datos de un lugar a otro, sin lógica. Es la "caja de envío" entre el cliente y tu aplicación.</p>
+    <p>"Encapsular los objetos de negocio" quiere decir no mostrar hacia afuera la entidad real (la que está ligada a la tabla). Si la mostraras, cualquier cambio en la tabla cambiaría lo que ve el cliente, y el cliente podría mandarte campos que no debería (por ejemplo, un id).</p>
+  </div></details>
+  <details class="dio"><summary>Qué hace cada anotación del DTO de entrada</summary><div class="db">
+    <ul>
+      <li><code>@NotBlank</code>: el texto no puede ser nulo, ni vacío, ni solo espacios.</li>
+      <li><code>@NotNull</code>: el valor no puede ser nulo. Se usa en la fecha porque <code>@NotBlank</code> solo vale para textos.</li>
+      <li><code>@Size(min = 4, max = 200)</code>: el texto debe medir entre 4 y 200 caracteres.</li>
+      <li><code>message = "..."</code>: el texto del error que verá el cliente cuando esa regla falle.</li>
+      <li><code>@FutureOrPresent</code>: la fecha debe ser hoy o posterior.</li>
+      <li><code>LocalDate</code>: una fecha sin hora (año, mes y día).</li>
+      <li><code>Long</code> con mayúscula: un número entero que además puede ser <em>null</em>. Con <code>long</code> minúscula nunca podría estar vacío, y antes de guardar el evento no tiene id todavía.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>Qué significa <code>import</code> y <code>jakarta.validation</code></summary><div class="db">
+    <p><code>import</code> trae una clase de otro paquete para poder usarla por su nombre corto. <code>jakarta.validation.constraints</code> es el paquete estándar de Java que contiene las anotaciones de validación.</p>
+    <p>Una <strong>anotación</strong> es una etiqueta que empieza con <code>@</code> y le avisa a una librería (aquí, la de validación) qué hacer con ese campo.</p>
+  </div></details>
+
+  <div class="ex">
+    <p class="ex-tag">Práctica · bloque 2</p>
+    <h3>¿Qué DTO y por qué?</h3>
+    <p class="ask">Elige la respuesta de cada caso.</p>
+    <div class="qrows" id="q2"></div>
+    <div class="btnrow"><button class="btn" id="q2go" type="button">Revisar</button><button class="btn ghost" id="q2rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q2fb"></div>
+  </div>
+</section>
+
+<section id="b3" class="capa ent">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 3 · minuto ≈ 14:00 a ≈ 19:00</p>
+    <h2 class="sec">La entidad se queda solo con la tabla</h2>
+    <p>Todo lo que era validación se fue a <code>CreateOrUpdateEventoDTO</code>. En <code>Evento</code> quedan los <code>@Column</code> y nada más.</p>
+  </div>
+<pre>@Entity(name = "Evento")
+public class Evento implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idEvento;
+
+    @Column(name = "nombreEvento", length = 200, nullable = false, unique = true)
+    private String nombreEvento;
+
+    @Column(name = "descripcionEvento", length = 500, nullable = false)
+    private String descripcionEvento;
+
+    @Column(name = "fechaCreacion", nullable = false)
+    private LocalDate fechaCreacion;
+}</pre>
+  <div class="quote">"Ahora sí mi clase entidad representa a lo que tengo en mi estructura [...]. Agarra el nombre, dice que por acá se llama nombre de evento, que tiene una longitud de 200, que es no nulo y que es único. <b>Sansacabó.</b> Los demás [validadores] no van ahí."</div>
+  <p class="body">En el DTO también quitó los <code>@Column</code> y el <code>@Id</code>: ahí no tienen sentido.</p>
+  <div class="quote">"Este cuate representa a una entidad en una base de datos. Este cuate representa a una clase simple en el orientado a objetos."</div>
+
+  <details class="dio"><summary>Qué significa cada anotación de la entidad</summary><div class="db">
+    <ul>
+      <li><code>@Entity(name = "Evento")</code>: "esta clase representa una tabla". El <code>name</code> es el nombre con el que JPA la conoce.</li>
+      <li><code>@Id</code>: este campo es la llave primaria, el dato que identifica a cada fila.</li>
+      <li><code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code>: el número del id lo asigna la propia base de datos (autonumérico). Por eso al crear no se manda.</li>
+      <li><code>@Column(name = "nombreEvento", length = 200, nullable = false, unique = true)</code>: <code>name</code> es el nombre de la columna; <code>length</code> es el largo máximo del texto; <code>nullable = false</code> significa que la columna es obligatoria; <code>unique = true</code> significa que no puede haber dos eventos con el mismo nombre.</li>
+      <li><code>implements Serializable</code>: marca que los objetos de esta clase se pueden convertir en una secuencia de bytes. Es una convención habitual en entidades; no cambia lo que se hizo en clase.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>JPA, Hibernate y "entidad": ¿cómo se llevan?</summary><div class="db">
+    <p><strong>JPA</strong> es la especificación (las reglas) para guardar objetos Java en una base relacional. <strong>Hibernate</strong> es la librería que de verdad lo hace. <strong>Spring Data JPA</strong> pone encima el <code>Repository</code>, con métodos ya hechos como <code>findAll</code> y <code>save</code>.</p>
+    <p>Una <strong>entidad</strong> es la clase que JPA liga a una tabla: cada objeto es una fila y cada atributo es una columna.</p>
+  </div></details>
+
+  <div class="ex">
+    <p class="ex-tag">Práctica · bloque 3</p>
+    <h3>¿En qué clase va cada anotación?</h3>
+    <p class="ask">Después de la separación, ¿dónde queda cada una?</p>
+    <div class="qrows" id="q3"></div>
+    <div class="btnrow"><button class="btn" id="q3go" type="button">Revisar</button><button class="btn ghost" id="q3rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q3fb"></div>
+  </div>
+
+  <details class="dio"><summary>Digresión · ¿por qué antes funcionaba todo en una sola clase?</summary><div class="db">
+    <p>Explicación del profesor, ya con el código partido: cuando se creó JPA, una de sus características era poder <strong>omitir los DTO</strong> y usar solo la entidad, agregándole todos los atributos necesarios y marcando cuáles se persisten y cuáles no.</p>
+    <div class="quote" style="margin:8px 0 0">"Funcionaba como lo teníamos. [...] Por definición, cuando se creó JPA, una de sus características era de podemos omitir el uso de clases de tipo DTO y solo utilizar la entidad."</div>
+    <p>En esta clase vuelve a usar el DTO como patrón de diseño y al repositorio como la variante del DAO: "todo lo que aprendieron el semestre pasado".</p>
+  </div></details>
+</section>
+
+<section id="b4" class="capa map">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 4 · minuto ≈ 19:00 a ≈ 38:00</p>
+    <h2 class="sec"><code>EventoMapper</code>: el pase de atributos, a mano</h2>
+    <p>Nuevo paquete <code>mapper</code>, clase simple con métodos estáticos. "El que quieran, y así hay varios", dijo del mapeo automático (menciona ModelMapper y MapStruct), "solo que hoy lo vamos a hacer a manita, porque este es más de configuración".</p>
+  </div>
+  <div class="quote">"En algún punto tenemos que decirle: tú vas a hacer este y tú vas a hacer este. Tenemos que hacer el pase de los atributos, hay que hacer un mapeo. <b>Esa les toca a ustedes.</b>"</div>
+<pre>package com.ipn.mx.evento.mapper;
+
+public class EventoMapper {
+
+    <span class="cm">// Entity Class ==> Clase DTO</span>
+    public static EventoDTO convertirADTO(Evento evento) {
+        if (evento == null) {
+            return null;
+        }
+        return new EventoDTO(
+                evento.getIdEvento(),
+                evento.getNombreEvento(),
+                evento.getDescripcionEvento(),
+                evento.getFechaCreacion()
+        );
+    }
+
+    <span class="cm">// DTO ==> Entity</span>
+    public static Evento convertirEntity(CreateOrUpdateEventoDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        Evento evento = new Evento();
+        evento.setNombreEvento(dto.nombreEvento());
+        evento.setDescripcionEvento(dto.descripcionEvento());
+        evento.setFechaCreacion(dto.fechaCreacion());
+        return evento;
+    }
+
+    <span class="cm">// DTO ==> Entity para un update</span>
+    public static void actualizarAPartirDeDTO(CreateOrUpdateEventoDTO dto, Evento evento) {
+        if (dto == null || evento == null) {
+            return;
+        }
+        evento.setNombreEvento(dto.nombreEvento());
+        evento.setDescripcionEvento(dto.descripcionEvento());
+        evento.setFechaCreacion(dto.fechaCreacion());
+    }
+
+    public static List&lt;EventoDTO&gt; convertirAListaDTO(List&lt;Evento&gt; eventos) {
+        if (eventos == null) {
+            return List.of();
+        }
+        return eventos.stream().map(EventoMapper::convertirADTO).toList();
+    }
+}</pre>
+  <p class="body">Cuatro métodos, y para cada uno dijo en qué momento se usa:</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Método</th><th>Recibe</th><th>Devuelve</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">convertirADTO</td><td class="mono">Evento</td><td class="mono">EventoDTO</td><td class="d">Pintar el resultado de un <code>select *</code> o de un <code>find</code>.</td></tr>
+      <tr><td class="sym">convertirEntity</td><td class="mono">CreateOrUpdateEventoDTO</td><td class="mono">Evento</td><td class="d">Insertar. No lleva id: lo genera la base ("ese lo vamos a tomar de este cuate").</td></tr>
+      <tr><td class="sym">actualizarAPartirDeDTO</td><td class="mono">DTO + Evento</td><td class="mono">void</td><td class="d">Actualizar. Ya tienes el <code>Evento</code> encontrado por id; solo le pasas los valores nuevos.</td></tr>
+      <tr><td class="sym">convertirAListaDTO</td><td class="mono">List&lt;Evento&gt;</td><td class="mono">List&lt;EventoDTO&gt;</td><td class="d">La consulta devuelve lista de entidades; se trata como lista de DTO con <code>stream().map(...)</code>.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="quote">"Recibiste un cuadrito, trátalo como circulito."</div>
+  <div class="note"><span class="ic">!</span><p><b>Un nombre que cambió en pantalla.</b> En la transcripción el método de entrada se dice "convertir a entity"; en el video aparece escrito <code>convertirEntity</code> (y <code>convertirADTO</code> para el otro sentido). Usé los nombres del video.</p></div>
+  <details class="dio"><summary>¿Por qué se llaman sin crear un objeto <code>EventoMapper</code>?</summary><div class="db">
+    <p>Porque son <code>static</code>: "el que podamos usar esto es porque los dejé como estáticos, tenía hueva". Si no lo fueran, habría que inyectar o instanciar el mapper (con Spring sería un <code>@Component</code>).</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué es <code>EventoMapper::convertirADTO</code> dentro de <code>map</code>?</summary><div class="db">
+    <p>Una referencia a método: le dice al <code>stream</code> "aplícale este método a cada elemento". Equivale a <code>e -&gt; EventoMapper.convertirADTO(e)</code>.</p>
+  </div></details>
+
+  <details class="dio"><summary>Qué significa <code>static</code>, <code>void</code> y <code>null</code> en el mapper</summary><div class="db">
+    <ul>
+      <li><code>public static</code>: el método pertenece a la clase, no a un objeto. Se llama escribiendo <code>EventoMapper.convertirADTO(...)</code>, sin <code>new</code>.</li>
+      <li><code>void</code>: el método no devuelve nada; solo hace algo. <code>actualizarAPartirDeDTO</code> modifica el <code>Evento</code> que recibe.</li>
+      <li><code>if (dto == null) return null;</code>: protege de que llegue un objeto vacío. Si no, la siguiente línea reventaría con un <code>NullPointerException</code>.</li>
+      <li><code>new Evento()</code>: crea un objeto vacío de la entidad, al que luego se le asignan los valores con <code>setNombreEvento(...)</code> y los demás <em>setters</em>.</li>
+      <li><code>dto.nombreEvento()</code>: así se lee un campo de un <code>record</code>. En una clase normal sería <code>getNombreEvento()</code>.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>Cómo leer <code>eventos.stream().map(EventoMapper::convertirADTO).toList()</code></summary><div class="db">
+    <ol>
+      <li><code>eventos.stream()</code>: convierte la lista en una cinta de elementos que se pueden procesar uno por uno.</li>
+      <li><code>.map(...)</code>: aplica una transformación a cada elemento de la cinta. Aquí, convertir cada <code>Evento</code> en <code>EventoDTO</code>.</li>
+      <li><code>EventoMapper::convertirADTO</code>: "usa este método"; los dos puntos dobles son una referencia a método.</li>
+      <li><code>.toList()</code>: junta los resultados en una lista nueva.</li>
+    </ol>
+    <p>Equivale a un <code>for</code> que recorre la lista, convierte cada elemento y lo mete en otra lista, pero en una línea.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué es "mapear" y qué es un ORM?</summary><div class="db">
+    <p><strong>Mapear</strong> es copiar los datos de un objeto a otro de otro tipo, campo por campo. Aquí, de <code>Evento</code> a <code>EventoDTO</code> y al revés.</p>
+    <p>En la clase 10 vimos <strong>ORM</strong> (<em>Object Relational Mapping</em>): lo mismo, pero entre objetos y tablas. Librerías como ModelMapper o MapStruct hacen el mapeo entre clases automáticamente; hoy se hizo a mano para ver qué pasa.</p>
+  </div></details>
+
+  <div class="ex">
+    <p class="ex-tag">Práctica · bloque 4</p>
+    <h3>Arma <code>convertirEntity</code> en orden</h3>
+    <p class="ask">Toca las líneas en el orden en que van. Tocar una línea ya puesta la quita, y las siguientes con ella.</p>
+    <div class="built" id="built"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow"><button class="btn ghost" id="bldRs" type="button">Reiniciar</button></div>
+    <div class="fb" id="bldFb"></div>
+  </div>
+</section>
+
+<section id="b5" class="capa srv">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 5 · minuto ≈ 38:00 a ≈ 54:00</p>
+    <h2 class="sec">Servicio e implementación: "chorro de errores"</h2>
+    <p>Anunció el efecto antes de hacerlo: "van a aparecer chorro 20000 errores y vamos a jugar con esos errores". Cambiar la interfaz rompe la implementación y el controlador, y esos errores en rojo son la guía.</p>
+  </div>
+  <div class="capabar"><span class="cchip">Interfaz</span></div>
+<pre>public interface EventoService {
+    List&lt;EventoDTO&gt; findAll();
+    EventoDTO findById(Long id);
+    EventoDTO save(CreateOrUpdateEventoDTO dto);
+    EventoDTO update(Long id, CreateOrUpdateEventoDTO dto);   <span class="cm">// nuevo: recibe id y objeto</span>
+    void delete(Long id);                                      <span class="cm">// no se toca</span>
+    ByteArrayInputStream generarReporte(List&lt;EventoDTO&gt; listaDeEventos);
+}</pre>
+  <div class="capabar"><span class="cchip">Implementación</span></div>
+<pre>@Override
+@Transactional(readOnly = true)
+public List&lt;EventoDTO&gt; findAll() {
+    return EventoMapper.convertirAListaDTO(eventoRepository.findAll());
+}
+
+@Override
+@Transactional(readOnly = true)
+public EventoDTO findById(Long id) {
+    return eventoRepository.findById(id)
+            .map(EventoMapper::convertirADTO)
+            .orElseThrow(() -&gt; new EntityNotFoundException(
+                    "El evento con ID: " + id + " no existe en la base de datos"));
+}
+
+@Override
+@Transactional
+public EventoDTO save(CreateOrUpdateEventoDTO dto) {
+    Evento evento = EventoMapper.convertirEntity(dto);
+    return EventoMapper.convertirADTO(eventoRepository.save(evento));
+}
+
+@Override
+@Transactional
+public EventoDTO update(Long id, CreateOrUpdateEventoDTO dto) {
+    Evento evento = eventoRepository.findById(id)
+            .orElseThrow(() -&gt; new EntityNotFoundException(
+                    "Error al actualizar: el ID " + id + " no se encuentra en la base de datos"));
+    EventoMapper.actualizarAPartirDeDTO(dto, evento);
+    return EventoMapper.convertirADTO(eventoRepository.save(evento));
+}
+
+@Override
+@Transactional
+public void delete(Long id) {
+    Evento evento = eventoRepository.findById(id)
+            .orElseThrow(() -&gt; new EntityNotFoundException(
+                    "El evento con ID: " + id + " no fue encontrado"));
+    eventoRepository.delete(evento);       <span class="cm">// antes: deleteById(id)</span>
+}</pre>
+  <div class="quote">"Literal, buscamos algo para eliminarlo. Si lo encuentra, se lo asigna, ya lo identifiqué específicamente. Si no lo encuentra, lánzame la excepción [...]. Y borra, en lugar de hacer un borrado por el ID, <b>vas a borrar por el objeto que ya está plenamente identificado.</b>"</div>
+  <p class="body">En <code>save</code> la lógica está en una frase suya: "yo le voy a pasar esta cosa, que es un DTO, es una clase simple, pero para poder persistir algo necesito que sea una entidad. Conviértelo a una de esas. Después guárdalo, el resultado, que es una entidad, conviértelo a una de esas y devuélvelo".</p>
+  <div class="note"><span class="ic">!</span><p><b>Cabo que dejó el profesor:</b> el <code>@Transactional</code> y el texto exacto de los mensajes se ven en pantalla a medias; lo reconstruí. Lo que sí es literal: <code>findById</code> con <code>.map(...).orElseThrow(...)</code> y el <code>delete</code> con <code>findById</code> previo.</p></div>
+  <details class="dio"><summary>¿Y el <code>ControllerAdvice</code> que mencionó?</summary><div class="db">
+    <p>Dijo que lo ideal sería "una clase específica que se encargue del manejo de las excepciones según la entidad" y "otro controlador [...] que se encargue de estar monitoreando todo el manejo de excepciones, que es un <code>@ControllerAdvice</code>". <strong>No lo hicieron:</strong> "lo vamos a trabajar normalito en el mismo esquema", con <code>try/catch</code> en cada método.</p>
+  </div></details>
+  <details class="dio"><summary>¿<code>orElse</code> u <code>orElseThrow</code>?</summary><div class="db">
+    <p><code>findById</code> devuelve un <code>Optional</code>. <code>orElseThrow(() -&gt; ...)</code> lanza la excepción si está vacío y entrega el valor si no. El <code>-&gt;</code> es una expresión lambda que construye la excepción solo cuando hace falta.</p>
+  </div></details>
+
+  <details class="dio"><summary>Interfaz e implementación: ¿por qué son dos archivos?</summary><div class="db">
+    <p><code>EventoService</code> (interfaz) solo lista <em>qué</em> se puede hacer: los nombres y los tipos de cada método. <code>EventoServiceImpl</code> dice <em>cómo</em> se hace. El controlador solo conoce la interfaz, así que se puede cambiar la implementación sin tocarlo.</p>
+    <p><code>@Override</code> avisa que ese método cumple con uno de la interfaz. Si el nombre o los tipos no coinciden, el compilador marca error. Por eso, al cambiar la interfaz, aparecieron errores en la implementación.</p>
+  </div></details>
+  <details class="dio"><summary>Qué hacen <code>findAll</code>, <code>findById</code>, <code>save</code> y <code>delete</code> del repositorio</summary><div class="db">
+    <ul>
+      <li><code>findAll()</code>: trae todas las filas como una lista de <code>Evento</code>.</li>
+      <li><code>findById(id)</code>: busca una fila por su id y la devuelve dentro de un <code>Optional</code>.</li>
+      <li><code>save(evento)</code>: si el <code>Evento</code> no tiene id, hace un <code>INSERT</code>; si ya tiene id, hace un <code>UPDATE</code>. Devuelve la entidad guardada.</li>
+      <li><code>delete(evento)</code>: borra la fila de ese objeto. <code>deleteById(id)</code> hacía lo mismo pasándole solo el id.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>Cómo leer <code>.orElseThrow(() -&gt; new EntityNotFoundException(...))</code></summary><div class="db">
+    <p><code>Optional</code> es una caja que puede traer un valor o estar vacía. <code>findById</code> la usa porque el id puede no existir.</p>
+    <p><code>orElseThrow</code> dice: "si la caja trae un valor, dámelo; si está vacía, lanza esta excepción". El <code>() -&gt; ...</code> es una <strong>lambda</strong>: una receta que solo se ejecuta si de verdad hace falta crear la excepción.</p>
+    <p><code>EntityNotFoundException</code> significa "no encontré esa entidad". El controlador la atrapa y responde 404.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué hace <code>@Transactional</code>?</summary><div class="db">
+    <p>Agrupa todo lo que hace el método en una sola <strong>transacción</strong>: o todo se guarda, o, si algo falla a la mitad, se deshace todo.</p>
+    <p><code>readOnly = true</code> avisa que ese método solo lee, así que la base puede trabajar más ligera.</p>
+  </div></details>
+
+  <div class="ex">
+    <p class="ex-tag">Práctica · bloque 5</p>
+    <h3>¿Qué hace cada método del servicio?</h3>
+    <div class="qrows" id="q5"></div>
+    <div class="btnrow"><button class="btn" id="q5go" type="button">Revisar</button><button class="btn ghost" id="q5rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q5fb"></div>
+  </div>
+</section>
+
+<section id="b6" class="capa ctl">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 6 · minuto ≈ 54:00 a ≈ 68:00</p>
+    <h2 class="sec">El controlador: cada resultado con su código HTTP</h2>
+    <p>Los métodos devuelven <code>ResponseEntity</code> para poder elegir el código de estado. En clase los fue cambiando uno por uno.</p>
+  </div>
+<pre>@GetMapping("/eventos")
+public ResponseEntity&lt;List&lt;EventoDTO&gt;&gt; lista() {
+    List&lt;EventoDTO&gt; eventos = eventoService.findAll();
+    if (eventos.isEmpty()) {
+        return ResponseEntity.noContent().build();      <span class="cm">// 204</span>
+    }
+    return ResponseEntity.ok(eventos);                  <span class="cm">// 200</span>
+}
+
+@GetMapping("/eventos/{id}")
+public ResponseEntity&lt;?&gt; findById(@PathVariable Long id) {
+    Map&lt;String, Object&gt; respuesta = new HashMap&lt;&gt;();
+    try {
+        EventoDTO evento = eventoService.findById(id);
+        return ResponseEntity.ok(evento);                                     <span class="cm">// 200</span>
+    } catch (EntityNotFoundException e) {
+        respuesta.put("mensaje", e.getMessage());
+        return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.NOT_FOUND);          <span class="cm">// 404</span>
+    } catch (DataAccessException e) {
+        respuesta.put("mensaje", "Error al realizar la consulta");
+        respuesta.put("error", e.getMessage());
+        return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.INTERNAL_SERVER_ERROR); <span class="cm">// 500</span>
+    }
+}</pre>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Código</th><th>Cuándo</th><th>Lo que dijo</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">204</td><td class="d">Lista vacía.</td><td class="d">"El no content. [...] Nada más le piquen, es un 204."</td></tr>
+      <tr><td class="sym">200</td><td class="d">Lista con elementos, o evento encontrado.</td><td class="d">"Felicidades, estos son los elementos y un código 200."</td></tr>
+      <tr><td class="sym">404</td><td class="d">El id no existe (<code>EntityNotFoundException</code>).</td><td class="d">"Si no lo encontró, me devuelve un 404."</td></tr>
+      <tr><td class="sym">500</td><td class="d">Falla de base de datos (<code>DataAccessException</code>).</td><td class="d">"La tabla se eliminó como en el ejercicio pasado, me darán 500."</td></tr>
+      <tr><td class="sym">400</td><td class="d">Errores de validación en el cuerpo.</td><td class="d">"Un bad request como código de respuesta."</td></tr>
+      <tr><td class="sym">201</td><td class="d">Evento creado.</td><td class="d">Se ve <code>HttpStatus.CREATED</code> al final del <code>create</code>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="sub">POST: se valida al llegar, no después</h3>
+<pre>@PostMapping("/eventos")
+public ResponseEntity&lt;?&gt; create(@Valid @RequestBody CreateOrUpdateEventoDTO dto,
+                                BindingResult resultados) {
+    Map&lt;String, Object&gt; respuesta = new HashMap&lt;&gt;();
+    if (resultados.hasErrors()) {
+        List&lt;String&gt; errores = resultados.getFieldErrors().stream()
+                .map(err -&gt; "El campo " + err.getField() + " " + err.getDefaultMessage())
+                .collect(Collectors.toList());
+        respuesta.put("errores", errores);
+        return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.BAD_REQUEST);          <span class="cm">// 400</span>
+    }
+    EventoDTO eventoNuevo;
+    try {
+        eventoNuevo = eventoService.save(dto);
+        emailService.enviarCorreo(eventoNuevo);
+    } catch (DataAccessException e) {
+        respuesta.put("mensaje", "Error al realizar el insert en la base de datos");
+        respuesta.put("error", e.getMessage());
+        return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    respuesta.put("mensaje", "El evento se ha creado con éxito");
+    respuesta.put("evento", eventoNuevo);
+    return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.CREATED);                  <span class="cm">// 201</span>
+}</pre>
+  <div class="quote">"Se valida justo cuando llega al controller que espera recibir esas cosas, <b>no hasta después</b>, como estaban."</div>
+  <p class="body">Lo que recibe el controlador desde Angular, React o lo que sea es un <code>CreateOrUpdateEventoDTO</code> en JSON; ese objeto es el que se valida contra las anotaciones del <code>record</code>.</p>
+
+  <h3 class="sub">El correo: dos formas de dejarlo</h3>
+  <p class="body">Tal como quedó, <code>enviarCorreo</code> está dentro del mismo <code>try</code> que el <code>save</code>. Si falla el correo, el cliente recibe un 500 aunque el evento ya se guardó. Propuso, como opción "que determinan ustedes", sacarlo a su propio bloque:</p>
+<pre>try {
+    emailService.enviarCorreo(eventoNuevo);
+} catch (MailException e) {
+    log.warn("No se pudo enviar el correo del evento {}", eventoNuevo.idEvento(), e);
+}</pre>
+  <p class="body">Con <code>@Slf4j</code> arriba de la clase (Simple Logging Facade for Java, ya incluido en Spring Boot). Así el evento se creó y solo el correo falló, y la respuesta sigue siendo 201.</p>
+
+  <h3 class="sub">PUT: <code>update</code> con id y objeto</h3>
+<pre>@PutMapping("/eventos/{id}")
+public ResponseEntity&lt;?&gt; update(@Valid @RequestBody CreateOrUpdateEventoDTO dto,
+                                BindingResult resultados,
+                                @PathVariable Long id) {
+    Map&lt;String, Object&gt; respuesta = new HashMap&lt;&gt;();
+    if (resultados.hasErrors()) {
+        List&lt;String&gt; errores = resultados.getFieldErrors().stream()
+                .map(err -&gt; "El campo " + err.getField() + " " + err.getDefaultMessage())
+                .collect(Collectors.toList());
+        respuesta.put("errores", errores);
+        return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.BAD_REQUEST);
+    }
+    try {
+        EventoDTO eventoActualizado = eventoService.update(id, dto);
+        respuesta.put("mensaje", "El evento se ha actualizado con éxito");
+        respuesta.put("evento", eventoActualizado);
+        return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.OK);
+    } catch (EntityNotFoundException e) {
+        respuesta.put("mensaje", e.getMessage());
+        return new ResponseEntity&lt;&gt;(respuesta, HttpStatus.NOT_FOUND);
+    }
+}</pre>
+  <div class="note"><span class="ic">!</span><p><b>Cuidado con lo que se ve en el video.</b> En el <code>update</code> del controlador aparece la firma con <code>@PathVariable Long id</code> y los mismos <code>Map</code> y <code>BindingResult</code> del <code>create</code>. El orden de los parámetros y el texto de los mensajes no se alcanzan a leer, así que son los míos.</p></div>
+  <div class="quote">"Más o menos así, y a ustedes les toca terminar el último, porque ya no nos dio tiempo. De hecho, los últimos 2 les toca terminarlos, que es el borrado y el generar PDF."</div>
+
+  <details class="dio"><summary>Recorrido línea por línea del <code>create</code></summary><div class="db">
+    <ol>
+      <li><code>@PostMapping("/eventos")</code>: este método atiende las peticiones <code>POST</code> a la ruta <code>/eventos</code>.</li>
+      <li><code>@Valid @RequestBody CreateOrUpdateEventoDTO dto</code>: toma el JSON del cuerpo de la petición, lo convierte al record y revisa las validaciones antes de entrar al método.</li>
+      <li><code>BindingResult resultados</code>: guarda lo que salió de esa revisión. Siempre va justo después del parámetro con <code>@Valid</code>.</li>
+      <li><code>Map&lt;String, Object&gt; respuesta = new HashMap&lt;&gt;()</code>: un diccionario clave-valor para armar la respuesta. Spring lo convierte a JSON, por ejemplo <code>{"mensaje": "..."}</code>.</li>
+      <li><code>if (resultados.hasErrors())</code>: ¿alguna validación falló? Si sí, arma la lista de errores y responde 400 sin tocar la base.</li>
+      <li><code>getFieldErrors().stream().map(...).collect(Collectors.toList())</code>: recorre cada campo con error, arma un texto como "El campo nombreEvento ..." y junta los textos en una lista.</li>
+      <li><code>try { ... } catch (DataAccessException e)</code>: intenta guardar; si la base falla (conexión caída, tabla inexistente, nombre repetido), cae al <code>catch</code> y responde 500.</li>
+      <li><code>eventoService.save(dto)</code>: manda el DTO al servicio y recibe el evento ya guardado, con su id.</li>
+      <li><code>emailService.enviarCorreo(eventoNuevo)</code>: avisa por correo del evento nuevo.</li>
+      <li><code>new ResponseEntity&lt;&gt;(respuesta, HttpStatus.CREATED)</code>: devuelve el cuerpo y el código 201.</li>
+    </ol>
+  </div></details>
+  <details class="dio"><summary>¿Qué es <code>ResponseEntity</code> y qué significa <code>&lt;?&gt;</code>?</summary><div class="db">
+    <p><code>ResponseEntity</code> es la respuesta HTTP completa: el <strong>código de estado</strong> (200, 404...) más el <strong>cuerpo</strong>. Con ella tú eliges el código, en lugar de dejar que Spring ponga siempre 200.</p>
+    <p><code>ResponseEntity&lt;?&gt;</code>: el signo <code>?</code> es un comodín que significa "cualquier tipo". Se usa cuando el método a veces devuelve un <code>EventoDTO</code> y a veces un <code>Map</code> de error.</p>
+    <p><code>HttpStatus.NOT_FOUND</code>, <code>CREATED</code>, <code>BAD_REQUEST</code> son nombres con los que Spring escribe los códigos 404, 201 y 400.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué hacen <code>@PathVariable</code>, <code>@GetMapping</code> y compañía?</summary><div class="db">
+    <ul>
+      <li><code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PutMapping</code>: ligan un método a un verbo HTTP y a una ruta.</li>
+      <li><code>"/eventos/{id}"</code>: las llaves marcan una parte variable de la ruta. Con <code>GET /eventos/7</code>, el id vale 7.</li>
+      <li><code>@PathVariable Long id</code>: toma esa parte de la ruta y la entrega al método como parámetro.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>Excepciones que aparecen: <code>try</code>, <code>catch</code>, <code>DataAccessException</code>, <code>MailException</code></summary><div class="db">
+    <ul>
+      <li><code>try { ... } catch (X e) { ... }</code>: intenta el bloque; si ocurre un error de tipo X, salta al <code>catch</code> en lugar de romper el programa.</li>
+      <li><code>DataAccessException</code>: error genérico de Spring cuando falla algo con la base de datos.</li>
+      <li><code>EntityNotFoundException</code>: error propio de JPA cuando no se encontró el registro buscado.</li>
+      <li><code>MailException</code>: error de Spring cuando el correo no pudo enviarse.</li>
+    </ul>
+    <p>Los <code>catch</code> van de lo más específico a lo más general, y cada uno responde con su código.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué es <code>@Slf4j</code> y <code>log.warn</code>?</summary><div class="db">
+    <p>SLF4J es una fachada de logging: una forma estándar de escribir mensajes en la consola o en archivos. La anotación <code>@Slf4j</code> viene de Lombok y crea sola una variable <code>log</code> en la clase.</p>
+    <p><code>log.warn(...)</code> escribe un mensaje de <strong>advertencia</strong>: algo salió mal pero el programa sigue. Los <code>{}</code> dentro del texto se reemplazan por los valores que siguen.</p>
+  </div></details>
+
+  <div class="ex">
+    <p class="ex-tag">Práctica · bloque 6</p>
+    <h3>¿Qué código HTTP devuelve?</h3>
+    <div class="qrows" id="q6"></div>
+    <div class="btnrow"><button class="btn" id="q6go" type="button">Revisar</button><button class="btn ghost" id="q6rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q6fb"></div>
+  </div>
+</section>
+
+<section id="b7" class="capa cfg">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 7 · minuto ≈ 68:00 al final</p>
+    <h2 class="sec"><code>EmailService</code> y cierre</h2>
+    <p>Antes de cerrar, un alumno preguntó por el de email, y el profesor completó lo que faltaba.</p>
+  </div>
+  <p class="body">Al cambiar <code>enviarCorreo</code> para recibir <code>EventoDTO</code> había quedado en rojo la implementación del correo, que seguía llamando a los getters:</p>
+<pre><span class="cm">// antes (Evento, con Lombok)</span>
+evento.getNombreEvento()
+
+<span class="cm">// ahora (EventoDTO, record)</span>
+evento.nombreEvento()</pre>
+  <div class="quote">"Hay que quitarle los gets y hay que ponerlo tal cual como atributos, aprovechando. Guardamos y ese ya quedó corregido."</div>
+  <p class="body">Cerró con el resumen de lo que recibe y valida la API, y despidió la clase: "Vámonos, señores".</p>
+  <div class="note"><span class="ic">!</span><p><b>Una cosa que no quedó clara.</b> A mitad de la clase dijo "yo necesito revisar por qué puse el otro, pero bueno, no sé". No se entiende a qué método o archivo se refería.</p></div>
+</section>
+
+<section id="final">
+  <div class="sec-head">
+    <p class="eyebrow">Cierre</p>
+    <h2 class="sec">Checklist de la clase</h2>
+    <p>Se guarda en este navegador.</p>
+  </div>
+  <div class="progress"><div class="bar"><span id="pbar"></span></div><span class="pcount" id="pcount">0 / 4</span></div>
+  <div class="final" id="checklist"></div>
+</section>
+
+<section id="diccionario">
+  <div class="sec-head">
+    <p class="eyebrow">Diccionario</p>
+    <h2 class="sec">Palabras de esta clase en lenguaje simple</h2>
+    <p>Todo junto y en orden alfabético, para consultar rápido.</p>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Palabra</th><th>En simple</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">anotación</td><td class="d">Etiqueta con <code>@</code> que le indica a una librería qué hacer con una clase, método o campo.</td></tr>
+      <tr><td class="sym">BindingResult</td><td class="d">Objeto que guarda si las validaciones de un <code>@Valid</code> pasaron o fallaron.</td></tr>
+      <tr><td class="sym">DTO</td><td class="d">Clase simple que solo lleva datos entre el cliente y la aplicación.</td></tr>
+      <tr><td class="sym">endpoint</td><td class="d">Una ruta de la API a la que se le pide algo, por ejemplo <code>GET /eventos</code>.</td></tr>
+      <tr><td class="sym">entidad</td><td class="d">Clase ligada a una tabla: cada objeto es una fila.</td></tr>
+      <tr><td class="sym">excepción</td><td class="d">Aviso de que algo salió mal; se atrapa con <code>catch</code>.</td></tr>
+      <tr><td class="sym">getter / setter</td><td class="d">Métodos para leer (<code>getX</code>) y asignar (<code>setX</code>) un campo. Los <code>record</code> no los tienen.</td></tr>
+      <tr><td class="sym">JSON</td><td class="d">Texto con datos entre llaves, como <code>{"nombreEvento": "Feria"}</code>; es lo que viaja en la API.</td></tr>
+      <tr><td class="sym">lambda</td><td class="d">Una mini función sin nombre, como <code>() -&gt; algo</code>.</td></tr>
+      <tr><td class="sym">mapeo / mapper</td><td class="d">Copiar datos de un objeto a otro de otro tipo; el mapper es la clase que lo hace.</td></tr>
+      <tr><td class="sym">Optional</td><td class="d">Caja que puede traer un valor o estar vacía; evita trabajar con <code>null</code>.</td></tr>
+      <tr><td class="sym">record</td><td class="d">Clase inmutable de Java que ya trae constructor, <code>equals</code> y un método por campo.</td></tr>
+      <tr><td class="sym">repositorio</td><td class="d">Interfaz con métodos ya hechos para leer y guardar entidades en la base.</td></tr>
+      <tr><td class="sym">static</td><td class="d">Método de la clase que se usa sin crear un objeto.</td></tr>
+      <tr><td class="sym">stream</td><td class="d">Cinta de elementos que se transforma con <code>map</code>, <code>filter</code> y demás.</td></tr>
+      <tr><td class="sym">transacción</td><td class="d">Operación de base de datos que se guarda completa o se deshace completa.</td></tr>
+      <tr><td class="sym">validación</td><td class="d">Regla que revisa un dato antes de aceptarlo, como "mínimo 4 caracteres".</td></tr>
+      <tr><td class="sym">variable de entorno</td><td class="d">Valor guardado fuera del código, que el programa lee al arrancar.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="codigo">
+  <div class="sec-head">
+    <p class="eyebrow">Código de la sesión</p>
+    <h2 class="sec">Qué cambia en tu proyecto</h2>
+    <p>Los bloques de código de arriba son el estado al final de la clase, con los cabos sueltos cerrados. Dónde va cada archivo:</p>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Archivo</th><th>Paquete</th><th>Acción</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">EventoDTO.java</td><td class="mono">evento.dto</td><td class="d">Nuevo.</td></tr>
+      <tr><td class="mono">CreateOrUpdateEventoDTO.java</td><td class="mono">evento.dto</td><td class="d">Nuevo. Con las validaciones que salieron de la entidad.</td></tr>
+      <tr><td class="mono">Evento.java</td><td class="mono">evento.domain</td><td class="d">Quitar <code>@NotBlank</code>, <code>@Size</code>, <code>@NotNull</code>, <code>@FutureOrPresent</code>; dejar los <code>@Column</code>.</td></tr>
+      <tr><td class="mono">EventoMapper.java</td><td class="mono">evento.mapper</td><td class="d">Nuevo.</td></tr>
+      <tr><td class="mono">EventoService.java</td><td class="mono">evento.service</td><td class="d">Firmas con DTO; agregar <code>update(Long, dto)</code>.</td></tr>
+      <tr><td class="mono">EventoServiceImpl.java</td><td class="mono">evento.service</td><td class="d">Reescribir los cinco métodos.</td></tr>
+      <tr><td class="mono">EventoController.java</td><td class="mono">evento.controller</td><td class="d">Reescribir lista, id, create, update. Terminar delete y PDF.</td></tr>
+      <tr><td class="mono">EmailServiceImpl.java</td><td class="mono">evento.utilerias</td><td class="d">Leer <code>evento.nombreEvento()</code> en vez de getters.</td></tr>
+    </tbody>
+  </table></div>
+  <details class="dio"><summary>En qué se diferencia este código de lo que quedó en pantalla</summary><div class="db">
+    <ul>
+      <li>El <code>convertirAListaDTO</code> devuelve <code>List.of()</code> si recibe <code>null</code>; en pantalla dijo "return, miss punto off" a media frase.</li>
+      <li>Las firmas del <code>update</code> del controlador y los textos de los mensajes: los completé donde el video no se alcanza a leer.</li>
+      <li>El borrado y el PDF del controlador <strong>no</strong> están escritos: son la tarea.</li>
+      <li>No agregué <code>@ControllerAdvice</code>: él mismo dijo que no lo harían.</li>
+    </ul>
+  </div></details>
+  <div class="note"><span class="ic">i</span><p>El proyecto del repositorio, <code>practicas/api/ApiEventos</code>, todavía está en el estado anterior (con la ruta <code>/api/v1/eventos</code> y sin DTOs). Esta clase no lo modifica.</p></div>
+</section>
+
+</main>
+<script>
+(function(){
+  "use strict";
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt"; b.innerHTML=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why); root.appendChild(row);
+      });
+    }
+    document.getElementById(goId).addEventListener("click",function(){
+      var right=0, answered=0;
+      Array.prototype.forEach.call(root.children,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; } else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  quiz("q2",[
+    {q:"El cliente pide la lista y el servicio hace un <code>findAll</code>. ¿Qué tipo se devuelve?",
+     opts:["EventoDTO (en lista)","CreateOrUpdateEventoDTO","Evento, la entidad"], ans:0,
+     why:"<b>EventoDTO.</b> Es la salida completa: id, nombre, descripción y fecha. La entidad no se expone."},
+    {q:"¿Por qué <code>CreateOrUpdateEventoDTO</code> no tiene <code>idEvento</code>?",
+     opts:["Porque un record no admite Long","Porque el id es autogenerado y no se manda al crear","Porque el id se valida en otra clase"], ans:1,
+     why:"<b>Es autogenerado.</b> \"El ID del evento es autogenerado. Entonces no me interesa, pero el nombre sí, la descripción también y la fecha de creación también.\""},
+    {q:"Registras hoy un evento con fecha de <b>hoy</b>.",
+     opts:["Pasa la validación","Falla: la fecha debe ser estrictamente futura"], ans:0,
+     why:"<b>Pasa.</b> <code>@FutureOrPresent</code> acepta hoy y cualquier día después."},
+    {q:"Registras hoy un evento con fecha de <b>ayer</b>.",
+     opts:["Pasa la validación","Falla: es una fecha pasada"], ans:1,
+     why:"<b>Falla.</b> \"No puedo registrar un evento que pasó ayer, inclusive que pasó hace unos cuantos minutos.\""}
+  ],"q2go","q2rs","q2fb","<b>Las cuatro.</b> Salida completa con id, entrada sin id, y la fecha puede ser hoy o después, nunca antes.");
+
+  quiz("q3",[
+    {q:"<code>@Column(name=\"nombreEvento\", length=200, nullable=false, unique=true)</code>",
+     opts:["Entidad Evento","CreateOrUpdateEventoDTO"], ans:0,
+     why:"<b>Entidad.</b> Describe cómo se guarda la columna en la tabla."},
+    {q:"<code>@NotBlank</code> + <code>@Size(min=4, max=200)</code> sobre el nombre",
+     opts:["Entidad Evento","CreateOrUpdateEventoDTO"], ans:1,
+     why:"<b>DTO de entrada.</b> \"Aquí es donde vamos a hacer todas las validaciones que se les ocurra.\""},
+    {q:"<code>@FutureOrPresent</code> sobre la fecha",
+     opts:["Entidad Evento","CreateOrUpdateEventoDTO"], ans:1,
+     why:"<b>DTO de entrada.</b> Se valida cuando llega la petición, antes de tocar la base."},
+    {q:"<code>@Id</code> + <code>@GeneratedValue(strategy = IDENTITY)</code>",
+     opts:["Entidad Evento","CreateOrUpdateEventoDTO"], ans:0,
+     why:"<b>Entidad.</b> Es la llave primaria de la tabla; el DTO de entrada ni siquiera tiene ese campo."},
+    {q:"<code>@Entity(name = \"Evento\")</code>",
+     opts:["Entidad Evento","EventoDTO"], ans:0,
+     why:"<b>Entidad.</b> Marca la clase como tabla. Un record DTO no es una entidad de base de datos."}
+  ],"q3go","q3rs","q3fb","<b>Las cinco.</b> La entidad dice cómo se guarda; el DTO de entrada dice qué se acepta.");
+
+  var STEPS=[
+    'public static Evento convertirEntity(CreateOrUpdateEventoDTO dto) {',
+    'if (dto == null) return null;',
+    'Evento evento = new Evento();',
+    'evento.setNombreEvento(dto.nombreEvento());',
+    'evento.setDescripcionEvento(dto.descripcionEvento());',
+    'evento.setFechaCreacion(dto.fechaCreacion());',
+    'return evento;',
+    '}'
+  ];
+  var INDENT=[0,1,1,1,1,1,1,0];
+  var WHY=[
+    "Primero la firma: estático, devuelve <code>Evento</code> y recibe el DTO de entrada.",
+    "Luego la guarda: si llega nulo, regresa nulo.",
+    "Se crea la entidad vacía.",
+    "Se copia el nombre con <code>nombreEvento()</code>, sin <code>get</code>.",
+    "Se copia la descripción.",
+    "Se copia la fecha de creación. No hay <code>setIdEvento</code>: el id lo genera la base.",
+    "Se devuelve el evento ya armado.",
+    "Se cierra el método."
+  ];
+  var placed=[], bank=document.getElementById("bank"), built=document.getElementById("built"), bfb=document.getElementById("bldFb");
+  function shuffled(n){ var a=[],i,j,t; for(i=0;i<n;i++)a.push(i); for(i=n-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=a[i];a[i]=a[j];a[j]=t; } return a; }
+  function pad(n){ return new Array(n*4+1).join(" "); }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled(STEPS.length).forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=STEPS[i];
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          bfb.className="fb show good";
+          bfb.innerHTML = placed.length===STEPS.length
+            ? "<b>Método completo.</b> Nunca se toca el id: \"ese lo vamos a tomar de este cuate [la entidad], porque el ID está mapeado y dice que se va a generar automático\"."
+            : "<b>Va.</b> "+WHY[i];
+        } else {
+          bfb.className="fb show bad";
+          bfb.innerHTML="<b>Todavía no toca esa.</b> "+(placed.length===0 ? "Empieza por la firma del método." : "Pista: "+WHY[placed.length]);
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando el método…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=pad(INDENT[i])+STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){ placed=placed.slice(0,n); renderBuilt(); renderBank(); bfb.className="fb"; });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){ placed=[]; renderBuilt(); renderBank(); bfb.className="fb"; });
+  renderBuilt(); renderBank();
+
+  quiz("q5",[
+    {q:"<code>findById(99)</code> y el id no existe en la base.",
+     opts:["Devuelve null","Lanza EntityNotFoundException","Devuelve una lista vacía"], ans:1,
+     why:"<b>Lanza la excepción</b> con <code>orElseThrow</code>, y el controlador la convierte en 404."},
+    {q:"Tipos de <code>save</code> en la interfaz.",
+     opts:["Recibe Evento, devuelve Evento","Recibe CreateOrUpdateEventoDTO, devuelve EventoDTO","Recibe EventoDTO, devuelve void"], ans:1,
+     why:"<b>DTO adentro, DTO afuera.</b> Por dentro: DTO → entidad → <code>save</code> → entidad → DTO."},
+    {q:"¿Cómo borra ahora <code>delete</code>?",
+     opts:["<code>deleteById(id)</code> directo","Busca el Evento con <code>findById</code> y borra ese objeto","Recibe el DTO completo"], ans:1,
+     why:"<b>Busca y borra el objeto.</b> Si no lo encuentra, lanza la excepción antes de borrar."},
+    {q:"¿Qué recibe <code>update</code>?",
+     opts:["Solo el DTO","El id y el DTO","Solo el id"], ans:1,
+     why:"<b>El id y el DTO.</b> El id sirve para ubicar el registro; el DTO trae los valores nuevos."}
+  ],"q5go","q5rs","q5fb","<b>Las cuatro.</b> Todo el servicio habla en DTOs, busca antes de modificar o borrar, y avisa con excepción cuando no encuentra.");
+
+  quiz("q6",[
+    {q:"<code>GET /eventos</code> y la tabla está vacía.",
+     opts:["200 OK","204 No Content","404 Not Found"], ans:1,
+     why:"<b>204.</b> La lista vacía no es un error: no hay nada que mostrar."},
+    {q:"<code>GET /eventos/99</code> y ese id no existe.",
+     opts:["204 No Content","404 Not Found","500 Internal Server Error"], ans:1,
+     why:"<b>404.</b> Sale del <code>catch (EntityNotFoundException e)</code>."},
+    {q:"<code>POST</code> con <code>nombreEvento</code> de 2 letras.",
+     opts:["201 Created","400 Bad Request","500 Internal Server Error"], ans:1,
+     why:"<b>400.</b> <code>@Size(min = 4)</code> falla y <code>BindingResult</code> trae errores; ni se llega al servicio."},
+    {q:"<code>POST</code> válido y se guarda.",
+     opts:["200 OK","201 Created","204 No Content"], ans:1,
+     why:"<b>201.</b> Se creó un recurso nuevo."},
+    {q:"Se eliminó la tabla de la base y llega un <code>GET /eventos/1</code>.",
+     opts:["404 Not Found","500 Internal Server Error","400 Bad Request"], ans:1,
+     why:"<b>500.</b> Es falla de base de datos (<code>DataAccessException</code>), no un id inexistente."}
+  ],"q6go","q6rs","q6fb","<b>Las cinco.</b> 204 vacío, 404 no existe, 400 datos inválidos, 201 creado, 500 falla de la base.");
+
+  var TAREAS=[
+    {t:"Terminar el borrado y el generar PDF en el controlador", d:"Con DTOs y <code>ResponseEntity</code>. Sin fecha de entrega."},
+    {t:"Corregir EmailService para el EventoDTO", d:"Leer <code>evento.nombreEvento()</code> y los demás campos como atributos del record."},
+    {t:"Opcional: correo en su propio try/catch", d:"<code>catch (MailException e)</code> con un <code>log.warn</code>; él dijo que lo deciden ustedes."},
+    {t:"Examen el martes 3 de noviembre", d:"Preguntar al profesor el temario; en clase no lo dijo."}
+  ];
+  var KEY="clase28oct-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var box=document.getElementById("checklist"), pbar=document.getElementById("pbar"), pcount=document.getElementById("pcount");
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+  function upd(){
+    var n=0; TAREAS.forEach(function(_,i){ if(st[i]) n++; });
+    pbar.style.width=(100*n/TAREAS.length)+"%"; pcount.textContent=n+" / "+TAREAS.length;
+  }
+  TAREAS.forEach(function(it,i){
+    var lb=document.createElement("label"); lb.className="ftask"+(st[i]?" done":"");
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.id="ft"+i; cb.checked=!!st[i];
+    var tx=document.createElement("div");
+    tx.innerHTML='<div class="tt">'+it.t+'</div><div class="td2">'+it.d+'</div>';
+    cb.addEventListener("change",function(){ st[i]=cb.checked; lb.classList.toggle("done",cb.checked); save(); upd(); });
+    lb.appendChild(cb); lb.appendChild(tx); box.appendChild(lb);
+  });
+  upd();
+})();
+</script>

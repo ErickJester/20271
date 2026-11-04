@@ -367,6 +367,22 @@ const TAREAS = [
     ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/api/ApiEventos"
   },
 
+  {
+    id: "wad-api-eventos-dto",
+    curso: "7CM2",
+    titulo: "Práctica — ApiEventos con DTO y mapper (terminar borrado y PDF)",
+    tipo: "practica",
+    entrega: null,
+    fechaPorConfirmar: true,
+    parcial: 2,
+    estado: "pendiente",
+    descripcion: "Clase del 28 de octubre: la API de eventos se refactoriza con EventoDTO y CreateOrUpdateEventoDTO (records), entidad solo con @Column, EventoMapper escrito a mano, servicio con update(id, dto) y controlador con ResponseEntity (204/200/404/500/400/201). El profesor dejó como tarea terminar el borrado y el generar PDF del controlador con el esquema nuevo. Además, EmailService debe leer los campos del record sin getters. Sin fecha de entrega. El examen es el martes 3 de noviembre; el profesor no dijo el temario.",
+    entregable: "ApiEventos con DTOs, mapper, delete y PDF en el controlador (por confirmar qué pide el profesor)",
+    pasos: ["Crear EventoDTO y CreateOrUpdateEventoDTO", "Dejar la entidad solo con @Column", "Escribir EventoMapper (convertirADTO, convertirEntity, actualizarAPartirDeDTO, convertirAListaDTO)", "Cambiar EventoService y EventoServiceImpl a DTOs, con update(id, dto)", "Reescribir lista, findById, create y update del controlador", "Terminar delete y generar PDF del controlador (tarea)", "Corregir EmailService para usar nombreEvento() sin getters", "Preguntar al profesor el temario del examen del 3 de noviembre"],
+    origen: "Clase del 28 de octubre (video + transcripción) · artifact claude.ai/artifact/VA37qZ1ZDtmWfWqVfHmxvv",
+    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/api/ApiEventos"
+  },
+
   /* ---------- 8CM2 · Liderazgo Personal ---------- */
   {
     id: "lid-asignacion-1",
