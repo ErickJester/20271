@@ -1,0 +1,980 @@
+<title>Clase 29 oct · Spring Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ECF0F3; --surface:#FFFFFF; --surface-2:#F4F7F9;
+    --text:#141B22; --text-muted:#586675; --border:#D3DCE4;
+    --accent:#2A5F8C; --accent-soft:#DDEAF4; --accent-ink:#FFFFFF;
+    --ok:#1B6E4A; --ok-soft:#E1F0E9; --ok-bd:#8AC5AC;
+    --bad:#A83A2C; --bad-soft:#F8E7E4; --bad-bd:#DFA79F;
+    --task:#8A5A0B; --task-soft:#FAF2E0; --task-bd:#E2C88E;
+    --ent:#6B4E9B; --ent-soft:#E9E2F4; --dto:#1F7A6D; --dto-soft:#DAF0EB;
+    --map:#A5600E; --map-soft:#F7E8D0; --srv:#2A5F8C; --srv-soft:#DDEAF4;
+    --ctl:#B23A48; --ctl-soft:#F8E3E6;
+    --code-bg:#EAEFF3;
+    --shadow:0 1px 2px rgba(20,27,34,.06), 0 10px 26px -14px rgba(20,27,34,.20);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --bg:#10161C; --surface:#171F27; --surface-2:#1C2630;
+      --text:#E6EDF3; --text-muted:#93A4B5; --border:#2A3743;
+      --accent:#7DB4E3; --accent-soft:#162838; --accent-ink:#10161C;
+      --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+      --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+      --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+      --ent:#B79CE6; --ent-soft:#241C36; --dto:#5FC9B8; --dto-soft:#11302B;
+      --map:#E0A24A; --map-soft:#33260F; --srv:#7DB4E3; --srv-soft:#162838;
+      --ctl:#F08A96; --ctl-soft:#35191D;
+      --code-bg:#131B22;
+      --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --bg:#10161C; --surface:#171F27; --surface-2:#1C2630;
+    --text:#E6EDF3; --text-muted:#93A4B5; --border:#2A3743;
+    --accent:#7DB4E3; --accent-soft:#162838; --accent-ink:#10161C;
+    --ok:#5FC496; --ok-soft:#122A20; --ok-bd:#2E6349;
+    --bad:#EE8F84; --bad-soft:#331B18; --bad-bd:#6B3730;
+    --task:#DEAA52; --task-soft:#332812; --task-bd:#5C4720;
+    --ent:#B79CE6; --ent-soft:#241C36; --dto:#5FC9B8; --dto-soft:#11302B;
+    --map:#E0A24A; --map-soft:#33260F; --srv:#7DB4E3; --srv-soft:#162838;
+    --ctl:#F08A96; --ctl-soft:#35191D;
+    --code-bg:#131B22;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -14px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{text-wrap:balance;}
+  ::selection{background:var(--accent-soft); color:var(--text);}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important;} }
+
+  header.page{border-bottom:1px solid var(--border); background:var(--surface); padding:26px 18px 22px;}
+  .wrap{max-width:900px; margin:0 auto;}
+  .kicker{font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.1em; color:var(--accent); margin:0 0 8px;}
+  h1{font-size:clamp(1.5rem,5vw,2.1rem); font-weight:700; margin:0 0 12px; letter-spacing:-.02em;}
+  .lede{font-family:'Source Serif 4',Georgia,serif; font-size:1rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:64ch;}
+  .lede + .lede{margin-top:10px;}
+
+  main{max-width:900px; margin:0 auto; padding:0 18px 70px;}
+  section{margin-top:42px;}
+  .sec-head{margin-bottom:14px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 5px;}
+  h2.sec{font-size:1.32rem; margin:0 0 8px; font-weight:700; letter-spacing:-.01em;}
+  .sec-head > p{font-family:'Source Serif 4',Georgia,serif; font-size:.92rem; line-height:1.6;
+    color:var(--text-muted); margin:0; max-width:66ch;}
+  h3.sub{font-size:1.02rem; margin:28px 0 10px; font-weight:600;}
+
+  p.body{font-family:'Source Serif 4',Georgia,serif; font-size:.95rem; line-height:1.65;
+    margin:0 0 13px; max-width:68ch;}
+  ul.body,ol.body{font-family:'Source Serif 4',Georgia,serif; font-size:.93rem; line-height:1.6;
+    max-width:68ch; margin:0 0 13px; padding-left:20px; display:flex; flex-direction:column; gap:7px;}
+
+  code{font-family:'IBM Plex Mono',monospace; font-size:.86em; background:var(--code-bg);
+    border:1px solid var(--border); padding:1px 5px; border-radius:4px;}
+  pre{font-family:'IBM Plex Mono',monospace; font-size:.78rem; line-height:1.65;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:9px;
+    padding:13px 15px; overflow-x:auto; margin:0 0 13px;}
+  pre code{background:none;border:none;padding:0;font-size:1em;}
+  pre .cm{color:var(--text-muted);}
+
+  /* --- las tres etapas del semestre: XML, JSON, JPA. cada bloque de esa
+         etapa lleva su color, como el mismo dato pasando de formato en formato --- */
+  .etapa{border-left:3px solid var(--ec); padding-left:16px;}
+  .etapa.xml{--ec:var(--xml);} .etapa.json{--ec:var(--json);} .etapa.jpa{--ec:var(--jpa);}
+  .etapa h2.sec{color:var(--ec);}
+  .etapabar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .etchip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .etchip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--ec);}
+
+  details.dio{background:var(--surface-2); border:1px dashed var(--border);
+    border-radius:9px; margin:0 0 11px; max-width:68ch;}
+  details.dio[open]{border-style:solid; border-color:var(--accent-soft);}
+  details.dio summary{cursor:pointer; padding:10px 14px; font-size:.85rem; font-weight:500;
+    color:var(--accent); list-style:none; display:flex; align-items:center; gap:9px;}
+  details.dio summary::-webkit-details-marker{display:none;}
+  details.dio summary::before{content:"?"; flex:0 0 auto; width:18px; height:18px;
+    border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; line-height:1;}
+  details.dio[open] summary::before{content:"\2212";}
+  details.dio summary:hover{background:var(--accent-soft);}
+  details.dio .db{padding:0 15px 13px 41px;}
+  details.dio p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.6;
+    margin:0 0 9px; color:var(--text);}
+  details.dio p:last-child{margin-bottom:0;}
+  details.dio ul,details.dio ol{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem;
+    line-height:1.55; margin:0 0 9px; padding-left:18px; display:flex; flex-direction:column; gap:6px;}
+  details.dio pre{font-size:.75rem; margin:9px 0;}
+
+  .quote{border-left:3px solid var(--accent); padding:3px 0 3px 15px; margin:16px 0;
+    font-family:'Source Serif 4',Georgia,serif; font-style:italic; font-size:.92rem;
+    line-height:1.6; color:var(--text-muted); max-width:66ch;}
+  .quote b{font-style:normal; font-weight:600; color:var(--text);}
+
+  .note{background:var(--surface-2); border:1px solid var(--border); border-radius:10px;
+    padding:13px 16px; margin:16px 0; max-width:68ch; display:flex; gap:11px;}
+  .note .ic{flex:0 0 auto; width:20px; height:20px; border-radius:50%; background:var(--border);
+    color:var(--text-muted); display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:.68rem; font-weight:700;}
+  .note p{font-family:'Source Serif 4',Georgia,serif; font-size:.86rem; line-height:1.55;
+    color:var(--text-muted); margin:0;}
+  .note b{color:var(--text); font-weight:600;}
+
+  .arranque{margin-top:24px; background:var(--surface); border:1px solid var(--border);
+    border-radius:12px; padding:17px 19px; box-shadow:var(--shadow);}
+  .arranque h2{font-size:.95rem; margin:0 0 11px; font-weight:700;}
+  .arranque ol{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px;}
+  .arranque li{display:flex; gap:11px; align-items:baseline;}
+  .arranque .t{flex:0 0 auto; font-family:'IBM Plex Mono',monospace; font-size:.66rem;
+    color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:4px;
+    min-width:74px; text-align:center;}
+  .arranque .d{font-size:.89rem; line-height:1.45;}
+
+  .ex{margin:22px 0; background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--accent); border-radius:11px; padding:17px 19px; box-shadow:var(--shadow);}
+  .ex-tag{font-family:'IBM Plex Mono',monospace; font-size:.64rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.09em; color:var(--accent); margin:0 0 6px;}
+  .ex h3{font-size:1rem; margin:0 0 6px; font-weight:600;}
+  .ex .ask{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; line-height:1.55;
+    color:var(--text-muted); margin:0 0 13px; max-width:64ch;}
+  .ex .ask b{color:var(--text); font-weight:600;}
+
+  .btn{background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    font-family:'IBM Plex Sans',sans-serif; font-size:.84rem; font-weight:500;
+    padding:9px 16px; border-radius:7px; cursor:pointer; white-space:nowrap;}
+  .btn:hover{filter:brightness(1.1);}
+  .btn.ghost{background:transparent; color:var(--text-muted); border-color:var(--border);}
+  .btn.ghost:hover{border-color:var(--accent); color:var(--accent); filter:none;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:11px;}
+
+  .fb{font-family:'Source Serif 4',Georgia,serif; font-size:.88rem; line-height:1.55;
+    padding:11px 13px; border-radius:8px; display:none; margin-top:11px;}
+  .fb.show{display:block;}
+  .fb.good{background:var(--ok-soft); border:1px solid var(--ok-bd);}
+  .fb.bad{background:var(--bad-soft); border:1px solid var(--bad-bd);}
+  .fb b{font-weight:600;}
+  .fb code{background:var(--surface);}
+
+  .qrows{display:flex; flex-direction:column; gap:10px;}
+  .qrow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:11px 13px;}
+  .qrow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .qrow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .qq{font-family:'IBM Plex Mono',monospace; font-size:.8rem; line-height:1.5;
+    margin-bottom:9px; word-break:break-word;}
+  .qq em{font-family:'Source Serif 4',Georgia,serif; font-style:normal;
+    font-size:.87rem; color:var(--text-muted);}
+  .qopts{display:flex; gap:6px; flex-wrap:wrap;}
+  .qopt{font-family:'IBM Plex Mono',monospace; font-size:.76rem;
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
+    padding:6px 12px; border-radius:999px; cursor:pointer; text-align:left;}
+  .qopt:hover{border-color:var(--accent); background:var(--accent-soft);}
+  .qopt.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+  .qwhy{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .qwhy.show{display:block;}
+  .qwhy b{color:var(--text); font-weight:600;}
+
+  .built{display:flex; flex-direction:column; gap:2px; min-height:54px;
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:11px 13px; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; font-size:.77rem;
+    overflow-x:auto;}
+  .built .ph{color:var(--text-muted); font-style:italic;
+    font-family:'Source Serif 4',Georgia,serif; font-size:.85rem;}
+  .built .ln{display:flex; gap:9px; align-items:baseline; cursor:pointer;
+    border-radius:3px; padding:1px 3px; white-space:pre;}
+  .built .ln:hover{background:var(--bad-soft);}
+  .built .n{color:var(--text-muted); font-size:.66rem; min-width:13px;
+    font-variant-numeric:tabular-nums;}
+  .bank{display:flex; flex-wrap:wrap; gap:7px; margin-bottom:11px;}
+  .chip{background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+    font-family:'IBM Plex Mono',monospace; font-size:.74rem; padding:7px 11px;
+    border-radius:8px; cursor:pointer; text-align:left; max-width:100%; overflow-wrap:anywhere;}
+  .chip:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft);}
+  .chip:disabled{opacity:.3; cursor:default;}
+
+  .crow{background:var(--surface-2); border:1px solid var(--border); border-radius:9px;
+    padding:11px 13px; margin-bottom:10px;}
+  .crow.right{background:var(--ok-soft); border-color:var(--ok-bd);}
+  .crow.wrong{background:var(--bad-soft); border-color:var(--bad-bd);}
+  .crow .cq{font-family:'Source Serif 4',Georgia,serif; font-size:.9rem; margin-bottom:8px; line-height:1.5;}
+  .crow .cl{display:flex; align-items:center; gap:7px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:.78rem;}
+  .crow input, .crow textarea{font-family:'IBM Plex Mono',monospace; font-size:.78rem; padding:7px 9px;
+    background:var(--surface); color:var(--text); border:1px solid var(--border);
+    border-radius:6px; width:100%;}
+  .crow textarea{min-height:78px; resize:vertical;}
+  .crow .ch{font-family:'Source Serif 4',Georgia,serif; font-size:.85rem; line-height:1.5;
+    color:var(--text-muted); margin-top:8px; display:none;}
+  .crow .ch.show{display:block;}
+  .crow .ch b{color:var(--text); font-weight:600;}
+
+  .task{margin:22px 0; background:var(--task-soft); border:1px solid var(--task-bd);
+    border-radius:11px; padding:16px 18px;}
+  .task-head{display:flex; align-items:center; gap:9px; margin-bottom:8px; flex-wrap:wrap;}
+  .task-badge{font-family:'IBM Plex Mono',monospace; font-size:.63rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.09em; background:var(--task); color:var(--task-soft);
+    padding:3px 9px; border-radius:5px;}
+  .task-when{font-family:'IBM Plex Mono',monospace; font-size:.66rem; color:var(--task);}
+  .task h3{font-size:.99rem; margin:0 0 7px; font-weight:600;}
+  .task p{font-family:'Source Serif 4',Georgia,serif; font-size:.89rem; line-height:1.55;
+    margin:0 0 8px; max-width:66ch;}
+  .task p:last-child{margin-bottom:0;}
+  .task .said{font-style:italic; color:var(--text-muted);}
+
+  figure{margin:18px 0 8px; background:var(--surface-2); border:1px solid var(--border);
+    border-radius:12px; padding:18px 16px 12px; overflow-x:auto;}
+  figure svg{width:100%; min-width:520px; height:auto; display:block;}
+  figcaption{font-family:'Source Serif 4',Georgia,serif; font-size:.83rem;
+    color:var(--text-muted); margin-top:12px; line-height:1.55;}
+
+  .tablewrap{overflow-x:auto; margin:14px 0; border:1px solid var(--border);
+    border-radius:10px; background:var(--surface); box-shadow:var(--shadow);}
+  table{border-collapse:collapse; width:100%; min-width:480px; font-size:.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.67rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted);
+    padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); white-space:nowrap;}
+  td{padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.sym{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--accent); white-space:nowrap;}
+  td.d{font-family:'Source Serif 4',Georgia,serif; color:var(--text-muted); font-size:.85rem;}
+  td.mono{font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+
+  .final{margin-top:18px;}
+  .ftask{display:flex; gap:11px; align-items:flex-start; background:var(--surface);
+    border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer;}
+  .ftask input{margin:2px 0 0; width:17px; height:17px; accent-color:var(--accent);
+    cursor:pointer; flex:0 0 auto;}
+  .ftask .tt{font-size:.92rem; font-weight:600; line-height:1.45;}
+  .ftask .td2{font-family:'Source Serif 4',Georgia,serif; font-size:.84rem; color:var(--text-muted);
+    line-height:1.5; margin-top:3px;}
+  .ftask.done{opacity:.5;}
+  .ftask.done .tt{text-decoration:line-through;}
+  .progress{display:flex; align-items:center; gap:12px; margin-bottom:14px;
+    background:var(--surface-2); border:1px solid var(--border); border-radius:9px; padding:12px 14px;}
+  .bar{flex:1; height:8px; background:var(--border); border-radius:99px; overflow:hidden;}
+  .bar span{display:block; height:100%; width:0%; background:var(--accent); transition:width .3s;}
+  .pcount{font-family:'IBM Plex Mono',monospace; font-size:.8rem; font-weight:600;
+    white-space:nowrap; font-variant-numeric:tabular-nums;}
+
+  /* --- una capa del proyecto = un color. el mismo color marca esa capa en
+         los bloques, el diagrama y el código final (como los marcadores del pizarrón) --- */
+  .capa{border-left:3px solid var(--cc); padding-left:16px;}
+  .capa.ent{--cc:var(--ent);} .capa.dto{--cc:var(--dto);} .capa.map{--cc:var(--map);}
+  .capa.srv{--cc:var(--srv);} .capa.ctl{--cc:var(--ctl);} .capa.cfg{--cc:var(--text-muted);}
+  .capa h2.sec{color:var(--cc);}
+  .capa .eyebrow{color:var(--cc);}
+  .capabar{display:flex; align-items:center; gap:9px; margin:0 0 9px; flex-wrap:wrap;}
+  .cchip{display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted);}
+  .cchip::before{content:""; width:24px; height:8px; border-radius:2px; background:var(--cc);}
+  .capa pre{border-left:3px solid var(--cc);}
+  .acciones{margin-top:26px; display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));}
+  .acciones .task{margin:0;}
+  svg text{font-family:'IBM Plex Sans',sans-serif; fill:var(--text);}
+  svg .mono{font-family:'IBM Plex Mono',monospace;}
+  svg .mut{fill:var(--text-muted);}
+  .estado{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:.62rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; padding:2px 8px; border-radius:4px;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted);}
+  .estado.ok{background:var(--ok-soft); border-color:var(--ok-bd); color:var(--ok);}
+  .estado.no{background:var(--bad-soft); border-color:var(--bad-bd); color:var(--bad);}
+  .kv{font-family:'IBM Plex Mono',monospace; font-size:.8rem;}
+</style>
+<header class="page"><div class="wrap">
+  <p class="kicker">C704 · Clase del 29 de octubre de 2026 · Unidad II</p>
+  <h1>Cerrar la API con Spring Security</h1>
+  <p class="lede">El profesor parte de la API de eventos ya terminada, agrega la dependencia de seguridad y ve cómo todo pide login. Después crea usuarios y roles en la base, enseña a Spring a leerlos con un <code>UserDetailsService</code> y escribe la configuración que decide quién puede hacer qué.</p>
+  <p class="lede">Reconstruida del video (pantalla proyectada) y de la transcripción. Quedó a medias: la configuración de seguridad no se terminó en clase.</p>
+</div></header>
+
+<main>
+
+<div class="acciones">
+  <div class="task">
+    <div class="task-head"><span class="task-badge">Tarea 1</span><span class="task-when">hacia el final</span></div>
+    <h3>Terminar <code>SecurityConfig</code></h3>
+    <p class="said">"Lo demás, que todavía falta para configuración, faltan como 2 metoditos todavía. O al menos 1, que es el authentication manager. Si tomaron apuntes, termínenlos."</p>
+    <p>También los permisos por ruta y método HTTP: "ya, si tomaron apuntes, ustedes lo agregan".</p>
+  </div>
+  <div class="task">
+    <div class="task-head"><span class="task-badge">Tarea 2</span><span class="task-when">hacia el final</span></div>
+    <h3>Llenar usuarios, roles y permisos</h3>
+    <p class="said">"Un usuario puede tener diversos roles, depende de ustedes."</p>
+    <p>Insertar filas en <code>Usuario</code>, <code>Rol</code> y <code>usuario_rol</code>, con la clave guardada en BCrypt.</p>
+  </div>
+  <div class="task">
+    <div class="task-head"><span class="task-badge">Arrastre</span><span class="task-when">inicio</span></div>
+    <h3>CRUD de eventos terminado</h3>
+    <p class="said">"Ustedes lo iban a terminar y bien bonito [...] muestre todos, el reporte, el leer 1, el crear, el actualizar, el borrar."</p>
+    <p>Viene de la clase del 28: borrado y PDF con DTOs. El profesor lo prueba al empezar.</p>
+  </div>
+</div>
+
+<section id="b0">
+  <div class="sec-head">
+    <p class="eyebrow">Mapa de la clase</p>
+    <h2 class="sec">Qué pasó y en qué orden</h2>
+    <p>Sin minutos: la transcripción no trae tiempos y mis saltos en el video no cargaron de forma confiable. El orden sí es el de la clase. Los recuadros con <b>?</b> explican en palabras simples lo que suena raro; al final hay un diccionario.</p>
+  </div>
+  <div class="arranque">
+    <h2>Orden en que se tocó cada pieza</h2>
+    <ol>
+      <li><span class="t">Bloque 1</span><span class="d">Prueba la API con Insomnia y Swagger.</span></li>
+      <li><span class="t">Bloque 2</span><span class="d">Agrega <code>spring-boot-starter-security</code>: todo pide login.</span></li>
+      <li><span class="t">Bloque 3</span><span class="d">Entidades <code>Usuario</code> y <code>Rol</code> y la tabla puente.</span></li>
+      <li><span class="t">Bloque 4</span><span class="d"><code>UserSessionDTO</code> y <code>UsuarioRepository</code>.</span></li>
+      <li><span class="t">Bloque 5</span><span class="d"><code>UserSecurityService</code>: de tu usuario al de Spring.</span></li>
+      <li><span class="t">Bloque 6</span><span class="d"><code>AuthController</code>: quién soy y con qué permisos.</span></li>
+      <li><span class="t">Bloque 7</span><span class="d"><code>SecurityConfig</code>: la cadena de filtros.</span></li>
+      <li><span class="t">Bloque 8</span><span class="d">Datos de prueba con <code>INSERT</code> en MySQL.</span></li>
+    </ol>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 786 190" role="img" aria-label="Recorrido de una petición con Spring Security">
+      <defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--text-muted)"/></marker></defs>
+      <rect x="8" y="8" width="170" height="104" rx="8" style="fill:var(--map-soft);stroke:var(--map);stroke-width:1.5"/>
+      <text x="93" y="32" text-anchor="middle" font-size="13" font-weight="700">SecurityFilterChain</text>
+      <text x="93" y="56" text-anchor="middle" font-size="11">revisa cada petición</text>
+      <text x="93" y="73" text-anchor="middle" font-size="11">antes del controlador</text>
+      <text x="93" y="96" text-anchor="middle" font-size="11" class="mono">httpBasic</text>
+      <rect x="208" y="8" width="170" height="104" rx="8" style="fill:var(--srv-soft);stroke:var(--srv);stroke-width:1.5"/>
+      <text x="293" y="32" text-anchor="middle" font-size="13" font-weight="700">UserSecurityService</text>
+      <text x="293" y="56" text-anchor="middle" font-size="11">loadUserByUsername</text>
+      <text x="293" y="76" text-anchor="middle" font-size="11">convierte Usuario</text>
+      <text x="293" y="92" text-anchor="middle" font-size="11">en UserDetails</text>
+      <rect x="408" y="8" width="170" height="104" rx="8" style="fill:var(--dto-soft);stroke:var(--dto);stroke-width:1.5"/>
+      <text x="493" y="32" text-anchor="middle" font-size="13" font-weight="700">UsuarioRepository</text>
+      <text x="493" y="58" text-anchor="middle" font-size="11">findByUserName</text>
+      <text x="493" y="78" text-anchor="middle" font-size="11">devuelve un Optional</text>
+      <text x="493" y="94" text-anchor="middle" font-size="11" class="mono">Optional&lt;Usuario&gt;</text>
+      <rect x="608" y="8" width="170" height="104" rx="8" style="fill:var(--ent-soft);stroke:var(--ent);stroke-width:1.5"/>
+      <text x="693" y="32" text-anchor="middle" font-size="13" font-weight="700">MySQL</text>
+      <text x="693" y="56" text-anchor="middle" font-size="11" class="mono">Usuario</text>
+      <text x="693" y="73" text-anchor="middle" font-size="11" class="mono">usuario_rol</text>
+      <text x="693" y="90" text-anchor="middle" font-size="11" class="mono">Rol</text>
+      <line x1="180" y1="60" x2="206" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <line x1="380" y1="60" x2="406" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <line x1="580" y1="60" x2="606" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+      <text x="8" y="146" font-size="12" font-weight="600">1. llega usuario y clave · 2. Spring los busca en tu base · 3. compara la clave · 4. deja pasar o responde 401/403</text>
+      <text x="8" y="170" font-size="11.5" class="mut">Dibujo mío. Los nombres de las piezas son los de la clase.</text>
+    </svg>
+    <figcaption>Cada flecha va y vuelve: la petición baja hasta la base y la respuesta sube convertida en un <code>UserDetails</code>.</figcaption>
+  </figure>
+</section>
+
+<section id="b1" class="capa cfg">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 1 · al inicio</p>
+    <h2 class="sec">Probar lo que ya funciona</h2>
+    <p>Antes de tocar nada, el profesor confirma que la API de eventos responde. En el video se ve Insomnia con una colección que tiene dos carpetas.</p>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Carpeta</th><th>Peticiones</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">Eventos</td><td class="d"><code>GET leerTodos</code>, <code>GET reporte</code>, <code>GET leerUno</code>, <code>POST crearUno</code>, <code>PUT actualizarUno</code>, <code>DEL eliminarUno</code></td></tr>
+      <tr><td class="sym">Archivos</td><td class="d"><code>POST subirArchivo</code>, <code>GET descargarArchivo</code></td></tr>
+    </tbody>
+  </table></div>
+  <p class="body">Después abre la documentación en el navegador, con las tres vistas que genera <code>springdoc</code>: Swagger UI, el JSON de <code>api-docs</code> y el formato OpenAPI. En el JSON del video se lee <code>"url": "http://localhost:8085"</code> y una ruta <code>/api/v1/apiEventos/eventos/{id}</code>.</p>
+  <div class="quote">"Funciona bien de lo lindo, bien bonito, o sea, como tal responde. [...] Aquí están los esquemas con los que está trabajando, los que recibe y los que genera de manera nativa."</div>
+  <div class="note"><span class="ic">!</span><p><b>Dos cosas que no coinciden con el repositorio.</b> El puerto es 8085 (en la clase del 28 se veía 8084) y la ruta lleva <code>apiEventos</code> en medio. El proyecto de <code>practicas/api/ApiEventos</code> usa 8080 y <code>/api/v1/eventos</code>. Esta clase no toca ese proyecto.</p></div>
+  <p class="body">Vuelve a pedir los eventos probando el criterio de fecha: "la fecha del evento debe ser hoy o en el futuro, se supone que hoy es 29". Es la validación <code>@FutureOrPresent</code> de la clase anterior.</p>
+</section>
+
+<section id="b2" class="capa cfg">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 2</p>
+    <h2 class="sec">La dependencia que cierra todo</h2>
+    <p>Para en el <code>pom.xml</code> y agrega una dependencia nueva. Antes de ese cambio apuntó las pruebas a <code>http://localhost:8085/eventos</code> y a la documentación.</p>
+  </div>
+<pre>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</pre>
+  <p class="body">Refresca Maven y arranca. La API sigue corriendo, pero ahora la consola trae una línea con una clave generada, y el navegador redirige a un formulario de login.</p>
+  <div class="quote">"Eso no se hizo en ningún momento, no lo hicimos nosotros, es el que genera por defecto, porque utiliza un mecanismo de autenticación básica basado en formularios."</div>
+  <div class="quote">"Solo por el simple hecho de haber incorporado la dependencia, pues nos obliga a que sí o sí pase por el filtro, por el <b>filter chain</b> de autenticación."</div>
+  <p class="body">El usuario por defecto se llama <code>user</code> y la clave cambia en cada arranque: "si lo vuelven a ejecutar, la cosa esta les va a generar otro código diferente, que es el password generado para desarrollo".</p>
+  <details class="dio"><summary>¿Qué es Spring Security y qué es la cadena de filtros?</summary><div class="db">
+    <p><strong>Spring Security</strong> es la librería de Spring que se encarga de dos preguntas: <em>¿quién eres?</em> (autenticación) y <em>¿qué puedes hacer?</em> (autorización).</p>
+    <p>Funciona como una <strong>cadena de filtros</strong>: cada petición pasa por una fila de revisiones antes de llegar a tu controlador. Si alguna falla, el controlador ni se entera.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué es Maven y por qué hay que "refrescar"?</summary><div class="db">
+    <p>Maven es la herramienta que descarga las librerías que declaras en el <code>pom.xml</code>. Al agregar una, IntelliJ no la ve hasta sincronizar.</p>
+    <p>Un alumno preguntó cómo: "cuando lo agrega, por aquí le aparece un iconito de Maven, y si no, se va acá y se va a la parte de sincronizar".</p>
+  </div></details>
+</section>
+
+<section id="b3" class="capa ent">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 3</p>
+    <h2 class="sec">Entidades <code>Usuario</code> y <code>Rol</code></h2>
+    <p>Crea un paquete nuevo por funcionalidad, <code>usuario</code>, con subpaquetes <code>domain</code>, <code>repository</code>, <code>service</code>, <code>controller</code> y <code>dto</code>. A la altura del proyecto agrega otro paquete, <code>config</code>: "para algo lo vamos a ocupar en algún momento".</p>
+  <div class="capabar"><span class="cchip">Usuario</span></div>
+<pre>@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "Usuario")
+public class Usuario implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idUsuario;
+
+    @Column(name = "nombreUsuario", unique = true, nullable = false, length = 50)
+    private String userName;
+
+    @Column(name = "claveUsuario", nullable = false, length = 200)
+    private String password;
+
+    @Column(name = "email", unique = true, nullable = false, length = 150)
+    private String email;
+
+    @Column(name = "habilitado", nullable = false)
+    private Boolean habilitado;
+
+    @Column(name = "bloqueado", nullable = false)
+    private Boolean bloqueado;
+
+    @ManyToMany
+    @JoinTable(name = "usuario_rol",
+            joinColumns = @JoinColumn(name = "idUsuario", referencedColumnName = "idUsuario"),
+            inverseJoinColumns = @JoinColumn(name = "idRol", referencedColumnName = "idRol"))
+    private List&lt;Rol&gt; roles;
+}</pre>
+  <div class="capabar"><span class="cchip">Rol</span></div>
+<pre>@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "Rol")
+public class Rol implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idRol;
+
+    @Column(name = "nombreRol", nullable = false, length = 50)
+    private String nombreRol;
+
+    @Column(name = "descripcionRol", nullable = false, length = 150)
+    private String descripcionRol;
+
+    @Column(name = "fechaCreacion", nullable = false)
+    private LocalDateTime fechaCreacion;
+}</pre>
+  <div class="note"><span class="ic">!</span><p><b>Lo que se ve en pantalla.</b> La tabla se declara como <code>@Table(name="Usuario")</code> con mayúscula, y el atributo de la clave primaria en el video llega a escribirse <code>private Long id</code> antes de completarse. Los nombres de columna salieron de la transcripción; el profesor los dictó de memoria.</p></div>
+  <div class="quote">"Va a haber una columna, un atributo en mi tabla, que le vamos a llamar clave de usuario. No va a ser única [...] con una longitud de, pues no sé, 200, por si quieren generar una clavezota."</div>
+  <p class="body">El campo de la lista de roles es lo que une las dos tablas. Cuando arranca, Hibernate crea la tabla puente sola:</p>
+  <div class="quote">"Tendríamos estas 3 tablas, de aquí para acá y de aquí para acá, de 1 a muchos y de 1 a muchos, que en teoría de aquí a acá sería un <b>muchos a muchos</b>."</div>
+  <p class="body">Para verlo, abre la base y las tablas aparecen. Luego usa la herramienta gráfica de la base para hacer ingeniería inversa y mostrar el modelo, y en IntelliJ abre el diagrama de clases (<em>Show Diagrams</em>). De paso muestra que algunas herramientas exportan un diccionario de datos: "ya les toca a ustedes pasarlo [al español]".</p>
+  <details class="dio"><summary><code>@ManyToMany</code>, <code>@JoinTable</code> y tabla puente</summary><div class="db">
+    <p>Un usuario puede tener varios roles y un rol puede estar en varios usuarios. Eso se llama <strong>muchos a muchos</strong>, y una base relacional no lo guarda en una sola tabla: hace falta una tercera, la <strong>tabla puente</strong>, con una fila por cada pareja usuario-rol.</p>
+    <ul>
+      <li><code>@ManyToMany</code>: marca la relación.</li>
+      <li><code>@JoinTable(name = "usuario_rol")</code>: nombre de la tabla puente.</li>
+      <li><code>joinColumns</code>: la columna que apunta a esta entidad (<code>idUsuario</code>).</li>
+      <li><code>inverseJoinColumns</code>: la que apunta a la otra (<code>idRol</code>).</li>
+      <li><code>referencedColumnName</code>: a qué columna de la tabla original apunta. Aquí se llaman igual "para no complicarnos la existencia".</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>¿Qué es <code>@Builder</code>?</summary><div class="db">
+    <p>Una anotación de Lombok que crea un constructor por pasos: <code>Usuario.builder().userName("ana").email("a@b.com").build()</code>. Evita recordar el orden de los parámetros del constructor largo.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué es <code>Serializable</code>?</summary><div class="db">
+    <p><code>implements Serializable</code> aparece en las dos entidades. Es la misma convención de la clase del 28: marca que el objeto se puede convertir en bytes. No cambia nada de lo que se hace hoy.</p>
+  </div></details>
+</section>
+
+<section id="b4" class="capa dto">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 4</p>
+    <h2 class="sec">El DTO de sesión y el repositorio</h2>
+    <p>Dos piezas pequeñas que las siguientes necesitan.</p>
+  </div>
+<pre>public record UserSessionDTO(
+        String userName,
+        List&lt;String&gt; roles,
+        List&lt;String&gt; authorities
+) {
+}</pre>
+  <p class="body">Como la clase del 28, es un <code>record</code>: "pudiera ser una clase simple con métodos get, métodos set [...] pero en realidad vamos a agarrar un récord para los DTOs, que son clases inmutables".</p>
+<pre>public interface UsuarioRepository extends JpaRepository&lt;Usuario, Long&gt; {
+    Optional&lt;Usuario&gt; findByUserName(String userName);
+}</pre>
+  <div class="quote">"Existe, pues, no, en realidad nosotros lo vamos a crear. Va a ser un método auxiliar que necesitamos y que a lo mejor vamos a ir agregando."</div>
+  <details class="dio"><summary>¿Cómo funciona <code>findByUserName</code> si no tiene cuerpo?</summary><div class="db">
+    <p>Spring Data JPA lee el nombre del método y escribe la consulta: <code>findBy</code> + el nombre del atributo (<code>UserName</code>) significa <code>SELECT ... WHERE nombreUsuario = ?</code>. Por eso el atributo de la entidad se llama <code>userName</code> y el método debe escribirse igual.</p>
+    <p>Devuelve un <code>Optional</code> porque ese usuario puede no existir.</p>
+  </div></details>
+</section>
+
+<section id="b5" class="capa srv">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 5</p>
+    <h2 class="sec"><code>UserSecurityService</code>: de tu usuario al usuario de Spring</h2>
+    <p>Spring no conoce la clase <code>Usuario</code> que acabas de crear. Hay que traducirla a lo que sí entiende, un <code>UserDetails</code>.</p>
+  </div>
+<pre>@Service
+public class UserSecurityService implements UserDetailsService {
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByUserName(username)
+                .orElseThrow(() -&gt; new UsernameNotFoundException("Usuario no encontrado: " + username));
+
+        List&lt;GrantedAuthority&gt; permisos = new ArrayList&lt;&gt;();
+        for (Rol rol : usuario.getRoles()) {
+            permisos.add(new SimpleGrantedAuthority("ROLE_" + rol.getNombreRol()));
+            if (rol.getNombreRol().equals("admin")) {
+                permisos.add(new SimpleGrantedAuthority("EVENTO_CREAR"));
+                permisos.add(new SimpleGrantedAuthority("EVENTO_MODIFICAR"));
+            } else if (rol.getNombreRol().equals("user")) {
+                permisos.add(new SimpleGrantedAuthority("EVENTO_LEER_TODO"));
+            }
+        }
+
+        return User.builder()
+                .username(usuario.getUserName())
+                .password(usuario.getPassword())
+                .authorities(permisos)
+                .accountLocked(usuario.getBloqueado())
+                .disabled(usuario.getHabilitado())
+                .build();
+    }
+}</pre>
+  <div class="quote">"El user details service no lo escribimos nosotros, ese existe y es parte del ecosistema, del API de security. Y nos dice, entre otras cosas, que tenemos que sobrescribir el método <b>loadUserByUsername</b>."</div>
+  <div class="quote">"Todos los roles que se hayan definido inician con ROLE_ guion bajo [...]. De tal forma que si aquí el rol se llama admin, pues en realidad para que esto funcione debería de ser ROLE_ADMIN."</div>
+  <p class="body">En pantalla se ve el ciclo <code>for (Rol rol : ...)</code> con las líneas <code>permisos.add(...)</code>, el <code>if</code> / <code>else if</code> por nombre de rol y el cierre con <code>return User.builder()...</code>. Los nombres de los permisos (<code>EVENTO_CREAR</code> y los demás) los eligió él: "ustedes determinan qué hacer".</p>
+  <div class="note"><span class="ic">!</span><p><b>Dos cabos que dejó, y que al copiar el código fallan.</b></p>
+    <p style="margin-top:6px">1. <code>disabled</code> es lo contrario de <code>habilitado</code>. Él lo llenó con <code>getHabilitado()</code> y dijo "yo qué sé, según lo que tengamos". Con <code>habilitado = true</code>, el usuario queda deshabilitado.</p>
+    <p style="margin-top:6px">2. Los roles se guardan como <code>admin</code>/<code>user</code> en minúsculas, y las reglas de la configuración preguntan por <code>ADMIN</code>/<code>USER</code>. Spring distingue mayúsculas y no hay coincidencia.</p></div>
+  <details class="dio"><summary>¿Qué es un <code>UserDetails</code> y un <code>UserDetailsService</code>?</summary><div class="db">
+    <p><code>UserDetails</code> es la ficha que Spring Security usa de cada usuario: nombre, clave, permisos y si la cuenta está bloqueada o deshabilitada. Es parte del núcleo de la librería: "si le pican, dice que tiene una colección de todas las autoridades, del password, del username, de si expiró, si la cuenta está bloqueada...".</p>
+    <p><code>UserDetailsService</code> es la interfaz con un solo método, <code>loadUserByUsername</code>: "dame la ficha de este nombre". Tú decides de dónde sale; aquí, de la base.</p>
+  </div></details>
+  <details class="dio"><summary>Authority y role: ¿no son lo mismo?</summary><div class="db">
+    <p>En Spring Security los dos son un <code>GrantedAuthority</code>, un texto. La diferencia es una convención: si el texto empieza con <code>ROLE_</code>, se puede preguntar con <code>hasRole("ADMIN")</code> (que agrega el prefijo solo). Si no lleva prefijo, se pregunta con <code>hasAuthority("EVENTO_CREAR")</code>.</p>
+    <ul>
+      <li><strong>Rol:</strong> el puesto, general. <code>ROLE_ADMIN</code>.</li>
+      <li><strong>Permiso (authority):</strong> una acción concreta. <code>EVENTO_CREAR</code>.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary><code>UsernameNotFoundException</code></summary><div class="db">
+    <p>La excepción de Spring Security para "ese usuario no existe". Tampoco la escribió él: "también forma parte del core". Su mensaje por defecto es <em>User not found</em>.</p>
+  </div></details>
+
+  <div class="ex">
+    <p class="ex-tag">Práctica · bloque 5</p>
+    <h3>Arma <code>loadUserByUsername</code> en orden</h3>
+    <p class="ask">Toca las líneas en el orden en que van. Tocar una línea ya puesta la quita, con las que le siguen.</p>
+    <div class="built" id="built"></div>
+    <div class="bank" id="bank"></div>
+    <div class="btnrow"><button class="btn ghost" id="bldRs" type="button">Reiniciar</button></div>
+    <div class="fb" id="bldFb"></div>
+  </div>
+</section>
+
+<section id="b6" class="capa ctl">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 6</p>
+    <h2 class="sec"><code>AuthController</code>: quién soy y qué puedo</h2>
+    <p>Un controlador pequeño que le devuelve al cliente (por ejemplo, un Angular en el puerto 4200) quién inició sesión.</p>
+  </div>
+<pre>@RestController
+@RequestMapping("/api/v1/auth")
+@CrossOrigin(origins = "http://localhost:4200")
+public class AuthController {
+
+    @GetMapping("/perfil")        <span class="cm">// el nombre lo eligió "el que ustedes quieran"</span>
+    public ResponseEntity&lt;UserSessionDTO&gt; obtenerPerfilDeUsuario(Authentication authentication) {
+        String userName = authentication.getName();
+
+        List&lt;String&gt; roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(a -&gt; a.startsWith("ROLE_"))
+                .toList();
+
+        List&lt;String&gt; authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .filter(a -&gt; !a.startsWith("ROLE_"))
+                .toList();
+
+        return ResponseEntity.ok(new UserSessionDTO(userName, roles, authorities));
+    }
+}</pre>
+  <div class="quote">"Asegúrense que esta cosa sea de tipo org.springframework.security.core, porque, se dieron cuenta, hay un montón de estas cuestiones acá."</div>
+  <p class="body">Armó la lista de roles primero con <code>filter(... startsWith("ROLE_"))</code>. La de permisos la hizo copiando y pegando, "solo que aquí vamos a hacerle algo diferente, vamos a negarlo": el mismo filtro con <code>!</code>.</p>
+  <details class="dio"><summary>¿De dónde sale el parámetro <code>Authentication</code>?</summary><div class="db">
+    <p>Spring lo inyecta solo: si la petición llegó hasta aquí, ya pasó el login, y <code>Authentication</code> trae el nombre del usuario (<code>getName()</code>) y sus permisos (<code>getAuthorities()</code>). No lo creaste tú.</p>
+  </div></details>
+  <details class="dio"><summary>¿Qué es <code>@CrossOrigin</code> y qué es el puerto 4200?</summary><div class="db">
+    <p>Un navegador bloquea por defecto que una página de un origen (<code>http://localhost:4200</code>) llame a una API de otro (<code>http://localhost:8085</code>). A eso se le llama <strong>CORS</strong>.</p>
+    <p><code>@CrossOrigin(origins = ...)</code> le dice a la API que sí acepte peticiones de ese origen. El 4200 es el puerto de Angular en desarrollo; el profesor lo usa de ejemplo "para un Angular, para un React, para un Vue".</p>
+  </div></details>
+</section>
+
+<section id="b7" class="capa map">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 7</p>
+    <h2 class="sec"><code>SecurityConfig</code>: las reglas de la API</h2>
+    <p>La pieza más larga y la que quedó a medias. En el video se ven errores en rojo mientras la escribe.</p>
+  </div>
+<pre>@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http,
+                                           CorsConfigurationSource corsConfigurationSource) throws Exception {
+        http
+            .cors(cors -&gt; cors.configurationSource(corsConfigurationSource))
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -&gt;
+                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -&gt; auth
+                    .requestMatchers("/documentacion/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/v1/apiEventos/eventos/**")
+                            .hasAuthority("EVENTO_CREAR")
+                    .requestMatchers(HttpMethod.PUT, "/api/v1/apiEventos/eventos/**")
+                            .hasAuthority("EVENTO_MODIFICAR")
+                    .requestMatchers(HttpMethod.DELETE, "/api/v1/apiEventos/eventos/**")
+                            .hasAuthority("EVENTO_ELIMINAR")
+                    .requestMatchers("/api/v1/apiEventos/eventos/**")
+                            .hasAnyRole("ADMIN", "USER")
+                    .anyRequest().authenticated())
+            .httpBasic(Customizer.withDefaults());
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}</pre>
+  <div class="note"><span class="ic">!</span><p><b>Qué es del profesor y qué es mío en este bloque.</b> Del profesor: el esqueleto (<code>@Configuration</code>, <code>@EnableWebSecurity</code>, <code>@EnableMethodSecurity</code>, <code>@RequiredArgsConstructor</code>, el bean <code>SecurityFilterChain</code> con <code>HttpSecurity</code> y <code>CorsConfigurationSource</code>, <code>cors</code>, <code>csrf</code> deshabilitado, sesión sin estado, <code>authorizeHttpRequests</code>, <code>httpBasic</code> con <code>withDefaults</code> y el bean <code>BCryptPasswordEncoder</code>). Mío: los textos exactos de las rutas y el orden de las reglas, porque en pantalla se cortan.</p></div>
+  <div class="quote">"Bueno, no puedo ver la documentación, me dice que tengo que iniciar sesión sí o sí. Pues porque estaba corriendo."</div>
+  <div class="quote">"Cualquier otra petición. Any request punto authenticated, que tiene que iniciarse, señor, sí o sí. Luego punto http basic, vamos con el customizer withDefaults, y se acabó."</div>
+  <p class="body">El orden en que se escriben las reglas importa: Spring toma la primera que coincida. Por eso las rutas abiertas van arriba y <code>anyRequest()</code> va al final.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Regla</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">permitAll()</td><td class="d">Cualquiera entra, sin login. Se usó para Swagger.</td></tr>
+      <tr><td class="sym">hasAuthority("EVENTO_CREAR")</td><td class="d">Solo quien tiene ese permiso exacto. En el <code>POST</code>.</td></tr>
+      <tr><td class="sym">hasAnyRole("ADMIN", "USER")</td><td class="d">Quien tenga cualquiera de esos roles, para el resto de las rutas de eventos.</td></tr>
+      <tr><td class="sym">anyRequest().authenticated()</td><td class="d">Todo lo demás exige haber iniciado sesión.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="ic">!</span><p><b>Cabos que dejó este bloque.</b></p>
+    <p style="margin-top:6px">1. El método recibe un <code>CorsConfigurationSource</code> pero en la clase nunca se ve el bean que lo crea. Sin él la aplicación no arranca.</p>
+    <p style="margin-top:6px">2. Para el <code>DELETE</code> pide <code>EVENTO_ELIMINAR</code>, pero el servicio solo le da al admin <code>EVENTO_CREAR</code> y <code>EVENTO_MODIFICAR</code>. Nadie podría borrar.</p>
+    <p style="margin-top:6px">3. Dijo que faltaba el bean <code>authenticationManager</code>: "si tomaron apuntes, termínenlos, del día de la presentación". Esa clase no la tengo.</p>
+    <p style="margin-top:6px">4. <code>@EnableMethodSecurity</code> quedó "preparado, por si se requiere un <code>@PreAuthorize</code>", sin usarse.</p></div>
+  <details class="dio"><summary><code>@Configuration</code>, <code>@Bean</code> y las tres anotaciones <code>@Enable...</code></summary><div class="db">
+    <ul>
+      <li><code>@Configuration</code>: esta clase solo existe para configurar la aplicación.</li>
+      <li><code>@Bean</code>: el objeto que devuelve el método se registra en Spring y se puede inyectar donde haga falta.</li>
+      <li><code>@EnableWebSecurity</code>: activa la seguridad web con tu configuración.</li>
+      <li><code>@EnableMethodSecurity</code>: permite usar <code>@PreAuthorize("hasRole('ADMIN')")</code> sobre métodos del controlador.</li>
+      <li><code>@RequiredArgsConstructor</code>: Lombok crea un constructor con los campos <code>final</code>.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>CSRF, sesión sin estado y <code>httpBasic</code></summary><div class="db">
+    <ul>
+      <li><strong>CSRF</strong> (<em>Cross-Site Request Forgery</em>): un ataque donde otra página hace que tu navegador mande una petición con tu sesión abierta. Se suele deshabilitar en una API que no usa formularios ni cookies de sesión: "vamos a deshabilitarlo, por lo pronto".</li>
+      <li><strong>Sin estado (<code>STATELESS</code>):</strong> el servidor no guarda sesión. El cliente manda su usuario y clave en cada petición.</li>
+      <li><strong><code>httpBasic</code>:</strong> el cliente manda el usuario y la clave en una cabecera <code>Authorization</code>, codificados en Base64. Es simple y por eso solo es seguro sobre HTTPS.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>¿Qué es BCrypt?</summary><div class="db">
+    <p>Un algoritmo que convierte la clave en un código que no se puede deshacer, por ejemplo <code>$2a$10$...</code>. En la base se guarda ese código, no la clave real. Cuando alguien inicia sesión, Spring aplica BCrypt a lo que escribió y compara los dos códigos.</p>
+    <p>El bean <code>passwordEncoder</code> le dice a Spring que use BCrypt. Por eso las claves que pongas en la base deben estar ya convertidas.</p>
+  </div></details>
+
+  <div class="ex">
+    <p class="ex-tag">Práctica · bloque 7</p>
+    <h3>¿Qué responde la API?</h3>
+    <p class="ask">Con las reglas de arriba, ¿qué código HTTP recibe cada caso?</p>
+    <div class="qrows" id="q7"></div>
+    <div class="btnrow"><button class="btn" id="q7go" type="button">Revisar</button><button class="btn ghost" id="q7rs" type="button">Reiniciar</button></div>
+    <div class="fb" id="q7fb"></div>
+  </div>
+</section>
+
+<section id="b8" class="capa cfg">
+  <div class="sec-head">
+    <p class="eyebrow">Bloque 8 · hacia el final</p>
+    <h2 class="sec">Datos de prueba en MySQL</h2>
+    <p>Al arrancar de nuevo, la clave de prueba que Spring daba ya no existe: "ya no hay clave para el usuario de prueba, ya va a depender de lo que ustedes agreguen". Hay que insertar usuarios.</p>
+  </div>
+  <p class="body">En la consola de MySQL del video se ve el resultado de <code>show tables</code> y la estructura de <code>Rol</code>: columnas <code>varchar(150)</code>, <code>datetime(6)</code> y <code>varchar(50)</code>. Y el primer intento de <code>INSERT</code> fallando:</p>
+<pre>mysql&gt; insert into Rol values(1,"administradoe",current_date ...
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual
+that corresponds to your MySQL server version for the right syntax to use near ...
+mysql&gt; insert into Rol values(1,'administradoe',current_date ...
+Query OK, 1 row affected (0.008 sec)</pre>
+  <div class="quote">"Sí, me equivoqué. Yo nomás al inicio [...] y aparte puse unas comillas dobles. Este fue el que dio lata y este signito de más dio lata."</div>
+<pre><span class="cm">-- el orden de las columnas es el de la tabla; ajusta si el tuyo es otro</span>
+insert into Usuario values (1, 'oyo', '$2a$10$...hash BCrypt...', 'tucorreo@gmail.com', true, false);
+insert into Rol values (1, 'admin', 'administrador', now());
+insert into Rol values (2, 'user',  'usuario limitado', now());
+insert into usuario_rol values (1, 1);</pre>
+  <p class="body">Para la clave usó un generador de BCrypt en línea: "pueden agarrar esto, <em>bcrypt online</em>". Insertó primero un usuario con su rol <code>admin</code> y después intentó el <code>usuario_rol</code> del usuario 2 con el rol 2, lo que falló por la llave foránea.</p>
+  <div class="quote">"Constrain usuario reference ID usuario. ¿Nada más hay un usuario? Sí. Ah, bueno. Gracias. Así, y lo van llenando."</div>
+  <details class="dio"><summary>¿Qué significa el <code>ERROR 1064</code> y el error de llave foránea?</summary><div class="db">
+    <ul>
+      <li><strong>1064:</strong> error de sintaxis del <code>SQL</code>. Aquí, por usar comillas dobles junto con un carácter de más. En MySQL conviene escribir los textos entre comillas simples.</li>
+      <li><strong>Llave foránea:</strong> la tabla puente guarda ids de <code>Usuario</code> y de <code>Rol</code>. MySQL no deja guardar el id 2 de usuario si en <code>Usuario</code> no existe una fila con id 2.</li>
+    </ul>
+  </div></details>
+  <details class="dio"><summary>¿Por qué <code>current_date</code> y <code>now()</code>?</summary><div class="db">
+    <p>La fecha de creación del rol es de tipo <code>datetime</code> (<code>LocalDateTime</code> en Java), y <code>now()</code> trae fecha y hora. El profesor usó <code>current_date</code> y su "fecha actual cuando se crea". Las dos sirven para llenar la columna.</p>
+  </div></details>
+</section>
+
+<section id="final">
+  <div class="sec-head">
+    <p class="eyebrow">Cierre</p>
+    <h2 class="sec">Checklist de la clase</h2>
+    <p>Se guarda en este navegador.</p>
+  </div>
+  <div class="progress"><div class="bar"><span id="pbar"></span></div><span class="pcount" id="pcount">0 / 5</span></div>
+  <div class="final" id="checklist"></div>
+</section>
+
+<section id="diccionario">
+  <div class="sec-head">
+    <p class="eyebrow">Diccionario</p>
+    <h2 class="sec">Palabras de esta clase en lenguaje simple</h2>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Palabra</th><th>En simple</th></tr></thead>
+    <tbody>
+      <tr><td class="sym">autenticación</td><td class="d">Comprobar quién eres: usuario y clave.</td></tr>
+      <tr><td class="sym">autorización</td><td class="d">Decidir qué puedes hacer una vez que se sabe quién eres.</td></tr>
+      <tr><td class="sym">authority</td><td class="d">Un permiso en forma de texto, como <code>EVENTO_CREAR</code>.</td></tr>
+      <tr><td class="sym">BCrypt</td><td class="d">Algoritmo que convierte la clave en un código irreversible para guardarla.</td></tr>
+      <tr><td class="sym">bean</td><td class="d">Objeto que Spring crea y reparte donde se necesita.</td></tr>
+      <tr><td class="sym">Basic Auth</td><td class="d">Mandar usuario y clave en una cabecera de la petición.</td></tr>
+      <tr><td class="sym">CORS</td><td class="d">Regla del navegador sobre llamar a una API de otro origen.</td></tr>
+      <tr><td class="sym">CSRF</td><td class="d">Ataque que usa tu sesión abierta desde otra página.</td></tr>
+      <tr><td class="sym">filter chain</td><td class="d">Fila de revisiones por la que pasa cada petición.</td></tr>
+      <tr><td class="sym">GrantedAuthority</td><td class="d">Interfaz de Spring que representa un permiso o un rol.</td></tr>
+      <tr><td class="sym">llave foránea</td><td class="d">Columna que debe apuntar a una fila que existe en otra tabla.</td></tr>
+      <tr><td class="sym">muchos a muchos</td><td class="d">Relación en la que cada lado puede tener varios del otro; necesita tabla puente.</td></tr>
+      <tr><td class="sym">rol</td><td class="d">Un puesto, como <code>ROLE_ADMIN</code>. En Spring es un authority con prefijo <code>ROLE_</code>.</td></tr>
+      <tr><td class="sym">stateless</td><td class="d">El servidor no recuerda sesiones entre peticiones.</td></tr>
+      <tr><td class="sym">tabla puente</td><td class="d">Tabla con una fila por cada pareja de una relación muchos a muchos.</td></tr>
+      <tr><td class="sym">UserDetails</td><td class="d">Ficha de usuario que Spring Security entiende.</td></tr>
+      <tr><td class="sym">UserDetailsService</td><td class="d">Interfaz con <code>loadUserByUsername</code>: devuelve esa ficha desde donde guardes tus usuarios.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="codigo">
+  <div class="sec-head">
+    <p class="eyebrow">Código de la sesión</p>
+    <h2 class="sec">Qué cambia en tu proyecto</h2>
+    <p>Los bloques de código de arriba son lo de la clase, con los cabos sueltos marcados. Dónde va cada archivo:</p>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Archivo</th><th>Paquete</th><th>Acción</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">pom.xml</td><td class="mono">raíz</td><td class="d">Agregar <code>spring-boot-starter-security</code> y sincronizar Maven.</td></tr>
+      <tr><td class="mono">Usuario.java, Rol.java</td><td class="mono">usuario.domain</td><td class="d">Nuevos.</td></tr>
+      <tr><td class="mono">UsuarioRepository.java</td><td class="mono">usuario.repository</td><td class="d">Nuevo.</td></tr>
+      <tr><td class="mono">UserSessionDTO.java</td><td class="mono">usuario.dto</td><td class="d">Nuevo, un <code>record</code>.</td></tr>
+      <tr><td class="mono">UserSecurityService.java</td><td class="mono">usuario.service</td><td class="d">Nuevo. Corregir <code>disabled</code> y la mayúscula del rol.</td></tr>
+      <tr><td class="mono">AuthController.java</td><td class="mono">usuario.controller</td><td class="d">Nuevo.</td></tr>
+      <tr><td class="mono">SecurityConfig.java</td><td class="mono">config</td><td class="d">Nuevo. Falta el bean de CORS, el <code>authenticationManager</code> y el permiso <code>EVENTO_ELIMINAR</code>.</td></tr>
+    </tbody>
+  </table></div>
+  <details class="dio"><summary>En qué se diferencia este código de lo que quedó en pantalla</summary><div class="db">
+    <ul>
+      <li>El nombre del método del controlador y su ruta, <code>/perfil</code>, son míos: él dijo "pongan el nombre que quieran".</li>
+      <li>La mayor parte de <code>SecurityConfig</code> se escribe en pantalla a trozos y la última parte (los bloques de métodos <code>PUT</code> y <code>DELETE</code>) se corta del encuadre. Reconstruí las rutas a partir de lo que dijo.</li>
+      <li>El <code>INSERT</code> de <code>Usuario</code> es mío: el orden de columnas lo dicta tu tabla, y el hash de la clave es el que generes.</li>
+      <li>Dejé tal cual los dos errores que marqué (<code>disabled</code> y las mayúsculas del rol), para que veas qué se dijo y qué falla.</li>
+    </ul>
+  </div></details>
+</section>
+
+</main>
+<script>
+(function(){
+  "use strict";
+  function quiz(rootId, items, goId, rsId, fbId, allGood){
+    var root=document.getElementById(rootId), fb=document.getElementById(fbId), sel={};
+    function build(){
+      root.innerHTML=""; fb.className="fb"; sel={};
+      items.forEach(function(it,i){
+        var row=document.createElement("div"); row.className="qrow";
+        var q=document.createElement("div"); q.className="qq"; q.innerHTML=it.q;
+        var op=document.createElement("div"); op.className="qopts";
+        it.opts.forEach(function(o,j){
+          var b=document.createElement("button"); b.type="button"; b.className="qopt"; b.innerHTML=o;
+          b.addEventListener("click",function(){
+            sel[i]=j;
+            Array.prototype.forEach.call(op.children,function(c){ c.classList.remove("sel"); });
+            b.classList.add("sel");
+          });
+          op.appendChild(b);
+        });
+        var why=document.createElement("div"); why.className="qwhy"; why.innerHTML=it.why;
+        row.appendChild(q); row.appendChild(op); row.appendChild(why); root.appendChild(row);
+      });
+    }
+    document.getElementById(goId).addEventListener("click",function(){
+      var right=0, answered=0;
+      Array.prototype.forEach.call(root.children,function(r,i){
+        r.classList.remove("right","wrong");
+        var why=r.querySelector(".qwhy");
+        if(sel[i]===undefined){ why.classList.remove("show"); return; }
+        answered++;
+        if(sel[i]===items[i].ans){ r.classList.add("right"); right++; } else r.classList.add("wrong");
+        why.classList.add("show");
+      });
+      if(answered<items.length){
+        fb.className="fb show bad";
+        fb.innerHTML="<b>Te faltan respuestas.</b> Contesta las "+items.length+" y vuelve a darle a Revisar.";
+        return;
+      }
+      fb.className="fb show "+(right===items.length?"good":"bad");
+      fb.innerHTML = right===items.length ? allGood
+        : "<b>"+right+" de "+items.length+".</b> Debajo de cada una está el porqué. Corrige las rojas y vuelve a revisar.";
+    });
+    document.getElementById(rsId).addEventListener("click",build);
+    build();
+  }
+
+  var STEPS=[
+    '@Override',
+    '@Transactional(readOnly = true)',
+    'public UserDetails loadUserByUsername(String username) {',
+    'Usuario usuario = usuarioRepository.findByUserName(username).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));',
+    'List<GrantedAuthority> permisos = new ArrayList<>();',
+    'for (Rol rol : usuario.getRoles()) { permisos.add(new SimpleGrantedAuthority("ROLE_" + rol.getNombreRol())); }',
+    'return User.builder().username(usuario.getUserName()).password(usuario.getPassword()).authorities(permisos).accountLocked(usuario.getBloqueado()).disabled(!usuario.getHabilitado()).build();',
+    '}'
+  ];
+  var INDENT=[0,0,0,1,1,1,1,0];
+  var WHY=[
+    "Primero se avisa que este método cumple con el de la interfaz <code>UserDetailsService</code>.",
+    "Luego se marca como solo lectura: \"nada más voy a consultar cosas\".",
+    "La firma: recibe el nombre y devuelve el <code>UserDetails</code> de Spring.",
+    "Se busca el usuario en la base; si no existe, lanza <code>UsernameNotFoundException</code>.",
+    "Se crea la lista vacía donde irán los permisos.",
+    "Se recorren los roles del usuario y a cada uno se le agrega el prefijo <code>ROLE_</code>.",
+    "Se arma el <code>User</code> de Spring con nombre, clave, permisos y los dos estados de la cuenta.",
+    "Se cierra el método."
+  ];
+  var placed=[], bank=document.getElementById("bank"), built=document.getElementById("built"), bfb=document.getElementById("bldFb");
+  function shuffled(n){ var a=[],i,j,t; for(i=0;i<n;i++)a.push(i); for(i=n-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=a[i];a[i]=a[j];a[j]=t; } return a; }
+  function pad(n){ return new Array(n*4+1).join(" "); }
+  function renderBank(){
+    bank.innerHTML="";
+    shuffled(STEPS.length).forEach(function(i){
+      var b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=STEPS[i];
+      b.disabled = placed.indexOf(i)!==-1;
+      b.addEventListener("click",function(){
+        if(i===placed.length){
+          placed.push(i); renderBuilt(); renderBank();
+          bfb.className="fb show good";
+          bfb.innerHTML = placed.length===STEPS.length
+            ? "<b>Método completo.</b> Con <code>!usuario.getHabilitado()</code> en <code>disabled</code>: una cuenta habilitada no está deshabilitada. En clase quedó sin el <code>!</code>."
+            : "<b>Va.</b> "+WHY[i];
+        } else {
+          bfb.className="fb show bad";
+          bfb.innerHTML="<b>Todavía no toca esa.</b> "+(placed.length===0 ? "Empieza por la anotación que sobrescribe el método." : "Pista: "+WHY[placed.length]);
+        }
+      });
+      bank.appendChild(b);
+    });
+  }
+  function renderBuilt(){
+    if(!placed.length){ built.innerHTML='<span class="ph">Aquí se va armando el método…</span>'; return; }
+    built.innerHTML="";
+    placed.forEach(function(i,n){
+      var ln=document.createElement("div"); ln.className="ln"; ln.title="Tocar para quitar";
+      var num=document.createElement("span"); num.className="n"; num.textContent=(n+1);
+      var tx=document.createElement("span"); tx.textContent=pad(INDENT[i])+STEPS[i];
+      ln.appendChild(num); ln.appendChild(tx);
+      ln.addEventListener("click",function(){ placed=placed.slice(0,n); renderBuilt(); renderBank(); bfb.className="fb"; });
+      built.appendChild(ln);
+    });
+  }
+  document.getElementById("bldRs").addEventListener("click",function(){ placed=[]; renderBuilt(); renderBank(); bfb.className="fb"; });
+  renderBuilt(); renderBank();
+
+  quiz("q7",[
+    {q:"<code>GET</code> a la lista de eventos, sin mandar usuario ni clave.",
+     opts:["200 OK","401 Unauthorized","403 Forbidden"], ans:1,
+     why:"<b>401.</b> Esa ruta cae en <code>anyRequest().authenticated()</code> y <code>httpBasic</code> responde pidiendo credenciales."},
+    {q:"Usuario y clave equivocados en la misma petición.",
+     opts:["401 Unauthorized","403 Forbidden","200 OK"], ans:0,
+     why:"<b>401.</b> No se pudo comprobar quién eres. Por eso mismo no se llega a mirar tus permisos."},
+    {q:"Un usuario con <code>ROLE_USER</code> hace <code>GET</code> a la lista de eventos.",
+     opts:["200 OK","401 Unauthorized","403 Forbidden"], ans:0,
+     why:"<b>200.</b> Pasó el login y la regla <code>hasAnyRole(\"ADMIN\", \"USER\")</code> lo deja entrar."},
+    {q:"Ese mismo usuario con <code>ROLE_USER</code> hace <code>POST</code> para crear un evento.",
+     opts:["201 Created","401 Unauthorized","403 Forbidden"], ans:2,
+     why:"<b>403.</b> Sí sabe quién es, pero no tiene <code>EVENTO_CREAR</code>. 401 es \"no sé quién eres\" y 403 es \"sé quién eres y no puedes\"."},
+    {q:"Un admin con <code>EVENTO_CREAR</code> hace <code>POST</code> con datos válidos.",
+     opts:["200 OK","201 Created","403 Forbidden"], ans:1,
+     why:"<b>201.</b> Pasa seguridad y el controlador responde <code>CREATED</code>, como en la clase del 28."},
+    {q:"<code>GET</code> a <code>/documentacion/swagger-ui/...</code> sin login.",
+     opts:["200 OK","401 Unauthorized","403 Forbidden"], ans:0,
+     why:"<b>200.</b> Esa ruta está en <code>permitAll()</code>, arriba de <code>anyRequest()</code>."}
+  ],"q7go","q7rs","q7fb","<b>Las seis.</b> 401 si no sabe quién eres, 403 si lo sabe y no te deja, y las rutas abiertas con <code>permitAll</code> no piden nada.");
+
+  var TAREAS=[
+    {t:"Terminar SecurityConfig", d:"Agregar el bean de CORS y el <code>authenticationManager</code> que el profesor dijo que faltaban."},
+    {t:"Llenar usuarios, roles y usuario_rol", d:"Con la clave guardada como hash de BCrypt, no en texto."},
+    {t:"Corregir <code>disabled</code> y los nombres de rol", d:"<code>disabled(!habilitado)</code> y rol en mayúsculas para que <code>hasAnyRole</code> coincida."},
+    {t:"Darle <code>EVENTO_ELIMINAR</code> al admin", d:"La regla del <code>DELETE</code> lo pide y el servicio no lo da."},
+    {t:"Tener el CRUD de eventos terminado", d:"Borrado y PDF con DTOs, de la clase del 28."}
+  ];
+  var KEY="clase29oct-tareas", st={};
+  try{ st=JSON.parse(localStorage.getItem(KEY)||"{}")||{}; }catch(e){ st={}; }
+  var box=document.getElementById("checklist"), pbar=document.getElementById("pbar"), pcount=document.getElementById("pcount");
+  function save(){ try{ localStorage.setItem(KEY,JSON.stringify(st)); }catch(e){} }
+  function upd(){
+    var n=0; TAREAS.forEach(function(_,i){ if(st[i]) n++; });
+    pbar.style.width=(100*n/TAREAS.length)+"%"; pcount.textContent=n+" / "+TAREAS.length;
+  }
+  TAREAS.forEach(function(it,i){
+    var lb=document.createElement("label"); lb.className="ftask"+(st[i]?" done":"");
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.id="ft"+i; cb.checked=!!st[i];
+    var tx=document.createElement("div");
+    tx.innerHTML='<div class="tt">'+it.t+'</div><div class="td2">'+it.d+'</div>';
+    cb.addEventListener("change",function(){ st[i]=cb.checked; lb.classList.toggle("done",cb.checked); save(); upd(); });
+    lb.appendChild(cb); lb.appendChild(tx); box.appendChild(lb);
+  });
+  upd();
+})();
+</script>

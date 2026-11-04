@@ -383,6 +383,22 @@ const TAREAS = [
     ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/api/ApiEventos"
   },
 
+  {
+    id: "wad-api-eventos-security",
+    curso: "7CM2",
+    titulo: "Práctica — ApiEventos con Spring Security (usuarios, roles y SecurityConfig)",
+    tipo: "practica",
+    entrega: null,
+    fechaPorConfirmar: true,
+    parcial: 2,
+    estado: "pendiente",
+    descripcion: "Clase del 29 de octubre: se agrega spring-boot-starter-security a ApiEventos, se crean las entidades Usuario y Rol (muchos a muchos con tabla usuario_rol), UserSessionDTO, UsuarioRepository, UserSecurityService (UserDetailsService), AuthController y SecurityConfig con SecurityFilterChain, CORS, CSRF deshabilitado, sesión sin estado, httpBasic y BCrypt. El profesor dejó SecurityConfig a medias: faltan el bean authenticationManager y terminar las reglas por rol y método. Sin fecha de entrega. Cabos del código visto: disabled debe ser !habilitado, los roles deben coincidir en mayúsculas con hasAnyRole, falta el bean CorsConfigurationSource y el admin no recibe EVENTO_ELIMINAR.",
+    entregable: "ApiEventos con seguridad (por confirmar qué pide el profesor)",
+    pasos: ["Agregar spring-boot-starter-security y sincronizar Maven", "Crear Usuario y Rol con @ManyToMany y @JoinTable usuario_rol", "UsuarioRepository.findByUserName y UserSessionDTO", "UserSecurityService con loadUserByUsername", "AuthController para el perfil de usuario", "Terminar SecurityConfig (CORS, authenticationManager, reglas por permiso)", "Insertar usuarios, roles y usuario_rol con clave en BCrypt", "Corregir disabled(!habilitado) y mayúsculas de rol"],
+    origen: "Clase del 29 de octubre (video + transcripción) · artifact claude.ai/artifact/1DZJvCekBpQNGVn3Nxhpi7",
+    ruta: "7CM2 - DES. DE APLIC(WEB CLIENT AND BACKEND/Primer parcial/practicas/api/ApiEventos"
+  },
+
   /* ---------- 8CM2 · Liderazgo Personal ---------- */
   {
     id: "lid-asignacion-1",
