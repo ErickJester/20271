@@ -315,7 +315,7 @@
     <div class="task-head"><span class="task-badge">Tarea 2</span><span class="task-when">hacia el final</span></div>
     <h3>Llenar usuarios, roles y permisos</h3>
     <p class="said">"Un usuario puede tener diversos roles, depende de ustedes."</p>
-    <p>Insertar filas en <code>Usuario</code>, <code>Rol</code> y <code>usuario_rol</code>, con la clave guardada en BCrypt.</p>
+    <p>Insertar filas en <code>Usuario</code>, <code>Rol</code> y <code>UsuarioRol</code>, con la clave guardada en BCrypt.</p>
   </div>
   <div class="task">
     <div class="task-head"><span class="task-badge">Arrastre</span><span class="task-when">inicio</span></div>
@@ -366,7 +366,7 @@
       <rect x="608" y="8" width="170" height="104" rx="8" style="fill:var(--ent-soft);stroke:var(--ent);stroke-width:1.5"/>
       <text x="693" y="32" text-anchor="middle" font-size="13" font-weight="700">MySQL</text>
       <text x="693" y="56" text-anchor="middle" font-size="11" class="mono">Usuario</text>
-      <text x="693" y="73" text-anchor="middle" font-size="11" class="mono">usuario_rol</text>
+      <text x="693" y="73" text-anchor="middle" font-size="11" class="mono">UsuarioRol</text>
       <text x="693" y="90" text-anchor="middle" font-size="11" class="mono">Rol</text>
       <line x1="180" y1="60" x2="206" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
       <line x1="380" y1="60" x2="406" y2="60" style="stroke:var(--text-muted);stroke-width:1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
@@ -439,10 +439,10 @@ public class Usuario implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idUsuario;
 
-    @Column(name = "nombreUsuario", unique = true, nullable = false, length = 50)
+    @Column(name = "nombreDeUsuario", unique = true, nullable = false, length = 50)
     private String userName;
 
-    @Column(name = "claveUsuario", nullable = false, length = 200)
+    @Column(name = "claveDeUsuario", nullable = false, length = 200)
     private String password;
 
     @Column(name = "email", unique = true, nullable = false, length = 150)
@@ -455,7 +455,7 @@ public class Usuario implements Serializable {
     private Boolean bloqueado;
 
     @ManyToMany
-    @JoinTable(name = "usuario_rol",
+    @JoinTable(name = "UsuarioRol",
             joinColumns = @JoinColumn(name = "idUsuario", referencedColumnName = "idUsuario"),
             inverseJoinColumns = @JoinColumn(name = "idRol", referencedColumnName = "idRol"))
     private List&lt;Rol&gt; roles;
@@ -479,19 +479,31 @@ public class Rol implements Serializable {
     @Column(name = "descripcionRol", nullable = false, length = 150)
     private String descripcionRol;
 
-    @Column(name = "fechaCreacion", nullable = false)
-    private LocalDateTime fechaCreacion;
+    @Column(name = "fecha", nullable = false)
+    private LocalDateTime fecha;
 }</pre>
-  <div class="note"><span class="ic">!</span><p><b>Lo que se ve en pantalla.</b> La tabla se declara como <code>@Table(name="Usuario")</code> con mayúscula, y el atributo de la clave primaria en el video llega a escribirse <code>private Long id</code> antes de completarse. Los nombres de columna salieron de la transcripción; el profesor los dictó de memoria.</p></div>
+  <div class="note"><span class="ic">!</span><p><b>Lo que se ve en pantalla.</b> La tabla se declara como <code>@Table(name="Usuario")</code> con mayúscula, y el atributo de la clave primaria en el video llega a escribirse <code>private Long id</code> antes de completarse. Los nombres de columna (<code>nombreDeUsuario</code>, <code>claveDeUsuario</code>, <code>fecha</code>) y el de la tabla puente (<code>UsuarioRol</code>) se leen en el diagrama que muestra después en la herramienta de base de datos.</p></div>
   <div class="quote">"Va a haber una columna, un atributo en mi tabla, que le vamos a llamar clave de usuario. No va a ser única [...] con una longitud de, pues no sé, 200, por si quieren generar una clavezota."</div>
   <p class="body">El campo de la lista de roles es lo que une las dos tablas. Cuando arranca, Hibernate crea la tabla puente sola:</p>
   <div class="quote">"Tendríamos estas 3 tablas, de aquí para acá y de aquí para acá, de 1 a muchos y de 1 a muchos, que en teoría de aquí a acá sería un <b>muchos a muchos</b>."</div>
   <p class="body">Para verlo, abre la base y las tablas aparecen. Luego usa la herramienta gráfica de la base para hacer ingeniería inversa y mostrar el modelo, y en IntelliJ abre el diagrama de clases (<em>Show Diagrams</em>). De paso muestra que algunas herramientas exportan un diccionario de datos: "ya les toca a ustedes pasarlo [al español]".</p>
+  <details class="dio"><summary>El diccionario de datos: qué se ve en el video</summary><div class="db">
+    <p>No se hace con IntelliJ. Lo saca de una herramienta gráfica de MySQL distinta, cuyo nombre no se lee en pantalla. Se ve así, en este orden:</p>
+    <ol>
+      <li>A la izquierda, la conexión con la base <code>GestionEventos7cm2</code> abierta (Tables, Views, Functions, Events, Queries, Backups).</li>
+      <li>Un diagrama de la base por ingeniería inversa, con las tablas <code>Usuario</code>, <code>UsuarioRol</code>, <code>Rol</code>, <code>Evento</code> y <code>Archivo</code>. En un momento se ve abierto el menú File con la opción <em>Export To…</em>. Dice que ese diagrama no lo quiere guardar.</li>
+      <li>En la lista de tablas aparecen seleccionadas Archivo, Evento, Rol, Usuario y UsuarioRol, con el menú <em>Tools</em> abierto: Data Transfer…, Data Generation…, <strong>Data Dictionary…</strong>, Data Synchronization…, Structure Synchronization…, Console…, Server Monitor…, Find in Database/Schema… e History Log.</li>
+      <li>Una ventana "Data Dictionary" con plantillas de portada: Orange (la marcada), Red, Black and White y Blue.</li>
+      <li>El documento generado, que abre con "Table of Contents" y trae una sección por tabla. La de <code>Evento</code> lleva una tabla de campos (Pos, Name, Type, Not Null, Others) y una de índices.</li>
+    </ol>
+    <p>Lo que dice sobre esto: "si su herramienta les permite hacer cosas como esto, pueden exportar", "viene en inglés, ya les toca a ustedes pasarlo" y "ahí está su diccionario de datos".</p>
+    <p>El video no muestra el formato de archivo en que lo guarda ni cómo.</p>
+  </div></details>
   <details class="dio"><summary><code>@ManyToMany</code>, <code>@JoinTable</code> y tabla puente</summary><div class="db">
     <p>Un usuario puede tener varios roles y un rol puede estar en varios usuarios. Eso se llama <strong>muchos a muchos</strong>, y una base relacional no lo guarda en una sola tabla: hace falta una tercera, la <strong>tabla puente</strong>, con una fila por cada pareja usuario-rol.</p>
     <ul>
       <li><code>@ManyToMany</code>: marca la relación.</li>
-      <li><code>@JoinTable(name = "usuario_rol")</code>: nombre de la tabla puente.</li>
+      <li><code>@JoinTable(name = "UsuarioRol")</code>: nombre de la tabla puente.</li>
       <li><code>joinColumns</code>: la columna que apunta a esta entidad (<code>idUsuario</code>).</li>
       <li><code>inverseJoinColumns</code>: la que apunta a la otra (<code>idRol</code>).</li>
       <li><code>referencedColumnName</code>: a qué columna de la tabla original apunta. Aquí se llaman igual "para no complicarnos la existencia".</li>
@@ -739,12 +751,12 @@ that corresponds to your MySQL server version for the right syntax to use near .
 mysql&gt; insert into Rol values(1,'administradoe',current_date ...
 Query OK, 1 row affected (0.008 sec)</pre>
   <div class="quote">"Sí, me equivoqué. Yo nomás al inicio [...] y aparte puse unas comillas dobles. Este fue el que dio lata y este signito de más dio lata."</div>
-<pre><span class="cm">-- el orden de las columnas es el de la tabla; ajusta si el tuyo es otro</span>
-insert into Usuario values (1, 'oyo', '$2a$10$...hash BCrypt...', 'tucorreo@gmail.com', true, false);
-insert into Rol values (1, 'admin', 'administrador', now());
-insert into Rol values (2, 'user',  'usuario limitado', now());
-insert into usuario_rol values (1, 1);</pre>
-  <p class="body">Para la clave usó un generador de BCrypt en línea: "pueden agarrar esto, <em>bcrypt online</em>". Insertó primero un usuario con su rol <code>admin</code> y después intentó el <code>usuario_rol</code> del usuario 2 con el rol 2, lo que falló por la llave foránea.</p>
+<pre><span class="cm">-- orden de columnas como en el diagrama de la clase: Usuario (id, bloqueado, email, habilitado, clave, nombre), Rol (id, descripción, fecha, nombre)</span>
+insert into Usuario values (1, false, 'tucorreo@gmail.com', true, '$2a$10$...hash BCrypt...', 'oyo');
+insert into Rol values (1, 'administrador', now(), 'admin');
+insert into Rol values (2, 'usuario limitado', now(), 'user');
+insert into UsuarioRol values (1, 1);</pre>
+  <p class="body">Para la clave usó un generador de BCrypt en línea: "pueden agarrar esto, <em>bcrypt online</em>". Insertó primero un usuario con su rol <code>admin</code> y después intentó el <code>UsuarioRol</code> del usuario 2 con el rol 2, lo que falló por la llave foránea.</p>
   <div class="quote">"Constrain usuario reference ID usuario. ¿Nada más hay un usuario? Sí. Ah, bueno. Gracias. Así, y lo van llenando."</div>
   <details class="dio"><summary>¿Qué significa el <code>ERROR 1064</code> y el error de llave foránea?</summary><div class="db">
     <ul>
@@ -818,7 +830,7 @@ insert into usuario_rol values (1, 1);</pre>
     <ul>
       <li>El nombre del método del controlador y su ruta, <code>/perfil</code>, son míos: él dijo "pongan el nombre que quieran".</li>
       <li>La mayor parte de <code>SecurityConfig</code> se escribe en pantalla a trozos y la última parte (los bloques de métodos <code>PUT</code> y <code>DELETE</code>) se corta del encuadre. Reconstruí las rutas a partir de lo que dijo.</li>
-      <li>El <code>INSERT</code> de <code>Usuario</code> es mío: el orden de columnas lo dicta tu tabla, y el hash de la clave es el que generes.</li>
+      <li>Los <code>INSERT</code> siguen el orden de columnas del diagrama de la clase, que coincide con el orden en que él dictó los valores. El hash de la clave es el que generes.</li>
       <li>Dejé tal cual los dos errores que marqué (<code>disabled</code> y las mayúsculas del rol), para que veas qué se dijo y qué falla.</li>
     </ul>
   </div></details>
@@ -954,7 +966,7 @@ insert into usuario_rol values (1, 1);</pre>
 
   var TAREAS=[
     {t:"Terminar SecurityConfig", d:"Agregar el bean de CORS y el <code>authenticationManager</code> que el profesor dijo que faltaban."},
-    {t:"Llenar usuarios, roles y usuario_rol", d:"Con la clave guardada como hash de BCrypt, no en texto."},
+    {t:"Llenar usuarios, roles y UsuarioRol", d:"Con la clave guardada como hash de BCrypt, no en texto."},
     {t:"Corregir <code>disabled</code> y los nombres de rol", d:"<code>disabled(!habilitado)</code> y rol en mayúsculas para que <code>hasAnyRole</code> coincida."},
     {t:"Darle <code>EVENTO_ELIMINAR</code> al admin", d:"La regla del <code>DELETE</code> lo pide y el servicio no lo da."},
     {t:"Tener el CRUD de eventos terminado", d:"Borrado y PDF con DTOs, de la clase del 28."}
