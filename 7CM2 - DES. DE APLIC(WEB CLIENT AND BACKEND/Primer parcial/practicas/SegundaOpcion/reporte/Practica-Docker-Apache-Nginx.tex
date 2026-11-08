@@ -26,22 +26,38 @@
 %#########################################################
 \begin{titlepage}
 	\centering
-	{ \huge \bfseries \color{colorIPN}{Instituto Politécnico Nacional} \par}
-	{ \Large \bfseries  \color{colorESCOM}{Escuela Superior de Cómputo} \par }
-	\vspace{1cm}
-	{\huge\Large \color{colorIPN}{Web Client and Backend Development Frameworks}.\par}
-	\vspace{1.5cm}
-	{\huge\Large  \color{colorESCOM}{Práctica: Descarga, creación y ejecución de imagen Docker del minisitio de nuevo ingreso de ESCOM}\par}
-		\vspace{2cm}
-	{\Large\itshape \color{colorIPN}{Profesor: Dr. José Asunción Enríquez Zárate}\par} \hfill \break
+
+	{\color{colorIPN}\rule{\linewidth}{1.4pt}}\\[0.35cm]
+	{\scshape\LARGE Instituto Politécnico Nacional}\\[0.2cm]
+	{\scshape\Large \color{colorESCOM}Escuela Superior de Cómputo}\\[0.35cm]
+	{\color{colorIPN}\rule{\linewidth}{0.5pt}}
+
+	\vspace{1.6cm}
+	{\large \color{colorESCOM}\MakeUppercase{Web Client and Backend Development Frameworks}\par}
+
 	\vspace{2cm}
-	{\Large\itshape \color{colorIPN}{Alumno: Angel Frausto Robles}\par} \hfill \break
-	{\Large\itshape \color{colorIPN}{Boleta: 2019630177}\par} \hfill \break
-	{\Large\itshape \color{colorIPN}{id634296@gmail.com}\par} \hfill \break
-	{\Large\itshape \color{colorIPN}{7CM2} \par}
+	\noindent
+	\begin{minipage}[t]{0.025\linewidth}
+		\color{colorESCOM}\rule{3.2pt}{3.6cm}
+	\end{minipage}%
+	\hspace{0.5cm}%
+	\begin{minipage}[t]{0.87\linewidth}
+		\raggedright\huge\bfseries\color{colorIPN} Práctica: Descarga, creación y ejecución de imagen Docker del minisitio de nuevo ingreso de ESCOM
+	\end{minipage}
+
+	\vspace{2.8cm}
+	\renewcommand{\arraystretch}{1.7}
+	\begin{tabular}{r @{\hspace{0.6cm}} l}
+		{\bfseries\color{colorESCOM}Profesor:} & {\itshape\color{colorIPN} Dr. José Asunción Enríquez Zárate} \\
+		{\bfseries\color{colorESCOM}Alumno:}   & {\itshape\color{colorIPN} Vanesa Rodriguez Verdin Sandoval} \\
+		{\bfseries\color{colorESCOM}Boleta:}   & {\itshape\color{colorIPN} 202263188} \\
+		{\bfseries\color{colorESCOM}Grupo:}    & {\itshape\color{colorIPN} 7CM2} \\
+	\end{tabular}
+
 	\vfill
-	{\large \color{colorIPN}{\today}\par}
-	\vfill
+	{\color{colorIPN}\rule{0.25\linewidth}{0.5pt}}\\[0.25cm]
+	{\small\color{colorIPN}\today\par}
+	\vspace{1cm}
 \end{titlepage}
 
 \renewcommand\lstlistingname{Código}

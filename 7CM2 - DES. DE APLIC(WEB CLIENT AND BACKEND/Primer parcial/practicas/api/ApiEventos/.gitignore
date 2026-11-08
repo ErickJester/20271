@@ -3,3 +3,6 @@ target/
 *.iml
 .vscode/
 HELP.md
+
+# 14oct: archivos que se suben en las pruebas del controlador de disco
+archivos-subidos/
