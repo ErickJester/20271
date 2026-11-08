@@ -2,6 +2,14 @@ package com.ipn.mx.asistente.domain;
 
 import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class Asistente {
     private Long idAsistente;
     private String nombre;
@@ -13,5 +21,5 @@ public class Asistente {
     private String colonia;
     private int numero;
     private boolean activo;
-    private byte [] foto;
+    private byte[] foto;
 }
