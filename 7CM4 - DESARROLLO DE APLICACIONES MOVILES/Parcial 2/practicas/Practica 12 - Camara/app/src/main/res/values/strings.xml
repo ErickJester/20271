@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cámara</string>
+    <string name="nombre_alumno">Angel Frausto Robles - 7CM4</string>
+    <string name="ejemplo1">Ejemplo 1</string>
+    <string name="ejemplo2">Ejemplo 2</string>
+    <string name="ejercicio">Ejercicio Compose</string>
+    <string name="foto">Tomar foto</string>
+    <string name="toma_foto">Toma foto</string>
+    <string name="op_preview">Tomar una vista previa</string>
+    <string name="op_completa">Tomar una imagen completa</string>
+    <string name="op_galeria">Mostrar una foto de la galería</string>
+</resources>

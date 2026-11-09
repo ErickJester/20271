@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 13 - SharedPreferences</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  h3, h4 { break-after: avoid; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+
+  pre { background:#f5f5f5; border:1px solid #ccc; border-radius:5px; padding:8px 10px; font-size:9.6px; line-height:1.35; white-space:pre-wrap; word-break:break-word; page-break-inside:auto; }
+  .nota { border-left:4px solid #888; background:#f4f4f4; padding:6px 10px; margin:8px 0; font-size:11.5px; }
+  .rejilla { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin:10px 0; }
+  .rejilla figure { width:30%; }
+  .rejilla.cuatro figure { width:22%; }
+</style>
+</head>
+<body>
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+  <div class="tema-box"><div class="etiqueta">Tema</div><div class="tema">La clase SharedPreferences</div></div>
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 13</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>8 de noviembre de 2026</td></tr>
+  </table>
+</div>
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p><code class="inline">SharedPreferences</code> guarda datos primitivos (cadenas, números, booleanos) como pares clave-valor en un archivo XML privado de la aplicación, que persiste aunque la app se cierre. Se obtiene con <code class="inline">getSharedPreferences(nombre, modo)</code> y se modifica con un <code class="inline">SharedPreferences.Editor</code> (<code class="inline">putString</code>, <code class="inline">putFloat</code>… y <code class="inline">commit</code>).</p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Guardar y recuperar un nombre y dos coordenadas con SharedPreferences (Ejemplo 1).</li>
+    <li>Guardar las coordenadas de la Ciudad de México y mostrarlas en otra pantalla con un Intent (Ejercicio 1).</li>
+    <li>Guardar en el almacén interno una imagen de la galería y dibujarla en un Canvas (Ejercicio 2).</li>
+    <li>Convertir el Ejemplo 1 a Kotlin (Ejercicio 3).</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+  <h3>Entorno de trabajo</h3>
+  <p>Un proyecto, <em>Preferencias</em>, con un menú de cuatro botones (<code class="inline">MainActivity.kt</code>) y una actividad por cada ejemplo o ejercicio. Se ejecutó en el emulador de Android Studio (API 36). Cada pantalla lleva mi nombre como encabezado. Para comprobar los datos se leyó el archivo XML de cada preferencia directamente del dispositivo con <code class="inline">adb shell run-as com.example.preferencias cat shared_prefs/…</code>, equivalente al Device Explorer que menciona la guía.</p>
+  <div class="nota"><strong>Adaptación.</strong> En <code class="inline">onPause</code> la guía convierte los campos con <code class="inline">Float.parseFloat</code>, que cierra la app si un campo queda vacío. Se agregó una validación: si el valor no es un número, se muestra un aviso y no se guarda.</div>
+
+  <h3>Ejemplo 1. Preferencias persistentes (Java)</h3>
+  <p>Al abrir la actividad se leen el título y los ejes X e Y del archivo <code class="inline">preferencias.xml</code> (con valores por omisión «ESCOM», 0 y 0). Al salir de la pantalla, <code class="inline">onPause</code> guarda los valores y muestra un <code class="inline">Toast</code>.</p>
+  <pre>package com.example.preferencias;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.widget.EditText;
+import android.widget.Toast;
+
+/** Ejemplo 1: nombre, eje X y eje Y persistentes en el archivo preferencias.xml. */
+public class Ejemplo1Activity extends Activity {
+    SharedPreferences sp;
+    EditText jetn, jetx, jety;
+    String s;
+    float x, y;
+
+    public void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_preferencias);
+        jetn = (EditText) findViewById(R.id.xetn);
+        jetx = (EditText) findViewById(R.id.xetx);
+        jety = (EditText) findViewById(R.id.xety);
+        sp = getSharedPreferences(&quot;preferencias&quot;, Context.MODE_PRIVATE);
+        s = sp.getString(&quot;titulo&quot;, &quot;ESCOM&quot;);
+        x = sp.getFloat(&quot;x&quot;, 0);
+        y = sp.getFloat(&quot;y&quot;, 0);
+        jetn.setText(s);
+        jetx.setText(&quot;&quot; + x);
+        jety.setText(&quot;&quot; + y);
+    }
+
+    protected void onPause() {
+        super.onPause();
+        try {
+            s = jetn.getText().toString();
+            x = Float.parseFloat(jetx.getText().toString());
+            y = Float.parseFloat(jety.getText().toString());
+        } catch (NumberFormatException e) {
+            // Un eje vac&#237;o o inv&#225;lido no debe cerrar la app: se conservan los valores anteriores.
+            Toast.makeText(this, &quot;Eje X o Y inv&#225;lido: no se guard&#243;&quot;, Toast.LENGTH_LONG).show();
+            return;
+        }
+        SharedPreferences.Editor miEditor = sp.edit();
+        miEditor.putString(&quot;titulo&quot;, s);
+        miEditor.putFloat(&quot;x&quot;, x);
+        miEditor.putFloat(&quot;y&quot;, y);
+        miEditor.commit();
+        Toast.makeText(this, &quot;Preferencias guardadas&quot;, Toast.LENGTH_LONG).show();
+    }
+}</pre>
+  <div class="rejilla "><figure><img src="../screenshots/01_menu.png" alt="Menú de la práctica."><figcaption>Fig. 1. Menú de la práctica.</figcaption></figure>
+<figure><img src="../screenshots/02_ej1_inicio.png" alt="Primera ejecución: valores iniciales."><figcaption>Fig. 2. Primera ejecución: valores iniciales.</figcaption></figure>
+<figure><img src="../screenshots/03_ej1_modificado.png" alt="Datos modificados por el usuario."><figcaption>Fig. 3. Datos modificados por el usuario.</figcaption></figure></div>
+  <div class="rejilla "><figure><img src="../screenshots/04_ej1_toast_guardado.png" alt="Al cerrar la pantalla, el Toast «Preferencias guardadas»."><figcaption>Fig. 4. Al cerrar la pantalla, el Toast «Preferencias guardadas».</figcaption></figure>
+<figure><img src="../screenshots/05_ej1_reabierto.png" alt="Al reabrir la aplicación, los datos persisten."><figcaption>Fig. 5. Al reabrir la aplicación, los datos persisten.</figcaption></figure></div>
+  <p>Contenido del archivo <code class="inline">shared_prefs/preferencias.xml</code> en el dispositivo:</p>
+  <pre>&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39; standalone=&#39;yes&#39; ?&gt;
+&lt;map&gt;
+    &lt;float name=&quot;x&quot; value=&quot;12.5&quot; /&gt;
+    &lt;string name=&quot;titulo&quot;&gt;ESCOM-Angel&lt;/string&gt;
+    &lt;float name=&quot;y&quot; value=&quot;-7.25&quot; /&gt;
+&lt;/map&gt;</pre>
+
+  <h3>Ejercicio 1. Coordenadas de la Ciudad de México</h3>
+  <p><code class="inline">CoordenadasActivity</code> pide latitud y longitud, las guarda en el archivo <code class="inline">coordenadas</code> junto con el nombre de la ciudad y, con un <code class="inline">Intent</code>, abre <code class="inline">MostrarCoordenadasActivity</code>, que las lee y las muestra en un <code class="inline">TextView</code>. Se usaron las coordenadas 19.4326 (latitud) y -99.1332 (longitud).</p>
+  <pre>package com.example.preferencias;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.widget.EditText;
+import android.widget.Toast;
+
+/** Ejercicio 1: pide latitud y longitud de la CDMX, las guarda y las muestra con un Intent. */
+public class CoordenadasActivity extends Activity {
+    EditText etLatitud, etLongitud;
+    SharedPreferences sp;
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_coordenadas);
+        etLatitud = findViewById(R.id.etLatitud);
+        etLongitud = findViewById(R.id.etLongitud);
+        sp = getSharedPreferences(&quot;coordenadas&quot;, Context.MODE_PRIVATE);
+
+        findViewById(R.id.bGuardar).setOnClickListener(v -&gt; guardar());
+        findViewById(R.id.bMostrar).setOnClickListener(v -&gt;
+                startActivity(new Intent(this, MostrarCoordenadasActivity.class)));
+    }
+
+    private void guardar() {
+        try {
+            float lat = Float.parseFloat(etLatitud.getText().toString());
+            float lon = Float.parseFloat(etLongitud.getText().toString());
+            SharedPreferences.Editor e = sp.edit();
+            e.putString(&quot;ciudad&quot;, &quot;Ciudad de M&#233;xico&quot;);
+            e.putFloat(&quot;latitud&quot;, lat);
+            e.putFloat(&quot;longitud&quot;, lon);
+            e.commit();
+            Toast.makeText(this, &quot;Coordenadas guardadas&quot;, Toast.LENGTH_SHORT).show();
+        } catch (NumberFormatException ex) {
+            Toast.makeText(this, &quot;Escribe latitud y longitud como n&#250;meros&quot;, Toast.LENGTH_SHORT).show();
+        }
+    }
+}</pre>
+  <pre>package com.example.preferencias;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.widget.TextView;
+
+/** Lee las coordenadas guardadas en SharedPreferences y las muestra en un TextView. */
+public class MostrarCoordenadasActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_mostrar_coordenadas);
+        SharedPreferences sp = getSharedPreferences(&quot;coordenadas&quot;, Context.MODE_PRIVATE);
+        TextView tv = findViewById(R.id.tvDatos);
+        if (!sp.contains(&quot;latitud&quot;)) {
+            tv.setText(&quot;No hay coordenadas guardadas.&quot;);
+            return;
+        }
+        tv.setText(sp.getString(&quot;ciudad&quot;, &quot;&quot;)
+                + &quot;\nLatitud: &quot; + sp.getFloat(&quot;latitud&quot;, 0)
+                + &quot;\nLongitud: &quot; + sp.getFloat(&quot;longitud&quot;, 0));
+    }
+}</pre>
+  <div class="rejilla "><figure><img src="../screenshots/06_ej1_coordenadas_vacio.png" alt="Pantalla de captura."><figcaption>Fig. 6. Pantalla de captura.</figcaption></figure>
+<figure><img src="../screenshots/07_ej1_coordenadas_capturadas.png" alt="Coordenadas escritas."><figcaption>Fig. 7. Coordenadas escritas.</figcaption></figure>
+<figure><img src="../screenshots/08_ej1_toast_guardado.png" alt="Toast «Coordenadas guardadas»."><figcaption>Fig. 8. Toast «Coordenadas guardadas».</figcaption></figure></div>
+  <div class="rejilla "><figure><img src="../screenshots/09_ej1_mostrar_intent.png" alt="Datos mostrados en un TextView mediante un Intent."><figcaption>Fig. 9. Datos mostrados en un TextView mediante un Intent.</figcaption></figure></div>
+  <pre>&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39; standalone=&#39;yes&#39; ?&gt;
+&lt;map&gt;
+    &lt;float name=&quot;latitud&quot; value=&quot;19.4326&quot; /&gt;
+    &lt;float name=&quot;longitud&quot; value=&quot;-99.1332&quot; /&gt;
+    &lt;string name=&quot;ciudad&quot;&gt;Ciudad de M&#233;xico&lt;/string&gt;
+&lt;/map&gt;</pre>
+
+  <h3>Ejercicio 2. Imagen en el almacén interno y Canvas</h3>
+  <p><code class="inline">ImagenActivity</code> abre el selector de imágenes con <code class="inline">ACTION_GET_CONTENT</code>, y la imagen elegida se guarda como PNG en el almacén interno de la app con <code class="inline">openFileOutput</code> (archivo <code class="inline">imagen_guardada.png</code>). Con un <code class="inline">Intent</code> se abre <code class="inline">MostrarImagenActivity</code>, que lee el archivo y lo dibuja en un <code class="inline">Canvas</code> con <code class="inline">drawBitmap</code> dentro de una vista propia (<code class="inline">onDraw</code>), centrado y escalado.</p>
+  <pre>package com.example.preferencias;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
+import android.os.Bundle;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+
+/** Ejercicio 2: guarda en el almac&#233;n interno de la app una imagen elegida de la galer&#237;a. */
+public class ImagenActivity extends Activity {
+    static final String ARCHIVO = &quot;imagen_guardada.png&quot;;
+    static final int PEDIR_IMAGEN = 1;
+    TextView tvEstado;
+    ImageView ivVista;
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_imagen);
+        tvEstado = findViewById(R.id.tvEstado);
+        ivVista = findViewById(R.id.ivVista);
+
+        findViewById(R.id.bElegir).setOnClickListener(v -&gt; {
+            Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+            i.setType(&quot;image/*&quot;);
+            startActivityForResult(i, PEDIR_IMAGEN);
+        });
+        // El Canvas se muestra en otra Activity, a la que se llega con un Intent.
+        findViewById(R.id.bMostrar).setOnClickListener(v -&gt; {
+            if (!getFileStreamPath(ARCHIVO).exists()) {
+                Toast.makeText(this, &quot;Primero elige una imagen&quot;, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            startActivity(new Intent(this, MostrarImagenActivity.class));
+        });
+        actualizarEstado();
+    }
+
+    @Override
+    protected void onActivityResult(int codigo, int resultado, Intent datos) {
+        super.onActivityResult(codigo, resultado, datos);
+        if (codigo != PEDIR_IMAGEN || resultado != RESULT_OK || datos == null) return;
+        Uri uri = datos.getData();
+        try {
+            Bitmap bmp = ImageDecoder.decodeBitmap(ImageDecoder.createSource(getContentResolver(), uri),
+                    (decoder, info, src) -&gt; {
+                        int lado = Math.max(info.getSize().getWidth(), info.getSize().getHeight());
+                        decoder.setTargetSampleSize(Math.max(1, lado / 1600));
+                    });
+            try (FileOutputStream fos = openFileOutput(ARCHIVO, MODE_PRIVATE)) {
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            }
+            Toast.makeText(this, &quot;Imagen guardada&quot;, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(this, &quot;No se pudo guardar la imagen&quot;, Toast.LENGTH_SHORT).show();
+        }
+        actualizarEstado();
+    }
+
+    private void actualizarEstado() {
+        File f = getFileStreamPath(ARCHIVO);
+        if (f.exists()) {
+            tvEstado.setText(&quot;Imagen guardada en el almac&#233;n interno:\n&quot; + f.getAbsolutePath());
+            ivVista.setImageBitmap(BitmapFactory.decodeFile(f.getAbsolutePath()));
+        }
+    }
+}</pre>
+  <pre>package com.example.preferencias;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+/** Dibuja en un Canvas la imagen guardada en el almac&#233;n interno. */
+public class MostrarImagenActivity extends Activity {
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        LinearLayout raiz = new LinearLayout(this);
+        raiz.setOrientation(LinearLayout.VERTICAL);
+        int margen = (int) (16 * getResources().getDisplayMetrics().density);
+        raiz.setPadding(margen, margen, margen, margen);
+
+        TextView nombre = new TextView(this);
+        nombre.setText(R.string.nombre_alumno);
+        nombre.setTextSize(18);
+        nombre.setTypeface(null, Typeface.BOLD);
+        raiz.addView(nombre);
+
+        Bitmap bmp = BitmapFactory.decodeFile(
+                getFileStreamPath(ImagenActivity.ARCHIVO).getAbsolutePath());
+        raiz.addView(new Lienzo(this, bmp), new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f));
+        // El FrameLayout recibe las barras del sistema; el LinearLayout conserva su margen de 16 dp.
+        FrameLayout marco = new FrameLayout(this);
+        marco.setFitsSystemWindows(true);
+        marco.addView(raiz, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(marco);
+    }
+
+    /** Vista que dibuja el bitmap centrado y escalado al espacio disponible. */
+    static class Lienzo extends View {
+        final Bitmap bmp;
+        final Paint pincel = new Paint(Paint.FILTER_BITMAP_FLAG);
+
+        Lienzo(Context c, Bitmap bmp) {
+            super(c);
+            this.bmp = bmp;
+        }
+
+        @Override
+        protected void onDraw(Canvas canvas) {
+            if (bmp == null) return;
+            float escala = Math.min((float) getWidth() / bmp.getWidth(),
+                    (float) getHeight() / bmp.getHeight());
+            float w = bmp.getWidth() * escala, h = bmp.getHeight() * escala;
+            float x = (getWidth() - w) / 2, y = (getHeight() - h) / 2;
+            canvas.drawBitmap(bmp, null, new RectF(x, y, x + w, y + h), pincel);
+        }
+    }
+}</pre>
+  <div class="rejilla "><figure><img src="../screenshots/10_ej2_inicio.png" alt="Pantalla inicial."><figcaption>Fig. 10. Pantalla inicial.</figcaption></figure>
+<figure><img src="../screenshots/11_ej2_selector.png" alt="Selector de imágenes del sistema."><figcaption>Fig. 11. Selector de imágenes del sistema.</figcaption></figure>
+<figure><img src="../screenshots/12_ej2_imagen_guardada.png" alt="Imagen guardada en el almacén interno."><figcaption>Fig. 12. Imagen guardada en el almacén interno.</figcaption></figure></div>
+  <div class="rejilla "><figure><img src="../screenshots/13_ej2_canvas.png" alt="La imagen dibujada en un Canvas."><figcaption>Fig. 13. La imagen dibujada en un Canvas.</figcaption></figure></div>
+  <p>Archivo en el almacén interno (<code class="inline">adb shell run-as … ls -l files</code>):</p>
+  <pre>total 88
+-rw-rw---- 1 u0_a217 u0_a217 84031 2026-11-09 01:59 imagen_guardada.png</pre>
+
+  <h3>Ejercicio 3. Conversión a Kotlin</h3>
+  <p>El Ejemplo 1 se reproduce en Kotlin con <code class="inline">Ejercicio3Activity.kt</code>, que usa <code class="inline">lateinit</code> para las vistas, el operador elvis (<code class="inline">?:</code>) para el valor por omisión y <code class="inline">toFloatOrNull()</code> para validar los números. Guarda en su propio archivo, <code class="inline">preferencias_kotlin.xml</code>, para no mezclar sus datos con los de la versión en Java.</p>
+  <pre>package com.example.preferencias
+
+import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.widget.EditText
+import android.widget.Toast
+
+/** Ejercicio 3: el Ejemplo 1 convertido a Kotlin (archivo preferencias_kotlin.xml). */
+class Ejercicio3Activity : Activity() {
+
+    private lateinit var sp: SharedPreferences
+    private lateinit var jetn: EditText
+    private lateinit var jetx: EditText
+    private lateinit var jety: EditText
+
+    private var s: String = &quot;&quot;
+    private var x: Float = 0f
+    private var y: Float = 0f
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_preferencias)
+
+        jetn = findViewById&lt;EditText&gt;(R.id.xetn)
+        jetx = findViewById&lt;EditText&gt;(R.id.xetx)
+        jety = findViewById&lt;EditText&gt;(R.id.xety)
+
+        sp = getSharedPreferences(&quot;preferencias_kotlin&quot;, Context.MODE_PRIVATE)
+
+        s = sp.getString(&quot;titulo&quot;, &quot;ESCOM&quot;) ?: &quot;ESCOM&quot;
+        x = sp.getFloat(&quot;x&quot;, 0f)
+        y = sp.getFloat(&quot;y&quot;, 0f)
+
+        jetn.setText(s)
+        jetx.setText(x.toString())
+        jety.setText(y.toString())
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        val nuevoX = jetx.text.toString().toFloatOrNull()
+        val nuevoY = jety.text.toString().toFloatOrNull()
+        if (nuevoX == null || nuevoY == null) {
+            Toast.makeText(this, &quot;Eje X o Y inv&#225;lido: no se guard&#243;&quot;, Toast.LENGTH_LONG).show()
+            return
+        }
+        s = jetn.text.toString()
+        x = nuevoX
+        y = nuevoY
+
+        val miEditor = sp.edit()
+        miEditor.putString(&quot;titulo&quot;, s)
+        miEditor.putFloat(&quot;x&quot;, x)
+        miEditor.putFloat(&quot;y&quot;, y)
+        miEditor.commit()
+
+        Toast.makeText(this, &quot;Preferencias guardadas&quot;, Toast.LENGTH_LONG).show()
+    }
+}</pre>
+  <div class="rejilla "><figure><img src="../screenshots/14_ej3_kotlin_inicio.png" alt="Kotlin: valores iniciales."><figcaption>Fig. 14. Kotlin: valores iniciales.</figcaption></figure>
+<figure><img src="../screenshots/15_ej3_kotlin_modificado.png" alt="Kotlin: datos modificados."><figcaption>Fig. 15. Kotlin: datos modificados.</figcaption></figure>
+<figure><img src="../screenshots/16_ej3_kotlin_toast.png" alt="Kotlin: Toast al guardar."><figcaption>Fig. 16. Kotlin: Toast al guardar.</figcaption></figure></div>
+  <pre>&lt;?xml version=&#39;1.0&#39; encoding=&#39;utf-8&#39; standalone=&#39;yes&#39; ?&gt;
+&lt;map&gt;
+    &lt;float name=&quot;x&quot; value=&quot;3.14&quot; /&gt;
+    &lt;string name=&quot;titulo&quot;&gt;Kotlin-Angel&lt;/string&gt;
+    &lt;float name=&quot;y&quot; value=&quot;-2.5&quot; /&gt;
+&lt;/map&gt;</pre>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>SharedPreferences es suficiente para guardar pocos datos simples, como configuraciones o las últimas coordenadas, y se usa con muy poco código: abrir el archivo, leer con valores por omisión y escribir con un editor. Para datos más grandes, como la imagen, no es adecuado, y por eso se guardó como archivo en el almacén interno, que también es privado de la aplicación. El archivo XML del dispositivo permitió comprobar que los datos realmente se escriben. En Kotlin el código queda más corto y seguro frente a valores nulos o vacíos, con el mismo comportamiento que en Java.</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>La Clase SharedPreferences</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>Save simple data with SharedPreferences</em>. developer.android.com/training/data-storage/shared-preferences</li>
+    <li>Android Developers. <em>Save files on device storage</em>. developer.android.com/training/data-storage/app-specific</li>
+  </ul>
+</section>
+</body>
+</html>

@@ -1,0 +1,6 @@
+﻿<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <float name="x" value="3.14" />
+    <string name="titulo">Kotlin-Angel</string>
+    <float name="y" value="-2.5" />
+</map>

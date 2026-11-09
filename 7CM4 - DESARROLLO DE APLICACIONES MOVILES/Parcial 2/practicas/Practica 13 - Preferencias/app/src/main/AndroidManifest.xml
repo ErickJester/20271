@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Preferencias">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Ejemplo1Activity" android:label="Ejemplo 1" />
+        <activity android:name=".CoordenadasActivity" android:label="Ejercicio 1" />
+        <activity android:name=".MostrarCoordenadasActivity" android:label="Coordenadas guardadas" />
+        <activity android:name=".ImagenActivity" android:label="Ejercicio 2" />
+        <activity android:name=".MostrarImagenActivity" android:label="Imagen guardada" />
+        <activity android:name=".Ejercicio3Activity" android:label="Ejercicio 3" />
+    </application>
+
+</manifest>

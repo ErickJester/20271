@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/nombre_alumno"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/xbn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="@string/toma_foto" />
+
+        <RadioGroup
+            android:id="@+id/xrg1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/xrb0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/op_preview" />
+
+            <RadioButton
+                android:id="@+id/xrb1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/op_completa" />
+
+            <RadioButton
+                android:id="@+id/xrb2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/op_galeria" />
+        </RadioGroup>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/xiv1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:contentDescription="Imagen obtenida"
+        android:scaleType="fitCenter" />
+</LinearLayout>
+</FrameLayout>

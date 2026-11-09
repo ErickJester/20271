@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 12 - Cámara</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  h3, h4 { break-after: avoid; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+
+  pre { background:#f5f5f5; border:1px solid #ccc; border-radius:5px; padding:8px 10px; font-size:9.6px; line-height:1.35; white-space:pre-wrap; word-break:break-word; page-break-inside:auto; }
+  .nota { border-left:4px solid #888; background:#f4f4f4; padding:6px 10px; margin:8px 0; font-size:11.5px; }
+  .rejilla { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin:10px 0; }
+  .rejilla figure { width:30%; }
+  .rejilla.cuatro figure { width:22%; }
+</style>
+</head>
+<body>
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+  <div class="tema-box"><div class="etiqueta">Tema</div><div class="tema">Cámara del dispositivo móvil (Java y Jetpack Compose)</div></div>
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 12</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>8 de noviembre de 2026</td></tr>
+  </table>
+</div>
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>Android permite capturar fotografías desde una aplicación con la API <code class="inline">android.hardware.camera2</code> o, de forma más sencilla, lanzando un <code class="inline">Intent</code> con la acción <code class="inline">MediaStore.ACTION_IMAGE_CAPTURE</code>, de modo que la aplicación de cámara del sistema toma la foto y la devuelve. La clase <code class="inline">android.hardware.Camera</code> está obsoleta.</p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Tomar una foto con el Intent de la cámara y guardarla en la carpeta <code class="inline">misfotos</code> (Ejemplo 1).</li>
+    <li>Ofrecer tres opciones con <code class="inline">RadioButton</code>: vista previa, imagen completa o foto de la galería (Ejemplo 2).</li>
+    <li>Convertir el Ejemplo 2 a Jetpack Compose (Ejercicio).</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+  <h3>Entorno de trabajo</h3>
+  <p>Un solo proyecto, <em>Camara</em>, con un menú (<code class="inline">MainActivity</code>) que abre las tres pantallas: <code class="inline">Ejemplo1Activity</code> y <code class="inline">Ejemplo2Activity</code> en Java, y <code class="inline">CamaraComposeActivity</code> en Kotlin con Compose. Se ejecutó en el emulador de Android Studio (API 36) y se compiló con <code class="inline">minSdk 29</code>. Cada pantalla lleva mi nombre como encabezado para identificar las capturas.</p>
+  <div class="nota"><strong>Adaptaciones al material del profesor.</strong> El código de la guía es de versiones antiguas de Android y no funciona tal cual en una versión actual:
+    <ul>
+      <li><code class="inline">Uri.fromFile()</code> y la carpeta pública de <code class="inline">Environment.getExternalStoragePublicDirectory</code> ya no se pueden entregar a la app de cámara (provocan <code class="inline">FileUriExposedException</code> y el almacenamiento está restringido). En su lugar se crea la foto con <code class="inline">MediaStore</code> (<code class="inline">Pictures/misfotos</code>) y se pasa ese <code class="inline">Uri</code> en <code class="inline">EXTRA_OUTPUT</code>. Así la foto aparece en la Galería y no hace falta <code class="inline">WRITE_EXTERNAL_STORAGE</code>.</li>
+      <li>No se declaró el permiso <code class="inline">CAMERA</code>: al usar el Intent la app de cámara del sistema es quien lo necesita. Si se declara sin solicitarlo en tiempo de ejecución, el Intent falla con <code class="inline">SecurityException</code>.</li>
+      <li>El patrón de fecha <code class="inline">yyyymmddhhmmss</code> de la guía usa <code class="inline">mm</code> (minutos) en lugar de <code class="inline">MM</code> (mes); se corrigió a <code class="inline">yyyyMMddHHmmss</code>.</li>
+      <li>Para la galería se usa <code class="inline">ACTION_GET_CONTENT</code> con tipo <code class="inline">image/*</code> en lugar de <code class="inline">ACTION_PICK</code> con <code class="inline">INTERNAL_CONTENT_URI</code>, que ya no muestra la galería. Las imágenes se leen con <code class="inline">ImageDecoder</code>, que las reduce y respeta la rotación.</li>
+    </ul></div>
+  <h3>Clase auxiliar Fotos.java</h3>
+  <p>Reúne lo que comparten los ejemplos: crear la entrada de la foto en <code class="inline">Pictures/misfotos</code>, borrarla si se cancela la cámara y leer una imagen reducida.</p>
+  <pre>package com.example.camara;
+
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+/** Utilidades compartidas por los ejemplos: crear la foto en la galer&#237;a y leer im&#225;genes. */
+final class Fotos {
+    private Fotos() {}
+
+    /**
+     * Crea una entrada vac&#237;a en Pictures/misfotos (visible en la Galer&#237;a) y devuelve su Uri.
+     * La app de c&#225;mara escribe en ese Uri (EXTRA_OUTPUT). En API 29+ no pide permisos.
+     */
+    static Uri nueva(Context c) {
+        ContentValues v = new ContentValues();
+        v.put(MediaStore.Images.Media.DISPLAY_NAME, codigo() + &quot;.jpg&quot;);
+        v.put(MediaStore.Images.Media.MIME_TYPE, &quot;image/jpeg&quot;);
+        v.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + &quot;/misfotos&quot;);
+        return c.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
+    }
+
+    /** Borra la entrada creada con nueva() cuando el usuario cancela la c&#225;mara. */
+    static void descartar(Context c, Uri uri) {
+        if (uri != null) c.getContentResolver().delete(uri, null, null);
+    }
+
+    /** Decodifica el Uri reduciendo el tama&#241;o (m&#225;x. ~1024 px) y respetando la rotaci&#243;n EXIF. */
+    static Bitmap leer(ContentResolver cr, Uri uri) throws IOException {
+        ImageDecoder.Source fuente = ImageDecoder.createSource(cr, uri);
+        return ImageDecoder.decodeBitmap(fuente, (decoder, info, src) -&gt; {
+            int lado = Math.max(info.getSize().getWidth(), info.getSize().getHeight());
+            decoder.setTargetSampleSize(Math.max(1, lado / 1024));
+            decoder.setMutableRequired(false);
+        });
+    }
+
+    /** Nombre pic_AAAAMMDDHHMMSS (en la gu&#237;a el patr&#243;n usa mm = minutos en lugar de MM = mes). */
+    static String codigo() {
+        return &quot;pic_&quot; + new SimpleDateFormat(&quot;yyyyMMddHHmmss&quot;, Locale.getDefault()).format(new Date());
+    }
+}</pre>
+
+  <h3>Ejemplo 1. Tomar una foto con el Intent de la cámara</h3>
+  <p>Al pulsar el botón se crea la foto vacía en la galería, se lanza el Intent con <code class="inline">EXTRA_OUTPUT</code> y, en <code class="inline">onActivityResult</code>, si el resultado es <code class="inline">RESULT_OK</code> se muestra la foto; si se cancela, se borra la entrada vacía.</p>
+  <pre>package com.example.camara;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.IOException;
+
+/** Ejemplo 1: toma una foto con el Intent de la c&#225;mara y la guarda en Pictures/misfotos. */
+public class Ejemplo1Activity extends Activity {
+    private Button jbn;
+    private Uri foto;
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_ejemplo1);
+        jbn = (Button) findViewById(R.id.xbn);
+        jbn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                foto = Fotos.nueva(Ejemplo1Activity.this);
+                Intent in = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                in.putExtra(MediaStore.EXTRA_OUTPUT, foto);
+                startActivityForResult(in, 0);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        TextView estado = (TextView) findViewById(R.id.tvEstado);
+        if (resultCode == RESULT_OK &amp;&amp; foto != null) {
+            try {
+                ((ImageView) findViewById(R.id.ivFoto)).setImageBitmap(
+                        Fotos.leer(getContentResolver(), foto));
+                estado.setText(&quot;Foto guardada en Pictures/misfotos:\n&quot; + foto);
+                Toast.makeText(this, &quot;Foto guardada&quot;, Toast.LENGTH_SHORT).show();
+            } catch (IOException ex) {
+                Log.e(&quot;Error&quot;, &quot;Error:&quot; + ex);
+                estado.setText(&quot;No se pudo leer la foto.&quot;);
+            }
+        } else {
+            Fotos.descartar(this, foto);
+            estado.setText(&quot;No se tom&#243; la foto.&quot;);
+        }
+    }
+}</pre>
+  <div class="rejilla "><figure><img src="../screenshots/01_menu.png" alt="Menú de la práctica."><figcaption>Fig. 1. Menú de la práctica.</figcaption></figure>
+<figure><img src="../screenshots/02_ej1_inicio.png" alt="Ejemplo 1: pantalla inicial."><figcaption>Fig. 2. Ejemplo 1: pantalla inicial.</figcaption></figure>
+<figure><img src="../screenshots/03_ej1_camara.png" alt="Se abre la cámara del emulador."><figcaption>Fig. 3. Se abre la cámara del emulador.</figcaption></figure></div>
+  <div class="rejilla "><figure><img src="../screenshots/04_ej1_confirmar.png" alt="Foto tomada: se confirma con Done."><figcaption>Fig. 4. Foto tomada: se confirma con Done.</figcaption></figure>
+<figure><img src="../screenshots/05_ej1_resultado.png" alt="La foto se muestra y se indica su ubicación."><figcaption>Fig. 5. La foto se muestra y se indica su ubicación.</figcaption></figure></div>
+  <p>Para verificar que la foto se guardó en la carpeta <code class="inline">misfotos</code>, se listó el directorio con <code class="inline">adb shell ls -l /sdcard/Pictures/misfotos</code>:</p>
+  <pre>total 76
+-rwxrwx--- 1 u0_a193 media_rw 72968 2026-11-09 02:01 pic_20261109020103.jpg</pre>
+
+  <h3>Ejemplo 2. Vista previa, imagen completa o galería</h3>
+  <p>Un <code class="inline">RadioGroup</code> con tres opciones decide qué Intent se lanza. Con la <em>vista previa</em> la cámara devuelve una miniatura en el extra <code class="inline">data</code>; con la <em>imagen completa</em> la cámara escribe en el <code class="inline">Uri</code> indicado; con la <em>galería</em> el selector del sistema devuelve el <code class="inline">Uri</code> de la imagen elegida.</p>
+  <pre>package com.example.camara;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.Toast;
+
+import java.io.IOException;
+
+/** Ejemplo 2: vista previa, imagen completa o foto elegida de la galer&#237;a. */
+public class Ejemplo2Activity extends Activity {
+    Button jbn;
+    RadioButton jrb0, jrb1, jrb2;
+    Intent i;
+    int TAKE_PREVIEW = 0;
+    int TAKE_PICTURE = 1;
+    int SELECT_PICTURE = 2;
+    Uri foto;
+
+    @Override
+    public void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_ejemplo2);
+        jbn = (Button) findViewById(R.id.xbn1);
+        jrb0 = (RadioButton) findViewById(R.id.xrb0);
+        jrb1 = (RadioButton) findViewById(R.id.xrb1);
+        jrb2 = (RadioButton) findViewById(R.id.xrb2);
+        jbn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                i = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                int code = TAKE_PREVIEW;
+                if (jrb1.isChecked()) {
+                    foto = Fotos.nueva(Ejemplo2Activity.this);
+                    i.putExtra(MediaStore.EXTRA_OUTPUT, foto);
+                    code = TAKE_PICTURE;
+                } else if (jrb2.isChecked()) {
+                    // ACTION_PICK con INTERNAL_CONTENT_URI (gu&#237;a) ya no muestra la galer&#237;a.
+                    i = new Intent(Intent.ACTION_GET_CONTENT);
+                    i.setType(&quot;image/*&quot;);
+                    code = SELECT_PICTURE;
+                }
+                startActivityForResult(i, code);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) {
+            if (requestCode == TAKE_PICTURE) Fotos.descartar(this, foto);
+            return;
+        }
+        ImageView iv = (ImageView) findViewById(R.id.xiv1);
+        try {
+            if (requestCode == TAKE_PREVIEW) {
+                if (data != null &amp;&amp; data.hasExtra(&quot;data&quot;)) {
+                    iv.setImageBitmap((Bitmap) data.getParcelableExtra(&quot;data&quot;));
+                } else {
+                    Toast.makeText(this, &quot;La c&#225;mara no devolvi&#243; vista previa&quot;, Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == TAKE_PICTURE) {
+                iv.setImageBitmap(Fotos.leer(getContentResolver(), foto));
+            } else if (requestCode == SELECT_PICTURE &amp;&amp; data != null) {
+                iv.setImageBitmap(Fotos.leer(getContentResolver(), data.getData()));
+            }
+        } catch (IOException e) {
+            Toast.makeText(this, &quot;No se pudo abrir la imagen&quot;, Toast.LENGTH_SHORT).show();
+        }
+    }
+}</pre>
+  <div class="rejilla "><figure><img src="../screenshots/06_ej2_inicio.png" alt="Ejemplo 2: pantalla inicial."><figcaption>Fig. 6. Ejemplo 2: pantalla inicial.</figcaption></figure>
+<figure><img src="../screenshots/08_ej2_vista_previa.png" alt="Opción «Tomar una vista previa»."><figcaption>Fig. 7. Opción «Tomar una vista previa».</figcaption></figure>
+<figure><img src="../screenshots/09_ej2_imagen_completa.png" alt="Opción «Tomar una imagen completa»."><figcaption>Fig. 8. Opción «Tomar una imagen completa».</figcaption></figure></div>
+  <div class="rejilla "><figure><img src="../screenshots/10_ej2_selector_galeria.png" alt="Opción de galería: selector de imágenes."><figcaption>Fig. 9. Opción de galería: selector de imágenes.</figcaption></figure>
+<figure><img src="../screenshots/11_ej2_galeria.png" alt="Foto de la galería mostrada."><figcaption>Fig. 10. Foto de la galería mostrada.</figcaption></figure></div>
+
+  <h3>Ejercicio. Cámara con Jetpack Compose</h3>
+  <p>El Ejemplo 2 se reescribió con Compose. Cada Intent se sustituye por un contrato de resultado registrado con <code class="inline">rememberLauncherForActivityResult</code>: <code class="inline">TakePicturePreview</code> (vista previa), <code class="inline">TakePicture</code> (imagen completa) y <code class="inline">GetContent</code> (galería). El estado (opción elegida, imagen y mensaje) vive en variables <code class="inline">remember</code>, y la interfaz se redibuja sola cuando cambian.</p>
+  <pre>package com.example.camara
+
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+
+/** Ejercicio: el Ejemplo 2 (vista previa / imagen completa / galer&#237;a) con Jetpack Compose. */
+class CamaraComposeActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { MaterialTheme { PantallaCamara() } }
+    }
+}
+
+@Composable
+fun PantallaCamara() {
+    val contexto = LocalContext.current
+    val resolver = contexto.contentResolver
+    val opciones = listOf(
+        stringResource(R.string.op_preview),
+        stringResource(R.string.op_completa),
+        stringResource(R.string.op_galeria)
+    )
+    var opcion by remember { mutableIntStateOf(0) }
+    var imagen by remember { mutableStateOf&lt;Bitmap?&gt;(null) }
+    var mensaje by remember { mutableStateOf(&quot;&quot;) }
+    var foto by remember { mutableStateOf&lt;Uri?&gt;(null) }
+
+    fun leer(uri: Uri): Bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(resolver, uri)) { d, info, _ -&gt;
+        d.setTargetSampleSize(maxOf(1, maxOf(info.size.width, info.size.height) / 1024))
+    }
+
+    // Vista previa: la c&#225;mara devuelve una miniatura (Bitmap).
+    val vistaPrevia = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bmp -&gt;
+        if (bmp != null) { imagen = bmp; mensaje = &quot;Vista previa&quot; }
+        else mensaje = &quot;La c&#225;mara no devolvi&#243; vista previa&quot;
+    }
+    // Imagen completa: la c&#225;mara escribe en el Uri indicado (Pictures/misfotos).
+    val completa = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { guardada -&gt;
+        val uri = foto
+        if (guardada &amp;&amp; uri != null) { imagen = leer(uri); mensaje = &quot;Imagen completa: $uri&quot; }
+        else { uri?.let { resolver.delete(it, null, null) }; mensaje = &quot;No se tom&#243; la foto&quot; }
+    }
+    // Galer&#237;a: el selector del sistema devuelve un Uri.
+    val galeria = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -&gt;
+        if (uri != null) { imagen = leer(uri); mensaje = &quot;Foto de la galer&#237;a&quot; }
+    }
+
+    Column(Modifier.fillMaxSize().systemBarsPadding().padding(16.dp)) {
+        Text(stringResource(R.string.nombre_alumno), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column(Modifier.weight(1f)) {
+                opciones.forEachIndexed { i, texto -&gt;
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(selected = opcion == i, onClick = { opcion = i })
+                        Text(texto)
+                    }
+                }
+            }
+            Button(onClick = {
+                when (opcion) {
+                    0 -&gt; vistaPrevia.launch(null)
+                    1 -&gt; { foto = Fotos.nueva(contexto); completa.launch(foto!!) }
+                    else -&gt; galeria.launch(&quot;image/*&quot;)
+                }
+            }) { Text(stringResource(R.string.toma_foto), maxLines = 1) }
+        }
+        Text(mensaje, Modifier.padding(vertical = 8.dp))
+        imagen?.let { Image(it.asImageBitmap(), contentDescription = &quot;Foto&quot;, Modifier.fillMaxWidth()) }
+    }
+}</pre>
+  <div class="rejilla "><figure><img src="../screenshots/12_compose_inicio.png" alt="Compose: pantalla inicial."><figcaption>Fig. 11. Compose: pantalla inicial.</figcaption></figure>
+<figure><img src="../screenshots/13_compose_vista_previa.png" alt="Compose: vista previa."><figcaption>Fig. 12. Compose: vista previa.</figcaption></figure>
+<figure><img src="../screenshots/14_compose_imagen_completa.png" alt="Compose: imagen completa."><figcaption>Fig. 13. Compose: imagen completa.</figcaption></figure></div>
+  <div class="rejilla "><figure><img src="../screenshots/15_compose_galeria.png" alt="Compose: foto de la galería."><figcaption>Fig. 14. Compose: foto de la galería.</figcaption></figure></div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>El Intent de la cámara es la forma más corta de tomar fotos: la aplicación no maneja el lente ni pide el permiso de cámara, y solo recibe el resultado. Lo que más cambió respecto al material de la guía es el almacenamiento: con <code class="inline">MediaStore</code> la foto queda en la Galería sin permisos especiales. La vista previa devuelve solo una miniatura, y para obtener la foto en su resolución real hay que indicar dónde guardarla. Con Compose el mismo programa quedó más corto, porque los contratos de resultado reemplazan a <code class="inline">startActivityForResult</code> y <code class="inline">onActivityResult</code>, y el estado actualiza la pantalla sin escribir <code class="inline">findViewById</code>.</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>Cámara del dispositivo móvil</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>Camera intents</em> y <em>Store media files</em>. developer.android.com/media/camera/camera-intents · developer.android.com/training/data-storage/shared/media</li>
+    <li>Android Developers. <em>Get a result from an activity (Activity Result APIs)</em>. developer.android.com/training/basics/intents/result</li>
+  </ul>
+</section>
+</body>
+</html>

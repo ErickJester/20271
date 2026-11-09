@@ -1,0 +1,2 @@
+﻿total 88
+-rw-rw---- 1 u0_a217 u0_a217 84031 2026-11-09 01:59 imagen_guardada.png

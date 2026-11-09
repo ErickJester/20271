@@ -1,0 +1,6 @@
+﻿<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <float name="latitud" value="19.4326" />
+    <float name="longitud" value="-99.1332" />
+    <string name="ciudad">Ciudad de México</string>
+</map>

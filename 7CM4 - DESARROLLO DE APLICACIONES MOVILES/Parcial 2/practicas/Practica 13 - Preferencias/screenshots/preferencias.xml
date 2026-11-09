@@ -1,0 +1,6 @@
+﻿<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <float name="x" value="12.5" />
+    <string name="titulo">ESCOM-Angel</string>
+    <float name="y" value="-7.25" />
+</map>

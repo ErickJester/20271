@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.Camara" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
