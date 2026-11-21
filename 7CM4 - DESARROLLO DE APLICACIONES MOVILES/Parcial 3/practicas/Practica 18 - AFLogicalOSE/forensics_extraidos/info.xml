@@ -1,0 +1,1548 @@
+<android-forensics>
+<date-time>20261121.2418</date-time>
+<IMSI>310260000000000</IMSI>
+<IMEI-MEID>358240051111110</IMEI-MEID>
+<phone-type>1</phone-type>
+<MSISDN-MDN>+15555215556</MSISDN-MDN>
+<ICCID>89014103211118510720</ICCID>
+<build>
+	<version.release>4.4.2</version.release>
+	<version.sdk>19</version.sdk>
+	<version.incremental>6761301</version.incremental>
+	<board>unknown</board>
+	<brand>generic_x86</brand>
+	<device>generic_x86</device>
+	<display>google_sdk_x86-eng 4.4.2 KK 6761301 test-keys</display>
+	<fingerprint>generic_x86/google_sdk_x86/generic_x86:4.4.2/KK/6761301:eng/test-keys</fingerprint>
+	<host>abfarm389</host>
+	<id>KK</id>
+	<model>Android SDK built for x86</model>
+	<product>google_sdk_x86</product>
+	<tags>test-keys</tags>
+	<time>1597353389000</time>
+	<type>eng</type>
+	<user>android-build</user>
+</build>
+<applications>
+	<app>
+		<label>Sound Recorder</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.soundrecorder</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.soundrecorder</packageName>
+		<permission>null</permission>
+		<processName>com.android.soundrecorder</processName>
+		<publicSourceDir>/system/app/SoundRecorder.apk</publicSourceDir>
+		<sourceDir>/system/app/SoundRecorder.apk</sourceDir>
+		<taskAffinity>com.android.soundrecorder</taskAffinity>
+		<uid>10047</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>com.android.sdksetup</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.sdksetup</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.sdksetup</packageName>
+		<permission>null</permission>
+		<processName>com.android.sdksetup</processName>
+		<publicSourceDir>/system/app/SdkSetup.apk</publicSourceDir>
+		<sourceDir>/system/app/SdkSetup.apk</sourceDir>
+		<taskAffinity>com.android.sdksetup</taskAffinity>
+		<uid>10046</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Package Access Helper</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.defcontainer</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082670661</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.defcontainer</packageName>
+		<permission>null</permission>
+		<processName>com.android.defcontainer</processName>
+		<publicSourceDir>/system/priv-app/DefaultContainerService.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/DefaultContainerService.apk</sourceDir>
+		<taskAffinity>com.android.defcontainer</taskAffinity>
+		<uid>10003</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Launcher</label>
+		<className>com.android.launcher2.LauncherApplication</className>
+		<dataDir>/data/data/com.android.launcher</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897733</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.launcher</packageName>
+		<permission>null</permission>
+		<processName>com.android.launcher</processName>
+		<publicSourceDir>/system/priv-app/Launcher2.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Launcher2.apk</sourceDir>
+		<taskAffinity>com.android.launcher</taskAffinity>
+		<uid>10009</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>com.android.smoketest</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.smoketest</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>10534468</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.smoketest</packageName>
+		<permission>null</permission>
+		<processName>com.android.smoketest</processName>
+		<publicSourceDir>/data/app/SmokeTestApp.apk</publicSourceDir>
+		<sourceDir>/data/app/SmokeTestApp.apk</sourceDir>
+		<taskAffinity>com.android.smoketest</taskAffinity>
+		<uid>10054</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Contacts</label>
+		<className>com.android.contacts.ContactsApplication</className>
+		<dataDir>/data/data/com.android.contacts</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897733</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.contacts</packageName>
+		<permission>null</permission>
+		<processName>com.android.contacts</processName>
+		<publicSourceDir>/system/priv-app/Contacts.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Contacts.apk</sourceDir>
+		<taskAffinity>android.task.contacts</taskAffinity>
+		<uid>10002</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Phone</label>
+		<className>com.android.phone.PhoneApp</className>
+		<dataDir>/data/data/com.android.phone</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897741</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.phone</packageName>
+		<permission>null</permission>
+		<processName>com.android.phone</processName>
+		<publicSourceDir>/system/priv-app/TeleService.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/TeleService.apk</sourceDir>
+		<taskAffinity>com.android.phone</taskAffinity>
+		<uid>1001</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Calculator</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.calculator2</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.calculator2</packageName>
+		<permission>null</permission>
+		<processName>com.android.calculator2</processName>
+		<publicSourceDir>/system/app/Calculator.apk</publicSourceDir>
+		<sourceDir>/system/app/Calculator.apk</sourceDir>
+		<taskAffinity>com.android.calculator2</taskAffinity>
+		<uid>10017</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>ProxyHandler</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.proxyhandler</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703429</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.proxyhandler</packageName>
+		<permission>null</permission>
+		<processName>com.android.proxyhandler</processName>
+		<publicSourceDir>/system/priv-app/ProxyHandler.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/ProxyHandler.apk</sourceDir>
+		<taskAffinity>com.android.proxyhandler</taskAffinity>
+		<uid>10011</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Connectivity Test</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.emulator.connectivity.test</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8437317</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.emulator.connectivity.test</packageName>
+		<permission>null</permission>
+		<processName>com.android.emulator.connectivity.test</processName>
+		<publicSourceDir>/system/app/ConnectivityTest.apk</publicSourceDir>
+		<sourceDir>/system/app/ConnectivityTest.apk</sourceDir>
+		<taskAffinity>com.android.emulator.connectivity.test</taskAffinity>
+		<uid>10020</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>HTML Viewer</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.htmlviewer</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.htmlviewer</packageName>
+		<permission>null</permission>
+		<processName>com.android.htmlviewer</processName>
+		<publicSourceDir>/system/app/HTMLViewer.apk</publicSourceDir>
+		<sourceDir>/system/app/HTMLViewer.apk</sourceDir>
+		<taskAffinity>com.android.htmlviewer</taskAffinity>
+		<uid>10030</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Google Account Manager</label>
+		<className>null</className>
+		<dataDir>/data/data/com.google.android.gsf.login</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897733</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.gsf.login</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.gsf.login</processName>
+		<publicSourceDir>/system/priv-app/GoogleLoginService.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/GoogleLoginService.apk</sourceDir>
+		<taskAffinity>com.google.android.gsf.login</taskAffinity>
+		<uid>10007</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Calendar Storage</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.calendar</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703429</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.calendar</packageName>
+		<permission>null</permission>
+		<processName>com.android.providers.calendar</processName>
+		<publicSourceDir>/system/priv-app/CalendarProvider.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/CalendarProvider.apk</sourceDir>
+		<taskAffinity>com.android.providers.calendar</taskAffinity>
+		<uid>10001</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Input Devices</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.inputdevices</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703365</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.inputdevices</packageName>
+		<permission>null</permission>
+		<processName>system</processName>
+		<publicSourceDir>/system/priv-app/InputDevices.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/InputDevices.apk</sourceDir>
+		<taskAffinity>com.android.inputdevices</taskAffinity>
+		<uid>1000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Custom Locale</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.customlocale2</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.customlocale2</packageName>
+		<permission>null</permission>
+		<processName>com.android.customlocale2</processName>
+		<publicSourceDir>/system/app/CustomLocale.apk</publicSourceDir>
+		<sourceDir>/system/app/CustomLocale.apk</sourceDir>
+		<taskAffinity>com.android.customlocale2</taskAffinity>
+		<uid>10021</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Browser</label>
+		<className>com.android.browser.Browser</className>
+		<dataDir>/data/data/com.android.browser</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>9027141</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.browser</packageName>
+		<permission>null</permission>
+		<processName>com.android.browser</processName>
+		<publicSourceDir>/system/app/Browser.apk</publicSourceDir>
+		<sourceDir>/system/app/Browser.apk</sourceDir>
+		<taskAffinity>android.task.browser</taskAffinity>
+		<uid>10016</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Music</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.music</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961637</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.music</packageName>
+		<permission>null</permission>
+		<processName>com.android.music</processName>
+		<publicSourceDir>/system/app/Music.apk</publicSourceDir>
+		<sourceDir>/system/app/Music.apk</sourceDir>
+		<taskAffinity>android.task.music</taskAffinity>
+		<uid>10036</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>NetSpeed</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.netspeed</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.netspeed</packageName>
+		<permission>null</permission>
+		<processName>com.android.netspeed</processName>
+		<publicSourceDir>/system/app/NetSpeed.apk</publicSourceDir>
+		<sourceDir>/system/app/NetSpeed.apk</sourceDir>
+		<taskAffinity>com.android.netspeed</taskAffinity>
+		<uid>10037</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Widget Preview</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.widgetpreview</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>11058756</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.widgetpreview</packageName>
+		<permission>null</permission>
+		<processName>com.android.widgetpreview</processName>
+		<publicSourceDir>/data/app/WidgetPreview.apk</publicSourceDir>
+		<sourceDir>/data/app/WidgetPreview.apk</sourceDir>
+		<taskAffinity>com.android.widgetpreview</taskAffinity>
+		<uid>10056</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Downloads</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.downloads.ui</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13155909</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.downloads.ui</packageName>
+		<permission>null</permission>
+		<processName>android.process.media</processName>
+		<publicSourceDir>/system/app/DownloadProviderUi.apk</publicSourceDir>
+		<sourceDir>/system/app/DownloadProviderUi.apk</sourceDir>
+		<taskAffinity>com.android.providers.downloads.ui</taskAffinity>
+		<uid>10005</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Example Wallpapers</label>
+		<className>null</className>
+		<dataDir>/data/data/com.example.android.livecubes</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>11058756</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.example.android.livecubes</packageName>
+		<permission>null</permission>
+		<processName>com.example.android.livecubes</processName>
+		<publicSourceDir>/data/app/CubeLiveWallpapers.apk</publicSourceDir>
+		<sourceDir>/data/app/CubeLiveWallpapers.apk</sourceDir>
+		<taskAffinity>com.example.android.livecubes</taskAffinity>
+		<uid>10051</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>User Dictionary</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.userdictionary</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961541</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.userdictionary</packageName>
+		<permission>null</permission>
+		<processName>android.process.acore</processName>
+		<publicSourceDir>/system/app/UserDictionaryProvider.apk</publicSourceDir>
+		<sourceDir>/system/app/UserDictionaryProvider.apk</sourceDir>
+		<taskAffinity>com.android.providers.userdictionary</taskAffinity>
+		<uid>10002</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Documents</label>
+		<className>com.android.documentsui.DocumentsApplication</className>
+		<dataDir>/data/data/com.android.documentsui</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13155909</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.documentsui</packageName>
+		<permission>null</permission>
+		<processName>com.android.documentsui</processName>
+		<publicSourceDir>/system/app/DocumentsUI.apk</publicSourceDir>
+		<sourceDir>/system/app/DocumentsUI.apk</sourceDir>
+		<taskAffinity>com.android.documentsui</taskAffinity>
+		<uid>10025</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>com.android.sharedstoragebackup</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.sharedstoragebackup</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082768901</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.sharedstoragebackup</packageName>
+		<permission>android.permission.CONFIRM_FULL_BACKUP</permission>
+		<processName>com.android.sharedstoragebackup</processName>
+		<publicSourceDir>/system/priv-app/SharedStorageBackup.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/SharedStorageBackup.apk</sourceDir>
+		<taskAffinity>com.android.sharedstoragebackup</taskAffinity>
+		<uid>10012</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>谷歌拼音输入法</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.inputmethod.pinyin</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.inputmethod.pinyin</packageName>
+		<permission>null</permission>
+		<processName>com.android.inputmethod.pinyin</processName>
+		<publicSourceDir>/system/app/PinyinIME.apk</publicSourceDir>
+		<sourceDir>/system/app/PinyinIME.apk</sourceDir>
+		<taskAffinity>com.android.inputmethod.pinyin</taskAffinity>
+		<uid>10042</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>VpnDialogs</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.vpndialogs</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082670661</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.vpndialogs</packageName>
+		<permission>null</permission>
+		<processName>com.android.vpndialogs</processName>
+		<publicSourceDir>/system/priv-app/VpnDialogs.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/VpnDialogs.apk</sourceDir>
+		<taskAffinity>com.android.vpndialogs</taskAffinity>
+		<uid>10014</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Messaging</label>
+		<className>com.android.mms.MmsApp</className>
+		<dataDir>/data/data/com.android.mms</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703461</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.mms</packageName>
+		<permission>null</permission>
+		<processName>com.android.mms</processName>
+		<publicSourceDir>/system/priv-app/Mms.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Mms.apk</sourceDir>
+		<taskAffinity>android.task.mms</taskAffinity>
+		<uid>10010</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Media Storage</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.media</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897733</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.media</packageName>
+		<permission>null</permission>
+		<processName>android.process.media</processName>
+		<publicSourceDir>/system/priv-app/MediaProvider.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/MediaProvider.apk</sourceDir>
+		<taskAffinity>com.android.providers.media</taskAffinity>
+		<uid>10005</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>700</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>PacProcessor</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.pacprocessor</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.pacprocessor</packageName>
+		<permission>null</permission>
+		<processName>com.android.pacprocessor</processName>
+		<publicSourceDir>/system/app/PacProcessor.apk</publicSourceDir>
+		<sourceDir>/system/app/PacProcessor.apk</sourceDir>
+		<taskAffinity>com.android.pacprocessor</taskAffinity>
+		<uid>10039</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Certificate Installer</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.certinstaller</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8928837</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.certinstaller</packageName>
+		<permission>null</permission>
+		<processName>com.android.certinstaller</processName>
+		<publicSourceDir>/system/app/CertInstaller.apk</publicSourceDir>
+		<sourceDir>/system/app/CertInstaller.apk</sourceDir>
+		<taskAffinity>com.android.certinstaller</taskAffinity>
+		<uid>10019</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>API Demos</label>
+		<className>com.example.android.apis.ApiDemosApplication</className>
+		<dataDir>/data/data/com.example.android.apis</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>15253060</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.example.android.apis</packageName>
+		<permission>null</permission>
+		<processName>com.example.android.apis</processName>
+		<publicSourceDir>/data/app/ApiDemos.apk</publicSourceDir>
+		<sourceDir>/data/app/ApiDemos.apk</sourceDir>
+		<taskAffinity>com.example.android.apis</taskAffinity>
+		<uid>10050</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Google Play services</label>
+		<className>co.g.App</className>
+		<dataDir>/data/data/com.google.android.gms</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086864965</flags>
+		<manageSpaceActivityName>co.g.Space</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.gms</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.gms</processName>
+		<publicSourceDir>/system/priv-app/PrebuiltGmsCore.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/PrebuiltGmsCore.apk</sourceDir>
+		<taskAffinity>com.google.android.gms</taskAffinity>
+		<uid>10007</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>202414005</versionCode>
+			<versionName>20.24.14 (000700-319035315)</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Fallback</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.fallback</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.fallback</packageName>
+		<permission>null</permission>
+		<processName>com.android.fallback</processName>
+		<publicSourceDir>/system/app/Fallback.apk</publicSourceDir>
+		<sourceDir>/system/app/Fallback.apk</sourceDir>
+		<taskAffinity>com.android.fallback</taskAffinity>
+		<uid>10028</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Print Spooler</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.printspooler</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13123141</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.printspooler</packageName>
+		<permission>null</permission>
+		<processName>com.android.printspooler</processName>
+		<publicSourceDir>/system/app/PrintSpooler.apk</publicSourceDir>
+		<sourceDir>/system/app/PrintSpooler.apk</sourceDir>
+		<taskAffinity>com.android.printspooler</taskAffinity>
+		<uid>10044</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>AFLogical OSE</label>
+		<className>null</className>
+		<dataDir>/data/data/com.viaforensics.android.aflogical_ose</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8422468</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.viaforensics.android.aflogical_ose</packageName>
+		<permission>null</permission>
+		<processName>com.viaforensics.android.aflogical_ose</processName>
+		<publicSourceDir>/data/app/com.viaforensics.android.aflogical_ose-1.apk</publicSourceDir>
+		<sourceDir>/data/app/com.viaforensics.android.aflogical_ose-1.apk</sourceDir>
+		<taskAffinity>com.viaforensics.android.aflogical_ose</taskAffinity>
+		<uid>10057</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>152</versionCode>
+			<versionName>1.5.2_OSE</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>com.android.gesture.builder</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.gesture.builder</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>11058756</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.gesture.builder</packageName>
+		<permission>null</permission>
+		<processName>com.android.gesture.builder</processName>
+		<publicSourceDir>/data/app/GestureBuilder.apk</publicSourceDir>
+		<sourceDir>/data/app/GestureBuilder.apk</sourceDir>
+		<taskAffinity>com.android.gesture.builder</taskAffinity>
+		<uid>10052</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Android System</label>
+		<className>null</className>
+		<dataDir>/data/system</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897673</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>android</packageName>
+		<permission>null</permission>
+		<processName>system</processName>
+		<publicSourceDir>/system/framework/framework-res.apk</publicSourceDir>
+		<sourceDir>/system/framework/framework-res.apk</sourceDir>
+		<taskAffinity>android</taskAffinity>
+		<uid>1000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Camera</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.gallery</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.gallery</packageName>
+		<permission>null</permission>
+		<processName>com.android.gallery</processName>
+		<publicSourceDir>/system/app/Gallery.apk</publicSourceDir>
+		<sourceDir>/system/app/Gallery.apk</sourceDir>
+		<taskAffinity>null</taskAffinity>
+		<uid>10005</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Contacts Storage</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.contacts</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082670661</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.contacts</packageName>
+		<permission>null</permission>
+		<processName>android.process.acore</processName>
+		<publicSourceDir>/system/priv-app/ContactsProvider.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/ContactsProvider.apk</sourceDir>
+		<taskAffinity>com.android.providers.contacts</taskAffinity>
+		<uid>10002</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Settings</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.settings</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897733</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.settings</packageName>
+		<permission>null</permission>
+		<processName>com.android.settings</processName>
+		<publicSourceDir>/system/priv-app/Settings.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Settings.apk</sourceDir>
+		<taskAffinity>null</taskAffinity>
+		<uid>1000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>External Storage</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.externalstorage</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703429</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.externalstorage</packageName>
+		<permission>null</permission>
+		<processName>com.android.externalstorage</processName>
+		<publicSourceDir>/system/priv-app/ExternalStorageProvider.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/ExternalStorageProvider.apk</sourceDir>
+		<taskAffinity>com.android.externalstorage</taskAffinity>
+		<uid>10006</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Home screen tips</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.protips</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.protips</packageName>
+		<permission>null</permission>
+		<processName>com.android.protips</processName>
+		<publicSourceDir>/system/app/Protips.apk</publicSourceDir>
+		<sourceDir>/system/app/Protips.apk</sourceDir>
+		<taskAffinity>com.android.protips</taskAffinity>
+		<uid>10045</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Basic Daydreams</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.dreams.basic</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.dreams.basic</packageName>
+		<permission>null</permission>
+		<processName>com.android.dreams.basic</processName>
+		<publicSourceDir>/system/app/BasicDreams.apk</publicSourceDir>
+		<sourceDir>/system/app/BasicDreams.apk</sourceDir>
+		<taskAffinity>com.android.dreams.basic</taskAffinity>
+		<uid>10015</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Street View</label>
+		<className>null</className>
+		<dataDir>/data/data/com.google.android.street</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.street</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.street</processName>
+		<publicSourceDir>/system/app/Street.apk</publicSourceDir>
+		<sourceDir>/system/app/Street.apk</sourceDir>
+		<taskAffinity>com.google.android.street</taskAffinity>
+		<uid>10049</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>18102</versionCode>
+			<versionName>1.8.1.2</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Development Settings</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.development_settings</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961601</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.development_settings</packageName>
+		<permission>null</permission>
+		<processName>com.android.development_settings</processName>
+		<publicSourceDir>/system/app/DevelopmentSettings.apk</publicSourceDir>
+		<sourceDir>/system/app/DevelopmentSettings.apk</sourceDir>
+		<taskAffinity>com.android.development_settings</taskAffinity>
+		<uid>10024</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Google Search</label>
+		<className>com.google.android.velvet.VelvetApplication</className>
+		<dataDir>/data/data/com.google.android.googlequicksearchbox</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1083752005</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.googlequicksearchbox</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.googlequicksearchbox</processName>
+		<publicSourceDir>/system/priv-app/Velvet.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Velvet.apk</sourceDir>
+		<taskAffinity>com.google.android.googlequicksearchbox</taskAffinity>
+		<uid>10013</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>300300070</versionCode>
+			<versionName>3.0.7.794767.arm</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>license checker</label>
+		<className>com.android.vending.VendingApplication</className>
+		<dataDir>/data/data/com.android.vending</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.vending</packageName>
+		<permission>null</permission>
+		<processName>com.android.vending</processName>
+		<publicSourceDir>/system/app/LicenseChecker.apk</publicSourceDir>
+		<sourceDir>/system/app/LicenseChecker.apk</sourceDir>
+		<taskAffinity>com.android.vending</taskAffinity>
+		<uid>10033</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1801</versionCode>
+			<versionName>1.8</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Google Play Games</label>
+		<className>com.google.android.apps.play.games.core.PlayGamesApplication</className>
+		<dataDir>/data/data/com.google.android.play.games</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13352517</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.play.games</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.play.games</processName>
+		<publicSourceDir>/system/app/PlayGames.apk</publicSourceDir>
+		<sourceDir>/system/app/PlayGames.apk</sourceDir>
+		<taskAffinity>com.google.android.play.games</taskAffinity>
+		<uid>10043</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>95330070</versionCode>
+			<versionName>2019.04.9533 (244301765.244301765-000700)</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>System UI</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.systemui</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086864909</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.systemui</packageName>
+		<permission>null</permission>
+		<processName>com.android.systemui</processName>
+		<publicSourceDir>/system/priv-app/SystemUI.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/SystemUI.apk</sourceDir>
+		<taskAffinity>com.android.systemui</taskAffinity>
+		<uid>10008</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Exchange Services</label>
+		<className>com.android.exchange.Exchange</className>
+		<dataDir>/data/data/com.android.exchange</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.exchange</packageName>
+		<permission>null</permission>
+		<processName>com.android.exchange</processName>
+		<publicSourceDir>/system/app/Exchange2.apk</publicSourceDir>
+		<sourceDir>/system/app/Exchange2.apk</sourceDir>
+		<taskAffinity>com.android.exchange</taskAffinity>
+		<uid>10027</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>500060</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Sample Soft Keyboard</label>
+		<className>null</className>
+		<dataDir>/data/data/com.example.android.softkeyboard</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>11058756</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.example.android.softkeyboard</packageName>
+		<permission>null</permission>
+		<processName>com.example.android.softkeyboard</processName>
+		<publicSourceDir>/data/app/SoftKeyboard.apk</publicSourceDir>
+		<sourceDir>/data/app/SoftKeyboard.apk</sourceDir>
+		<taskAffinity>com.example.android.softkeyboard</taskAffinity>
+		<uid>10055</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Live Wallpaper Picker</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.wallpaper.livepicker</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13155909</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.wallpaper.livepicker</packageName>
+		<permission>null</permission>
+		<processName>com.android.wallpaper.livepicker</processName>
+		<publicSourceDir>/system/app/LiveWallpapersPicker.apk</publicSourceDir>
+		<sourceDir>/system/app/LiveWallpapersPicker.apk</sourceDir>
+		<taskAffinity>com.android.wallpaper.livepicker</taskAffinity>
+		<uid>10034</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Key Chain</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.keychain</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8928837</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.keychain</packageName>
+		<permission>null</permission>
+		<processName>com.android.keychain</processName>
+		<publicSourceDir>/system/app/KeyChain.apk</publicSourceDir>
+		<sourceDir>/system/app/KeyChain.apk</sourceDir>
+		<taskAffinity>com.android.keychain</taskAffinity>
+		<uid>1000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Speech Recorder</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.speechrecorder</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.speechrecorder</packageName>
+		<permission>null</permission>
+		<processName>com.android.speechrecorder</processName>
+		<publicSourceDir>/system/app/SpeechRecorder.apk</publicSourceDir>
+		<sourceDir>/system/app/SpeechRecorder.apk</sourceDir>
+		<taskAffinity>com.android.speechrecorder</taskAffinity>
+		<uid>10048</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>GPS Location Test</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.emulator.gps.test</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8437317</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.emulator.gps.test</packageName>
+		<permission>null</permission>
+		<processName>com.android.emulator.gps.test</processName>
+		<publicSourceDir>/system/app/GpsLocationTest.apk</publicSourceDir>
+		<sourceDir>/system/app/GpsLocationTest.apk</sourceDir>
+		<taskAffinity>com.android.emulator.gps.test</taskAffinity>
+		<uid>10029</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Dev Tools</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.development</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.development</packageName>
+		<permission>null</permission>
+		<processName>com.android.development</processName>
+		<publicSourceDir>/system/app/Development.apk</publicSourceDir>
+		<sourceDir>/system/app/Development.apk</sourceDir>
+		<taskAffinity>com.android.development</taskAffinity>
+		<uid>10023</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Google Keyboard</label>
+		<className>null</className>
+		<dataDir>/data/data/com.google.android.inputmethod.latin</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13155909</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.inputmethod.latin</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.inputmethod.latin</processName>
+		<publicSourceDir>/system/app/LatinImeGoogle.apk</publicSourceDir>
+		<sourceDir>/system/app/LatinImeGoogle.apk</sourceDir>
+		<taskAffinity>com.google.android.inputmethod.latin</taskAffinity>
+		<uid>10031</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19007</versionCode>
+			<versionName>2.0.19007.6761301x</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Package installer</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.packageinstaller</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13123141</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.packageinstaller</packageName>
+		<permission>null</permission>
+		<processName>com.android.packageinstaller</processName>
+		<publicSourceDir>/system/app/PackageInstaller.apk</publicSourceDir>
+		<sourceDir>/system/app/PackageInstaller.apk</sourceDir>
+		<taskAffinity>com.android.packageinstaller</taskAffinity>
+		<uid>10040</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>com.android.smoketest.tests</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.smoketest.tests</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>10534468</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.smoketest.tests</packageName>
+		<permission>null</permission>
+		<processName>com.android.smoketest.tests</processName>
+		<publicSourceDir>/data/app/SmokeTest.apk</publicSourceDir>
+		<sourceDir>/data/app/SmokeTest.apk</sourceDir>
+		<taskAffinity>com.android.smoketest.tests</taskAffinity>
+		<uid>10053</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Phone/Messaging Storage</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.telephony</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8928773</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.telephony</packageName>
+		<permission>null</permission>
+		<processName>com.android.phone</processName>
+		<publicSourceDir>/system/app/TelephonyProvider.apk</publicSourceDir>
+		<sourceDir>/system/app/TelephonyProvider.apk</sourceDir>
+		<taskAffinity>com.android.providers.telephony</taskAffinity>
+		<uid>1001</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Camera</label>
+		<className>com.android.camera.CameraAppImpl</className>
+		<dataDir>/data/data/com.android.camera</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.camera</packageName>
+		<permission>null</permission>
+		<processName>com.android.camera</processName>
+		<publicSourceDir>/system/app/LegacyCamera.apk</publicSourceDir>
+		<sourceDir>/system/app/LegacyCamera.apk</sourceDir>
+		<taskAffinity>com.android.camera</taskAffinity>
+		<uid>10032</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Pico TTS</label>
+		<className>null</className>
+		<dataDir>/data/data/com.svox.pico</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.svox.pico</packageName>
+		<permission>null</permission>
+		<processName>com.svox.pico</processName>
+		<publicSourceDir>/system/app/PicoTts.apk</publicSourceDir>
+		<sourceDir>/system/app/PicoTts.apk</sourceDir>
+		<taskAffinity>com.svox.pico</taskAffinity>
+		<uid>10041</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>1</versionCode>
+			<versionName>1.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>OpenWnn</label>
+		<className>null</className>
+		<dataDir>/data/data/jp.co.omronsoft.openwnn</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>jp.co.omronsoft.openwnn</packageName>
+		<permission>null</permission>
+		<processName>jp.co.omronsoft.openwnn</processName>
+		<publicSourceDir>/system/app/OpenWnn.apk</publicSourceDir>
+		<sourceDir>/system/app/OpenWnn.apk</sourceDir>
+		<taskAffinity>jp.co.omronsoft.openwnn</taskAffinity>
+		<uid>10038</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Email</label>
+		<className>com.android.email.EmailApplication</className>
+		<dataDir>/data/data/com.android.email</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.email</packageName>
+		<permission>null</permission>
+		<processName>com.android.email</processName>
+		<publicSourceDir>/system/app/Email.apk</publicSourceDir>
+		<sourceDir>/system/app/Email.apk</sourceDir>
+		<taskAffinity>com.android.email</taskAffinity>
+		<uid>10026</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>500060</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Maps</label>
+		<className>com.google.android.apps.gmm.base.app.GoogleMapsApplication</className>
+		<dataDir>/data/data/com.google.android.apps.maps</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13155909</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.apps.maps</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.apps.maps</processName>
+		<publicSourceDir>/system/app/Maps.apk</publicSourceDir>
+		<sourceDir>/system/app/Maps.apk</sourceDir>
+		<taskAffinity>com.google.android.apps.maps</taskAffinity>
+		<uid>10035</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>704001123</versionCode>
+			<versionName>7.4.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Dialer</label>
+		<className>com.android.dialer.DialerApplication</className>
+		<dataDir>/data/data/com.android.dialer</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086963269</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.dialer</packageName>
+		<permission>null</permission>
+		<processName>com.android.dialer</processName>
+		<publicSourceDir>/system/priv-app/Dialer.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Dialer.apk</sourceDir>
+		<taskAffinity>com.android.dialer</taskAffinity>
+		<uid>10004</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Clock</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.deskclock</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>13155909</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.deskclock</packageName>
+		<permission>null</permission>
+		<processName>com.android.deskclock</processName>
+		<publicSourceDir>/system/app/DeskClock.apk</publicSourceDir>
+		<sourceDir>/system/app/DeskClock.apk</sourceDir>
+		<taskAffinity>com.android.deskclock</taskAffinity>
+		<uid>10022</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>301</versionCode>
+			<versionName>3.0.0</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Fused Location</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.location.fused</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703429</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.location.fused</packageName>
+		<permission>null</permission>
+		<processName>system</processName>
+		<publicSourceDir>/system/priv-app/FusedLocation.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/FusedLocation.apk</sourceDir>
+		<taskAffinity>com.android.location.fused</taskAffinity>
+		<uid>1000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>com.android.backupconfirm</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.backupconfirm</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082670597</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.backupconfirm</packageName>
+		<permission>android.permission.CONFIRM_FULL_BACKUP</permission>
+		<processName>com.android.backupconfirm</processName>
+		<publicSourceDir>/system/priv-app/BackupRestoreConfirmation.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/BackupRestoreConfirmation.apk</sourceDir>
+		<taskAffinity>com.android.backupconfirm</taskAffinity>
+		<uid>10000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Settings Storage</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.settings</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703365</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.settings</packageName>
+		<permission>null</permission>
+		<processName>system</processName>
+		<publicSourceDir>/system/priv-app/SettingsProvider.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/SettingsProvider.apk</sourceDir>
+		<taskAffinity>com.android.providers.settings</taskAffinity>
+		<uid>1000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Google Services Framework</label>
+		<className>null</className>
+		<dataDir>/data/data/com.google.android.gsf</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082670661</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.gsf</packageName>
+		<permission>null</permission>
+		<processName>com.google.process.gapps</processName>
+		<publicSourceDir>/system/priv-app/GoogleServicesFramework.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/GoogleServicesFramework.apk</sourceDir>
+		<taskAffinity>com.google.android.gsf</taskAffinity>
+		<uid>10007</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>com.android.keyguard</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.keyguard</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1086897741</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.keyguard</packageName>
+		<permission>null</permission>
+		<processName>com.android.systemui</processName>
+		<publicSourceDir>/system/priv-app/Keyguard.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Keyguard.apk</sourceDir>
+		<taskAffinity>com.android.keyguard</taskAffinity>
+		<uid>10008</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Calendar</label>
+		<className>com.android.calendar.CalendarApplication</className>
+		<dataDir>/data/data/com.google.android.calendar</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>9027141</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.calendar</packageName>
+		<permission>null</permission>
+		<processName>com.google.android.calendar</processName>
+		<publicSourceDir>/system/app/CalendarGoogle.apk</publicSourceDir>
+		<sourceDir>/system/app/CalendarGoogle.apk</sourceDir>
+		<taskAffinity>google.android.task.calendar</taskAffinity>
+		<uid>10018</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>201308021</versionCode>
+			<versionName>201308021</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Shell</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.shell</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703429</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.shell</packageName>
+		<permission>null</permission>
+		<processName>com.android.shell</processName>
+		<publicSourceDir>/system/priv-app/Shell.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/Shell.apk</sourceDir>
+		<taskAffinity>com.android.shell</taskAffinity>
+		<uid>2000</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Download Manager</label>
+		<className>null</className>
+		<dataDir>/data/data/com.android.providers.downloads</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>1082703429</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.android.providers.downloads</packageName>
+		<permission>null</permission>
+		<processName>android.process.media</processName>
+		<publicSourceDir>/system/priv-app/DownloadProvider.apk</publicSourceDir>
+		<sourceDir>/system/priv-app/DownloadProvider.apk</sourceDir>
+		<taskAffinity>com.android.providers.downloads</taskAffinity>
+		<uid>10005</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+	<app>
+		<label>Google Contacts Sync</label>
+		<className>null</className>
+		<dataDir>/data/data/com.google.android.syncadapters.contacts</dataDir>
+		<descriptionRes>0</descriptionRes>
+		<flags>8961605</flags>
+		<manageSpaceActivityName>null</manageSpaceActivityName>
+		<name>null</name>
+		<packageName>com.google.android.syncadapters.contacts</packageName>
+		<permission>null</permission>
+		<processName>com.google.process.gapps</processName>
+		<publicSourceDir>/system/app/GoogleContactsSyncAdapter.apk</publicSourceDir>
+		<sourceDir>/system/app/GoogleContactsSyncAdapter.apk</sourceDir>
+		<taskAffinity>com.google.android.syncadapters.contacts</taskAffinity>
+		<uid>10007</uid>
+		<enabled>true</enabled>
+		<description>null</description>
+		<packageinfo>			<versionCode>19</versionCode>
+			<versionName>4.4.2-6761301</versionName>
+		</packageinfo>	</app>
+</applications>
+</android-forensics>

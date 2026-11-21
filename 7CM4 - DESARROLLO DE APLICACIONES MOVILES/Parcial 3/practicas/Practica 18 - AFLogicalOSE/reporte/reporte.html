@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 18 - AFLogical OSE</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  h3, h4 { break-after: avoid; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+
+  table.datos { border-collapse: collapse; width: 100%; font-size: 10.5px; margin: 8px 0; }
+  table.datos th, table.datos td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
+  table.datos th { background: #eee; }
+
+  pre { background:#f5f5f5; border:1px solid #ccc; border-radius:5px; padding:8px 10px; font-size:9.6px; line-height:1.35; white-space:pre-wrap; word-break:break-word; page-break-inside:auto; }
+  .nota { border-left:4px solid #888; background:#f4f4f4; padding:6px 10px; margin:8px 0; font-size:11.5px; }
+  .alerta { border-left:4px solid #B00020; background:#fdecea; padding:6px 10px; margin:8px 0; font-size:11.5px; }
+  .rejilla { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin:10px 0; }
+  .rejilla figure { width:30%; }
+  .rejilla.cuatro figure { width:22%; }
+</style>
+</head>
+<body>
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+  <div class="tema-box"><div class="etiqueta">Tema</div><div class="tema">Análisis forense de un móvil Android con AFLogical OSE</div></div>
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 18</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>21 de noviembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>A diferencia de la Práctica 17 (una app forense propia escrita en Java), esta práctica usa una herramienta forense de terceros ya compilada: <strong>AFLogical OSE</strong> (Open Source Edition), de viaForensics. Es una app Android que, al ejecutarse en el propio dispositivo, extrae de forma lógica el registro de llamadas, contactos, SMS y MMS a una carpeta <code class="inline">forensics/&lt;fecha&gt;/</code> en la tarjeta SD, en archivos <code class="inline">.csv</code> más un <code class="inline">info.xml</code> con metadatos del equipo (IMEI, IMSI, build, apps instaladas).</p>
+  <p>Objetivos de la guía: instalar y ejecutar AFLogical OSE, revisar los archivos extraídos en la carpeta <code class="inline">Forensics</code>, y abrirlos como hojas de datos.</p>
+  <div class="alerta"><strong>Alcance de esta entrega.</strong> La guía original termina con un ejercicio que pide diseñar una app que envíe AFLogical a otro usuario, la ejecute <em>oculta</em> en su teléfono sin que lo note, y reenvíe automáticamente la carpeta <code class="inline">Forensic</code> resultante (sus llamadas, contactos y SMS) al emisor original. Ese ejercicio no se desarrolló: es, en esencia, pedir una app de <em>stalkerware</em> — ejecución oculta más exfiltración automática de los datos personales de un tercero sin su conocimiento ni consentimiento — y queda fuera de lo que puedo construir sin importar el contexto académico. El resto de la guía (instalar AFLogical en el propio dispositivo, capturar, revisar los archivos) es una demostración forense normal sobre el propio equipo de pruebas y sí se realizó completa.</div>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+  <h3>Entorno de trabajo</h3>
+  <p>AFLogical OSE 1.5.2 (<code class="inline">com.viaforensics.android.aflogical_ose</code>) declara <code class="inline">minSdkVersion="3"</code> y un <code class="inline">targetSdkVersion</code> muy antiguo (la app es de ~2011-2013). Un Android moderno (API&nbsp;36, usado en las demás prácticas) <strong>rechaza instalar</strong> cualquier app con un <code class="inline">targetSdkVersion</code> tan bajo (<code class="inline">INSTALL_FAILED_DEPRECATED_SDK_VERSION</code>) — es una restricción real y vigente de Android, no un problema del entorno de pruebas. Por eso esta práctica se ejecutó en un segundo emulador, uno con Android 4.4.2 «KitKat» (API 19, contemporáneo de la herramienta), creado específicamente para esta app.</p>
+  <div class="nota"><strong>Datos de prueba.</strong> Igual que en la Práctica 17, se sembraron dos llamadas (<code class="inline">adb shell content insert --uri content://call_log/calls</code>) y un SMS simulado (<code class="inline">sms send</code> por la consola del emulador) sobre este mismo dispositivo de pruebas, nunca de un tercero.</div>
+
+  <h3>Paso 1-3. Instalación, captura y archivos generados</h3>
+  <p>Al abrir la app se muestran las cinco fuentes disponibles, todas preseleccionadas (Fig.&nbsp;1); al pulsar <strong>Capture</strong> extrae todo y muestra «Data extraction completed» (Fig.&nbsp;2). Los archivos quedan en <code class="inline">/sdcard/forensics/&lt;fecha&gt;.&lt;hora&gt;/</code>:</p>
+  <pre>drwxrwx--- 20261121.2418
+-rwxrwx--- CallLog Calls.csv
+-rwxrwx--- Contacts Phones.csv
+-rwxrwx--- MMS.csv
+-rwxrwx--- MMSParts.csv
+-rwxrwx--- SMS.csv
+-rwxrwx--- info.xml</pre>
+  <div class="par"><figure><img src="../screenshots/01_inicial.png" alt="Pantalla inicial de AFLogical OSE con las cinco fuentes disponibles marcadas."><figcaption>Fig. 1. Pantalla inicial.</figcaption></figure>
+<figure><img src="../screenshots/02_capturando.png" alt="Mensaje «Data extraction completed» al terminar la captura."><figcaption>Fig. 2. Extracción completada.</figcaption></figure></div>
+
+  <h3>Paso 4-5. Contenido de los archivos extraídos</h3>
+  <p>El equipo de pruebas no tiene teclado físico de hojas de cálculo (es un emulador Linux/Android), así que los <code class="inline">.csv</code> se revisaron directamente con <code class="inline">adb pull</code> + <code class="inline">cat</code> en vez de abrirlos en Excel como sugiere la guía (Figura 4 de la guía original); el contenido es el mismo dato tabular, solo que mostrado aquí en vez de en una hoja de cálculo de Windows:</p>
+  <p><strong>CallLog Calls.csv</strong> (las dos llamadas sembradas, tipo 1 = entrante, tipo 2 = saliente):</p>
+  <table class="datos">
+    <tr><th>_id</th><th>number</th><th>date</th><th>duration</th><th>type</th></tr>
+    <tr><td>1</td><td>5555550111</td><td>1795241798225</td><td>30</td><td>1</td></tr>
+    <tr><td>2</td><td>5555550222</td><td>1795241798667</td><td>90</td><td>2</td></tr>
+  </table>
+  <p><strong>SMS.csv</strong> (el SMS simulado con el módem del emulador):</p>
+  <table class="datos">
+    <tr><th>_id</th><th>address</th><th>date</th><th>type</th><th>body</th></tr>
+    <tr><td>1</td><td>5555550111</td><td>1795241804506</td><td>1 (recibido)</td><td>Mensaje de prueba para AFLogical.</td></tr>
+  </table>
+  <p><code class="inline">info.xml</code> trae metadatos del dispositivo (IMEI/IMSI simulados del emulador, huella del build) y la lista de apps instaladas, igual que la Figura 4 de la guía original:</p>
+  <pre>&lt;android-forensics&gt;
+&lt;date-time&gt;20261121.2418&lt;/date-time&gt;
+&lt;IMSI&gt;310260000000000&lt;/IMSI&gt;
+&lt;IMEI-MEID&gt;358240051111110&lt;/IMEI-MEID&gt;
+&lt;build&gt;
+	&lt;version.release&gt;4.4.2&lt;/version.release&gt;
+	&lt;version.sdk&gt;19&lt;/version.sdk&gt;
+	&lt;fingerprint&gt;generic_x86/google_sdk_x86/generic_x86:4.4.2/KK/6761301:eng/test-keys&lt;/fingerprint&gt;
+	&lt;model&gt;Android SDK built for x86&lt;/model&gt;
+	...
+&lt;/build&gt;
+&lt;applications&gt;
+	&lt;app&gt;
+		&lt;label&gt;Sound Recorder&lt;/label&gt;
+		&lt;packageName&gt;com.android.soundrecorder&lt;/packageName&gt;
+		...</pre>
+  <p>Los cinco archivos extraídos (<code class="inline">CallLog Calls.csv</code>, <code class="inline">Contacts Phones.csv</code>, <code class="inline">MMS.csv</code>, <code class="inline">MMSParts.csv</code>, <code class="inline">SMS.csv</code>) y <code class="inline">info.xml</code> se incluyen sin modificar en la carpeta <code class="inline">forensics_extraidos/</code> de esta entrega.</p>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>Lo más revelador de esta práctica no fue el uso de AFLogical en sí —es una app sencilla, de un solo botón— sino encontrarse con que el propio Android moderno ya no la deja instalarse: el piso mínimo de <code class="inline">targetSdkVersion</code> que el sistema exige para instalar cualquier app ha subido con los años, así que una herramienta forense de 2013 queda, en la práctica, obsoleta en un teléfono actual sin un entorno dedicado de la época. Eso en sí es un hallazgo forense legítimo: las herramientas de este tipo envejecen con el sistema operativo que inspeccionan. En cuanto al ejercicio final de la guía (envío oculto + autoejecución + reenvío automático a un tercero), es exactamente el patrón de una herramienta de vigilancia encubierta sobre un dispositivo ajeno, y por eso no se construyó.</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>Análisis forense de un móvil Android</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>viaForensics. <em>AFLogical OSE — Open Source Edition</em>. github.com/viaforensics/android-forensics</li>
+    <li>Android Developers. <em>Meet Google Play's target API level requirement</em> (restricciones de <code class="inline">targetSdkVersion</code> mínimo para instalar). developer.android.com/google/play/requirements/target-sdk</li>
+  </ul>
+</section>
+</body>
+</html>
