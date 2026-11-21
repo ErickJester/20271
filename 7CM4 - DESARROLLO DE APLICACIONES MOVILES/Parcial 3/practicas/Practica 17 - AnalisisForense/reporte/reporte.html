@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 17 - Análisis Forense</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  h3, h4 { break-after: avoid; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+
+  pre { background:#f5f5f5; border:1px solid #ccc; border-radius:5px; padding:8px 10px; font-size:9.6px; line-height:1.35; white-space:pre-wrap; word-break:break-word; page-break-inside:auto; }
+  .nota { border-left:4px solid #888; background:#f4f4f4; padding:6px 10px; margin:8px 0; font-size:11.5px; }
+  .rejilla { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin:10px 0; }
+  .rejilla figure { width:30%; }
+  .rejilla.cuatro figure { width:22%; }
+</style>
+</head>
+<body>
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+  <div class="tema-box"><div class="etiqueta">Tema</div><div class="tema">Análisis Forense con Android</div></div>
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 17</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>21 de noviembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p>El análisis forense móvil busca identificar, preservar, extraer, analizar y presentar datos de un teléfono de forma que conserven validez como evidencia. El proceso típico es: <strong>identificación y preservación</strong> (aislar el equipo de redes para no alterarlo), <strong>adquisición</strong> (extracción lógica de datos accesibles, del sistema de archivos, o física bit a bit), <strong>análisis</strong> e <strong>interpretación</strong>, y <strong>documentación</strong> con un informe trazable. En Android, el acceso a los datos está limitado por el modelo de permisos y el <em>sandboxing</em>: una app propia solo puede leer lo que el usuario le conceda explícitamente, a través de <code class="inline">ContentResolver</code> sobre los proveedores de contenido del sistema (registro de llamadas, SMS, contactos).</p>
+  <p>Objetivo: construir una app (<em>MiAnalisisForense</em>) que, con permiso del usuario, realice una extracción lógica del registro de llamadas y los SMS, calcule un hash SHA-256 del reporte para preservar su integridad (cadena de custodia) y lo exporte a un archivo estructurado (XML).</p>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+  <h3>Entorno de trabajo</h3>
+  <p>Proyecto <em>MiAnalisisForense</em> en Java, <code class="inline">minSdk 24</code>, ejecutado en el mismo emulador Android 16 (API 36) de las demás prácticas. Como el emulador no tiene llamadas ni SMS reales, se sembraron datos de prueba sobre el propio dispositivo de pruebas (nunca de un tercero): dos llamadas con <code class="inline">adb shell content insert --uri content://call_log/calls</code>, y dos SMS simulados con el comando de la consola del emulador <code class="inline">sms send &lt;número&gt; &lt;mensaje&gt;</code> (el proveedor <code class="inline">content://sms</code> solo acepta escritura real desde la app con el rol de SMS por defecto, así que un <code class="inline">content insert</code> directo no basta; <code class="inline">sms send</code> simula una recepción real a través del módem GSM emulado y la entrega a la app de Mensajes).</p>
+  <div class="nota"><strong>Adaptación al material del profesor.</strong> El permiso <code class="inline">MANAGE_EXTERNAL_STORAGE</code> que sugiere la guía es un permiso especial que Google Play exige declarar y justificar por separado; para una app de este alcance no hace falta: el reporte se exporta con <code class="inline">getExternalFilesDir()</code>, almacenamiento específico de la app que no requiere ningún permiso adicional desde Android 10 (API 29). Se declaran únicamente los permisos realmente usados: <code class="inline">READ_CALL_LOG</code>, <code class="inline">READ_SMS</code>, <code class="inline">READ_CONTACTS</code>, <code class="inline">READ_PHONE_STATE</code> y <code class="inline">ACCESS_NETWORK_STATE</code>.</div>
+
+  <h3>Extracción lógica y cálculo de integridad</h3>
+  <p>Al pulsar «Iniciar Extracción Lógica» se verifican los permisos y, si faltan, se solicitan en tiempo de ejecución; al concederlos, <code class="inline">onRequestPermissionsResult</code> dispara la extracción. <code class="inline">extractCallLogs()</code> y <code class="inline">extractSms()</code> consultan <code class="inline">CallLog.Calls.CONTENT_URI</code> y <code class="inline">Telephony.Sms.CONTENT_URI</code> con un <code class="inline">Cursor</code>; el reporte final se hashea con SHA-256 para que cualquier alteración posterior sea detectable:</p>
+  <pre>private void runForensicExtraction() {
+    StringBuilder report = new StringBuilder();
+    report.append("=== INFORMACIÓN DEL DISPOSITIVO ===\n");
+    report.append("Fabricante: ").append(Build.MANUFACTURER).append("\n");
+    report.append("Modelo: ").append(Build.MODEL).append("\n");
+    report.append("Versión Android: ").append(Build.VERSION.RELEASE).append("\n");
+    report.append("Parche Seguridad: ").append(Build.VERSION.SECURITY_PATCH).append("\n\n");
+    report.append("=== REGISTRO DE LLAMADAS ===\n").append(extractCallLogs()).append("\n");
+    report.append("=== MENSAJES SMS ===\n").append(extractSms()).append("\n");
+
+    String finalData = report.toString();
+    String sha256 = calculateSHA256(finalData);
+    tvLog.setText(finalData + "\n=== INTEGRIDAD ===\nSHA-256: " + sha256);
+
+    String rutaXml = exportarXml(finalData, sha256); // Paso 6: formato tabular (XML)
+    if (rutaXml != null) tvLog.append("\nReporte XML: " + rutaXml);
+}
+
+private String extractCallLogs() {
+    StringBuilder calls = new StringBuilder();
+    Cursor cursor = getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null,
+            CallLog.Calls.DATE + " DESC");
+    if (cursor != null) {
+        int numberIdx = cursor.getColumnIndex(CallLog.Calls.NUMBER);
+        int typeIdx = cursor.getColumnIndex(CallLog.Calls.TYPE);
+        int dateIdx = cursor.getColumnIndex(CallLog.Calls.DATE);
+        while (cursor.moveToNext()) {
+            calls.append("Número: ").append(cursor.getString(numberIdx))
+                 .append(" | Tipo: ").append(cursor.getString(typeIdx))
+                 .append(" | Timestamp: ").append(cursor.getString(dateIdx)).append("\n");
+        }
+        cursor.close();
+    }
+    return calls.toString();
+}</pre>
+  <div class="rejilla"><figure><img src="../screenshots/01_inicial.png" alt="Pantalla inicial de la app."><figcaption>Fig. 1. Pantalla inicial.</figcaption></figure>
+<figure><img src="../screenshots/02_permiso_llamadas.png" alt="Solicitud del permiso de registro de llamadas."><figcaption>Fig. 2. Permiso de llamadas.</figcaption></figure>
+<figure><img src="../screenshots/03_permiso_contactos.png" alt="Solicitud del permiso de contactos."><figcaption>Fig. 3. Permiso de contactos.</figcaption></figure></div>
+  <div class="rejilla"><figure><img src="../screenshots/04_permiso_sms.png" alt="Solicitud del permiso de SMS."><figcaption>Fig. 4. Permiso de SMS.</figcaption></figure>
+<figure><img src="../screenshots/05_extraccion_resultado.png" alt="Reporte final: metadatos del dispositivo, 2 llamadas, 2 SMS, hash SHA-256 y ruta del XML exportado."><figcaption>Fig. 5. Reporte completo con hash e XML exportado.</figcaption></figure></div>
+
+  <h3>Paso 6. Exportación a XML</h3>
+  <p>El reporte se guarda además como archivo XML (etiquetas <code class="inline">&lt;dispositivo&gt;</code>, <code class="inline">&lt;contenido&gt;</code> y <code class="inline">&lt;sha256&gt;</code>) en <code class="inline">getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)</code>. Se verificó con <code class="inline">adb shell cat</code> sobre el archivo generado:</p>
+  <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;reporteForense&gt;
+  &lt;dispositivo&gt;
+    &lt;fabricante&gt;Google&lt;/fabricante&gt;
+    &lt;modelo&gt;sdk_gphone64_x86_64&lt;/modelo&gt;
+    &lt;version&gt;16&lt;/version&gt;
+  &lt;/dispositivo&gt;
+  &lt;contenido&gt;=== INFORMACIÓN DEL DISPOSITIVO ===
+Fabricante: Google
+Modelo: sdk_gphone64_x86_64
+Versión Android: 16
+Parche Seguridad: 2025-07-05
+
+=== REGISTRO DE LLAMADAS ===
+Número: 5555550199 | Tipo: 1 | Timestamp: 1795240487240
+Número: 5555550123 | Tipo: 2 | Timestamp: 1795240486003
+
+=== MENSAJES SMS ===
+De/Para: +15555550199 | Mensaje: Confirmado: la entrega vence el viernes.
+De/Para: +15555550123 | Mensaje: Hola, este es un SMS de prueba para mi analisis forense.
+&lt;/contenido&gt;
+  &lt;sha256&gt;28a319ae66123922aa70ec8769d140a2cbf1bf39cec6f4a02b9a7356448bf89f&lt;/sha256&gt;
+&lt;/reporteForense&gt;</pre>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>La parte técnica de esta práctica (consultar <code class="inline">ContentResolver</code> y calcular un hash) es sencilla; lo que de verdad exige cuidado es el principio de no alteración: cualquier herramienta forense nativa debe declarar solo los permisos que usa, pedirlos en tiempo de ejecución y no tocar nada fuera de su propio sandbox. El reto real de la práctica terminó siendo generar datos de prueba realistas sin hardware de telefonía: el registro de llamadas se puede sembrar directamente por <code class="inline">content insert</code>, pero el proveedor de SMS de Android solo acepta escritura desde la app con el rol de «SMS por defecto», así que hubo que simular una recepción real con el comando <code class="inline">sms send</code> de la consola del emulador. Con el reporte, su hash SHA-256 y el XML exportado, queda una cadena de evidencia completa y verificable para un solo dispositivo (el propio equipo de pruebas), sin tocar datos de terceros.</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>Análisis Forense con Android</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>Content providers</em> y <em>App-specific storage</em>. developer.android.com/guide/topics/providers/content-provider-basics · developer.android.com/training/data-storage/app-specific</li>
+    <li>Android Developers. <em>Request runtime permissions</em>. developer.android.com/training/permissions/requesting</li>
+  </ul>
+</section>
+</body>
+</html>

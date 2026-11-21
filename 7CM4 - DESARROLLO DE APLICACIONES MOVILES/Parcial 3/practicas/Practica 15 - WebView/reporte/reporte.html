@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Práctica 15 - WebView</title>
+<style>
+  @page { size: letter; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #1a1a1a;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .caratula {
+    height: 225mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    page-break-after: always;
+  }
+  .caratula .escudo { font-size: 15px; letter-spacing: .04em; color: #444; margin-bottom: 4px; }
+  .caratula h1 { font-size: 22px; margin: 2px 0 0; font-weight: 700; }
+  .caratula h2 { font-size: 15px; font-weight: 500; color: #333; margin: 4px 0 40px; }
+  .caratula .tema-box {
+    border: 1.5px solid #333; border-radius: 8px; padding: 22px 30px; max-width: 480px; margin-bottom: 40px;
+  }
+  .caratula .tema-box .etiqueta { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: #666; margin-bottom: 6px; }
+  .caratula .tema-box .tema { font-size: 16px; font-weight: 600; }
+  .caratula table { border-collapse: collapse; font-size: 13px; }
+  .caratula td { padding: 4px 12px; text-align: left; }
+  .caratula td.k { color: #555; text-align: right; font-weight: 600; }
+
+  section { margin-bottom: 22px; }
+  h2.sec {
+    font-size: 15px; text-transform: uppercase; letter-spacing: .05em;
+    border-bottom: 2px solid #333; padding-bottom: 4px; margin: 0 0 12px;
+  }
+  h3 { font-size: 13.5px; margin: 16px 0 6px; }
+  h4 { font-size: 12.5px; margin: 10px 0 4px; }
+  h3, h4 { break-after: avoid; }
+  p { margin: 0 0 8px; text-align: justify; }
+  ul, ol { margin: 4px 0 10px 18px; padding: 0; }
+  li { margin-bottom: 3px; }
+
+  code, pre { font-family: "Consolas", "Courier New", monospace; }
+  code.inline { background: #eee; padding: 1px 4px; border-radius: 3px; }
+
+  .figura-sola { text-align: center; margin: 10px 0; }
+  .figura-sola figure { margin: 0; }
+  .figura-sola img { width: 44%; border: 1px solid #999; border-radius: 6px; }
+  .figura-sola figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .par, .rejilla { display: flex; gap: 14px; justify-content: center; margin: 10px 0; page-break-inside: avoid; }
+  .par figure { margin: 0; text-align: center; width: 36%; }
+  .rejilla figure { margin: 0; text-align: center; width: 30%; }
+  .par img, .rejilla img { width: 100%; border: 1px solid #999; border-radius: 6px; }
+  .par figcaption, .rejilla figcaption { font-size: 10.5px; color: #444; margin-top: 5px; }
+
+  .caso { page-break-inside: avoid; margin-bottom: 16px; border-top: 1px solid #ddd; padding-top: 10px; }
+  .caso h4 { margin-top: 0; }
+
+  .biblio li { margin-bottom: 6px; }
+
+  pre { background:#f5f5f5; border:1px solid #ccc; border-radius:5px; padding:8px 10px; font-size:9.6px; line-height:1.35; white-space:pre-wrap; word-break:break-word; page-break-inside:auto; }
+  .nota { border-left:4px solid #888; background:#f4f4f4; padding:6px 10px; margin:8px 0; font-size:11.5px; }
+  .rejilla { display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin:10px 0; }
+  .rejilla figure { width:30%; }
+  .rejilla.cuatro figure { width:22%; }
+</style>
+</head>
+<body>
+<div class="caratula">
+  <div class="escudo">INSTITUTO POLITÉCNICO NACIONAL</div>
+  <h1>Escuela Superior de Cómputo (ESCOM / UPIIZ)</h1>
+  <h2>Ingeniería en Sistemas Computacionales</h2>
+  <div class="tema-box"><div class="etiqueta">Tema</div><div class="tema">La clase WebView (Java y Jetpack Compose)</div></div>
+  <table>
+    <tr><td class="k">Asignatura:</td><td>Desarrollo de Aplicaciones Móviles Nativas</td></tr>
+    <tr><td class="k">Práctica:</td><td>Práctica 15</td></tr>
+    <tr><td class="k">Alumno:</td><td>Angel Frausto Robles</td></tr>
+    <tr><td class="k">Grupo:</td><td>7CM4</td></tr>
+    <tr><td class="k">Fecha:</td><td>21 de noviembre de 2026</td></tr>
+  </table>
+</div>
+
+<section>
+  <h2 class="sec">Introducción</h2>
+  <p><code class="inline">WebView</code> es un <code class="inline">View</code> de Android que incrusta el motor de renderizado web (WebKit/Chromium) dentro de una <code class="inline">Activity</code>, permitiendo mostrar páginas de Internet o HTML propio sin invocar un navegador aparte. Requiere el permiso <code class="inline">INTERNET</code> y, para interactividad real, habilitar JavaScript en sus <code class="inline">WebSettings</code>. Los puntos de personalización principales son <code class="inline">WebViewClient</code> (controla la navegación y la carga de contenido) y <code class="inline">WebChromeClient</code> (eventos de interfaz, como el progreso de carga).</p>
+  <p>Objetivos:</p>
+  <ul>
+    <li>Construir un navegador propio en Java con botones Atrás / Inicio / Adelante / Ir (Ejemplo).</li>
+    <li>Convertir ese navegador a Jetpack Compose, usando <code class="inline">AndroidView</code> para incrustar el <code class="inline">WebView</code> (Ejercicio 1).</li>
+    <li>Ejecutar la acción de cada botón en un hilo propio con tiempo de espera, para no congestionar la carga (Ejercicio 2).</li>
+  </ul>
+</section>
+
+<section>
+  <h2 class="sec">Desarrollo</h2>
+  <h3>Entorno de trabajo</h3>
+  <p>Un solo proyecto, <em>WebView</em>, con un menú (<code class="inline">MainActivity</code>) que abre las tres pantallas: <code class="inline">EjemploActivity</code> y <code class="inline">Ejercicio2Activity</code> en Java (comparten el layout <code class="inline">activity_navegador.xml</code>), y <code class="inline">WebViewComposeActivity</code> en Kotlin con Compose. Se ejecutó en un emulador Android 16 (API 36) con acceso real a Internet (red NAT del emulador), <code class="inline">minSdk 24</code>, <code class="inline">targetSdk 36</code>.</p>
+  <div class="nota"><strong>Trampa común: edge-to-edge en <code class="inline">targetSdk 36</code>.</strong> La primera versión del layout <code class="inline">activity_navegador.xml</code> no traía <code class="inline">android:fitsSystemWindows="true"</code> en la raíz. A partir de Android 15 las apps con <code class="inline">targetSdk</code> alto se dibujan automáticamente borde a borde: sin ese atributo, la fila de botones Atrás/Inicio/Adelante/Ir quedaba físicamente debajo de la barra de estado del sistema y, aunque se veía en pantalla, los toques no le llegaban a los <code class="inline">Button</code> (se los quedaba la barra de estado). El síntoma era que <code class="inline">wv.loadUrl(...)</code> nunca se ejecutaba y la pantalla se quedaba en blanco. La solución, igual que en <code class="inline">activity_main.xml</code>, es agregar <code class="inline">fitsSystemWindows="true"</code> a la raíz del layout para que el sistema reserve el espacio de la barra de estado.</div>
+
+  <h3>Ejemplo. Navegador básico (Java)</h3>
+  <p>El <code class="inline">WebViewClient</code> intercepta la navegación (<code class="inline">shouldOverrideUrlLoading</code> devuelve <code class="inline">false</code> para que todo se cargue dentro del mismo <code class="inline">WebView</code>) y actualiza el campo de URL cuando la página termina de cargar.</p>
+  <pre>package com.example.webview;
+
+public class EjemploActivity extends Activity implements OnClickListener {
+
+    Button xbn1, xbn2, xbn3, xbn4;
+    WebSettings ws;
+    WebView wv;
+    EditText xet;
+    String s = "https://www.google.com/";
+
+    @Override
+    public void onCreate(Bundle b) {
+        super.onCreate(b);
+        setContentView(R.layout.activity_navegador);
+        xbn1 = (Button) findViewById(R.id.xbn1); xbn1.setOnClickListener(this);
+        xbn2 = (Button) findViewById(R.id.xbn2); xbn2.setOnClickListener(this);
+        xbn3 = (Button) findViewById(R.id.xbn3); xbn3.setOnClickListener(this);
+        xbn4 = (Button) findViewById(R.id.xbn4); xbn4.setOnClickListener(this);
+        xet = (EditText) findViewById(R.id.xet);
+        wv = (WebView) findViewById(R.id.xwv);
+        wv.setWebViewClient(new Cliente());
+        ws = wv.getSettings();
+        ws.setBuiltInZoomControls(true);
+        ws.setJavaScriptEnabled(true);
+        ws.setUseWideViewPort(true);
+    }
+
+    class Cliente extends WebViewClient {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) { return false; }
+        @Override
+        public void onPageFinished(WebView view, String url) { xet.setText(url); }
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (id == R.id.xbn1) wv.goBack();
+        else if (id == R.id.xbn2) wv.loadUrl(s);
+        else if (id == R.id.xbn3) wv.goForward();
+        else if (id == R.id.xbn4) wv.loadUrl(xet.getText() + "");
+    }
+}</pre>
+  <div class="rejilla"><figure><img src="../screenshots/01_menu.png" alt="Menú de la práctica."><figcaption>Fig. 1. Menú de la práctica.</figcaption></figure>
+<figure><img src="../screenshots/02_ejemplo_inicial.png" alt="Ejemplo: pantalla inicial, sin cargar nada todavía."><figcaption>Fig. 2. Ejemplo: pantalla inicial.</figcaption></figure>
+<figure><img src="../screenshots/03_ejemplo_home.png" alt="Botón Inicio: carga https://www.google.com/."><figcaption>Fig. 3. Botón Inicio: Google cargado.</figcaption></figure></div>
+  <div class="rejilla"><figure><img src="../screenshots/04_ejemplo_wikipedia.png" alt="Botón Ir: carga la URL escrita (Wikipedia en español)."><figcaption>Fig. 4. Botón Ir: Wikipedia cargada.</figcaption></figure>
+<figure><img src="../screenshots/05_ejemplo_atras.png" alt="Botón Atrás: regresa a Google."><figcaption>Fig. 5. Botón Atrás: regresa a Google.</figcaption></figure></div>
+  <p><em>Nota sobre el campo de URL:</em> igual que en la guía original, <code class="inline">wv.loadUrl(xet.getText() + "")</code> no agrega un esquema por defecto: si se escribe <code class="inline">example.com</code> sin <code class="inline">https://</code>, el <code class="inline">WebView</code> no resuelve nada (limitación del ejemplo base, no del dispositivo). Por eso las pruebas usan URLs completas, como hace la guía al definir <code class="inline">s = "https://www.google.com/"</code> para el botón Inicio.</p>
+
+  <h3>Ejercicio 1. El mismo navegador en Jetpack Compose</h3>
+  <p>El <code class="inline">WebView</code> se incrusta con <code class="inline">AndroidView</code>, cuyo <code class="inline">factory</code> lo crea y configura una sola vez. El estado de los botones Atrás/Adelante (habilitados o no) vive en <code class="inline">remember { mutableStateOf(...) }</code> y se actualiza en <code class="inline">doUpdateVisitedHistory</code>/<code class="inline">onPageFinished</code> del <code class="inline">WebViewClient</code>. Un <code class="inline">BackHandler</code> intercepta el botón Atrás del sistema para navegar el historial del <code class="inline">WebView</code> en vez de cerrar la Activity.</p>
+  <pre>@Composable
+fun Navegador(modifier: Modifier = Modifier) {
+    var direccion by rememberSaveable { mutableStateOf("") }
+    var navegador by remember { mutableStateOf&lt;WebView?&gt;(null) }
+    var puedeRetroceder by remember { mutableStateOf(false) }
+    var puedeAvanzar by remember { mutableStateOf(false) }
+
+    fun actualizarHistorial(view: WebView) {
+        puedeRetroceder = view.canGoBack()
+        puedeAvanzar = view.canGoForward()
+    }
+
+    BackHandler(enabled = puedeRetroceder) { navegador?.goBack() }
+
+    Column(modifier = modifier) {
+        Row(/* Atrás, Inicio, Adelante, Ir */) { /* ... */ }
+        OutlinedTextField(value = direccion, onValueChange = { direccion = it; error = null }, /* ... */)
+        AndroidView(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            factory = { context -&gt;
+                WebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    webViewClient = object : WebViewClient() {
+                        override fun doUpdateVisitedHistory(view: WebView, url: String?, isReload: Boolean) {
+                            actualizarHistorial(view)
+                        }
+                        override fun onPageFinished(view: WebView, url: String?) {
+                            if (url != null) direccion = url
+                            actualizarHistorial(view)
+                        }
+                    }
+                    navegador = this
+                    loadUrl(PAGINA_INICIO)
+                }
+            },
+            onRelease = { view -&gt; navegador = null; view.stopLoading(); view.destroy() }
+        )
+    }
+}</pre>
+  <p>La función <code class="inline">normalizarUrl()</code> sí valida el esquema (agrega <code class="inline">https://</code> si falta y rechaza direcciones sin host), a diferencia del Ejemplo base en Java; es la diferencia de diseño más visible entre las dos versiones.</p>
+  <div class="rejilla"><figure><img src="../screenshots/09_compose_inicial.png" alt="Compose: carga automática de la página de inicio; Atrás/Adelante deshabilitados."><figcaption>Fig. 6. Compose: estado inicial.</figcaption></figure>
+<figure><img src="../screenshots/10_compose_wikipedia.png" alt="Compose: navegación a Wikipedia; Atrás ya habilitado."><figcaption>Fig. 7. Compose: Wikipedia cargada.</figcaption></figure>
+<figure><img src="../screenshots/11_compose_historial.png" alt="Tras dos pulsaciones del botón Atrás del sistema: de regreso en Google, con Adelante habilitado."><figcaption>Fig. 8. BackHandler: historial del WebView.</figcaption></figure></div>
+
+  <h3>Ejercicio 2. Botones con hilos</h3>
+  <p>La guía pide «asignarle un hilo a la ejecución digitada de cada botón, incluyendo su tiempo de ejecución (o espera) para evitar congestión en el tiempo de carga». Se implementó deshabilitando los cuatro botones, lanzando un <code class="inline">Thread</code> que espera 800&nbsp;ms (tiempo simulado de «espera antes de ejecutar») y, de regreso en el hilo de UI con <code class="inline">runOnUiThread</code>, aplicando la acción real sobre el <code class="inline">WebView</code> y reactivando los botones. El <code class="inline">WebView</code> no es thread-safe, así que la navegación en sí siempre ocurre en el hilo principal; lo que corre en el hilo secundario es solamente la espera.</p>
+  <pre>private void ejecutarConHilo(Runnable accionSobreWebView) {
+    setBotonesHabilitados(false);
+    final long inicio = System.currentTimeMillis();
+    new Thread(() -&gt; {
+        try { Thread.sleep(ESPERA_MS); } catch (InterruptedException ignored) {}
+        final long transcurrido = System.currentTimeMillis() - inicio;
+        runOnUiThread(() -&gt; {
+            accionSobreWebView.run();
+            setBotonesHabilitados(true);
+            Toast.makeText(this, "Hilo ejecutado tras " + transcurrido + " ms", Toast.LENGTH_SHORT).show();
+        });
+    }).start();
+}</pre>
+  <div class="rejilla"><figure><img src="../screenshots/06_ejercicio2_hilo_espera.png" alt="Justo tras pulsar Inicio: los cuatro botones se deshabilitan mientras el hilo espera."><figcaption>Fig. 9. Hilo en espera: botones deshabilitados.</figcaption></figure>
+<figure><img src="../screenshots/07_ejercicio2_botones_deshabilitados.png" alt="Mismo instante, acercamiento a la fila de botones en gris."><figcaption>Fig. 10. Botones Atrás/Inicio/Adelante/Ir en gris.</figcaption></figure>
+<figure><img src="../screenshots/08_ejercicio2_reactivado.png" alt="Pasados los 800 ms: el hilo terminó, la página cargó y los botones se reactivaron."><figcaption>Fig. 11. Hilo terminado: botones reactivados.</figcaption></figure></div>
+</section>
+
+<section>
+  <h2 class="sec">Conclusiones</h2>
+  <p>El <code class="inline">WebView</code> resultó sencillo de integrar tanto en vistas XML clásicas como en Compose, donde <code class="inline">AndroidView</code> permite reutilizar directamente la API de Android sin reescribirla. La parte menos evidente de la práctica no fue el código del propio <code class="inline">WebView</code>, sino un error de layout: con <code class="inline">targetSdk</code> 36 el sistema fuerza el dibujo borde a borde, y sin <code class="inline">fitsSystemWindows</code> los botones quedaban visualmente en pantalla pero inalcanzables al tacto porque la barra de estado absorbía los toques. Sobre los hilos, quedó claro que «ejecutar la acción en un hilo» solo puede referirse al tiempo de espera: cualquier llamada directa al <code class="inline">WebView</code> fuera del hilo de UI lanza una excepción, así que el hilo secundario únicamente retrasa la orden y la propia navegación se delega de vuelta a <code class="inline">runOnUiThread</code>.</p>
+</section>
+
+<section>
+  <h2 class="sec">Bibliografía</h2>
+  <ul class="biblio">
+    <li>Cifuentes A., Alejandro S. <em>La Clase WebView</em>. Material de la asignatura Desarrollo de Aplicaciones Móviles Nativas, IPN-ESCOM/UPIIZ.</li>
+    <li>Android Developers. <em>Build web apps in WebView</em> y <em>Compose interop with views (AndroidView)</em>. developer.android.com/develop/ui/views/layout/webapps · developer.android.com/develop/ui/compose/migrate/interoperability-apis/views-in-compose</li>
+    <li>Android Developers. <em>Edge to edge</em>. developer.android.com/develop/ui/views/layout/edge-to-edge</li>
+  </ul>
+</section>
+</body>
+</html>

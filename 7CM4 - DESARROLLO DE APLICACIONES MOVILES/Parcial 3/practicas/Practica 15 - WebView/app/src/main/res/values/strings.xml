@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WebView</string>
+    <string name="nombre_alumno">Angel Frausto Robles - 7CM4</string>
+    <string name="ejemplo">Ejemplo (Java)</string>
+    <string name="ejercicio1">Ejercicio 1 (Compose)</string>
+    <string name="ejercicio2">Ejercicio 2 (Java, con hilos)</string>
+
+    <!-- Navegador -->
+    <string name="back">Atrás</string>
+    <string name="home">Inicio</string>
+    <string name="forward">Adelante</string>
+    <string name="go">Ir</string>
+    <string name="internet">URL:</string>
+    <string name="url">URL</string>
+    <string name="opcion">Opciones</string>
+    <string name="url_hint">Escribe una URL</string>
+    <string name="url_error">Escribe una dirección HTTP o HTTPS válida</string>
+</resources>
